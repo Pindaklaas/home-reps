@@ -151,6 +151,7 @@ legend{font-size:13px;font-weight:600;margin-bottom:6px}
 .scrim{position:fixed;inset:0;background:rgba(10,12,16,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center}
 .sheet{background:var(--surface);width:100%;max-width:540px;max-height:86%;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;animation:up .2s ease-out}
 @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+.sheet .demo{width:100%;max-height:52vh;object-fit:contain;border-radius:12px;background:var(--bg);display:block}
 .sheet ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 .sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--line);align-self:center}
 .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
@@ -356,6 +357,9 @@ const EX_RAW = [
 ];
 const EX = {};
 EX_RAW.forEach(([id,name,groups,equip,level,dose,unit,steps]) => EX[id] = {id,name,groups,equip,level,dose,unit,steps});
+// Demo videos shown on the "How to" sheet, keyed by exercise id
+// (each has an .mp4 and a .webm copy in videos/)
+const VIDEOS = {'backpack-curl':'videos/backpack-curl'};
 const exFor = g => EX_RAW.map(r => EX[r[0]]).filter(e => e.groups.includes(g))
   .sort((a,b) => (a.groups[0]===g?0:1)-(b.groups[0]===g?0:1) || a.level-b.level);
 
@@ -464,6 +468,7 @@ function infoSheet(id){
   openSheet(`<h2>${esc(e.name)}</h2>
     <div class="row small muted"><b style="color:var(--ink)">${doseText(e.dose,e.unit)}</b> per set · ${esc(e.equip)} · ${lvlBars(e.level)}</div>
     <div class="row">${e.groups.map(g=>`<span class="tag small">${GROUPS[g].label}</span>`).join('')}</div>
+    ${VIDEOS[id] ? `<video class="demo" controls playsinline muted loop autoplay preload="metadata"><source src="${VIDEOS[id]}.mp4" type="video/mp4"><source src="${VIDEOS[id]}.webm" type="video/webm"></video>` : ''}
     <ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
     <div class="row" style="margin-top:4px"><button class="btn primary" data-add="${e.id}">+ Add to schedule</button><button class="btn ghost" data-close="1">Close</button></div>`);
 }
