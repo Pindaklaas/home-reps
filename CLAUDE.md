@@ -7,3 +7,9 @@
 - Colors are CSS variables on `:root` with dark-mode overrides; use the tokens, not literal colors.
 - State is saved in `localStorage` under the `homereps.` prefix (profile, schedule, done, tab). Keep old keys readable when changing data shapes.
 - Test changes at phone width (about 400px) in light and dark mode.
+
+## How changes go live
+
+- Juul (the owner) wants changes live without merge steps: commit and push straight to `main`. Do not create a separate branch or pull request unless the person asks for one.
+- Before pushing, pull the latest `main` (`git pull origin main`) so you don't undo a change someone else just made, and test the page at phone width.
+- `main` is what the website (pindaklaas.github.io/home-reps) shows, so only push changes that work.
