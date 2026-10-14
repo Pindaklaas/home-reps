@@ -51,8 +51,10 @@ p{margin:0}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 
 /* body figure */
-.figure-wrap{display:grid;grid-template-columns:1fr;justify-items:center;position:relative;margin-top:6px}
-svg.body{width:min(100%,250px);height:auto;display:block;touch-action:manipulation}
+.figure-wrap{position:relative;margin-top:4px}
+#figure{display:flex;justify-content:center;width:100%}
+/* Size the figure by the screen height so head to feet always fits above the tab bar */
+svg.body{height:clamp(240px,calc(100vh - 290px),520px);height:clamp(240px,calc(100dvh - 290px),520px);width:auto;max-width:100%;display:block;touch-action:manipulation}
 svg.body .skin{fill:var(--skin)}
 svg.body .m{fill:var(--muscle);stroke:var(--bg);stroke-width:1.2;cursor:pointer;transition:fill .15s}
 svg.body .m:hover{fill:var(--muscle-hover)}
@@ -60,8 +62,8 @@ svg.body .m.on{fill:var(--accent)}
 svg.body .m:focus{outline:none}
 svg.body .m:focus-visible{stroke:var(--ink);stroke-width:2}
 svg.body .detail{stroke:var(--bg);stroke-width:1.2;fill:none;pointer-events:none}
-.figure-hint{position:absolute;left:0;top:4px;font-size:12px;color:var(--muted);max-width:110px}
-.side-tag{position:absolute;right:0;top:4px;font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-size:14px}
+.figure-hint{font-size:13px;color:var(--muted);margin-top:6px}
+.side-tag{position:absolute;right:0;top:0;font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-size:14px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -187,8 +189,8 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
         <button id="side-back" aria-pressed="false">Back</button>
       </div>
     </div>
+    <p class="figure-hint">Tap a muscle to see exercises you can do at home.</p>
     <div class="figure-wrap">
-      <p class="figure-hint">Tap a muscle to see exercises you can do at home.</p>
       <span class="side-tag" id="side-tag">Front</span>
       <div id="figure"></div>
     </div>
@@ -422,7 +424,7 @@ function drawFigure(){
     ? '<path class="detail" d="M88,140 H112 M88,160 H112 M88,180 H112 M100,120 V202"/>'
     : '<path class="detail" d="M100,124 V200"/>';
   document.getElementById('figure').innerHTML =
-    `<svg class="body" viewBox="0 0 200 430" role="group" aria-label="${ui.side} of body">
+    `<svg class="body" viewBox="26 8 148 418" role="group" aria-label="${ui.side} of body">
       <ellipse class="skin" cx="100" cy="34" rx="16" ry="21"/>
       <path class="skin" d="${SIL}"/><path class="skin" d="${SIL}" transform="${MIRROR}"/>
       ${m}${detail}
