@@ -51,8 +51,10 @@ p{margin:0}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 
 /* body figure */
-.figure-wrap{display:grid;grid-template-columns:1fr;justify-items:center;position:relative;margin-top:6px}
-svg.body{width:min(100%,250px);height:auto;display:block;touch-action:manipulation}
+.figure-wrap{position:relative;margin-top:4px}
+#figure{display:flex;justify-content:center;width:100%}
+/* Size the figure by the screen height so head to feet always fits above the tab bar */
+svg.body{height:clamp(240px,calc(100vh - 290px),520px);height:clamp(240px,calc(100dvh - 290px),520px);width:auto;max-width:100%;display:block;touch-action:manipulation}
 svg.body .skin{fill:var(--skin)}
 svg.body .m{fill:var(--muscle);stroke:var(--bg);stroke-width:1.2;cursor:pointer;transition:fill .15s}
 svg.body .m:hover{fill:var(--muscle-hover)}
@@ -60,8 +62,8 @@ svg.body .m.on{fill:var(--accent)}
 svg.body .m:focus{outline:none}
 svg.body .m:focus-visible{stroke:var(--ink);stroke-width:2}
 svg.body .detail{stroke:var(--bg);stroke-width:1.2;fill:none;pointer-events:none}
-.figure-hint{position:absolute;left:0;top:4px;font-size:12px;color:var(--muted);max-width:110px}
-.side-tag{position:absolute;right:0;top:4px;font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-size:14px}
+.figure-hint{font-size:13px;color:var(--muted);margin-top:6px}
+.side-tag{position:absolute;right:0;top:0;font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-size:14px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
@@ -151,6 +153,7 @@ legend{font-size:13px;font-weight:600;margin-bottom:6px}
 .scrim{position:fixed;inset:0;background:rgba(10,12,16,.45);z-index:40;display:flex;align-items:flex-end;justify-content:center}
 .sheet{background:var(--surface);width:100%;max-width:540px;max-height:86%;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;animation:up .2s ease-out}
 @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+.sheet .demo{width:100%;max-height:52vh;object-fit:contain;border-radius:12px;background:var(--bg);display:block}
 .sheet ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 .sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--line);align-self:center}
 .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
@@ -186,8 +189,8 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
         <button id="side-back" aria-pressed="false">Back</button>
       </div>
     </div>
+    <p class="figure-hint">Tap a muscle to see exercises you can do at home.</p>
     <div class="figure-wrap">
-      <p class="figure-hint">Tap a muscle to see exercises you can do at home.</p>
       <span class="side-tag" id="side-tag">Front</span>
       <div id="figure"></div>
     </div>
@@ -380,6 +383,10 @@ const STRETCH = {};
 STRETCH_RAW.forEach(([id,name,groups,hold,steps]) => STRETCH[id] = {id,name,groups,hold,steps});
 const stretchesFor = gs => STRETCH_RAW.map(r => STRETCH[r[0]]).filter(s => s.groups.some(g => gs.includes(g)))
   .sort((a,b) => gs.indexOf(a.groups.find(g=>gs.includes(g))) - gs.indexOf(b.groups.find(g=>gs.includes(g))));
+
+// Demo videos shown on the "How to" sheet, keyed by exercise id
+// (each has an .mp4 and a .webm copy in videos/)
+const VIDEOS = {'backpack-curl':'videos/backpack-curl'};
 const exFor = g => EX_RAW.map(r => EX[r[0]]).filter(e => e.groups.includes(g))
   .sort((a,b) => (a.groups[0]===g?0:1)-(b.groups[0]===g?0:1) || a.level-b.level);
 
@@ -442,7 +449,7 @@ function drawFigure(){
     ? '<path class="detail" d="M88,140 H112 M88,160 H112 M88,180 H112 M100,120 V202"/>'
     : '<path class="detail" d="M100,124 V200"/>';
   document.getElementById('figure').innerHTML =
-    `<svg class="body" viewBox="0 0 200 430" role="group" aria-label="${ui.side} of body">
+    `<svg class="body" viewBox="26 8 148 418" role="group" aria-label="${ui.side} of body">
       <ellipse class="skin" cx="100" cy="34" rx="16" ry="21"/>
       <path class="skin" d="${SIL}"/><path class="skin" d="${SIL}" transform="${MIRROR}"/>
       ${m}${detail}
@@ -489,6 +496,7 @@ function infoSheet(id){
   openSheet(`<h2>${esc(e.name)}</h2>
     <div class="row small muted"><b style="color:var(--ink)">${doseText(e.dose,e.unit)}</b> per set · ${esc(e.equip)} · ${lvlBars(e.level)}</div>
     <div class="row">${e.groups.map(g=>`<span class="tag small">${GROUPS[g].label}</span>`).join('')}</div>
+    ${VIDEOS[id] ? `<video class="demo" controls playsinline muted loop autoplay preload="metadata"><source src="${VIDEOS[id]}.mp4" type="video/mp4"><source src="${VIDEOS[id]}.webm" type="video/webm"></video>` : ''}
     <ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
     <div class="row" style="margin-top:4px"><button class="btn primary" data-add="${e.id}">+ Add to schedule</button><button class="btn" data-stretch="${e.id}">Stretch</button><button class="btn ghost" data-close="1">Close</button></div>`);
 }
