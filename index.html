@@ -139,6 +139,13 @@ legend{font-size:13px;font-weight:600;margin-bottom:6px}
 .week-strip .dot.has{background:var(--accent)}
 .week-strip button[aria-pressed="true"] .dot.has{background:var(--accent-ink)}
 
+/* recipes */
+.recipe{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.recipe video{display:block;width:100%;max-height:min(60vh,480px);object-fit:cover;background:var(--skin)}
+.recipe .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px}
+.recipe .t{font-weight:700;font-size:16px}
+.recipe ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+
 /* schedule */
 .sched-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
 .sched-item .name{font-weight:700}
@@ -159,7 +166,7 @@ legend{font-size:13px;font-weight:600;margin-bottom:6px}
 
 /* tab bar */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
-nav.tabs .in{max-width:540px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+nav.tabs .in{max-width:540px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
 nav.tabs button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:10px;color:var(--muted);font-size:11.5px;font-weight:600}
 nav.tabs button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 nav.tabs button[aria-selected="true"]{color:var(--accent)}
@@ -254,6 +261,13 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
     </form>
   </section>
 
+  <!-- RECIPES -->
+  <section class="view" id="v-recipes" hidden>
+    <h2>Recipes</h2>
+    <p class="muted small" style="margin-top:4px">Quick home meals to go with your training, sorted by what they are best for.</p>
+    <div id="recipes-content" class="stack" style="margin-top:4px"></div>
+  </section>
+
   <!-- SCHEDULE -->
   <section class="view" id="v-sched" hidden>
     <div class="row" style="justify-content:space-between">
@@ -270,6 +284,7 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
     <button role="tab" data-tab="body" id="t-body" aria-selected="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2.2"/><path d="M5 8.5h14M12 8.5v6M12 14.5l-3.5 7M12 14.5l3.5 7"/></svg>Body</button>
     <button role="tab" data-tab="today" id="t-today" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/></svg>Today</button>
     <button role="tab" data-tab="food" id="t-food" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2.5 1.5-3.5 4-3.5 8h3.5"/></svg>Food</button>
+    <button role="tab" data-tab="recipes" id="t-recipes" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="10" cy="13" r="7"/><circle cx="10" cy="13" r="2.5"/><path d="M16 9l5-5"/></svg>Recipes</button>
     <button role="tab" data-tab="sched" id="t-sched" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>Schedule</button>
   </div>
 </nav>
@@ -613,6 +628,25 @@ const MEALS = [
   ['snack','Edamame beans','vegan',190,17,'150 g edamame, sea salt'],
   ['snack','Rice cakes with peanut butter','vegan',230,8,'2 rice cakes, 1 tbsp peanut butter']
 ];
+/* ---------- recipes: [category, name, kcal, protein, video (path without .mp4/.webm), poster, ingredients, steps] ---------- */
+const RECIPE_CATS = {protein:'Protein'};
+const RECIPES = [
+  ['protein','Fried eggs on toast',380,21,'media/eggs','media/eggs.jpg','2 eggs, 2 slices wholegrain bread, 1 tsp oil or butter',
+    ['Heat a little oil or butter in a pan over medium heat.','Crack in the eggs and add the bread next to them to toast in the pan.','Fry for 3 to 4 minutes until the whites are set and the yolks still soft.','Season with salt and pepper and serve the eggs on the toast.']]
+];
+function drawRecipes(){
+  document.getElementById('recipes-content').innerHTML = Object.entries(RECIPE_CATS).map(([c,label]) => {
+    const list = RECIPES.filter(r => r[0]===c);
+    return `<h3>${label}</h3><div class="list">${list.map(([,name,kcal,prot,video,poster,ingr,steps]) => `<article class="recipe">
+      <video poster="${poster}" muted loop playsinline autoplay controls preload="metadata" aria-label="${esc(name)} video">
+        <source src="${video}.mp4" type="video/mp4"><source src="${video}.webm" type="video/webm"></video>
+      <div class="body"><span class="t">${esc(name)}</span>
+        <span class="small muted">≈ ${kcal} kcal · <b style="color:var(--ink)">${prot} g protein</b></span>
+        <span class="small">${esc(ingr)}</span>
+        <ol>${steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>
+    </article>`).join('')}</div>`;
+  }).join('');
+}
 function targets(p){
   const w=+p.weight, h=+p.height, a=+p.age;
   const bmr = 10*w + 6.25*h - 5*a + (p.sex==='m'?5:-161);
@@ -696,7 +730,7 @@ function sampleWeek(){
 /* ---------- render + events ---------- */
 function setTab(t){
   ui.tab = t; store.set('tab', t);
-  ['body','today','food','sched'].forEach(k => {
+  ['body','today','food','recipes','sched'].forEach(k => {
     document.getElementById('v-'+k).hidden = k!==t;
     document.getElementById('t-'+k).setAttribute('aria-selected', k===t);
   });
@@ -706,6 +740,7 @@ function render(){
   if (ui.tab==='body'){ drawFigure(); drawGroupDetail(); }
   if (ui.tab==='today') drawToday();
   if (ui.tab==='food') drawFood();
+  if (ui.tab==='recipes') drawRecipes();
   if (ui.tab==='sched') drawSchedule();
 }
 
@@ -760,7 +795,7 @@ document.getElementById('qform').addEventListener('submit', ev => {
 
 document.getElementById('today-date').textContent = new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});
 fillForm();
-setTab(['body','today','food','sched'].includes(ui.tab) ? ui.tab : 'body');
+setTab(['body','today','food','recipes','sched'].includes(ui.tab) ? ui.tab : 'body');
 </script>
 </body>
 </html>
