@@ -146,6 +146,29 @@ legend{font-size:13px;font-weight:600;margin-bottom:6px}
 .recipe .t{font-weight:700;font-size:16px}
 .recipe ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:14px}
 
+/* welcome survey */
+#onboard{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto}
+#onboard .in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+#onboard .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#onboard .bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+#onboard .bar span{display:block;height:100%;background:var(--accent);transition:width .25s}
+#onboard .count{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+#onboard h2{font-size:30px}
+#onboard .hero{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px}
+#onboard .hero .brand{font-size:44px}
+.sv-opts{display:flex;flex-direction:column;gap:8px}
+.sv-opt{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:14px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:10px}
+.sv-opt::before{content:"";width:18px;height:18px;flex:none;border:2px solid var(--line);border-radius:50%}
+.sv-opt.multi::before{border-radius:5px}
+.sv-opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.sv-opt[aria-pressed="true"]::before{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--surface)}
+#onboard .foot{margin-top:auto;display:flex;gap:8px;padding-top:6px}
+#onboard .foot .btn{flex:1;padding:13px}
+#onboard .foot .btn[disabled]{opacity:.45;cursor:default}
+.sv-sum{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.sv-sum dt{color:var(--muted)}
+.sv-sum dd{margin:0;font-weight:600}
+
 /* schedule */
 .sched-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
 .sched-item .name{font-weight:700}
@@ -259,6 +282,7 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
       </label>
       <button class="btn primary wide full" type="submit">Save and update my plan</button>
     </form>
+    <p class="small muted" style="margin-top:14px;text-align:center"><button class="btn sm ghost" id="survey-again">Take the welcome survey again</button></p>
   </section>
 
   <!-- RECIPES -->
@@ -289,6 +313,7 @@ nav.tabs button[aria-selected="true"]{color:var(--accent)}
   </div>
 </nav>
 
+<div id="onboard" role="dialog" aria-modal="true" aria-label="Welcome survey" hidden></div>
 <div id="sheet-root"></div>
 <div id="toast-root" aria-live="polite"></div>
 
@@ -727,6 +752,69 @@ function sampleWeek(){
   store.set('schedule', schedule); render(); toast('Sample week loaded. Edit it any way you like.');
 }
 
+/* ---------- welcome survey (shown on first open; answers stay on this device) ---------- */
+const SURVEY = [
+  {id:'age', label:'Age', q:'How old are you?', opts:['Under 18','18–24','25–34','35–44','45–54','55 or older']},
+  {id:'gender', label:'Gender', q:'How do you describe yourself?', opts:['Woman','Man','Another way','Prefer not to say']},
+  {id:'goal', label:'Goal', q:'What is your main goal?', opts:['Lose fat','Build muscle','Tone and stay in shape','Better fitness and stamina','Move better, less pain']},
+  {id:'level', label:'Training now', q:'How much do you train right now?', opts:['Not at all, I am just starting','Now and then','Regularly, for over a year','A lot, I am advanced']},
+  {id:'where', label:'Trains', q:'Where do you usually work out?', opts:['At home, no equipment','At home with some equipment','At the gym and at home','Outdoors']},
+  {id:'days', label:'Days a week', q:'How many days a week can you train?', opts:['1 or 2','3 or 4','5 or more']},
+  {id:'time', label:'Workout length', q:'How long can a workout be?', opts:['10–15 min','20–30 min','30–45 min','More than 45 min']},
+  {id:'want', label:'Would use', q:'What would you use most?', hint:'Pick all that apply.', multi:true, opts:['Exercises by muscle','A plan for each day','Stretching','Meal plan','Recipe videos','Tracking my progress']}
+];
+let sv = null;
+function openSurvey(){
+  const prev = store.get('survey', null);
+  sv = {i:-1, a: prev && prev.answers ? JSON.parse(JSON.stringify(prev.answers)) : {}};
+  document.getElementById('onboard').hidden = false; document.body.style.overflow = 'hidden';
+  drawSurvey();
+}
+function closeSurvey(skipped){
+  if (skipped) store.set('survey', {v:1, at:new Date().toISOString(), skipped:true, answers:sv.a});
+  document.getElementById('onboard').hidden = true; document.body.style.overflow = ''; sv = null;
+}
+function drawSurvey(){
+  const el = document.getElementById('onboard'), n = SURVEY.length;
+  let h;
+  if (sv.i < 0){
+    h = `<div class="hero"><div class="brand">Home<span>Reps</span></div>
+      <h2>Help us build the right app for you</h2>
+      <p class="muted">${n} quick questions, about one minute. Your answers stay on this device.</p></div>
+      <div class="foot"><button class="btn ghost" data-sv="skip">Not now</button><button class="btn primary" data-sv="next">Start</button></div>`;
+  } else if (sv.i >= n){
+    h = `<div class="hero"><h2>Thanks!</h2><p class="muted">This is what you told us:</p>
+      <dl class="sv-sum">${SURVEY.map(q=>{ const v = sv.a[q.id]; const t = Array.isArray(v) ? v.join(', ') : v;
+        return `<dt>${q.label}</dt><dd>${t ? esc(t) : '<span class="muted">Skipped</span>'}</dd>`; }).join('')}</dl></div>
+      <div class="foot"><button class="btn ghost" data-sv="back">Back</button><button class="btn primary" data-sv="done">Start training</button></div>`;
+  } else {
+    const q = SURVEY[sv.i], v = sv.a[q.id], on = o => q.multi ? (v||[]).includes(o) : v===o;
+    const answered = q.multi ? (v||[]).length > 0 : !!v;
+    h = `<div class="top"><span class="bar" aria-hidden="true"><span style="width:${(sv.i+1)/n*100}%"></span></span>
+        <span class="count">${sv.i+1} of ${n}</span><button class="btn sm ghost" data-sv="skip">Skip</button></div>
+      <h2>${esc(q.q)}</h2>${q.hint?`<p class="muted small" style="margin-top:-6px">${q.hint}</p>`:''}
+      <div class="sv-opts" role="${q.multi?'group':'radiogroup'}" aria-label="${esc(q.q)}">${q.opts.map((o,j)=>
+        `<button class="sv-opt${q.multi?' multi':''}" data-svopt="${j}" aria-pressed="${on(o)}">${esc(o)}</button>`).join('')}</div>
+      <div class="foot"><button class="btn ghost" data-sv="back">Back</button><button class="btn primary" data-sv="next" ${answered?'':'disabled'}>${sv.i===n-1?'Finish':'Next'}</button></div>`;
+  }
+  el.innerHTML = `<div class="in">${h}</div>`;
+  el.scrollTop = 0;
+}
+document.getElementById('onboard').addEventListener('click', ev => {
+  const t = ev.target.closest('[data-sv],[data-svopt]'); if (!t || t.disabled) return;
+  if (t.dataset.svopt){
+    const q = SURVEY[sv.i], o = q.opts[+t.dataset.svopt];
+    if (q.multi){ const s = new Set(sv.a[q.id]||[]); s.has(o) ? s.delete(o) : s.add(o); sv.a[q.id] = q.opts.filter(x=>s.has(x)); drawSurvey(); }
+    else { sv.a[q.id] = o; drawSurvey(); setTimeout(()=>{ if (sv && SURVEY[sv.i]===q){ sv.i++; drawSurvey(); } }, 220); }
+    return;
+  }
+  const a = t.dataset.sv;
+  if (a==='next'){ sv.i++; return drawSurvey(); }
+  if (a==='back'){ sv.i = Math.max(-1, sv.i-1); return drawSurvey(); }
+  if (a==='skip') return closeSurvey(true);
+  if (a==='done'){ store.set('survey', {v:1, at:new Date().toISOString(), answers:sv.a}); closeSurvey(false); toast('Thanks! Your answers are saved.'); }
+});
+
 /* ---------- render + events ---------- */
 function setTab(t){
   ui.tab = t; store.set('tab', t);
@@ -745,7 +833,7 @@ function render(){
 }
 
 document.addEventListener('click', ev => {
-  const t = ev.target.closest('[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,#clear-sched,#side-front,#side-back');
+  const t = ev.target.closest('[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,#survey-again,#clear-sched,#side-front,#side-back');
   if (!t) return;
   if (t.dataset.close && ev.target!==t && t.classList.contains('scrim')) return;
   if (t.dataset.tab) return setTab(t.dataset.tab);
@@ -761,6 +849,7 @@ document.addEventListener('click', ev => {
   if (t.dataset.pickday){ ui.day = t.dataset.pickday; return drawToday(); }
   if (t.dataset.goto) return setTab(t.dataset.goto);
   if (t.id==='sample-week') return sampleWeek();
+  if (t.id==='survey-again') return openSurvey();
   if (t.id==='clear-sched'){
     if (t.dataset.armed){ schedule = Object.fromEntries(DAYS.map(d=>[d,[]])); store.set('schedule',schedule); delete t.dataset.armed; t.textContent='Clear week'; render(); return toast('Week cleared'); }
     t.dataset.armed='1'; t.textContent='Tap again to clear'; setTimeout(()=>{ delete t.dataset.armed; t.textContent='Clear week'; }, 3000); return;
@@ -774,7 +863,7 @@ document.addEventListener('click', ev => {
   if (t.dataset.del){ const [d,i] = t.dataset.del.split('|'); const name = EX[schedule[d][+i].id].name; schedule[d].splice(+i,1); store.set('schedule',schedule); drawSchedule(); return toast(`${name} removed`); }
 });
 document.addEventListener('keydown', ev => {
-  if (ev.key==='Escape') closeSheet();
+  if (ev.key==='Escape'){ if (sv) return closeSurvey(true); closeSheet(); }
   if ((ev.key==='Enter'||ev.key===' ') && ev.target.matches('path.m')){ ev.preventDefault(); selectGroup(ev.target.dataset.g); }
 });
 document.addEventListener('change', ev => {
@@ -796,6 +885,7 @@ document.getElementById('qform').addEventListener('submit', ev => {
 document.getElementById('today-date').textContent = new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});
 fillForm();
 setTab(['body','today','food','recipes','sched'].includes(ui.tab) ? ui.tab : 'body');
+if (!store.get('survey', null) || /[?#&]survey\b/.test(location.search + location.hash)) openSurvey();
 </script>
 </body>
 </html>
