@@ -52,7 +52,7 @@ p{margin:0}
 
 /* body figure */
 .figure-wrap{display:grid;grid-template-columns:1fr;justify-items:center;position:relative;margin-top:6px}
-svg.body{width:min(100%,250px);height:auto;display:block;touch-action:manipulation}
+svg.body{width:auto;max-width:min(100%,250px);height:clamp(260px,calc(100vh - 330px),538px);height:clamp(260px,calc(100svh - 330px),538px);display:block;touch-action:manipulation}
 svg.body .skin{fill:var(--skin)}
 svg.body .m{fill:var(--muscle);stroke:var(--bg);stroke-width:1.2;cursor:pointer;transition:fill .15s}
 svg.body .m:hover{fill:var(--muscle-hover)}
@@ -64,6 +64,7 @@ svg.body .detail{stroke:var(--bg);stroke-width:1.2;fill:none;pointer-events:none
 .side-tag{position:absolute;right:0;top:4px;font-family:var(--display);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-size:14px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+@media (max-width:420px){.chips{gap:5px}.chip{padding:5px 10px;font-size:12.5px}.figure-hint{max-width:84px;font-size:11.5px}}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 
 /* exercise cards */
