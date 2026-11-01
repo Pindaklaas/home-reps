@@ -5,4 +5,5 @@
 - Muscle shapes are SVG paths in `FRONT_PATHS` / `BACK_PATHS` (viewBox 200x430). Paths marked `1` are mirrored to the other side.
 - Colors are CSS variables on `:root` with dark-mode overrides; use the tokens, not literal colors.
 - State is saved in `localStorage` under the `homereps.` prefix (profile, schedule, done, tab, survey). Keep old keys readable when changing data shapes.
+- Motion uses the `--spring` / `--out` easing tokens; JS checks `RM()` and CSS has a reduced-motion rule, so keep both working when adding animation.
 - Test changes at phone width (about 400px) in light and dark mode.
