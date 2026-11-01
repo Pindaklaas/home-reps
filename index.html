@@ -172,6 +172,38 @@ legend{font-size:13px;font-weight:600;margin-bottom:6px}
 .sv-sum dt{color:var(--muted)}
 .sv-sum dd{margin:0;font-weight:600}
 
+/* flows: onboarding and plan builder */
+.sv-opt small{display:block;font-weight:500;color:var(--muted);font-size:12.5px;margin-top:2px}
+.ob-field{display:flex;flex-direction:column;gap:6px;font-size:13.5px;font-weight:600;min-width:0}
+.ob-field input,.ob-field select,.ob-field textarea{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px;font-weight:500;width:100%;min-width:0;font-size:16px}
+.ob-field textarea{resize:vertical}
+.ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ob-grid .full{grid-column:1/-1}
+.yn{display:flex;flex-direction:column;gap:8px}
+.yn-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 12px 12px 14px}
+.yn-row p{font-size:14.5px}
+.yn-pills{display:flex;gap:6px}
+.yn-pills button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:7px 14px;font-weight:700;font-size:13.5px}
+.yn-pills button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.consent{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:600;font-size:14.5px;cursor:pointer}
+.consent input{width:24px;height:24px;accent-color:var(--accent);flex:none;margin:0}
+.note{background:var(--accent-soft);border-radius:12px;padding:12px 14px;font-size:14px}
+.tapper{width:min(60vw,210px);aspect-ratio:1;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:72px;font-weight:700;line-height:1;align-self:center;box-shadow:0 12px 30px -12px var(--accent);transition:transform .1s var(--out),background-color .3s;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.tapper:active{transform:scale(.93)}
+.tapper small{display:block;font-family:var(--text);font-size:14px;font-weight:600;opacity:.85}
+.tapper.done{background:var(--good);box-shadow:0 12px 30px -12px var(--good);animation:pop .45s var(--spring)}
+.gen{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;flex:1;justify-content:center}
+.spin{width:54px;height:54px;border-radius:50%;border:5px solid var(--line);border-top-color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.why{font-style:italic;font-size:14px;opacity:.9}
+.why-big{font-family:var(--display);font-size:26px;line-height:1.15;font-weight:600}
+.cta-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.cta-card b{display:block}
+.badge{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:700;background:var(--accent-soft);color:var(--ink)}
+.badge.ok{background:var(--good-soft)}
+.plan-day{display:flex;flex-direction:column;gap:6px}
+.linkish{border:0;background:none;color:var(--muted);text-decoration:underline;font-size:13.5px;padding:6px;align-self:center}
+
 /* schedule */
 .sched-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
 .sched-item .name{font-weight:700}
@@ -390,7 +422,12 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
       </label>
       <button class="btn primary wide full" type="submit">Save and update my plan</button>
     </form>
-    <p class="small muted" style="margin-top:14px;text-align:center"><button class="btn sm ghost" id="survey-again">Take the welcome survey again</button></p>
+    <h3>Your setup and data</h3>
+    <div class="panel stack small">
+      <p class="muted">In this prototype everything you enter stays on this device.</p>
+      <div class="row"><button class="btn sm" data-flow="plan">Build my plan</button><button class="btn sm" id="redo-setup">Redo setup</button></div>
+      <div class="row"><button class="btn sm ghost" id="del-health">Delete my health answers</button><button class="btn sm ghost" id="del-all">Delete all my data</button></div>
+    </div>
   </section>
 
   <!-- RECIPES -->
@@ -434,7 +471,8 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 /* ---------- storage ---------- */
 const store = {
   get(k, d){ try{ const v = localStorage.getItem('homereps.'+k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
-  set(k, v){ try{ localStorage.setItem('homereps.'+k, JSON.stringify(v)); }catch(e){} }
+  set(k, v){ try{ localStorage.setItem('homereps.'+k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem('homereps.'+k); }catch(e){} }
 };
 
 /* ---------- muscle groups ---------- */
@@ -712,16 +750,29 @@ const PLAN = {
   sun:{title:'Rest and mobility',focus:[],note:'Let your muscles recover. A walk and gentle stretching.'}
 };
 const STRETCHES = [['Cat-cow','10 slow rounds'],['Hip flexor stretch','45 sec each side'],['Hamstring stretch','45 sec each side'],['Chest doorway stretch','30 sec each side'],["Child's pose",'60 sec'],['Easy walk','20–30 min']];
-const P_ = () => profile || EXAMPLE_PROFILE;
+const LEVEL_MAP = {start:1, some:1, regular:2, advanced:3};
+const GOAL_FOR_FOOD = {lose:'lose', gain:'gain', tone:'tone', endure:'endure', move:'tone'};
+const P_ = () => {
+  if (profile) return profile;
+  const o = store.get('onboarding', null), a = (o && o.answers) || {};
+  return {...EXAMPLE_PROFILE, goal: GOAL_FOR_FOOD[a.goal] || EXAMPLE_PROFILE.goal, level: String(LEVEL_MAP[a.level] || EXAMPLE_PROFILE.level)};
+};
 function weekNo(){ const d=new Date(); const s=new Date(d.getFullYear(),0,1); return Math.floor((d-s)/604800000); }
 function recommend(day){
-  const plan = PLAN[day], p = P_(), lvl = +p.level;
+  const ap = approvedPlan();
+  if (ap && ap.plan.days.length){
+    const d = ap.plan.days.find(x => x.day===day);
+    if (!d) return {plan:{title:'Rest day', focus:[], note:'Your plan has a rest day today. A walk and gentle stretching.'}, items:[], sets:0};
+    return {plan:{title:d.title, focus:['plan'], note:'From your personal plan.'}, sets:d.exercises[0] ? d.exercises[0].sets : 2,
+      items:d.exercises.filter(x => EX[x.id]).map(x => ({id:x.id, sets:x.sets, dose:x.dose}))};
+  }
+  const plan = PLAN[day], p = P_(), L = currentLimits(), lvl = Math.min(+p.level, L.maxLevel);
   if (!plan.focus.length) return {plan, items:[], sets:0};
-  const count = 3 + lvl, sets = 1 + lvl, shift = weekNo() + DAYS.indexOf(day);
+  const count = 3 + lvl, sets = Math.min(1 + lvl, L.maxSets), shift = weekNo() + DAYS.indexOf(day);
   const picked = [];
   for (let i=0; picked.length<count && i<20; i++){
     const g = plan.focus[i % plan.focus.length];
-    const pool = exFor(g).filter(e => e.level <= lvl && !picked.some(x=>x.id===e.id));
+    const pool = exFor(g).filter(e => e.level <= lvl && !L.avoid.includes(e.id) && !picked.some(x=>x.id===e.id));
     if (pool.length) picked.push(pool[(shift + Math.floor(i/plan.focus.length)) % pool.length]);
   }
   const scale = p.goal==='endure' ? 1.25 : p.goal==='gain' ? 0.85 : 1;
@@ -753,17 +804,20 @@ function drawToday(){
       <span><span class="name">${esc(e.name)}</span><br><span class="sub">${x.sets} × ${doseText(x.dose,e.unit)} · ${esc(e.equip)}</span></span>
       <span class="acts">${e.unit==='sec'?`<button class="btn sm primary" type="button" data-timer="${x.dose}" data-tlabel="${esc(e.name)}" aria-label="Start ${doseText(x.dose,e.unit)} timer">▶ ${doseText(x.dose,e.unit)}</button>`:''}<button class="btn sm ghost" data-info="${e.id}" type="button">How to</button></span></label>`; };
   const L = todayAnim ? 'list in' : 'list';
+  const ob = store.get('onboarding', null), why = ob && ob.answers && ob.answers.why, hl = store.get('health', null), Lt = currentLimits();
   let h = `<div class="day-hero">
     <span class="k">${isToday?'Today':''} ${DAY_FULL[day]}</span>
-    <h2>${mine.length ? 'Your workout' : rec.plan.title}</h2>
-    <p class="small" style="opacity:.85">${mine.length ? `${mine.length} exercises from your schedule, plus today's suggestions below.` : rec.plan.note}</p>
+    <h2>${mine.length ? 'Your workout' : esc(rec.plan.title)}</h2>
+    <p class="small" style="opacity:.85">${mine.length ? `${mine.length} exercises from your schedule, plus today's suggestions below.` : esc(rec.plan.note)}</p>
+    ${why ? `<p class="why">Your why: “${esc(why)}”</p>` : ''}
     <div class="facts"><span>Goal: <b>${GOAL_TXT[p.goal]}</b></span>${rec.plan.focus.length?`<button class="rest-btn" type="button" data-timer="${REST_SEC[p.goal]}" data-tlabel="Rest between sets">⏱ Rest <b>${REST[p.goal]}</b> · start timer</button>`:''}${cardio?`<span>Cardio <b>${cardio} min</b></span>`:''}</div>
     ${all.length?`<div class="prog-row"><span>${nDone} of ${all.length} done</span><b>${pct}%</b></div><div class="progress" aria-label="${pct}% done"><span style="width:${lastPct===null?pct:lastPct}%"></span></div>`:''}
   </div>`;
-  if (!profile) h += `<p class="banner">These suggestions use an example profile. <button class="btn sm" data-goto="food" style="margin-left:4px">Fill in the questionnaire</button> to match your goal and level.</p>`;
+  h += planCard();
+  if (Lt.mode==='gentle') h += `<p class="banner">${hl ? 'Gentle mode: based on your health check we keep things easy. Check with your doctor before harder training.' : 'Gentle mode until you do the quick health check.'}${hl ? '' : ' <button class="btn sm" data-flow="plan" style="margin-left:4px">Do the health check</button>'}</p>`;
   if (mine.length) h += `<h3>From your schedule</h3><div class="${L}">${mine.map(x=>row(x,'s:')).join('')}</div>`;
   if (rec.items.length){
-    h += `<h3>Recommended · ${rec.plan.title}</h3>
+    h += `<h3>${approvedPlan() ? 'Your plan' : 'Recommended'} · ${esc(rec.plan.title)}</h3>
       <p class="muted small">Warm up first: 1 min marching on the spot, 10 arm circles, 10 bodyweight squats.</p>
       <div class="${L}">${rec.items.map(x=>row(x,'r:')).join('')}</div>`;
     if (cardio) h += `<div class="panel small"><b>Finisher:</b> ${cardio} min of cardio at home. Try 30 sec jumping jacks, 30 sec high knees, 30 sec rest, repeated.</div>`;
@@ -776,8 +830,8 @@ function drawToday(){
   if (justKey && pct===100 && lastPct!==null && lastPct<100) celebrate();
   lastPct = pct; justKey = null; todayAnim = true;
 }
-function celebrate(){
-  toast('Workout complete! Great job.'); buzz([30,60,30]);
+function celebrate(msg){
+  toast(msg || 'Workout complete! Great job.'); buzz([30,60,30]);
   if (RM()) return;
   const cv = document.createElement('canvas'); cv.id = 'confetti'; document.body.appendChild(cv);
   const dpr = devicePixelRatio || 1, W = innerWidth, H = innerHeight; cv.width = W*dpr; cv.height = H*dpr;
@@ -910,8 +964,19 @@ function drawFood(){
   const sorter = p.goal==='gain' ? (a,b)=>b[4]-a[4] : p.goal==='lose' ? (a,b)=>(b[4]/b[3])-(a[4]/a[3]) : p.goal==='endure' ? (a,b)=>b[3]-a[3] : (a,b)=>(b[4]/b[3])-(a[4]/a[3]);
   const slots = ['breakfast','lunch','dinner'].concat(per>3?['snack']:[]);
   const kP = t.protein*4/t.kcal*100, kF = t.fat*9/t.kcal*100, kC = Math.max(0,100-kP-kF);
+  const hl = store.get('health', null), pl = store.get('plan', null);
+  if (hl && hl.eating && hl.eating.refer){
+    document.getElementById('food-results').innerHTML = `<div class="panel stack"><b>We’ve paused calorie numbers for you</b>
+      <p class="small">Some of your answers suggested food may be taking up a lot of headspace right now. That’s common, and you deserve proper support. Please consider talking to your doctor or an eating disorder support service in your country.</p>
+      <p class="small muted">You can still use workouts, stretching and recipes. If you answered by mistake, delete your health answers below and try again.</p></div>`;
+    return;
+  }
   let h = profile ? '' : `<p class="banner">Showing an <b>example profile</b> (30-year-old woman, 68 kg). Fill in your answers below to get your own numbers.</p>`;
-  h += `<div class="panel">
+  if (pl && pl.plan.nutrition){ const n = pl.plan.nutrition;
+    h += `<div class="panel stack"><div class="row" style="justify-content:space-between"><b>Your plan’s nutrition</b><span class="badge ${pl.status==='approved'?'ok':''}">${pl.status==='approved'?'Approved by Coach Dani':'Waiting for review'}</span></div>
+      <div class="kpis" style="margin-top:0"><div class="kpi"><span class="v">${n.kcal}</span><span class="l">kcal / day</span></div><div class="kpi"><span class="v">${n.protein}g</span><span class="l">Protein</span></div><div class="kpi"><span class="v">${n.carbs}g</span><span class="l">Carbs</span></div><div class="kpi"><span class="v">${n.fat}g</span><span class="l">Fat</span></div></div>
+      <button class="btn sm" data-plan="view" style="align-self:flex-start">View full plan</button></div>`; }
+  if (!(pl && pl.plan.nutrition)) h += `<div class="panel">
     <div class="row" style="justify-content:space-between"><b>${GOAL_TXT[p.goal]}</b><span class="muted small">Maintenance ≈ ${t.tdee} kcal</span></div>
     <div class="kpis">
       <div class="kpi"><span class="v">${t.kcal}</span><span class="l">kcal / day</span></div>
@@ -973,69 +1038,524 @@ function sampleWeek(){
   store.set('schedule', schedule); render(); toast('Sample week loaded. Edit it any way you like.');
 }
 
-/* ---------- welcome survey (shown on first open; answers stay on this device) ---------- */
-const SURVEY = [
-  {id:'age', label:'Age', q:'How old are you?', opts:['Under 18','18–24','25–34','35–44','45–54','55 or older']},
-  {id:'gender', label:'Gender', q:'How do you describe yourself?', opts:['Woman','Man','Another way','Prefer not to say']},
-  {id:'goal', label:'Goal', q:'What is your main goal?', opts:['Lose fat','Build muscle','Tone and stay in shape','Better fitness and stamina','Move better, less pain']},
-  {id:'level', label:'Training now', q:'How much do you train right now?', opts:['Not at all, I am just starting','Now and then','Regularly, for over a year','A lot, I am advanced']},
-  {id:'where', label:'Trains', q:'Where do you usually work out?', opts:['At home, no equipment','At home with some equipment','At the gym and at home','Outdoors']},
-  {id:'days', label:'Days a week', q:'How many days a week can you train?', opts:['1 or 2','3 or 4','5 or more']},
-  {id:'time', label:'Workout length', q:'How long can a workout be?', opts:['10–15 min','20–30 min','30–45 min','More than 45 min']},
-  {id:'want', label:'Would use', q:'What would you use most?', hint:'Pick all that apply.', multi:true, opts:['Exercises by muscle','A plan for each day','Stretching','Meal plan','Recipe videos','Tracking my progress']}
+/* ---------- Phase 2: onboarding, health check and personal plan (see docs/fase-2-onboarding-plan-ia.md) ---------- */
+
+/* safety-core:start — pure functions with no DOM or app state. Tested in tests/safety.test.mjs */
+const WEEK = ['mon','tue','wed','thu','fri','sat','sun'];
+// Health questions based on PAR-Q+ (paraphrased; check licence and wording with a professional before launch).
+const PARQ = [
+  ['heart','Has a doctor ever said you have a heart condition or high blood pressure?'],
+  ['chest','Do you feel pain in your chest at rest, in daily life or when you exercise?'],
+  ['dizzy','In the last 12 months, have you lost your balance because of dizziness or passed out?'],
+  ['chronic','Have you been diagnosed with another long-term medical condition?'],
+  ['meds','Do you take prescribed medicine for a long-term condition?'],
+  ['joint','Do you have a bone, joint or muscle problem that more activity could make worse?'],
+  ['supervised','Has a doctor ever said you should only exercise under medical supervision?'],
+  ['pregnant','Are you pregnant, or did you give birth in the last 6 months?']
 ];
-let sv = null;
-function openSurvey(){
-  const prev = store.get('survey', null);
-  sv = {i:-1, a: prev && prev.answers ? JSON.parse(JSON.stringify(prev.answers)) : {}};
+// Eating screen based on SCOFF (paraphrased; thresholds must be validated by a professional before launch).
+const SCOFF = [
+  ['sick','Do you make yourself sick because you feel uncomfortably full?'],
+  ['control','Do you worry that you have lost control over how much you eat?'],
+  ['lost','Have you lost more than 6 kg in the last 3 months?'],
+  ['fat','Do you believe you are fat when others say you are too thin?'],
+  ['dominates','Would you say that food dominates your life?']
+];
+const HIGH_IMPACT = ['jump-squat','mountain','skip','wall-hs','decline-pushup','split-squat','hollow','leg-raise','bridge-walk','hip-dips'];
+const INJURY_AVOID = {
+  knee:['jump-squat','split-squat','lunge','step-up','skip','wall-sit','mountain'],
+  lowerback:['good-morning','superman','leg-raise','sl-rdl','russian-twist','hollow','backpack-row'],
+  shoulder:['pike-pushup','wall-hs','decline-pushup','backpack-press','chair-dip','diamond-pushup','backpack-ext'],
+  wrist:['pushup','wide-pushup','decline-pushup','diamond-pushup','pike-pushup','wall-hs','shoulder-taps','mountain','bottle-wrist','chair-dip'],
+  neck:['shrug','wall-hs','crunch','bicycle']
+};
+const BANNED_TEXT = /\b(detox\w*|cleanse\w*|starv\w*|purg\w*|water[- ]fast\w*|juice[- ]fast\w*|dry[- ]fast\w*|skip(?:ping)? (?:all |your )?meals|no[- ]carb\w*|zero[- ]carb\w*|crash[- ]diet\w*|laxative\w*|diet pills?)\b/i;
+const bmiOf = (kg, cm) => (kg > 0 && cm > 0) ? kg / Math.pow(cm / 100, 2) : null;
+function assessHealth(h){
+  const parq = (h && h.parq) || {};
+  const reasons = PARQ.map(q => q[0]).filter(k => parq[k] === true);
+  return {risk: reasons.length > 0, reasons};
+}
+function screenEating(e){
+  e = e || {};
+  const s = e.scoff || {}, reasons = [];
+  const score = SCOFF.filter(q => s[q[0]] === true).length;
+  if (score >= 2) reasons.push('scoff');
+  const b = bmiOf(+e.weight, +e.height);
+  if (b !== null && b < 17.5) reasons.push('bmi_very_low');
+  if (b !== null && b < 18.5 && e.goal === 'lose') reasons.push('bmi_low_and_losing');
+  return {refer: reasons.length > 0, score, reasons};
+}
+function kcalFloor(sex, bmr){ return Math.max(sex === 'm' ? 1500 : 1200, Math.round(bmr || 0)); }
+function safetyLimits(i){
+  i = i || {};
+  const h = assessHealth(i.health), ed = i.eating ? screenEating(i.eating) : {refer:false, reasons:[]};
+  const gentle = h.risk || !i.healthChecked || ed.refer;
+  const lvl = Math.max(1, Math.min(3, Math.round(+i.level) || 1));
+  const avoid = new Set();
+  (i.injuries || []).forEach(k => (INJURY_AVOID[k] || []).forEach(x => avoid.add(x)));
+  if (gentle) HIGH_IMPACT.forEach(x => avoid.add(x));
+  const notes = [];
+  if (!i.healthChecked) notes.push('No health check yet, so the plan stays gentle.');
+  if (h.risk) notes.push('Check with your doctor before harder training. Until then the plan stays gentle.');
+  if (ed.refer) notes.push('We paused the nutrition part and recommend talking to a professional.');
+  return {
+    mode: gentle ? 'gentle' : 'normal',
+    nutrition: ed.refer ? 'blocked' : 'ok',
+    maxDays: gentle ? 3 : [0, 4, 5, 6][lvl],
+    maxMinutes: gentle ? 30 : 60,
+    maxLevel: gentle ? 1 : lvl,
+    maxSets: gentle ? 2 : lvl + 1,
+    avoid: [...avoid],
+    maxDeficitPct: 0.20,
+    maxSurplusPct: 0.12,
+    maxLossPctWeek: 0.0075,
+    proteinMaxGPerKg: 2.2,
+    reasons: {health: h.reasons, eating: ed.reasons},
+    notes
+  };
+}
+// Safe calorie range: never below the floor, never a deficit over 20 % or faster than 0.75 % of body weight a week.
+function calorieBounds(L, c){
+  if (!c || !c.tdee) return null;
+  const floor = Math.max(kcalFloor(c.sex, c.bmr), Math.round(c.tdee * (1 - L.maxDeficitPct)), Math.round(c.tdee - (+c.weight || 0) * L.maxLossPctWeek * 1100));
+  return {floor, ceil: Math.max(floor, Math.round(c.tdee * (1 + L.maxSurplusPct)))};
+}
+// Checks and repairs any draft (from the AI or the local generator) against the limits. Never trust the draft.
+function validatePlan(raw, L, c){
+  const issues = [], p = (raw && typeof raw === 'object') ? raw : {};
+  const clean = (v, max) => { const t = String(v == null ? '' : v).slice(0, max || 600).trim(); if (BANNED_TEXT.test(t)){ issues.push('removed unsafe wording'); return ''; } return t; };
+  const list = v => Array.isArray(v) ? v : [];
+  const out = {summary: clean(p.summary, 400), days: [], nutrition: null, safetyNotes: [], questionsForCoach: []};
+  const seen = new Set();
+  let days = list(p.days).filter(d => d && WEEK.includes(d.day) && !seen.has(d.day) && seen.add(d.day));
+  if (Array.isArray(c.days) && c.days.length){ const n0 = days.length; days = days.filter(d => c.days.includes(d.day)); if (days.length < n0) issues.push('kept only the days you can train'); }
+  if (days.length > L.maxDays){ issues.push('trimmed to ' + L.maxDays + ' training days'); days = days.slice(0, L.maxDays); }
+  if (days.length === 7){ issues.push('kept one rest day'); days = days.slice(0, 6); }
+  out.days = days.map(d => {
+    const ex = list(d.exercises).filter(x => {
+      const e = x && c.catalog[x.id];
+      if (!e){ issues.push('removed an exercise we do not have'); return false; }
+      if (L.avoid.includes(x.id)){ issues.push('removed ' + e.name + ' (not right for you yet)'); return false; }
+      if (e.level > L.maxLevel){ issues.push('removed ' + e.name + ' (too advanced for now)'); return false; }
+      return true;
+    }).slice(0, 8).map(x => {
+      const e = c.catalog[x.id];
+      return {id: x.id,
+        sets: Math.min(L.maxSets, Math.max(1, Math.round(+x.sets) || 2)),
+        dose: Math.min(e.dose * 2, Math.max(1, Math.round(+x.dose) || e.dose)),
+        restSec: Math.min(180, Math.max(15, Math.round(+x.restSec) || 60)),
+        note: clean(x.note, 160)};
+    });
+    return {day: d.day, title: clean(d.title, 40) || 'Workout', exercises: ex};
+  }).filter(d => d.exercises.length);
+  if (p.nutrition && L.nutrition === 'blocked') issues.push('removed the nutrition part');
+  const b = calorieBounds(L, c);
+  if (p.nutrition && typeof p.nutrition === 'object' && L.nutrition !== 'blocked' && b){
+    const n = p.nutrition, w = +c.weight || 70;
+    let kcal = Math.round(+n.kcal) || c.tdee;
+    if (kcal < b.floor){ issues.push('raised calories to ' + b.floor + ' (safe minimum)'); kcal = b.floor; }
+    if (kcal > b.ceil){ issues.push('lowered calories to ' + b.ceil); kcal = b.ceil; }
+    const protein = Math.min(Math.round(L.proteinMaxGPerKg * w), Math.max(Math.round(1.2 * w), Math.round(+n.protein) || 0));
+    const fat = Math.min(Math.round(kcal * 0.4 / 9), Math.max(Math.round(kcal * 0.2 / 9), Math.round(+n.fat) || 0));
+    const carbs = Math.max(0, Math.round((kcal - protein * 4 - fat * 9) / 4));
+    const meals = list(n.meals).slice(0, 6).map(m => ({slot: ['breakfast','lunch','dinner','snack'].includes(m && m.slot) ? m.slot : 'snack', idea: clean(m && m.idea, 120), note: clean(m && m.note, 200)})).filter(m => m.idea);
+    out.nutrition = {kcal, protein, carbs, fat, meals, tips: list(n.tips).slice(0, 4).map(t => clean(t, 200)).filter(Boolean)};
+  }
+  out.safetyNotes = L.notes.concat(list(p.safetyNotes).slice(0, 4).map(t => clean(t, 200)).filter(Boolean));
+  out.questionsForCoach = list(p.questionsForCoach).slice(0, 4).map(t => clean(t, 200)).filter(Boolean);
+  return {plan: out, issues: [...new Set(issues)]};
+}
+/* safety-core:end */
+
+// The generator's standing instructions. The page has no system prompt of its own, so this goes first in every request.
+const PLAN_SYSTEM_PROMPT = `You draft personal weekly plans for Home Reps, a home fitness and nutrition app. A coach, Coach Dani, reviews every draft before the user treats it as final.
+
+Hard rules:
+1. Safety first. Follow every value in SAFETY LIMITS exactly: never exceed the training days, sets per exercise or exercise level, never use an exercise listed in avoidExerciseIds, and keep every workout within maxMinutesPerWorkout.
+2. Use only exercises from EXERCISE CATALOG, referenced by their id. Never invent exercises.
+3. Nutrition: stay between calorieFloor and calorieCeiling. Never suggest fasting protocols, detoxes, cleanses, skipping meals, very-low-carb or crash diets, diet pills or supplements. Respect the diet and allergies strictly; if you are not sure an idea is safe for an allergy, leave it out.
+4. You are not a doctor. Do not diagnose or talk about treating any condition. If mode is "gentle", keep everything low intensity and say kindly that a doctor should clear harder training.
+5. Keep at least one full rest day and progress gradually.
+6. Tone: warm, direct and encouraging, in plain English. No guilt, no shame, no comparing bodies, no promises of specific results.
+7. If anything in the answers is unclear or might be risky, add a short question to questionsForCoach instead of guessing.
+Reply with only one JSON object in the OUTPUT FORMAT.`;
+
+const AGE_OPTS = [['u18','Under 18'],['18-24','18–24'],['25-34','25–34'],['35-44','35–44'],['45-54','45–54'],['55+','55 or older']];
+const GOAL_OPTS = [['lose','Lose fat'],['gain','Build muscle'],['tone','Tone and stay in shape'],['endure','Better fitness and stamina'],['move','Move better, less pain']];
+const GOAL_LABEL = Object.fromEntries(GOAL_OPTS);
+const INJ_OPTS = [['none','No pain or injuries'],['knee','Knee'],['lowerback','Lower back'],['shoulder','Shoulder'],['wrist','Wrist'],['neck','Neck']];
+const EQUIP_OPTS = [['none','Just me'],['furniture','Chair, table or couch'],['weights','Backpack or water bottles'],['bar','Pull-up bar'],['bands','Resistance bands']];
+const ALLERGY_OPTS = [['none','None'],['gluten','Gluten'],['lactose','Lactose'],['nuts','Nuts'],['eggs','Eggs'],['fish','Fish or shellfish'],['soy','Soy']];
+const ALLERGEN_WORDS = {gluten:/bread|toast|oats|pasta|noodle|wrap|tortilla|wholegrain|wholewheat/i, lactose:/yogurt|skyr|cheese|feta|halloumi|cottage|milk|whey|butter/i,
+  nuts:/nut|almond|peanut|walnut/i, eggs:/egg/i, fish:/salmon|tuna|fish|shellfish|prawn/i, soy:/soy|tofu|edamame/i};
+const CONSENT_V = 'proto-2026-11';
+const equipNeed = e => { const q = e.equip.toLowerCase(); if (/optional|none|wall|towel|stair|rope/.test(q)) return null; if (/backpack|bottle|jug|bag/.test(q)) return 'weights'; if (/chair|couch|table|door/.test(q)) return 'furniture'; return null; };
+const dietOk = (m, d) => !d || d==='any' || (d==='veg' && m[2]!=='any') || (d==='vegan' && m[2]==='vegan');
+const allergyOk = (m, al) => (al || []).every(k => !ALLERGEN_WORDS[k] || !ALLERGEN_WORDS[k].test(m[1] + ' ' + m[5]));
+const adult = a => !!a.age && a.age !== 'u18';
+const nut = a => a.kind === 'nutrition' || a.kind === 'both';
+const trn = a => a.kind === 'training' || a.kind === 'both';
+function addPoints(d, r){ const l = store.get('points', []); l.push({d, r, at:new Date().toISOString()}); store.set('points', l); }
+function approvedPlan(){ const P = store.get('plan', null); return P && P.status === 'approved' ? P : null; }
+function currentLimits(){
+  const hl = store.get('health', null), o = store.get('onboarding', null), a = (o && o.answers) || {};
+  return safetyLimits({health: hl, healthChecked: !!hl, injuries: (hl && hl.injuries) || [], level: +P_().level || LEVEL_MAP[a.level] || 1, eating: hl && hl.eating});
+}
+
+/* step builders shared by both flows */
+const healthConsentStep = (extra) => ({type:'consent', id:'healthConsent', title:'A quick health check',
+  body:'To keep your workouts safe we ask a few health questions. With your OK we use the answers only to adjust your plan. In this prototype they stay on this device, and you can delete them any time in the Food tab.' + (extra || ''),
+  label:'I agree that Home Reps uses my health answers to keep my plan safe.'});
+const parqStep = () => ({type:'yesno', id:'parq', q:'Health check', hint:'Answer honestly. A “yes” doesn’t stop you training; it helps us keep you safe.', items:PARQ});
+const riskStep = () => ({type:'info', title:'Let’s start gently', body:'Based on your answers, please check with a doctor before harder training. Until then we’ll keep things gentle: mobility, walking and easy strength moves.', cta:'I understand'});
+const injuryStep = () => ({type:'multi', id:'injuries', q:'Any pain or injuries?', hint:'We’ll leave out moves that could make them worse.', opts:INJ_OPTS, none:'none'});
+const schedHtml = (a, withWake) => `<div class="stack">
+  ${withWake ? `<label class="ob-field">Wake-up time<input type="time" data-field="wake" value="${esc(a.wake || '07:30')}"></label>` : ''}
+  <div class="ob-field" role="group" aria-label="Training days">Training days<div class="days">${DAYS.map(d => `<button data-fx="day" data-d="${d}" aria-pressed="${(a.days || []).includes(d)}">${DAY_LABEL[d]}</button>`).join('')}</div></div>
+  <label class="ob-field">Time per workout<select data-field="minutes">${[10,20,30,45,60].map(m => `<option value="${m}" ${+a.minutes===m ? 'selected' : ''}>${m} min</option>`).join('')}</select></label></div>`;
+function healthRecord(a){
+  return {v:1, at:new Date().toISOString(), consent:{granted:true, at:new Date().toISOString(), version:CONSENT_V}, parq:a.parq || {}, injuries:(a.injuries || []).filter(x => x !== 'none')};
+}
+
+/* ---------- onboarding ---------- */
+function prefillFromSurvey(){
+  const sv = store.get('survey', null), x = (sv && sv.answers) || {};
+  const age = {'Under 18':'u18','18–24':'18-24','25–34':'25-34','35–44':'35-44','45–54':'45-54','55 or older':'55+'}[x.age];
+  const goal = {'Lose fat':'lose','Build muscle':'gain','Tone and stay in shape':'tone','Better fitness and stamina':'endure','Move better, less pain':'move'}[x.goal];
+  const level = {'Not at all, I am just starting':'start','Now and then':'some','Regularly, for over a year':'regular','A lot, I am advanced':'advanced'}[x.level];
+  const track = x.where === 'At the gym and at home' ? 'gym' : x.where ? 'home' : undefined;
+  const days = {'1 or 2':['tue','thu'],'3 or 4':['mon','wed','fri'],'5 or more':['mon','tue','wed','thu','fri']}[x.days];
+  const minutes = {'10–15 min':10,'20–30 min':20,'30–45 min':30,'More than 45 min':45}[x.time];
+  return {age, goal, level, track, days, minutes};
+}
+const FLOWS = {};
+FLOWS.onboarding = {
+  closable: () => !!store.get('onboarding', null),
+  init(){
+    const o = store.get('onboarding', null), oa = (o && o.answers) || {}, hl = store.get('health', null), pre = prefillFromSurvey();
+    return {wake:'07:30', minutes:20, days:['mon','wed','fri'], ...Object.fromEntries(Object.entries(pre).filter(([,v]) => v !== undefined)), ...oa,
+      healthConsent: hl ? true : undefined, parq: hl ? hl.parq : undefined, injuries: hl ? (hl.injuries.length ? hl.injuries : ['none']) : undefined};
+  },
+  steps: [
+    {type:'info', hero:true, title:'Let’s set you up', body:'About 2 minutes: your goal, your schedule, a quick health check and your first win.', cta:'Start'},
+    {type:'single', id:'age', q:'How old are you?', opts:AGE_OPTS},
+    {type:'info', block:true, when:a => a.age === 'u18', title:'Home Reps is for adults for now', body:'You need to be 18 or older to use Home Reps. If you picked this by mistake, go back and change it.'},
+    {type:'single', id:'track', when:adult, q:'How do you like to train?', opts:[['home','At home, no equipment','Bodyweight moves you can do anywhere'],['cali','Calisthenics','Bodyweight skills: pull-ups, dips, holds'],['gym','At the gym','Coming soon. We’ll start you with home workouts']]},
+    {type:'single', id:'goal', when:adult, q:'What’s your main goal?', opts:GOAL_OPTS},
+    {type:'text', id:'why', when:adult, q:'Why now?', hint:'In your own words. We’ll show it to you on tough mornings.', placeholder:'e.g. I want to keep up with my kids', optional:true, max:140},
+    {type:'single', id:'level', when:adult, q:'How much do you train right now?', opts:[['start','Not at all, just starting'],['some','Now and then'],['regular','Regularly, for over a year'],['advanced','A lot, I’m advanced']]},
+    {type:'custom', id:'schedule', when:adult, q:'When do you want to train?', render:a => schedHtml(a, true), valid:a => (a.days || []).length > 0},
+    {...healthConsentStep(), when:adult, skipLabel:'Skip for now'},
+    {...parqStep(), when:a => adult(a) && a.healthConsent},
+    {...riskStep(), when:a => adult(a) && a.healthConsent && assessHealth({parq:a.parq}).risk},
+    {...injuryStep(), when:a => adult(a) && a.healthConsent},
+    {type:'custom', id:'firstWin', when:adult, q:'Your first win', render:firstWinHtml, valid:a => !!(a.firstWin || a.firstWinSkipped), click:firstWinClick},
+    {type:'single', id:'alarm', when:adult, q:'How should your morning alarm work?', hint:'Alarms come with the mobile app. We’ll remember your choice.',
+      opts:[['gentle','Gentle','A normal alarm with your task as a reminder'],['commit','Commitment mode','It rings again every few minutes until you do your task. You can always stop it in an emergency.']]},
+    {type:'custom', id:'obDone', when:adult, q:'You’re all set', render:a => `${a.why ? `<p class="why-big">“${esc(a.why)}”</p><p class="muted small">We’ll remind you of this when it counts.</p>` : ''}
+      <dl class="sv-sum"><dt>Goal</dt><dd>${esc(GOAL_LABEL[a.goal] || '')}</dd><dt>Training days</dt><dd>${(a.days || []).map(d => DAY_LABEL[d]).join(', ')}</dd><dt>Wake-up</dt><dd>${esc(a.wake || '')}</dd>
+      <dt>Alarm</dt><dd>${a.alarm === 'commit' ? 'Commitment mode' : 'Gentle'}</dd><dt>Health check</dt><dd>${a.healthConsent ? (assessHealth({parq:a.parq}).risk ? 'Done. Gentle mode for now' : 'Done') : 'Skipped. We’ll keep things gentle'}</dd></dl>
+      <p class="muted small">Next: get your personal plan from the Today tab.</p>`, cta:'Let’s go'}
+  ],
+  finish(a){
+    if (a.healthConsent){ const prev = store.get('health', null); store.set('health', {...healthRecord(a), eating: prev && prev.eating}); }
+    store.set('onboarding', {v:1, at:new Date().toISOString(), answers:{age:a.age, track:a.track, goal:a.goal, why:String(a.why || '').trim().slice(0,140), level:a.level, wake:a.wake, days:a.days, minutes:+a.minutes, alarm:a.alarm}});
+    if (a.firstWin && !store.get('points', []).some(x => x.r === 'first_win')) addPoints(10, 'first_win');
+    toast(a.firstWin ? 'Welcome! Day 1 is done.' : 'Welcome to Home Reps!');
+  }
+};
+function firstWinHtml(a){
+  const gentle = !a.healthConsent || assessHealth({parq:a.parq}).risk;
+  if (a.firstWin) return `<div class="gen"><div class="tapper done" aria-hidden="true">✓</div><h2>Day 1 done!</h2><p class="muted">+10 points. Your streak starts today.</p></div>`;
+  const skip = `<button class="linkish" data-fx="win-skip">I’ll do it later</button>`;
+  if (gentle) return `<p>One easy minute: march on the spot and roll your shoulders. Stop if anything hurts.</p>
+    <button class="tapper" data-fx="win-timer" id="win-btn">60<small>Tap to start</small></button>${skip}`;
+  return `<p>Do 5 push-ups. Too hard? Knee push-ups or push-ups against a wall count too. Tap the circle after each one.</p>
+    <button class="tapper" data-fx="win-tap" id="win-btn" aria-label="Count a push-up">${a.reps || 0}<small>of 5</small></button>${skip}`;
+}
+function firstWinDone(a){ a.firstWin = true; flow.dir = 0; drawFlow(); celebrate('Nice! Your first win.'); }
+function firstWinClick(t, a){
+  if (t.dataset.fx === 'win-skip'){ a.firstWinSkipped = true; return next(); }
+  if (t.dataset.fx === 'win-tap'){ a.reps = (a.reps || 0) + 1; buzz(10); if (a.reps >= 5) return firstWinDone(a); const b = document.getElementById('win-btn'); b.innerHTML = `${a.reps}<small>of 5</small>`; return; }
+  if (t.dataset.fx === 'win-timer' && !a.timing){
+    a.timing = true; const end = Date.now() + 60000;
+    (function tick(){ if (!flow || flow.a !== a) return; const left = Math.ceil((end - Date.now()) / 1000), b = document.getElementById('win-btn');
+      if (left <= 0) return firstWinDone(a);
+      if (b) b.innerHTML = `${left}<small>seconds</small>`; setTimeout(tick, 250); })();
+  }
+}
+
+/* ---------- plan builder ---------- */
+FLOWS.plan = {
+  closable: () => true,
+  init(){
+    const o = store.get('onboarding', null), oa = (o && o.answers) || {}, hl = store.get('health', null), p = profile || {};
+    return {_hadHealth: !!hl, healthConsent: hl ? true : undefined, parq: hl ? hl.parq : undefined, injuries: hl ? (hl.injuries.length ? hl.injuries : ['none']) : undefined,
+      goal: oa.goal || p.goal, level: oa.level, days: oa.days || ['mon','wed','fri'], minutes: oa.minutes || 20, track: oa.track || 'home',
+      sex: p.sex, age: p.age, height: p.height, weight: p.weight, activity: p.activity || '1.375', diet: p.diet, meals: p.meals};
+  },
+  steps: [
+    {type:'info', hero:true, title:'Your personal plan', body:'About 3 minutes. Your answers shape a plan for your body, your time and your kit. Coach Dani reviews every plan before it’s final.', cta:'Start'},
+    {...healthConsentStep(' A personal plan needs this check.'), required:true, when:a => !a._hadHealth},
+    {...parqStep(), when:a => !a._hadHealth && a.healthConsent},
+    {...riskStep(), when:a => !a._hadHealth && a.healthConsent && assessHealth({parq:a.parq}).risk},
+    {type:'single', id:'kind', q:'What should your plan cover?', opts:[['training','Training'],['nutrition','Nutrition'],['both','Training and nutrition']]},
+    {type:'single', id:'goal', q:'What’s your main goal?', opts:GOAL_OPTS},
+    {type:'custom', id:'body', when:nut, q:'About you', hint:'Used only to estimate how much energy you need.', render:a => `<div class="ob-grid">
+      <label class="ob-field">Sex<select data-field="sex"><option value="">Choose</option><option value="f" ${a.sex==='f'?'selected':''}>Female</option><option value="m" ${a.sex==='m'?'selected':''}>Male</option></select></label>
+      <label class="ob-field">Age<input type="number" inputmode="numeric" data-field="age" min="18" max="90" value="${esc(a.age || '')}"></label>
+      <label class="ob-field">Height (cm)<input type="number" inputmode="numeric" data-field="height" min="120" max="230" value="${esc(a.height || '')}"></label>
+      <label class="ob-field">Weight (kg)<input type="number" inputmode="decimal" step="0.1" data-field="weight" min="35" max="250" value="${esc(a.weight || '')}"></label>
+      <label class="ob-field full">How active are you outside workouts?<select data-field="activity">${[['1.2','Mostly sitting'],['1.375','Lightly active'],['1.55','On my feet most of the day'],['1.725','Physical job']].map(([v,l]) => `<option value="${v}" ${a.activity===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`,
+      valid:a => (a.sex==='f' || a.sex==='m') && +a.age>=18 && +a.age<=90 && +a.height>=120 && +a.height<=230 && +a.weight>=35 && +a.weight<=250},
+    {type:'single', id:'pace', when:a => nut(a) && a.goal==='lose', q:'How fast do you want to go?', opts:[['slow','Slow and steady','About 0.25 kg a week'],['steady','Steady','About 0.5 kg a week'],['fast','As fast as is safe','We cap it at a safe pace for your body']]},
+    {type:'custom', id:'tsched', when:trn, q:'When can you train?', render:a => schedHtml(a, false), valid:a => (a.days || []).length > 0},
+    {type:'multi', id:'equipment', when:trn, q:'What do you have at home?', opts:EQUIP_OPTS, none:'none'},
+    {...injuryStep(), when:trn},
+    {type:'text', id:'injNote', when:trn, q:'Anything else Coach Dani should know?', hint:'Optional. Don’t include your name or contact details.', placeholder:'e.g. I sit all day and my hips feel tight', optional:true, max:200},
+    {type:'single', id:'diet', when:nut, q:'How do you eat?', opts:[['any','Everything'],['veg','Vegetarian'],['vegan','Vegan']]},
+    {type:'multi', id:'allergies', when:nut, q:'Any allergies or intolerances?', opts:ALLERGY_OPTS, none:'none'},
+    {type:'single', id:'meals', when:nut, q:'How many times a day do you eat?', opts:[['3','3 meals'],['4','3 meals and 1 snack'],['5','3 meals and 2 snacks']]},
+    {type:'yesno', id:'scoff', when:nut, q:'You and food', hint:'These questions help us keep your plan safe. There are no wrong answers.', items:SCOFF},
+    {type:'info', id:'edRefer', when:a => nut(a) && screenEating({scoff:a.scoff, weight:a.weight, height:a.height, goal:a.goal}).refer, title:'Let’s look after you first',
+      body:a => 'Some of your answers suggest food may be taking up a lot of headspace right now. That’s more common than people think, and you deserve proper support. We won’t make a nutrition plan for now. Please consider talking to your doctor or an eating disorder support service in your country.' + (a.kind === 'both' ? ' We can still build you a gentle training plan.' : ''),
+      cta:a => a.kind === 'both' ? 'Continue with training only' : 'Close',
+      onNext(a){
+        const hl = store.get('health', null) || (a.healthConsent ? healthRecord(a) : null);
+        if (hl){ hl.eating = {scoff:a.scoff, weight:+a.weight, height:+a.height, goal:a.goal, refer:true, at:new Date().toISOString()}; store.set('health', hl); }
+        if (a.kind === 'both'){ a.kind = 'training'; return 'goto:aiConsent'; }
+        return 'close';
+      }},
+    {type:'consent', id:'aiConsent', q:'Draft it with AI?', body:'We send your answers to Claude, Anthropic’s AI, to draft your plan. We never send your name or email. Coach Dani then reviews the draft. If you say no, we draft it on your device with simpler rules.', label:'Yes, draft my plan with AI', skipLabel:'No, draft it on my device'},
+    {type:'custom', id:'gen', q:'', render:() => `<div class="gen"><div class="spin" aria-hidden="true"></div><h2>Drafting your plan</h2><p class="muted" id="gen-s" aria-live="polite">Reading your answers…</p></div>`,
+      valid:() => false, cta:() => 'Working…', after:(el, a) => runGeneration(a)}
+  ]
+};
+
+/* ---------- flow engine (full-screen, one question per screen) ---------- */
+let flow = null;
+const steps = () => flow.def.steps.filter(st => !st.when || st.when(flow.a));
+const flowClosable = () => !!(flow && flow.def.closable());
+function openFlow(name){
+  closeSheet();
+  flow = {name, def:FLOWS[name], i:0, a:FLOWS[name].init(), dir:1};
   document.getElementById('onboard').hidden = false; document.body.style.overflow = 'hidden';
-  drawSurvey();
+  drawFlow();
 }
-function closeSurvey(skipped){
-  if (skipped) store.set('survey', {v:1, at:new Date().toISOString(), skipped:true, answers:sv.a});
-  document.getElementById('onboard').hidden = true; document.body.style.overflow = ''; sv = null;
-  if (ui.tab==='body'){ drawFigure.intro = false; drawFigure(); }
+function closeFlow(){
+  if (!flow) return;
+  const n = flow.name; if (flow.ctl) flow.ctl.abort();
+  flow = null; document.getElementById('onboard').hidden = true; document.body.style.overflow = '';
+  if (n === 'onboarding' && ui.tab === 'body') drawFigure.intro = false;
+  lastPct = null; render();
 }
-function drawSurvey(){
-  const el = document.getElementById('onboard'), n = SURVEY.length;
-  let h;
-  if (sv.i < 0){
-    h = `<div class="hero"><div class="brand">Home<span>Reps</span></div>
-      <h2>Help us build the right app for you</h2>
-      <p class="muted">${n} quick questions, about one minute. Your answers stay on this device.</p></div>
-      <div class="foot"><button class="btn ghost" data-sv="skip">Not now</button><button class="btn primary" data-sv="next">Start</button></div>`;
-  } else if (sv.i >= n){
-    h = `<div class="hero"><h2>Thanks!</h2><p class="muted">This is what you told us:</p>
-      <dl class="sv-sum">${SURVEY.map(q=>{ const v = sv.a[q.id]; const t = Array.isArray(v) ? v.join(', ') : v;
-        return `<dt>${q.label}</dt><dd>${t ? esc(t) : '<span class="muted">Skipped</span>'}</dd>`; }).join('')}</dl></div>
-      <div class="foot"><button class="btn ghost" data-sv="back">Back</button><button class="btn primary" data-sv="done">Start training</button></div>`;
+function stepValid(st, a){
+  if (st.type === 'single') return a[st.id] !== undefined && a[st.id] !== null && a[st.id] !== '';
+  if (st.type === 'multi') return (a[st.id] || []).length > 0;
+  if (st.type === 'text') return !!st.optional || String(a[st.id] || '').trim().length > 0;
+  if (st.type === 'yesno') return st.items.every(([k]) => typeof (a[st.id] || {})[k] === 'boolean');
+  if (st.type === 'consent') return !st.required || a[st.id] === true;
+  if (st.type === 'custom') return st.valid ? st.valid(a) : true;
+  return !st.block;
+}
+function nextLabel(st, a){
+  if (st.cta) return typeof st.cta === 'function' ? st.cta(a) : st.cta;
+  if (st.type === 'consent' && !a[st.id]) return st.required ? 'Tick the box to continue' : (st.skipLabel || 'Not now');
+  if (st.type === 'text' && st.optional && !String(a[st.id] || '').trim()) return 'Skip';
+  return 'Next';
+}
+function drawFlow(){
+  const el = document.getElementById('onboard'), list = steps(), st = list[flow.i], a = flow.a, n = list.length;
+  if (!st) return finishFlow();
+  const title = st.q || st.title || '';
+  const head = st.hero ? '' : `<div class="top"><span class="bar" aria-hidden="true"><span style="width:${(flow.i + 1) / n * 100}%"></span></span>
+    <span class="count">${flow.i + 1} of ${n}</span>${flowClosable() ? `<button class="btn sm ghost" data-fx="close">Close</button>` : ''}</div>`;
+  let body;
+  if (st.type === 'info'){
+    body = `<div class="hero">${st.hero ? '<div class="brand">Home<span>Reps</span></div>' : ''}<h2>${esc(title)}</h2><p class="muted">${typeof st.body === 'function' ? st.body(a) : st.body}</p></div>`;
   } else {
-    const q = SURVEY[sv.i], v = sv.a[q.id], on = o => q.multi ? (v||[]).includes(o) : v===o;
-    const answered = q.multi ? (v||[]).length > 0 : !!v;
-    h = `<div class="top"><span class="bar" aria-hidden="true"><span style="width:${(sv.i+1)/n*100}%"></span></span>
-        <span class="count">${sv.i+1} of ${n}</span><button class="btn sm ghost" data-sv="skip">Skip</button></div>
-      <h2>${esc(q.q)}</h2>${q.hint?`<p class="muted small" style="margin-top:-6px">${q.hint}</p>`:''}
-      <div class="sv-opts" role="${q.multi?'group':'radiogroup'}" aria-label="${esc(q.q)}">${q.opts.map((o,j)=>
-        `<button class="sv-opt${q.multi?' multi':''}" data-svopt="${j}" aria-pressed="${on(o)}">${esc(o)}</button>`).join('')}</div>
-      <div class="foot"><button class="btn ghost" data-sv="back">Back</button><button class="btn primary" data-sv="next" ${answered?'':'disabled'}>${sv.i===n-1?'Finish':'Next'}</button></div>`;
+    body = (title ? `<h2>${esc(title)}</h2>` : '') + (st.hint ? `<p class="muted small" style="margin-top:-6px">${esc(st.hint)}</p>` : '');
+    if (st.type === 'single' || st.type === 'multi'){
+      const cur = a[st.id], multi = st.type === 'multi';
+      body += `<div class="sv-opts" role="${multi ? 'group' : 'radiogroup'}" aria-label="${esc(title)}">${st.opts.map(([v, l, sub], j) => {
+        const on = multi ? (cur || []).includes(v) : cur === v;
+        return `<button class="sv-opt${multi ? ' multi' : ''}" data-fx="opt" data-j="${j}" aria-pressed="${on}"><span>${esc(l)}${sub ? `<small>${esc(sub)}</small>` : ''}</span></button>`; }).join('')}</div>`;
+    }
+    if (st.type === 'text') body += `<label class="ob-field"><textarea id="ob-text" rows="3" maxlength="${st.max || 200}" aria-label="${esc(title)}" placeholder="${esc(st.placeholder || '')}">${esc(a[st.id] || '')}</textarea></label>`;
+    if (st.type === 'yesno') body += `<div class="yn">${st.items.map(([k, q]) => { const v = (a[st.id] || {})[k];
+      return `<div class="yn-row"><p>${esc(q)}</p><div class="yn-pills" role="group" aria-label="${esc(q)}"><button data-fx="yn" data-k="${k}" data-v="1" aria-pressed="${v === true}">Yes</button><button data-fx="yn" data-k="${k}" data-v="0" aria-pressed="${v === false}">No</button></div></div>`; }).join('')}</div>`;
+    if (st.type === 'consent') body += `<p>${esc(st.body)}</p><label class="consent"><input type="checkbox" id="ob-consent" ${a[st.id] ? 'checked' : ''}><span>${esc(st.label)}</span></label>`;
+    if (st.type === 'custom') body += st.render(a);
   }
-  el.innerHTML = `<div class="in" style="--dx:${(drawSurvey.dir??1)*24}px${drawSurvey.dir===0?';animation:none':''}">${h}</div>`;
-  el.scrollTop = 0;
+  const back = flow.i > 0 ? `<button class="btn ghost" data-fx="back">Back</button>` : (flowClosable() ? `<button class="btn ghost" data-fx="close">Not now</button>` : '');
+  const foot = `<div class="foot">${back}${st.block ? '' : `<button class="btn primary" data-fx="next" ${stepValid(st, a) ? '' : 'disabled'}>${esc(nextLabel(st, a))}</button>`}</div>`;
+  el.innerHTML = `<div class="in" style="--dx:${(flow.dir ?? 1) * 24}px${flow.dir === 0 ? ';animation:none' : ''}">${head}${body}${foot}</div>`;
+  if (flow.dir !== 0) el.scrollTop = 0;
+  if (st.after) st.after(el, a);
 }
-document.getElementById('onboard').addEventListener('click', ev => {
-  const t = ev.target.closest('[data-sv],[data-svopt]'); if (!t || t.disabled) return;
-  if (t.dataset.svopt){
-    const q = SURVEY[sv.i], o = q.opts[+t.dataset.svopt];
-    if (q.multi){ const s = new Set(sv.a[q.id]||[]); s.has(o) ? s.delete(o) : s.add(o); sv.a[q.id] = q.opts.filter(x=>s.has(x)); drawSurvey.dir = 0; drawSurvey(); }
-    else { sv.a[q.id] = o; drawSurvey.dir = 0; drawSurvey(); setTimeout(()=>{ if (sv && SURVEY[sv.i]===q){ sv.i++; drawSurvey.dir = 1; drawSurvey(); } }, 260); }
-    return;
+function refreshNext(){
+  const st = steps()[flow.i], b = document.querySelector('#onboard [data-fx="next"]');
+  if (b){ b.disabled = !stepValid(st, flow.a); b.textContent = nextLabel(st, flow.a); }
+}
+function next(){
+  const st = steps()[flow.i];
+  if (!st || !stepValid(st, flow.a)) return;
+  if (st.onNext){
+    const r = st.onNext(flow.a);
+    if (r === 'close') return closeFlow();
+    if (r && r.startsWith('goto:')){ flow.i = Math.max(0, steps().findIndex(x => x.id === r.slice(5))); flow.dir = 1; return drawFlow(); }
   }
-  const a = t.dataset.sv;
-  if (a==='next'){ sv.i++; drawSurvey.dir = 1; return drawSurvey(); }
-  if (a==='back'){ sv.i = Math.max(-1, sv.i-1); drawSurvey.dir = -1; return drawSurvey(); }
-  if (a==='skip') return closeSurvey(true);
-  if (a==='done'){ store.set('survey', {v:1, at:new Date().toISOString(), answers:sv.a}); closeSurvey(false); toast('Thanks! Your answers are saved.'); }
+  flow.i++; flow.dir = 1;
+  if (flow.i >= steps().length) return finishFlow();
+  drawFlow();
+}
+function finishFlow(){ const f = flow; if (f.def.finish) f.def.finish(f.a); closeFlow(); }
+document.getElementById('onboard').addEventListener('click', ev => {
+  if (!flow) return;
+  const t = ev.target.closest('[data-fx]'); if (!t || t.disabled) return;
+  const st = steps()[flow.i], a = flow.a, fx = t.dataset.fx;
+  if (fx === 'opt'){
+    const v = st.opts[+t.dataset.j][0];
+    if (st.type === 'multi'){
+      let cur = new Set(a[st.id] || []);
+      if (v === st.none) cur = new Set(cur.has(v) ? [] : [v]); else { cur.delete(st.none); cur.has(v) ? cur.delete(v) : cur.add(v); }
+      a[st.id] = st.opts.map(o => o[0]).filter(x => cur.has(x)); flow.dir = 0; return drawFlow();
+    }
+    a[st.id] = v; flow.dir = 0; drawFlow(); buzz(8);
+    setTimeout(() => { if (flow && flow.a === a && steps()[flow.i] === st) next(); }, 260); return;
+  }
+  if (fx === 'yn'){ a[st.id] = {...(a[st.id] || {}), [t.dataset.k]: t.dataset.v === '1'}; flow.dir = 0; return drawFlow(); }
+  if (fx === 'day'){ const cur = new Set(a.days || []); cur.has(t.dataset.d) ? cur.delete(t.dataset.d) : cur.add(t.dataset.d); a.days = DAYS.filter(x => cur.has(x)); flow.dir = 0; return drawFlow(); }
+  if (fx === 'next') return next();
+  if (fx === 'back'){ if (flow.ctl) flow.ctl.abort(); flow.gen = null; flow.i = Math.max(0, flow.i - 1); flow.dir = -1; return drawFlow(); }
+  if (fx === 'close') return closeFlow();
+  if (st.click) st.click(t, a);
 });
+['input','change'].forEach(evt => document.getElementById('onboard').addEventListener(evt, ev => {
+  if (!flow) return;
+  const st = steps()[flow.i], a = flow.a, t = ev.target;
+  if (t.id === 'ob-text') a[st.id] = t.value;
+  else if (t.id === 'ob-consent') a[st.id] = t.checked;
+  else if (t.dataset.field) a[t.dataset.field] = t.value;
+  else return;
+  refreshNext();
+}));
+
+/* ---------- plan generation ---------- */
+const SPLITS = {push:['Push',['chest','shoulders','triceps']], legs:['Legs',['quads','glutes','hamstrings','calves']], pull:['Pull',['upperback','biceps','traps','forearms']],
+  core:['Core',['abs','obliques','lowerback']], full:['Full body',['chest','quads','upperback','abs','glutes']]};
+function planContext(a){
+  const eating = nut(a) ? {scoff:a.scoff || {}, weight:+a.weight, height:+a.height, goal:a.goal} : null;
+  const L = safetyLimits({health:{parq:a.parq || {}}, healthChecked:!!a.healthConsent, injuries:(a.injuries || []).filter(x => x !== 'none'), level:LEVEL_MAP[a.level] || 1, eating});
+  const wantsNut = nut(a) && L.nutrition !== 'blocked';
+  let tdee = null, bmr = null;
+  if (wantsNut){ const t = targets({goal:'tone', weight:a.weight, height:a.height, age:a.age, sex:a.sex, activity:a.activity}); tdee = t.tdee; bmr = t.bmr; }
+  const catalog = {}; EX_RAW.forEach(r => { const e = EX[r[0]]; catalog[e.id] = {name:e.name, level:e.level, dose:e.dose, unit:e.unit}; });
+  const kit = new Set(a.equipment || ['none']);
+  const allowed = Object.keys(catalog).filter(id => !L.avoid.includes(id) && catalog[id].level <= L.maxLevel && (!equipNeed(EX[id]) || kit.has(equipNeed(EX[id]))));
+  const meals = MEALS.filter(m => dietOk(m, a.diet) && allergyOk(m, a.allergies));
+  return {L, nut:wantsNut, tr:trn(a), tdee, bmr, sex:a.sex, weight:+a.weight, days:trn(a) ? a.days : null, catalog, allowed, meals, paceKg:{slow:0.25, steady:0.5, fast:1}[a.pace] || 0.5};
+}
+function buildPlanPrompt(a, c){
+  const L = c.L, b = calorieBounds(L, c);
+  const user = {planCovers: c.tr && c.nut ? 'training and nutrition' : c.tr ? 'training' : 'nutrition', goal:GOAL_LABEL[a.goal], experience:a.level, trainingStyle:a.track};
+  if (c.tr) Object.assign(user, {trainingDays:a.days, minutesPerWorkout:+a.minutes, equipment:a.equipment, painOrInjuries:(a.injuries || []).filter(x => x !== 'none'), notesForCoach:String(a.injNote || '').slice(0, 200)});
+  if (c.nut) Object.assign(user, {sex:a.sex, age:+a.age, heightCm:+a.height, weightKg:+a.weight, maintenanceKcal:c.tdee, desiredPace:a.goal === 'lose' ? a.pace : undefined, diet:a.diet, allergies:a.allergies, mealsPerDay:+a.meals});
+  const limits = {mode:L.mode, maxTrainingDays:L.maxDays, maxMinutesPerWorkout:L.maxMinutes, maxSetsPerExercise:L.maxSets, maxExerciseLevel:L.maxLevel, avoidExerciseIds:L.avoid};
+  if (c.nut) Object.assign(limits, {calorieFloor:b.floor, calorieCeiling:b.ceil, proteinMaxGPerKg:L.proteinMaxGPerKg}); else limits.nutrition = 'not included';
+  const cat = c.tr ? c.allowed.map(id => { const e = EX[id]; return `${id} | ${e.name} | ${e.groups.join(',')} | level ${e.level} | default ${e.dose} ${e.unit} | needs: ${e.equip}`; }).join('\n') : '(training not included)';
+  const meals = c.nut ? c.meals.map(m => `${m[0]} | ${m[1]} | about ${m[3]} kcal, ${m[4]} g protein | ${m[5]}`).join('\n') : '(nutrition not included)';
+  const format = {summary:'2 or 3 warm sentences about the plan', days:[{day:'mon', title:'Push', exercises:[{id:'incline-pushup', sets:2, dose:10, restSec:60, note:'optional short tip'}]}],
+    nutrition:{kcal:2000, protein:120, carbs:220, fat:65, meals:[{slot:'breakfast', idea:'meal idea', note:'portion or tip'}], tips:['short tip']}, safetyNotes:['short note'], questionsForCoach:['short question']};
+  return `${PLAN_SYSTEM_PROMPT}\n\nSAFETY LIMITS (hard, never exceed):\n${JSON.stringify(limits, null, 1)}\n\nUSER (anonymous):\n${JSON.stringify(user, null, 1)}\n\nEXERCISE CATALOG (id | name | muscles | level | default dose | needs):\n${cat}\n\nMEAL IDEAS (prefer these; any new idea must fit the diet and allergies):\n${meals}\n\nOUTPUT FORMAT: one JSON object like this. "dose" is reps, or seconds for timed moves. Use day keys mon to sun. Leave out "days" if training is not included and "nutrition" if nutrition is not included.\n${JSON.stringify(format)}`;
+}
+function localDraft(a, c){
+  const L = c.L, out = {summary:'', days:[], safetyNotes:[], questionsForCoach:[]};
+  if (c.tr){
+    const days = ((a.days && a.days.length) ? a.days : ['mon','wed','fri']).slice(0, L.maxDays);
+    const per = Math.max(3, Math.min(6, Math.round((+a.minutes || 20) / 6)));
+    const order = [SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full, SPLITS.legs];
+    const allowed = new Set(c.allowed);
+    out.days = days.map((d, i) => {
+      const [title, groups] = (L.mode === 'gentle' || days.length <= 3) ? SPLITS.full : order[i], picked = [];
+      for (let k = 0; picked.length < per && k < 40; k++){
+        const pool = exFor(groups[k % groups.length]).filter(e => allowed.has(e.id) && !picked.includes(e.id));
+        if (pool.length) picked.push(pool[(i + Math.floor(k / groups.length)) % pool.length].id);
+      }
+      return {day:d, title: L.mode === 'gentle' ? 'Gentle strength' : title, exercises: picked.map(id => ({id, sets:L.maxSets, dose:EX[id].dose, restSec:60}))};
+    });
+    out.summary = L.mode === 'gentle' ? `A gentle plan with ${days.length} short sessions a week to build the habit safely.` : `${days.length} workouts a week, about ${a.minutes} minutes each, with what you have at home.`;
+  }
+  if (c.nut && c.tdee){
+    const b = calorieBounds(L, c), want = c.tdee - (a.goal === 'lose' ? c.paceKg * 1100 : 0) + (a.goal === 'gain' ? c.tdee * 0.1 : 0);
+    const kcal = Math.min(b.ceil, Math.max(b.floor, Math.round(want / 10) * 10));
+    if (kcal > want + 5) out.safetyNotes.push('We set a safe pace of about ' + (Math.round((c.tdee - kcal) / 1100 * 20) / 20) + ' kg a week for your body.');
+    const slots = ['breakfast','lunch','dinner'].concat(+a.meals > 3 ? ['snack'] : []);
+    out.nutrition = {kcal, protein:Math.round(+a.weight * ({lose:2.0, gain:1.8}[a.goal] || 1.6)), fat:Math.round(kcal * 0.28 / 9), carbs:0,
+      meals: slots.map(sl => c.meals.find(m => m[0] === sl)).filter(Boolean).map(m => ({slot:m[0], idea:m[1], note:m[5]})), tips:(GOAL_TIPS[a.goal] || GOAL_TIPS.tone).slice(0, 3)};
+    out.summary += (out.summary ? ' ' : '') + 'Meals are built from simple ideas that fit how you eat.';
+  }
+  return out;
+}
+async function runGeneration(a){
+  const token = {}, ctl = new AbortController(); flow.gen = token; flow.ctl = ctl;
+  const msgs = ['Reading your answers…','Checking your safety limits…','Picking moves for your space and kit…','Balancing your meals…','Almost there…'];
+  let mi = 0; const tick = setInterval(() => { const e = document.getElementById('gen-s'); if (e && mi < msgs.length - 1) e.textContent = msgs[++mi]; }, 2600);
+  const c = planContext(a);
+  let raw = null, source = 'auto', note = '';
+  try {
+    if (a.aiConsent && window.claude && typeof window.claude.use === 'function'){
+      const sample = await window.claude.use('sample');
+      if (ctl.signal.aborted) throw {code:'cancelled'};
+      if (sample){ raw = await sample.json(buildPlanPrompt(a, c), {signal:ctl.signal, modelTier:'default', cache:false}); source = 'ai'; }
+      else note = 'AI isn’t available here, so we drafted it on your device.';
+    } else if (a.aiConsent) note = 'AI isn’t available here, so we drafted it on your device.';
+  } catch (e){
+    if (e && e.code === 'cancelled'){ clearInterval(tick); return; }
+    raw = null; source = 'auto';
+    note = e && e.code === 'not_granted' ? 'You didn’t allow AI here, so we drafted it on your device.' : 'The AI draft didn’t work this time, so we drafted it on your device.';
+  }
+  clearInterval(tick);
+  if (!flow || flow.gen !== token) return;
+  let res = validatePlan(raw, c.L, c);
+  if (source === 'ai' && !res.plan.days.length && !res.plan.nutrition){ source = 'auto'; note = 'The AI draft wasn’t usable, so we drafted it on your device.'; res = validatePlan(localDraft(a, c), c.L, c); }
+  if (source === 'auto' && !raw) res = validatePlan(localDraft(a, c), c.L, c);
+  const now = new Date().toISOString();
+  if (!a._hadHealth && a.healthConsent) store.set('health', healthRecord(a));
+  if (nut(a)){ const hl = store.get('health', null); if (hl){ hl.eating = {scoff:a.scoff, weight:+a.weight, height:+a.height, goal:a.goal, refer:false, at:now}; store.set('health', hl); } }
+  if (c.nut){ profile = {goal:GOAL_FOR_FOOD[a.goal] || 'tone', sex:a.sex, age:String(a.age), height:String(a.height), weight:String(a.weight), activity:a.activity, level:String(LEVEL_MAP[a.level] || 1), diet:a.diet || 'any', meals:String(a.meals || 4)}; store.set('profile', profile); fillForm(); }
+  store.set('plan', {v:1, at:now, status:'pending_review', source, kind:a.kind, note, issues:res.issues, plan:res.plan});
+  const first = !store.get('points', []).some(x => x.r === 'plan_questionnaire');
+  if (first) addPoints(50, 'plan_questionnaire');
+  closeFlow(); planSheet();
+  toast(first ? 'Plan drafted. +50 points for finishing the questionnaire.' : 'Plan drafted.');
+}
+
+/* ---------- plan views ---------- */
+function planCard(){
+  const P = store.get('plan', null);
+  if (!P) return `<div class="cta-card"><span><b>Get your personal plan</b><span class="small muted">Built from your goals and health check. Coach Dani reviews it.</span></span><button class="btn sm primary" data-flow="plan">Start</button></div>`;
+  if (P.status !== 'approved') return `<div class="cta-card"><span><b>Your plan is with Coach Dani</b><span class="small muted">Usually reviewed within 48 hours. Today’s suggestions below are safe to start with.</span></span><button class="btn sm" data-plan="view">View draft</button></div>`;
+  return `<div class="cta-card"><span><b>Your personal plan</b><span class="small muted">Approved by Coach Dani. Today follows it.</span></span><button class="btn sm" data-plan="view">View plan</button></div>`;
+}
+function planSheet(){
+  const P = store.get('plan', null); if (!P) return;
+  const pl = P.plan, ok = P.status === 'approved', n = pl.nutrition;
+  openSheet(`<div class="row" style="justify-content:space-between"><span class="badge ${ok ? 'ok' : ''}">${ok ? 'Approved by Coach Dani' : 'Waiting for Coach Dani’s review'}</span><span class="small muted">${P.source === 'ai' ? 'Drafted by AI (Claude)' : 'Drafted on your device'}</span></div>
+    <h2>Your personal plan</h2>
+    ${P.note ? `<p class="small muted">${esc(P.note)}</p>` : ''}
+    ${pl.summary ? `<p>${esc(pl.summary)}</p>` : ''}
+    ${pl.safetyNotes.length ? `<div class="note">${pl.safetyNotes.map(esc).join('<br>')}</div>` : ''}
+    ${pl.days.map(d => `<div class="plan-day"><b>${DAY_FULL[d.day]}: ${esc(d.title)}</b><ol>${d.exercises.map(x => `<li>${esc(EX[x.id].name)}, ${x.sets} × ${doseText(x.dose, EX[x.id].unit)}${x.note ? ` <span class="muted">(${esc(x.note)})</span>` : ''}</li>`).join('')}</ol></div>`).join('')}
+    ${n ? `<div class="plan-day"><b>Nutrition: about ${n.kcal} kcal a day</b><p class="small muted">Protein ${n.protein} g · Carbs ${n.carbs} g · Fat ${n.fat} g</p>
+      ${n.meals.length ? `<ol>${n.meals.map(m => `<li><b>${m.slot[0].toUpperCase() + m.slot.slice(1)}:</b> ${esc(m.idea)}${m.note ? ` <span class="muted">(${esc(m.note)})</span>` : ''}</li>`).join('')}</ol>` : ''}
+      ${n.tips.length ? `<ul style="margin:0;padding-left:18px">${n.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}</div>` : ''}
+    ${pl.questionsForCoach.length ? `<div class="plan-day"><b>Questions for Coach Dani</b><ul style="margin:0;padding-left:18px">${pl.questionsForCoach.map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>` : ''}
+    ${P.issues.length ? `<p class="small muted">Our safety check adjusted the draft: ${P.issues.map(esc).join('; ')}.</p>` : ''}
+    <p class="small muted">A general fitness guide, not medical advice.</p>
+    <div class="row">${ok ? '' : '<button class="btn primary" data-plan="approve">Prototype: approve as Coach Dani</button>'}<button class="btn" data-flow="plan">Redo questionnaire</button><button class="btn ghost" data-plan="discard">Delete plan</button></div>`);
+}
 
 /* ---------- render + events ---------- */
 const TABS = ['body','today','food','recipes','sched'];
@@ -1065,7 +1585,7 @@ function render(){
 }
 
 document.addEventListener('click', ev => {
-  const t = ev.target.closest('[data-timer],[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,#survey-again,#clear-sched,#side-front,#side-back');
+  const t = ev.target.closest('[data-timer],[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,[data-flow],[data-plan],#redo-setup,#del-health,#del-all,#clear-sched,#side-front,#side-back');
   if (!t) return;
   if (t.dataset.timer){ ev.preventDefault(); return startTimer(+t.dataset.timer, t.dataset.tlabel); }
   if (t.dataset.close && ev.target!==t && t.classList.contains('scrim')) return;
@@ -1082,7 +1602,19 @@ document.addEventListener('click', ev => {
   if (t.dataset.pickday){ if (ui.day===t.dataset.pickday) return; ui.day = t.dataset.pickday; lastPct = null; todayAnim = true; return drawToday(); }
   if (t.dataset.goto) return setTab(t.dataset.goto);
   if (t.id==='sample-week') return sampleWeek();
-  if (t.id==='survey-again') return openSurvey();
+  if (t.dataset.flow){ closeSheet(); return openFlow(t.dataset.flow); }
+  if (t.dataset.plan==='view') return planSheet();
+  if (t.dataset.plan==='approve'){ const P = store.get('plan', null); if (!P) return; P.status = 'approved'; P.approvedAt = new Date().toISOString(); store.set('plan', P);
+    closeSheet(); lastPct = null; render(); return toast('Plan approved (prototype). Today now follows your plan.'); }
+  if (t.dataset.plan==='discard'){ if (!t.dataset.armed){ t.dataset.armed = '1'; t.textContent = 'Tap again to delete'; return; }
+    store.del('plan'); closeSheet(); render(); return toast('Plan deleted'); }
+  if (t.id==='redo-setup') return openFlow('onboarding');
+  if (t.id==='del-health' || t.id==='del-all'){
+    if (!t.dataset.armed){ const old = t.textContent; t.dataset.armed = '1'; t.textContent = 'Tap again to confirm'; setTimeout(()=>{ delete t.dataset.armed; t.textContent = old; }, 3000); return; }
+    if (t.id==='del-health'){ store.del('health'); store.del('plan'); render(); return toast('Health answers and plan deleted'); }
+    try { Object.keys(localStorage).filter(k => k.startsWith('homereps.')).forEach(k => localStorage.removeItem(k)); } catch(e){}
+    location.reload(); return;
+  }
   if (t.id==='clear-sched'){
     if (t.dataset.armed){ schedule = Object.fromEntries(DAYS.map(d=>[d,[]])); store.set('schedule',schedule); delete t.dataset.armed; t.textContent='Clear week'; render(); return toast('Week cleared'); }
     t.dataset.armed='1'; t.textContent='Tap again to clear'; setTimeout(()=>{ delete t.dataset.armed; t.textContent='Clear week'; }, 3000); return;
@@ -1100,7 +1632,7 @@ document.addEventListener('click', ev => {
     if (RM() || !row || row.classList.contains('leaving')) return go(); row.classList.add('leaving'); setTimeout(go, 200); return; }
 });
 document.addEventListener('keydown', ev => {
-  if (ev.key==='Escape'){ if (sv) return closeSurvey(true); closeSheet(); }
+  if (ev.key==='Escape'){ if (flow){ if (flowClosable()) closeFlow(); return; } closeSheet(); }
   if ((ev.key==='Enter'||ev.key===' ') && ev.target.matches('path.m')){ ev.preventDefault(); selectGroup(ev.target.dataset.g); }
 });
 document.addEventListener('change', ev => {
@@ -1153,7 +1685,7 @@ document.addEventListener('click', ev => { if (swallowClick && ev.target.closest
 document.getElementById('today-date').textContent = new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});
 fillForm();
 setTab(['body','today','food','recipes','sched'].includes(ui.tab) ? ui.tab : 'body');
-if (!store.get('survey', null) || /[?#&]survey\b/.test(location.search + location.hash)) openSurvey();
+if (!store.get('onboarding', null) || /[?#&](survey|setup)\b/.test(location.search + location.hash)) openFlow('onboarding');
 </script>
 </body>
 </html>

@@ -5,6 +5,7 @@
 - Data tables live near the top of the script: `EX_RAW` (exercises: id, name, muscle groups, equipment, level 1-3, dose, unit, steps), `STRETCH_RAW`, `MEALS`, `RECIPES` (Recipes tab; videos live in `media/` as .mp4 + .webm with a .jpg poster), `PLAN` (weekday split) and `GROUPS`.
 - Muscle shapes are SVG paths in `FRONT_PATHS` / `BACK_PATHS` (viewBox 200x430). Paths marked `1` are mirrored to the other side.
 - Colors are CSS variables on `:root` with dark-mode overrides; use the tokens, not literal colors.
-- State is saved in `localStorage` under the `homereps.` prefix (profile, schedule, done, tab, survey). Keep old keys readable when changing data shapes.
+- State is saved in `localStorage` under the `homereps.` prefix (profile, schedule, done, tab, onboarding, health, plan, points; `survey` is legacy and only read). Keep old keys readable when changing data shapes.
+- Plan safety rules live in the `safety-core` block of `index.html` (pure functions, no DOM). Every plan draft, AI or local, must pass `validatePlan`. Run `node --test tests/*.test.mjs` after touching that block.
 - Motion uses the `--spring` / `--out` easing tokens; JS checks `RM()` and CSS has a reduced-motion rule, so keep both working when adding animation.
 - Test changes at phone width (about 400px) in light and dark mode.
