@@ -740,15 +740,7 @@ details.steps ol{margin-top:8px}
 .xp-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:14px}
 .xp-list li{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0}
 .xp-list b{color:var(--accent);font-variant-numeric:tabular-nums}
-.learn-card{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.learn-card button{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;min-width:0}
-.learn-card button:only-child{grid-column:1/-1}
-.learn-card b{font-size:14.5px;line-height:1.25}
-.learn-card .small{color:var(--muted)}
 .lc-k,.lr-k{font-family:var(--display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:12px;color:var(--accent)}
-.lc-pair{display:grid;grid-template-columns:1fr 1fr;gap:4px;width:100%}
-.lc-pair svg{width:100%;aspect-ratio:1;height:auto;background:var(--bg);border-radius:10px}
-.lc-tip{background:linear-gradient(160deg,var(--accent-soft),var(--surface) 70%)!important}
 .learn-vid,.learn-img{width:100%;border-radius:16px;background:var(--bg);max-height:280px;object-fit:cover}
 .ab-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ab-opt{position:relative;border:2px solid var(--line);background:var(--bg);border-radius:18px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:border-color .2s,transform .3s var(--spring),opacity .2s}
@@ -799,12 +791,6 @@ details.steps ol{margin-top:8px}
 .t-accent{--t:var(--accent)}.t-blue{--t:var(--blue)}.t-good{--t:var(--good)}.t-amber{--t:var(--amber)}.t-gold{--t:var(--gold)}.t-legend{--t:var(--legend)}.t-ink{--t:var(--ink)}
 .help-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0;color:var(--ink);flex:none}
 .help-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-.qtiles{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:2px -16px 12px;padding:2px 16px 4px;scroll-snap-type:x proximity}
-.qtiles::-webkit-scrollbar{display:none}
-.qtile{flex:1 0 64px;max-width:84px;border:0;background:none;padding:4px 0;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ink);scroll-snap-align:start}
-.qtile .itile{width:52px;height:52px;border-radius:17px;transition:transform .25s var(--spring)}
-.qtile .itile .ico{width:26px;height:26px}
-.qtile:active .itile{transform:scale(.9)}
 .hint{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1.5px solid var(--accent);border-radius:16px;padding:10px 10px 10px 12px;margin:0 0 12px;animation:rise .35s var(--out)}
 .hint p{font-size:14px;line-height:1.35;margin:0}
 .hint .itile{width:34px;height:34px;border-radius:11px}
@@ -898,28 +884,51 @@ h3.ih .itile .ico{width:18px;height:18px}
 .hero-pop b{font-family:var(--display);font-size:22px;text-transform:uppercase}
 .hero-pop i{font-style:normal;opacity:.6}
 @keyframes hpop{0%{opacity:0;transform:translate(-50%,30px) scale(.8)}12%{opacity:1;transform:translate(-50%,0) scale(1.05)}20%{transform:translate(-50%,0) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,10px)}}
-.quests{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 10px 10px;margin-bottom:12px}
-.q-head{display:flex;align-items:center;gap:8px;padding:0 4px 8px}
-.q-head b{font-family:var(--display);font-size:17px;text-transform:uppercase;letter-spacing:.05em}
-.q-count{font-weight:700;font-size:13px;color:var(--muted)}
-.q-bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
-.q-bar span{display:block;height:100%;background:var(--good);transition:width .5s var(--out)}
-.q-row{display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
-.quest{--t:var(--accent);border:0;background:none;padding:2px 0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;color:var(--ink)}
 .q-ring{position:relative;width:52px;height:52px;display:grid;place-items:center;color:var(--t);transition:transform .25s var(--spring)}
-.quest:active .q-ring{transform:scale(.9)}
 .q-ring svg:first-child{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
 .q-trk{fill:color-mix(in srgb,var(--t) 12%,var(--surface));stroke:color-mix(in srgb,var(--t) 22%,transparent);stroke-width:4}
 .q-arc{fill:none;stroke:var(--t);stroke-width:4;stroke-linecap:round;transition:stroke-dasharray .6s var(--out)}
 .q-ring .ico{position:relative;width:22px;height:22px}
-.quest.ok .q-trk{fill:var(--good);stroke:var(--good)}
-.quest.ok .q-arc{stroke:var(--good)}
 .q-ok{position:relative;width:24px;height:24px;stroke:var(--surface);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;animation:pop .45s var(--spring)}
-.q-n{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.q-x{font-size:11px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
-.quest.ok .q-x{color:var(--good)}
-.qtile{flex:1 1 0;min-width:0}
-@media (max-width:380px){.qtile .itile{width:46px;height:46px;border-radius:15px}.qtile{font-size:11px}.q-ring{width:46px;height:46px}}
+/* menus: home menu tiles, sub-tabs, quests list */
+[data-sec][hidden]{display:none!important}
+.home-menu{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.mtile{--t:var(--accent);border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:10px 4px 9px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;color:var(--ink);transition:transform .2s var(--spring)}
+.mtile:active{transform:scale(.95)}
+.mtile b{font-size:12.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.mtile>span:last-child{font-size:11px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-variant-numeric:tabular-nums}
+.mt-ico{position:relative;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--t);background:color-mix(in srgb,var(--t) 15%,var(--surface));margin-bottom:4px}
+.mt-ico .ico{width:24px;height:24px;position:relative}
+.mt-ico>svg:first-child:not(.ico){position:absolute;inset:-3px;width:calc(100% + 6px);height:calc(100% + 6px);transform:rotate(-90deg)}
+.mt-ico .q-trk{fill:none;stroke:transparent}
+.mt-ico .q-arc{stroke:var(--good);stroke-width:3.5}
+.mt-dot{position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.subtabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:4px;margin:8px 0 12px;position:sticky;top:calc(4px + env(safe-area-inset-top,0px));z-index:5}
+.subtabs button{flex:1;min-width:0;border:0;background:none;border-radius:12px;padding:7px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;font-weight:700;color:var(--muted);transition:background-color .2s,color .2s}
+.subtabs button .ico{width:20px;height:20px}
+.subtabs button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.subtabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.dh-chips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px}
+.dh-chips span{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;background:color-mix(in srgb,var(--bg) 14%,transparent);border-radius:999px;padding:4px 10px}
+.dh-chips .ico{width:15px;height:15px}
+.ex-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+.ex-head h3{margin:12px 0 8px}
+.rest-chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;min-height:34px;font-variant-numeric:tabular-nums}
+.warm{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--muted);margin:0 0 8px}
+.warm .ico{width:18px;height:18px;color:var(--amber);margin-top:1px}
+.warm b{color:var(--ink);margin-right:4px}
+.q-list{display:flex;flex-direction:column;gap:8px}
+.q-item{--t:var(--accent);border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 12px;display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;text-align:left;color:var(--ink)}
+.q-item .q-ring{position:relative;width:52px;height:52px;display:grid;place-items:center;color:var(--t)}
+.q-item .q-ring>svg:first-child{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.q-item .q-ring .ico{position:relative}
+.q-item.ok .q-trk{fill:var(--good);stroke:var(--good)}
+.q-item.ok .q-arc{stroke:var(--good)}
+.qi-t{display:flex;flex-direction:column;min-width:0}.qi-t span{font-size:12.5px;color:var(--muted)}
+.qi-r{display:flex;flex-direction:column;align-items:flex-end}.qi-r b{color:var(--accent);font-size:13.5px}.qi-r span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.q-item.ok .qi-r b{color:var(--good)}
+.why-line{font-style:italic;color:var(--muted)}
+@media (max-width:380px){.home-menu{gap:6px}.mt-ico{width:40px;height:40px}.mtile b{font-size:11.5px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -966,10 +975,11 @@ h3.ih .itile .ico{width:18px;height:18px}
 
   <!-- FOOD -->
   <section class="view" id="v-food" hidden>
-    <h2>Food plan</h2>
-    <p class="muted small" style="margin-top:4px">Answer a few questions and get daily targets and meal ideas for your goal.</p>
-    <div id="food-results" class="stack" style="margin-top:14px"></div>
-    <h3>Your answers</h3>
+    <h2>Food</h2>
+    <div id="food-subs" style="margin-top:10px"></div>
+    <div id="food-results" class="stack"></div>
+    <div data-sec="food:setup" class="stack">
+    <p class="small muted">Your answers set your daily targets and meal ideas.</p>
     <form class="q panel" id="qform" novalidate>
       <fieldset>
         <legend>Main goal</legend>
@@ -1020,6 +1030,7 @@ h3.ih .itile .ico{width:18px;height:18px}
       <p class="muted">In this prototype everything you enter stays on this device.</p>
       <div class="row"><button class="btn sm" data-flow="plan">Build my plan</button><button class="btn sm" id="redo-setup">Redo setup</button></div>
       <div class="row"><button class="btn sm ghost" id="del-health">Delete my health answers</button><button class="btn sm ghost" id="del-all">Delete all my data</button></div>
+    </div>
     </div>
   </section>
 
@@ -1465,28 +1476,24 @@ function drawToday(){
       <span class="acts">${e.unit==='sec'?`<button class="btn sm primary" type="button" data-timer="${x.dose}" data-tlabel="${esc(e.name)}" aria-label="Start ${doseText(x.dose,e.unit)} timer">▶ ${doseText(x.dose,e.unit)}</button>`:''}${th ? '' : `<button class="btn sm ghost" data-info="${e.id}" type="button">How to</button>`}</span></label>`; };
   const L = todayAnim ? 'list in' : 'list';
   const ob = store.get('onboarding', null), why = ob && ob.answers && ob.answers.why, hl = store.get('health', null), Lt = currentLimits();
+  const pi = planInfo(), mins = pi && pi.a.minutes ? Math.min(pi.a.minutes, Lt.maxMinutes) : null, P0 = store.get('plan', null);
   let h = `<div class="day-hero">
     <span class="k">${isToday?'Today':''} ${DAY_FULL[day]}</span>
     <h2>${mine.length ? 'Your workout' : esc(rec.plan.title)}</h2>
-    <p class="small" style="opacity:.85">${mine.length ? `${mine.length} exercises from your schedule, plus today's suggestions below.` : esc(rec.plan.note)}</p>
-    ${why ? `<p class="why">Your why: “${esc(why)}”</p>` : ''}
-    ${(() => { const pi = planInfo(); return pi && pi.a.time && rec.items.length ? `<p class="small" style="opacity:.85">Session at <b>${esc(pi.a.time)}</b>${pi.a.minutes ? ` · ${Math.min(pi.a.minutes, currentLimits().maxMinutes)} min` : ''}</p>` : ''; })()}
-    <div class="facts"><span>Goal: <b>${GOAL_TXT[p.goal]}</b></span>${rec.plan.focus.length?`<button class="rest-btn" type="button" data-timer="${REST_SEC[p.goal]}" data-tlabel="Rest between sets">⏱ Rest <b>${REST[p.goal]}</b> · start timer</button>`:''}${cardio?`<span>Cardio <b>${cardio} min</b></span>`:''}</div>
-    ${isToday && (rec.items.length || mine.length) ? (() => { const ss = store.get('session', null); return `<button class="btn primary hero-go" data-startwo="${day}">${ss ? 'Resume workout · ' + fmtClock((Date.now() - new Date(ss.startedAt)) / 1000) : 'Start workout'}</button>`; })() : ''}
+    ${all.length ? `<div class="dh-chips"><span>${ico('workout')}${all.length} exercises</span>${mins ? `<span>${ico('alarm')}${mins} min</span>` : ''}${pi && pi.a.time ? `<span>${ico('today')}${esc(pi.a.time)}</span>` : ''}</div>` : `<p class="small" style="opacity:.85">${esc(rec.plan.note)}</p>`}
+    ${isToday && (rec.items.length || mine.length) ? (() => { const ss = store.get('session', null); return `<button class="btn primary hero-go" data-startwo="${day}">${ss ? 'Resume workout · ' + fmtClock((Date.now() - new Date(ss.startedAt)) / 1000) : '▶ Start workout'}</button>`; })() : ''}
     ${all.length?`<div class="prog-row"><span>${nDone} of ${all.length} done</span><b>${pct}%</b></div><div class="progress" aria-label="${pct}% done"><span style="width:${lastPct===null?pct:lastPct}%"></span></div>`:''}
   </div>`;
-  h = quickTiles('train') + questsHtml() + batteryCard() + h;
-  h += learnCardHtml();
-  h += planCard();
-  if (ob && ob.answers && ob.answers.goal && !why && !store.get('whyAsked', false)) h += `<div class="cta-card stack" style="align-items:stretch"><span><b>What’s your why?</b><span class="small muted">One line. We’ll show it on the tough days.</span></span>
-    <input id="why-in" class="why-in" maxlength="140" placeholder="e.g. feel strong again" aria-label="Your why"><span class="row"><button class="btn sm primary" id="why-save">Save</button><button class="btn sm ghost" id="why-skip">Not now</button></span></div>`;
-  if (Lt.mode==='gentle') h += `<p class="banner">${hl ? 'Gentle mode: based on your health check we keep things easy. Check with your doctor before harder training.' : 'Gentle mode until you do the quick health check.'}${hl ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
-  if (mine.length) h += `<h3>From your schedule</h3><div class="${L}">${mine.map(x=>row(x,'s:')).join('')}</div>`;
+  if (!(ob && ob.answers && ob.answers.goal) || !P0) h += planCard();
+  h += homeMenu('train');
+  if (Lt.mode==='gentle') h += `<p class="banner">${hl ? 'Gentle mode: easy sessions only.' : 'Gentle mode until your safety check.'}${hl ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do it (20 sec)</button>'}</p>`;
+  const exHead = (title, rest) => `<div class="ex-head"><h3 class="ih">${tile('workout', 'accent')}${title}</h3>${rest && rec.plan.focus.length ? `<button class="rest-chip" type="button" data-timer="${REST_SEC[p.goal]}" data-tlabel="Rest between sets">⏱ ${REST[p.goal]}</button>` : ''}</div>`;
+  if (mine.length) h += `${exHead('From your schedule', !rec.items.length)}<div class="${L}">${mine.map(x=>row(x,'s:')).join('')}</div>`;
   if (rec.items.length){
-    h += `<h3>${planForToday() ? 'Your plan' : 'Recommended'} · ${esc(rec.plan.title)}</h3>
-      <p class="muted small">${userTrack() === 'gym' ? 'Warm up first: 5 minutes of easy cardio, then a couple of light sets of your first lift.' : 'Warm up first: 1 min marching on the spot, 10 arm circles, 10 bodyweight squats.'}</p>
+    h += `${exHead(planForToday() ? 'Your exercises' : 'Recommended', true)}
+      <p class="warm">${ico('flame')}<span><b>Warm up</b> ${userTrack() === 'gym' ? '5 min easy cardio, then light sets.' : '1 min marching, arm circles, 10 squats.'}</span></p>
       <div class="${L}">${rec.items.map(x=>row(x,'r:')).join('')}</div>`;
-    if (cardio) h += `<div class="panel small"><b>Finisher:</b> ${cardio} min of cardio. ${userTrack() === 'gym' ? 'Bike, rower or incline walk: 30 sec hard, 60 sec easy, repeated.' : 'Try 30 sec jumping jacks, 30 sec high knees, 30 sec rest, repeated.'}</div>`;
+    if (cardio) h += `<p class="warm">${ico('bolt')}<span><b>Finisher</b> ${cardio} min cardio: 30 sec hard, 60 sec easy.</span></p>`;
   } else {
     h += `<h3>Recovery</h3><div class="${L}">${STRETCHES.map(([n,d],i)=>`<div class="check" style="--i:${i}"><span></span><span><span class="name">${n}</span><br><span class="sub">${d}</span></span><span></span></div>`).join('')}</div>`;
   }
@@ -1637,7 +1644,8 @@ function drawFood(){
       <p class="small muted">You can still use workouts, stretching and recipes. If you answered by mistake, delete your health answers below and try again.</p></div>`;
     return;
   }
-  let h = mealCard() + (profile ? '' : `<p class="banner">Showing an <b>example profile</b> (30-year-old woman, 68 kg). Fill in your answers below to get your own numbers.</p>`);
+  document.getElementById('food-subs').innerHTML = subTabs('food');
+  let h = '<div data-sec="food:today" class="stack">' + mealCard() + (profile ? '' : `<p class="banner">Example numbers. <button class="btn sm" data-subtab="food:setup">Use my answers</button></p>`);
   if (pl && pl.plan.nutrition){ const n = pl.plan.nutrition;
     h += `<div class="panel stack"><div class="row" style="justify-content:space-between"><b>Your plan’s nutrition</b><span class="badge ${pl.status==='approved'?'ok':''}">${pl.status==='approved'?'Approved by your coach':'Waiting for review'}</span></div>
       <div class="kpis" style="margin-top:0"><div class="kpi"><span class="v">${n.kcal}</span><span class="l">kcal / day</span></div><div class="kpi"><span class="v">${n.protein}g</span><span class="l">Protein</span></div><div class="kpi"><span class="v">${n.carbs}g</span><span class="l">Carbs</span></div><div class="kpi"><span class="v">${n.fat}g</span><span class="l">Fat</span></div></div>
@@ -1654,15 +1662,15 @@ function drawFood(){
     <div class="legend"><span><i class="c-p"></i>Protein ${Math.round(kP)}%</span><span><i class="c-c"></i>Carbs ${Math.round(kC)}%</span><span><i class="c-f"></i>Fat ${Math.round(kF)}%</span><span>Water ≈ ${t.water} L</span></div>
     <p class="small muted" style="margin-top:10px">Per meal: about ${Math.round(t.kcal/per/10)*10} kcal and ${Math.round(t.protein/per)} g protein over ${per} eating moments.</p>
   </div>`;
+  h += `<p class="small muted">Estimates from the Mifflin-St Jeor formula. A general guide, not medical advice; check with a doctor or dietitian if you have a health condition.</p></div><div data-sec="food:ideas" class="stack">`;
   h += `<div class="panel small"><b>Tips for ${GOAL_TXT[p.goal].toLowerCase()}</b><ul style="margin:6px 0 0;padding-left:18px">${GOAL_TIPS[p.goal].map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
-  h += `<button class="cta-card" data-goto="recipes" style="text-align:left;width:100%">${tile('recipe', 'accent')}<span><b>Recipe videos</b><span class="small muted">Quick meals with lots of protein.</span></span><span class="btn sm">Open</span></button>`;
   const SLOT_ICON = {breakfast:['sunrise','amber'], lunch:['sun','accent'], dinner:['moon','blue'], snack:['apple','good']};
   slots.forEach(s => {
     const list = MEALS.filter(m => m[0]===s && ok(m)).sort(sorter).slice(0,3);
     h += `<h3 class="ih">${tile(SLOT_ICON[s][0], SLOT_ICON[s][1])}${s[0].toUpperCase()+s.slice(1)} ideas</h3><div class="hscroll">${list.map(m=>`<div class="meal mcard"><span class="t">${m[1]}</span><span class="pills"><span class="pill p-k">${m[3]} kcal</span><span class="pill p-p">${m[4]} g protein</span></span><span class="small muted">${m[5]}</span></div>`).join('')}</div>`;
   });
-  h += `<p class="small muted">Estimates from the Mifflin-St Jeor formula. A general guide, not medical advice; check with a doctor or dietitian if you have a health condition.</p>`;
-  document.getElementById('food-results').innerHTML = h;
+  h += '</div>';
+  document.getElementById('food-results').innerHTML = h; applySub(document.getElementById('v-food'), 'food');
   document.querySelectorAll('#food-results .list').forEach(l => { l.classList.add('in'); [...l.children].forEach((c,i)=>c.style.setProperty('--i',i)); });
   if (!RM()) document.querySelectorAll('#food-results .kpi .v').forEach(v => {
     const m = v.textContent.match(/^(\d+)(.*)$/); if (!m) return;
@@ -1679,7 +1687,7 @@ function fillForm(){
 /* ---------- schedule ---------- */
 function drawSchedule(){
   const total = DAYS.reduce((n,d)=>n+schedule[d].length,0), planned = !!planInfo();
-  let h = plannerHtml() + alarmSettingsHtml();
+  let h = subTabs('sched') + '<div data-sec="sched:week">' + planCard() + plannerHtml();
   if (planned) h += `<h3>Extra exercises</h3>` + (total ? '' : `<p class="small muted">Add extras from the Body tab with <b>+ Schedule</b>. They show up on Today next to your plan.</p>`);
   if (!total && !planned){
     h += `<div class="empty"><p><b>Your week is empty.</b></p><p class="small" style="margin-top:4px">Tap a muscle on the body, then <b>+ Schedule</b> on any exercise. Or start from a sample week and edit it.</p>
@@ -1697,8 +1705,9 @@ function drawSchedule(){
       <div class="icon-btns"><button data-move="${d}|${i}|-1" aria-label="Move up">↑</button><button data-move="${d}|${i}|1" aria-label="Move down">↓</button><button data-del="${d}|${i}" aria-label="Remove">✕</button></div>
     </div>`;}).join('')}</div>`;
   });
-  document.getElementById('sched-content').innerHTML = h;
-  document.getElementById('clear-sched').hidden = !total;
+  const sc = document.getElementById('sched-content');
+  sc.innerHTML = h + '</div>' + sec('sched:alarm', alarmSettingsHtml()); applySub(sc, 'sched');
+  document.getElementById('clear-sched').hidden = !total || subOf('sched') !== 'week';
 }
 function sampleWeek(){
   const s = (id,sets=3) => ({id, sets, dose:EX[id].dose});
@@ -3120,7 +3129,7 @@ document.getElementById('alarm').addEventListener('click', ev => {
 function alarmSettingsHtml(){
   const c = alarmCfg(), next = nextAlarmAt(c, new Date()), gentle = currentLimits().mode === 'gentle';
   const chip = (k, opts) => `<div class="chipset">${opts.map(([v, l]) => `<button class="pick" data-alcfg="${k}" data-v="${v}" aria-pressed="${String(c[k]) === String(v)}">${l}</button>`).join('')}</div>`;
-  let h = `<h3 id="alarm-set" class="ih">${tile('alarm', 'blue')}Wake-up alarm</h3><div class="panel stack">
+  let h = `<div id="alarm-set" class="panel stack">
     <label class="consent" style="padding:0;border:0;background:none"><input type="checkbox" id="al-on" ${c.on ? 'checked' : ''}><span>Ring every morning until I do my task<small>${c.on && next ? `Next: ${DAY_FULL[WEEKDAY(next)]} at ${c.time}` : 'Off'}${c.pausedUntil ? ` · paused until ${c.pausedUntil}` : ''}</small></span></label>`;
   if (c.on) h += `<div class="ob-grid"><label class="ob-field">Time<input type="time" id="al-time" value="${esc(c.time)}"></label>
       ${block('Reps to stop it', chip('reps', [['5','5'],['10','10'],['15','15']]))}</div>
@@ -3282,6 +3291,7 @@ async function duelsInit(){
   db.collection('duels').orderBy('createdAt', 'desc').limit(60).onSnapshot(s => {
     duel.list = s.docs.map(d => ({id:d.id, ...d.data()})); duel.ready = true;
     if (ui.mode === 'challenge' && !arena) drawChallenges(false);
+    refreshDuelsSheet();
   }, () => { duel.db = null; duel.ready = false; if (ui.mode === 'challenge' && !arena) drawChallenges(false); });
 }
 const duelOn = () => !!(duel.db && duel.me && duel.canWrite !== false);
@@ -3590,17 +3600,17 @@ function drawProgress(){
     const cls = future ? 'fut' : k < first ? 'pre' : act.has(k) ? 'on' : frozen.has(k) ? 'frz' : trainDays.includes(tcWeekday(d)) ? 'miss' : 'rest';
     cells += `<i class="hm ${cls}" style="grid-column:${wk + 1};grid-row:${dd + 1}" title="${d.toLocaleDateString(undefined, {day:'numeric', month:'short'})}: ${({on:'trained', frz:'streak freeze', miss:'missed', rest:'rest day', fut:'', pre:'before you started'})[cls]}"></i>`;
   }
-  let h = `<div class="streak-card"><div class="streak-top">${ICON_FLAME}<span><b>${st.current}</b><span>day streak</span></span><span class="streak-meta">Best ${st.best}<br>${st.freezesLeft} freeze${st.freezesLeft === 1 ? '' : 's'} left</span></div>
+  let sk = `<div class="streak-card"><div class="streak-top">${ICON_FLAME}<span><b>${st.current}</b><span>day streak</span></span><span class="streak-meta">Best ${st.best}<br>${st.freezesLeft} freeze${st.freezesLeft === 1 ? '' : 's'} left</span></div>
     <div class="heat" role="img" aria-label="Activity over the last 12 weeks">${cells}</div>
     <div class="legend"><span><i class="hm on"></i>Trained</span><span><i class="hm rest"></i>Rest day</span><span><i class="hm frz"></i>Freeze</span><span><i class="hm miss"></i>Missed</span></div>
     <p class="small" style="opacity:.75">Rest days keep your streak. Two missed training days a month are forgiven automatically.</p></div>`;
-  h += `<div class="panel stack">${profileHtml(false)}<div class="row"><button class="btn sm primary" data-open="ranks">Rankings</button><button class="btn sm" data-open="learn">Tips and A/B</button><button class="btn sm ghost" data-open="profile">Profile</button></div></div>`;
+  let h = '', lv = `<div class="panel stack">${profileHtml(false)}<div class="row"><button class="btn sm primary" data-open="ranks">Rankings</button><button class="btn sm" data-open="learn">Tips and A/B</button><button class="btn sm ghost" data-open="profile">Profile</button></div></div>`;
   if (!log.length){
     h += `<div class="empty"><p><b>Your progress starts with your first workout.</b></p><p class="small" style="margin-top:4px">Log your sets in Today and you’ll see your strength, volume and records here.</p>
       <div class="row" style="justify-content:center;margin-top:12px"><button class="btn primary" data-goto="today">Go to Today</button></div></div>`;
   } else {
     const wk0 = weekStart(now), thisWeek = log.filter(s => new Date(s.endedAt) >= wk0), stats = thisWeek.reduce((a, s) => { const t = sessionStats(s); a.sets += t.sets; a.vol += t.volume; return a; }, {sets:0, vol:0});
-    h += `<h3>This week</h3><div class="panel"><div class="kpis" style="margin-top:0"><div class="kpi"><span class="v">${thisWeek.length}<small>/${trainDays.length}</small></span><span class="l">workouts</span></div>
+    sk += `<h3>This week</h3><div class="panel"><div class="kpis" style="margin-top:0"><div class="kpi"><span class="v">${thisWeek.length}<small>/${trainDays.length}</small></span><span class="l">workouts</span></div>
       <div class="kpi"><span class="v">${stats.sets}</span><span class="l">sets</span></div><div class="kpi"><span class="v">${stats.vol >= 1000 ? (stats.vol / 1000).toFixed(1) + 't' : stats.vol}</span><span class="l">lifted</span></div>
       <div class="kpi"><span class="v">${batteryScore(habitLog(todayISO())) ?? '–'}</span><span class="l">battery</span></div></div></div>`;
     // strength: lifts with weight, most logged first
@@ -3628,7 +3638,10 @@ function drawProgress(){
     return {y:sc || 0, label:d.toLocaleDateString(undefined, {weekday:'short', day:'numeric'}), short: i === 13 ? 'Today' : d.toLocaleDateString(undefined, {day:'numeric', month:'short'}), tip: sc == null ? 'not logged' : `${sc}% (${batteryColor(sc)})`, col:batteryColor(sc)}; });
   if (days.some(d => d.y > 0)) h += `<h3>Battery · last 14 days</h3><div class="panel chart-panel">${barChart(days, '%', b => 'b-' + b.col, 100)}
     <div class="legend"><span><i class="c-good"></i>Green 75%+</span><span><i class="c-amber"></i>Yellow 45–74%</span><span><i class="c-bad"></i>Red under 45%</span></div></div>`;
-  el.innerHTML = h;
+  const hh = heroNow();
+  lv += `<button class="cta-card" data-jump="hero" style="text-align:left;width:100%">${tile('star', 'gold')}<span><b>${esc(hh.cls.name)}</b><span class="small muted">Your hero · ${hh.power} power</span></span><span class="btn sm">See</span></button>`;
+  el.innerHTML = subTabs('progress') + sec('progress:streak', sk) + sec('progress:level', lv) + sec('progress:strength', h || '<div class="empty"><p class="small">Charts appear after your first logged workout.</p></div>');
+  applySub(el, 'progress');
 }
 document.getElementById('v-progress').addEventListener('click', ev => {
   const t = ev.target.closest('[data-lift]'); if (t){ ui.lift = t.dataset.lift; drawProgress(); }
@@ -3999,6 +4012,7 @@ function profileSheet(){
   const rows = [...g.ledger].reverse().slice(0, 6).map(r => `<li><span>${esc(XP_LABEL[r.kind] || 'Activity')}</span><b>+${r.xp} XP</b></li>`).join('');
   openSheet(`<h2>Your profile</h2>${profileHtml(false)}
     <div class="row"><button class="btn primary" data-open="ranks">Rankings</button><button class="btn" data-open="learn">Tips and A/B</button><button class="btn" data-open="nick">${g.nick ? 'Edit nickname and sector' : 'Pick a nickname'}</button><button class="btn" data-jump="hero">My hero</button><button class="btn" data-open="help">Help</button>${m ? '<button class="btn master-btn" data-open="master">MÁSTER</button>' : ''}</div>
+    ${(() => { const o = store.get('onboarding', null), why = o && o.answers && o.answers.why; return o && o.answers && o.answers.goal ? (why ? `<p class="why-line">“${esc(why)}”</p>` : `<div class="stack" style="gap:6px"><b>Your why</b><input id="why-in" class="why-in" maxlength="140" placeholder="e.g. feel strong again" aria-label="Your why"><button class="btn sm primary" id="why-save" style="align-self:flex-start">Save</button></div>`) : ''; })()}
     ${rows ? `<h3>Latest XP</h3><ul class="xp-list">${rows}</ul>` : ''}
     ${gFlagged() ? '<p class="banner">Some of your sessions looked unusual, so you’re out of the rankings until we check them. Your XP is safe.</p>' : ''}
     <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
@@ -4020,14 +4034,6 @@ const LEARN_DEFAULT = [
 const learn = {items:LEARN_DEFAULT, live:false};
 const learnList = type => learn.items.filter(x => x.type === type).sort((a, b) => (a.order || 0) - (b.order || 0));
 const todayCount = kind => { const d = gDay(new Date()); return gameS().ledger.filter(e => e.kind === kind && gDay(e.at) === d).length; };
-function learnCardHtml(){
-  const g = gameS(), tip = learnList('tip').find(t => !g.read.includes(t.id)), ab = learnList('ab').find(x => !g.answered.includes(x.id));
-  if (!tip && !ab) return '';
-  return `<div class="learn-card">
-    ${ab ? `<button class="lc-ab" data-ab="${esc(ab.id)}"><span class="lc-k">A or B?</span><span class="lc-pair">${animSvg(ab.a.anim, 'th', 'data-ar="1"')}${animSvg(ab.b.anim, 'th', 'data-ar="1"')}</span><b>${esc(ab.title)}</b><span class="small">+${GAME.xp.ab} XP · ${Math.max(0, GAME.perDay.ab - todayCount('ab'))} left today</span></button>` : ''}
-    ${tip ? `<button class="lc-tip" data-tip="${esc(tip.id)}"><span class="lc-k">Tip</span><b>${esc(tip.title)}</b><span class="small">+${GAME.xp.tip} XP · ${Math.max(0, GAME.perDay.tip - todayCount('tip'))} left today</span></button>` : ''}
-  </div>`;
-}
 const learnMedia = it => it.video ? `<video class="learn-vid" src="${esc(it.video)}" controls playsinline preload="metadata"></video>` : it.image ? `<img class="learn-img" src="${esc(it.image)}" alt="">` : it.anim && animFor(it.anim) ? `<div class="anim-stage">${animSvg(it.anim, 'big', 'data-ar="1.5"')}</div>` : '';
 function tipSheet(id){
   const t = learn.items.find(x => x.id === id); if (!t) return;
@@ -4254,7 +4260,7 @@ document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-open],[data-tip],[data-ab],[data-rk],[data-lg],[data-nick],[data-sector],[data-mr],#lvl-chip,#master-chip'); if (!t) return;
   if (t.id === 'lvl-chip') return profileSheet();
   if (t.id === 'master-chip') return masterSheet();
-  if (t.dataset.open){ const k = t.dataset.open; return k === 'ranks' ? ranksSheet() : k === 'learn' ? learnSheet() : k === 'nick' ? nickSheet() : k === 'master' ? masterSheet() : k === 'profile' ? profileSheet() : k === 'help' ? helpSheet() : null; }
+  if (t.dataset.open){ const k = t.dataset.open; return k === 'ranks' ? ranksSheet() : k === 'learn' ? learnSheet() : k === 'nick' ? nickSheet() : k === 'master' ? masterSheet() : k === 'profile' ? profileSheet() : k === 'help' ? helpSheet() : k === 'quests' ? questsSheet() : k === 'duels' ? duelsSheet() : null; }
   if (t.dataset.abpick) return abSheet(t.dataset.ab, t.dataset.abpick);
   if (t.dataset.ab){ const s = document.querySelector('#sheet-root .scrim:not(.closing)'); if (!s) openSheet(''); return abSheet(t.dataset.ab); }
   if (t.dataset.tip){ const s = document.querySelector('#sheet-root .scrim:not(.closing)'); if (!s) openSheet(''); return tipSheet(t.dataset.tip); }
@@ -4298,21 +4304,12 @@ const ICONS = {
 const ico = (name, cls) => `<svg class="ico${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 const tile = (name, tone) => `<span class="itile t-${tone || 'accent'}">${ico(name)}</span>`;
 
-// Shortcuts to everything, one tap away.
-function quickTiles(mode){
-  const items = mode === 'challenge'
-    ? [['trophy', 'gold', 'Rankings', 'data-open="ranks"'], ['bulb', 'amber', 'A or B?', 'data-open="learn"'], ['star', 'accent', 'My hero', 'data-jump="hero"'],
-       ['duel', 'legend', 'Duels', 'data-jump="duels"'], ['help', 'ink', 'Help', 'data-open="help"']]
-    : [['workout', 'accent', 'Workout', 'data-jump="workout"'], ['star', 'gold', 'My hero', 'data-jump="hero"'], ['alarm', 'blue', 'Alarm', 'data-jump="alarm"'], ['trophy', 'gold', 'Rankings', 'data-open="ranks"'],
-       ['bulb', 'amber', 'A or B?', 'data-open="learn"'], ['photo', 'good', 'Meal', 'data-jump="meal"']];
-  return `<nav class="qtiles" aria-label="Shortcuts">${items.map(([i, t, l, a]) => `<button class="qtile" ${a}>${tile(i, t)}<span>${l}</span></button>`).join('')}</nav>`;
-}
 function jumpTo(where){
   closeSheet();
   if (where === 'workout'){ if (ui.mode !== 'train') setMode('train'); setTab('today'); const b = document.querySelector('[data-startwo]'); if (b) return b.click(); return setTimeout(() => document.querySelector('#today-content .list')?.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'start'}), 80); }
-  if (where === 'alarm'){ if (ui.mode !== 'train') setMode('train'); setTab('sched'); return setTimeout(() => { const a = document.getElementById('alarm-set'); if (a){ a.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'start'}); flash(a); } }, 80); }
-  if (where === 'meal'){ if (ui.mode !== 'train') setMode('train'); setTab('food'); return setTimeout(() => document.querySelector('[data-meal="open"]')?.click(), 120); }
-  if (where === 'duels'){ if (ui.mode !== 'challenge') setMode('challenge'); return setTimeout(() => { const d = document.getElementById('duels'); if (d){ d.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'start'}); flash(d); } else toast('Duels need the shared version of the app.'); }, 120); }
+  if (where === 'alarm'){ if (ui.mode !== 'train') setMode('train'); ui.sub = {...ui.sub, sched:'alarm'}; store.set('subs', ui.sub); setTab('sched'); return setTimeout(() => { const a = document.getElementById('alarm-set'); if (a){ a.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'start'}); flash(a); } }, 80); }
+  if (where === 'meal'){ if (ui.mode !== 'train') setMode('train'); ui.sub = {...ui.sub, food:'today'}; store.set('subs', ui.sub); setTab('food'); return setTimeout(() => document.querySelector('[data-meal="open"]')?.click(), 120); }
+  if (where === 'duels'){ if (ui.mode !== 'challenge') setMode('challenge'); return setTimeout(duelsSheet, 150); }
   if (where === 'challenge') return setMode('challenge');
   if (where === 'hero'){ if (ui.mode !== 'train') setMode('train'); ui.bodyMode = 'hero'; store.set('bodyMode', 'hero'); setTab('body'); return window.scrollTo({top:0}); }
   if (['today', 'sched', 'body', 'progress', 'food', 'recipes'].includes(where)){ if (ui.mode !== 'train') setMode('train'); return setTab(where); }
@@ -4326,16 +4323,16 @@ function hintText(k){
   const o = store.get('onboarding', null), a = (o && o.answers) || {}, novice = !a.level || a.level === 'start', gym = userTrack() === 'gym';
   const plan = !!store.get('plan', null);
   return ({
-    today: !plan ? ['today', 'This is your day. Pick an exercise, tick it when it’s done, and tap any picture to see how it’s done.']
-      : novice ? ['workout', 'Tap Start workout and follow the cards one by one. Tap a moving picture to see the exercise.']
-      : ['workout', gym ? 'Start workout logs every set, shows last time and suggests your next weight.' : 'Start workout, follow the cards, tick each set. Rest timer starts by itself.'],
-    sched: ['plan', 'Your week at a glance. Tap a day to see it. The wake-up alarm is at the top.'],
-    body: ['body', 'Tap a muscle to see exercises for it. Recovery map: red means you worked it in the last 3 days.'],
-    progress: ['progress', 'Every workout adds a square and keeps your streak alive. Your level and records live here too.'],
-    food: ['food', novice ? 'Start easy: snap your meals with Meal photo. Two taps, no calorie counting.' : 'Your daily targets are at the top. Meal photo logs a meal in two taps.'],
-    recipes: ['recipe', 'Short videos of quick, high-protein meals. Tap one to play.'],
-    hero: ['star', 'This is you as a game character. Every rep levels up the muscles it works. Tap one to see how to level it up.'],
-    challenge: ['bolt', novice ? 'Start with a Level 1 card. Beat the target to win a medal; 2 medals open the next level.' : 'Pick a card, beat your best, win medals. Rankings and duels are in the shortcuts.']
+    today: !plan ? ['today', 'Start your workout here. Tap a picture to see how.']
+      : novice ? ['workout', 'Tap Start workout and follow the cards.']
+      : ['workout', gym ? 'Start workout: it suggests your next weight.' : 'Start workout and tick each set.'],
+    sched: ['plan', 'Your week. The alarm has its own tab.'],
+    body: ['body', 'Tap a muscle to see its exercises.'],
+    progress: ['progress', 'Streak, level and charts, one tab each.'],
+    food: ['food', 'Snap your meals. Ideas and recipes have their own tabs.'],
+    recipes: ['recipe', 'Tap a video to play it.'],
+    hero: ['star', 'You as a game character. Every rep levels you up.'],
+    challenge: ['bolt', novice ? 'Pick a Level 1 card and beat the target.' : 'Pick a card, beat your best, win medals.']
   })[k];
 }
 function hintHtml(k){
@@ -4481,14 +4478,13 @@ function drawHero(){
         <div class="hero-meta"><span>${ico('star')}<b>${h.power}</b> power</span><span>${ico('flame')}<b>${streakNow().current}</b> day streak</span>${g.nick ? `<span>${esc(g.nick)}</span>` : ''}</div></div>
       <div class="tier-key" aria-label="Muscle colours">${['none', 'bronze', 'silver', 'gold', 'legend'].map(t => `<span><i class="tk tier-${t}"></i>${TIER_NAME[t]}</span>`).join('')}</div>
     </div>
-    <h3 class="ih">${tile('progress', 'accent')}Stats</h3>
-    <div class="panel hero-stats">${radarSvg(h.stats)}
+    ${subTabs('hero')}
+    <div data-sec="hero:stats"><div class="panel hero-stats">${radarSvg(h.stats)}
       <div class="stat-list">${STAT_NAMES.map(([k, n]) => { const S = h.stats[k], ic = STAT_ICON[k];
-        return `<div class="stat-row">${tile(ic[0], ic[1])}<span class="sn"><b>${n}</b><span class="xpbar"><span style="width:${k === 'bal' ? Math.min(100, S.level * 5) : bar(S.xp, S.from, S.next)}%"></span></span></span><b class="sl">${S.level}</b></div>`; }).join('')}</div></div>
-    <h3 class="ih">${tile('body', 'blue')}Muscles</h3>
-    <div class="m-grid">${list.map(([k, M]) => `<button class="m-card tier-${M.tier}" data-hero="${k}"><span class="mn">${GROUPS[k].label}</span><b>${M.level}</b><span class="mbar"><span style="width:${bar(M.xp, M.from, M.next)}%"></span></span></button>`).join('')}</div>
-    <div class="panel stack"><b>Level up next</b>${weak.map(([k, M]) => `<button class="weak-row" data-herotrain="${k}">${tile('body', 'accent')}<span><b>${GROUPS[k].label}</b><span class="small muted">Level ${M.level} · ${M.next - M.xp} reps to level ${M.level + 1}</span></span><span class="btn sm primary">Train it</span></button>`).join('')}</div>
-    <p class="small muted">Your hero grows with every rep: logged workouts, ticks on Today, challenges and the morning alarm.</p>`;
+        return `<div class="stat-row">${tile(ic[0], ic[1])}<span class="sn"><b>${n}</b><span class="xpbar"><span style="width:${k === 'bal' ? Math.min(100, S.level * 5) : bar(S.xp, S.from, S.next)}%"></span></span></span><b class="sl">${S.level}</b></div>`; }).join('')}</div></div></div>
+    <div data-sec="hero:muscles" class="stack"><div class="m-grid">${list.map(([k, M]) => `<button class="m-card tier-${M.tier}" data-hero="${k}"><span class="mn">${GROUPS[k].label}</span><b>${M.level}</b><span class="mbar"><span style="width:${bar(M.xp, M.from, M.next)}%"></span></span></button>`).join('')}</div>
+    <div class="panel stack"><b>Level up next</b>${weak.map(([k, M]) => `<button class="weak-row" data-herotrain="${k}">${tile('body', 'accent')}<span><b>${GROUPS[k].label}</b><span class="small muted">Level ${M.level} · ${M.next - M.xp} reps to level ${M.level + 1}</span></span><span class="btn sm primary">Train it</span></button>`).join('')}</div></div>`;
+  applySub(el, 'hero');
 }
 function heroMuscleSheet(g){
   const h = heroNow(), M = h.muscles[g], pct = M.next > M.from ? Math.round((M.xp - M.from) / (M.next - M.from) * 100) : 100, exs = exFor(g).slice(0, 3);
@@ -4507,25 +4503,6 @@ function setBodyMode(m){
   placeHint();
 }
 
-// Daily quests: today's small wins, each one tap away.
-function questsHtml(){
-  const g = gameS(), day = gDay(new Date()), L = g.ledger.filter(e => gDay(e.at) === day), n = k => L.filter(e => e.kind === k).length;
-  const ab = learnList('ab').find(x => !g.answered.includes(x.id)), tip = learnList('tip').find(x => !g.read.includes(x.id)), al = alarmCfg();
-  const trained = n('workout') + n('challenge') > 0 || ((doneLog || {})[dateStr(new Date())] || []).length > 0;
-  const Q = [
-    {icon:'alarm', tone:'blue', name:'Alarm', xp:30, have:n('alarm'), need:1, go:'data-jump="alarm"', sub:n('alarm') ? 'Done' : al.on ? al.time : 'Set it'},
-    {icon:'workout', tone:'accent', name:'Train', xp:15, have:trained ? 1 : 0, need:1, go:ui.mode === 'challenge' ? 'data-jump="challenge"' : 'data-jump="workout"', sub:trained ? 'Done' : 'Go'},
-    {icon:'bulb', tone:'amber', name:'A or B?', xp:5, have:n('ab'), need:GAME.perDay.ab, go:ab ? `data-ab="${esc(ab.id)}"` : 'data-open="learn"'},
-    {icon:'help', tone:'amber', name:'Tip', xp:2, have:n('tip'), need:GAME.perDay.tip, go:tip ? `data-tip="${esc(tip.id)}"` : 'data-open="learn"'},
-    {icon:'photo', tone:'good', name:'Meal', xp:3, have:n('meal'), need:GAME.perDay.meal, go:'data-jump="meal"'}
-  ];
-  const done = Q.filter(q => q.have >= q.need).length, C = 2 * Math.PI * 22;
-  return `<section class="quests" aria-label="Daily quests"><div class="q-head"><b>Daily quests</b><span class="q-count">${done}/${Q.length}</span><span class="q-bar"><span style="width:${done / Q.length * 100}%"></span></span></div>
-    <div class="q-row">${Q.map(q => { const k = Math.min(1, q.have / q.need), ok = k >= 1;
-      return `<button class="quest t-${q.tone}${ok ? ' ok' : ''}" ${q.go} aria-label="${q.name}: ${Math.min(q.have, q.need)} of ${q.need}, +${q.xp} XP">
-        <span class="q-ring"><svg viewBox="0 0 52 52" aria-hidden="true"><circle class="q-trk" cx="26" cy="26" r="22"/><circle class="q-arc" cx="26" cy="26" r="22" style="stroke-dasharray:${(k * C).toFixed(1)} ${C.toFixed(1)}"/></svg>${ok ? '<svg class="q-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>' : ico(q.icon)}</span>
-        <span class="q-n">${q.name}</span><span class="q-x">${ok ? '✓' : q.need > 1 ? `${q.have}/${q.need}` : '+' + q.xp + ' XP'}</span></button>`; }).join('')}</div></section>`;
-}
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-bmode],[data-hero],[data-herotrain]'); if (!t) return;
   if (t.dataset.bmode) return setBodyMode(t.dataset.bmode);
@@ -4533,6 +4510,83 @@ document.addEventListener('click', ev => {
   if (t.dataset.hero) return heroMuscleSheet(t.dataset.hero);
 });
 document.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('path[data-hero]')){ ev.preventDefault(); heroMuscleSheet(ev.target.dataset.hero); } });
+
+/* ---------- menus: one screen, one job. Sub-tabs inside tabs, a home menu of big tiles, sheets for the rest ---------- */
+const SUBS = {
+  sched:[['week', 'plan', 'My week'], ['alarm', 'alarm', 'Alarm']],
+  food:[['today', 'food', 'Today'], ['ideas', 'bulb', 'Ideas'], ['recipes', 'recipe', 'Recipes'], ['setup', 'plan', 'My answers']],
+  progress:[['streak', 'flame', 'Streak'], ['level', 'star', 'Level'], ['strength', 'progress', 'Charts']],
+  hero:[['stats', 'progress', 'Stats'], ['muscles', 'body', 'Muscles']],
+  challenge:[['all', 'bolt', 'Challenges'], ['recent', 'medal', 'My battles']]
+};
+ui.sub = store.get('subs', {}) || {};
+const subOf = k => (ui.sub && ui.sub[k] && SUBS[k].some(s => s[0] === ui.sub[k])) ? ui.sub[k] : SUBS[k][0][0];
+const sec = (key, html) => `<div data-sec="${key}">${html}</div>`;
+const subTabs = k => `<div class="subtabs" role="tablist" aria-label="Sections">${SUBS[k].map(([v, i, l]) => `<button role="tab" data-subtab="${k}:${v}" aria-selected="${subOf(k) === v}">${ico(i)}<span>${l}</span></button>`).join('')}</div>`;
+function applySub(root, k){
+  const cur = k + ':' + subOf(k);
+  (root || document).querySelectorAll(`[data-sec^="${k}:"]`).forEach(el => { el.hidden = el.dataset.sec !== cur; });
+  (root || document).querySelectorAll(`[data-subtab^="${k}:"]`).forEach(b => b.setAttribute('aria-selected', String(b.dataset.subtab === cur)));
+}
+function setSub(k, v){
+  if (k === 'food' && v === 'recipes') return setTab('recipes');
+  ui.sub = {...ui.sub, [k]:v}; store.set('subs', ui.sub); applySub(document, k);
+  const bar = document.querySelector(`[data-subtab="${k}:${v}"]`); if (bar){ const top = bar.closest('.subtabs').getBoundingClientRect().top; if (top < 60) window.scrollBy({top:top - 70, behavior:RM() ? 'auto' : 'smooth'}); }
+}
+
+// The home menu: big tiles with a live status, each opens one thing.
+function questList(){
+  const g = gameS(), day = gDay(new Date()), L = g.ledger.filter(e => gDay(e.at) === day), n = k => L.filter(e => e.kind === k).length;
+  const ab = learnList('ab').find(x => !g.answered.includes(x.id)), tip = learnList('tip').find(x => !g.read.includes(x.id)), al = alarmCfg();
+  const trained = n('workout') + n('challenge') > 0 || ((doneLog || {})[dateStr(new Date())] || []).length > 0;
+  return [
+    {icon:'alarm', tone:'blue', name:'Alarm', what:'Do your push-ups or squats when it rings.', xp:30, have:n('alarm'), need:1, go:'data-jump="alarm"'},
+    {icon:'workout', tone:'accent', name:'Train', what:'Any workout or challenge counts.', xp:15, have:trained ? 1 : 0, need:1, go:ui.mode === 'challenge' ? 'data-jump="challenge"' : 'data-jump="workout"'},
+    {icon:'bulb', tone:'amber', name:'A or B?', what:'Spot the right form. One try each.', xp:5, have:n('ab'), need:GAME.perDay.ab, go:ab ? `data-ab="${esc(ab.id)}"` : 'data-open="learn"'},
+    {icon:'help', tone:'amber', name:'Tip', what:'Ten seconds to read, worth knowing.', xp:2, have:n('tip'), need:GAME.perDay.tip, go:tip ? `data-tip="${esc(tip.id)}"` : 'data-open="learn"'},
+    {icon:'photo', tone:'good', name:'Meal photo', what:'A picture and two taps.', xp:3, have:n('meal'), need:GAME.perDay.meal, go:'data-jump="meal"'}
+  ];
+}
+const ringSvg = (k, size) => { const C = 2 * Math.PI * 22; return `<svg viewBox="0 0 52 52" aria-hidden="true" ${size ? `width="${size}" height="${size}"` : ''}><circle class="q-trk" cx="26" cy="26" r="22"/><circle class="q-arc" cx="26" cy="26" r="22" style="stroke-dasharray:${(Math.min(1, k) * C).toFixed(1)} ${C.toFixed(1)}"/></svg>`; };
+function questsSheet(){
+  const Q = questList(), done = Q.filter(q => q.have >= q.need).length;
+  openSheet(`<div class="help-head">${tile('today', 'good')}<span><h2>Daily quests</h2><span class="small muted">${done} of ${Q.length} done today. New ones tomorrow.</span></span></div>
+    <div class="q-list">${Q.map(q => { const ok = q.have >= q.need;
+      return `<button class="q-item t-${q.tone}${ok ? ' ok' : ''}" ${q.go}><span class="q-ring">${ringSvg(q.have / q.need)}${ok ? '<svg class="q-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>' : ico(q.icon)}</span>
+        <span class="qi-t"><b>${q.name}</b><span>${q.what}</span></span><span class="qi-r"><b>${ok ? 'Done' : '+' + q.xp + ' XP'}</b><span>${Math.min(q.have, q.need)}/${q.need}</span></span></button>`; }).join('')}</div>
+    <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
+}
+function duelsSheet(){
+  if (!duel.db){ return toast('Duels need the shared version of the app.'); }
+  openSheet(`<div class="help-head">${tile('duel', 'legend')}<span><h2>Duels</h2><span class="small muted">Beat a friend’s score, or send yours.</span></span></div><div id="duels-body">${duelsHtml().replace(/<div class="lvl-head">[\s\S]*?<\/div>/, '')}</div>
+    <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
+  fillNames(document.getElementById('duels-body'));
+}
+function refreshDuelsSheet(){ const b = document.getElementById('duels-body'); if (b){ b.innerHTML = duelsHtml().replace(/<div class="lvl-head">[\s\S]*?<\/div>/, ''); fillNames(b); } }
+function homeMenu(mode){
+  const Q = questList(), qd = Q.filter(q => q.have >= q.need).length, log = habitLog(todayISO()), sc = batteryScore(log), col = batteryColor(sc);
+  const g = gameS(), ab = learnList('ab').filter(x => !g.answered.includes(x.id)).length, h = heroNow(), al = alarmCfg(), L = gLevel();
+  const openDuels = duel.db ? duel.list.filter(d => d.status === 'open' && d.from && d.from.uid !== duel.me).length : 0;
+  const bt = {green:'good', yellow:'amber', red:'accent', none:'ink'}[col];
+  const T = {
+    quests:{icon:'today', tone:'good', name:'Quests', sub:`${qd}/${Q.length} today`, a:'data-open="quests"', ring:qd / Q.length},
+    battery:{icon:'battery', tone:bt, name:'Battery', sub:sc == null ? 'Check in' : sc + '%', a:'data-habits="1"'},
+    hero:{icon:'star', tone:'gold', name:'My hero', sub:h.cls.name.replace('The ', ''), a:'data-jump="hero"'},
+    ab:{icon:'bulb', tone:'amber', name:'A or B?', sub:ab ? `${ab} new` : 'All done', a:'data-open="learn"', dot:ab > 0},
+    ranks:{icon:'trophy', tone:'gold', name:'Rankings', sub:g.nick ? 'Level ' + L.level : 'Join', a:'data-open="ranks"'},
+    alarm:{icon:'alarm', tone:'blue', name:'Alarm', sub:al.on ? al.time : 'Off', a:'data-jump="alarm"'},
+    meal:{icon:'photo', tone:'good', name:'Meal', sub:'Snap it', a:'data-jump="meal"'},
+    duels:{icon:'duel', tone:'legend', name:'Duels', sub:openDuels ? `${openDuels} waiting` : 'Challenge', a:'data-open="duels"', dot:openDuels > 0},
+    help:{icon:'help', tone:'ink', name:'Help', sub:'How it works', a:'data-open="help"'}
+  };
+  const keys = mode === 'challenge' ? ['quests', 'battery', 'ranks', 'duels', 'hero', 'ab', 'alarm', 'help'] : ['quests', 'battery', 'hero', 'ab', 'ranks', 'alarm', 'meal', 'help'];
+  return `<nav class="home-menu" aria-label="Menu">${keys.map(k => { const t = T[k];
+    return `<button class="mtile t-${t.tone}" ${t.a}><span class="mt-ico">${t.ring != null ? ringSvg(t.ring) : ''}${ico(t.icon)}${t.dot ? '<i class="mt-dot"></i>' : ''}</span><b>${t.name}</b><span>${esc(t.sub)}</span></button>`; }).join('')}</nav>`;
+}
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-subtab]'); if (!t) return;
+  const [k, v] = t.dataset.subtab.split(':'); setSub(k, v);
+});
 
 /* ---------- mode: Challenge or Training ---------- */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
@@ -4609,7 +4663,7 @@ function drawChallenges(anim){
   const avail = CHALLENGES.filter(c => chAvailability(c, S, L, open).ok);
   const dayNo = Math.floor(Date.now() / 86400000), feat = avail.length ? avail[dayNo % avail.length] : null;
   const f = ui.chFilter || 'all';
-  let h = batteryCard() + `<div class="rank-card">
+  let h = `<div class="rank-card">
       <div class="rank-badge">${lvl}</div>
       <div><span class="small" style="opacity:.7">Your rank</span><b class="rank-name">${rankFor(lvl)}</b>
         <div class="xpbar"><span id="rank-xp" style="width:${anim && !RM() ? 0 : pct}%"></span></div>
@@ -4620,10 +4674,10 @@ function drawChallenges(anim){
     h += `<div class="feat"><span class="small" style="font-weight:700">Today’s challenge · ${esc(chFmtLabel(feat))}</span><h2>${esc(feat.name)}</h2><p class="small">${esc(feat.blurb)}</p>
       <p class="small"><b>Your target: ${chVal(feat, nt.value)}</b>${nt.medal ? ` for ${MEDAL_NAME[nt.medal]}` : ''}</p>
       <button class="btn" data-ch="${feat.id}">Let’s go</button></div>`; }
-  h = h.replace('<div class="rank-card">', quickTiles('challenge') + questsHtml() + '<div class="rank-card">');
-  h += duelsHtml();
+  h = feat ? h.replace('<div class="feat">', homeMenu('challenge') + '<div class="feat">') : h + homeMenu('challenge');
   if (L.mode === 'gentle') h += `<p class="banner">High-intensity challenges are locked for now. ${store.get('health', null) ? 'Your safety check suggests talking to a doctor before harder training.' : '<button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
-  h += `<div class="chips" style="margin-top:16px">${CH_FILTERS.map(([k, l]) => `<button class="chip" data-chf="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>`;
+  h += subTabs('challenge') + '<div data-sec="challenge:all">';
+  h += `<div class="chips" style="margin-top:4px">${CH_FILTERS.map(([k, l]) => `<button class="chip" data-chf="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>`;
   let i = 0;
   for (let n = 1; n <= 5; n++){
     const list = CHALLENGES.filter(c => c.level === n && (f === 'all' || chCat(c) === f));
@@ -4637,14 +4691,16 @@ function drawChallenges(anim){
         <span class="pb">${a.ok ? (best != null ? `Best ${chVal(c, best)} · next ${chVal(c, nt.value)}` : `Target ${chVal(c, nt.value)}`) : esc(a.why)}</span></button>`; }).join('');
     h += `</div>`;
   }
+  h += '</div><div data-sec="challenge:recent">';
+  if (!S.history.length) h += `<div class="empty"><p><b>No battles yet.</b></p><p class="small">Finish any challenge and it shows up here.</p></div>`;
   if (S.history.length){
-    h += `<h3>Recent battles</h3><div class="list">${S.history.slice(0, 6).map(r => { const c = CH[r.id]; if (!c) return '';
+    h += `<div class="list">${S.history.slice(0, 6).map(r => { const c = CH[r.id]; if (!c) return '';
       return `<div class="meal"><span class="t">${r.medal ? `<i class="mdot ${r.medal}"></i>` : ''}${esc(c.name)}${r.scaled ? ' <span class="muted small">(easier)</span>' : ''}${r.pb ? ' <span class="badge ok">PB</span>' : ''}</span>
         <span class="n">${chVal(c, r.score)} ${chUnit(c)} · +${r.xp} XP · ${new Date(r.at).toLocaleDateString(undefined, {day:'numeric', month:'short'})}</span></div>`; }).join('')}</div>`;
   }
-  h += `<p class="small muted" style="margin-top:16px">One or two challenges a day is plenty. Rest days make you faster.</p>`;
+  h += '</div>';
   const el = document.getElementById('challenge-content');
-  el.innerHTML = h; fillNames(el);
+  el.innerHTML = h; applySub(el, 'challenge'); fillNames(el);
   el.querySelectorAll('.ch-grid').forEach(g => { if (anim) g.classList.add('in'); });
   if (anim && !RM()) requestAnimationFrame(() => requestAnimationFrame(() => { const x = document.getElementById('rank-xp'); if (x) x.style.width = pct + '%'; }));
 }
