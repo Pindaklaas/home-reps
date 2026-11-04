@@ -427,6 +427,22 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .photo-drop input{position:absolute;width:1px;height:1px;opacity:0}
 .photo-drop small{font-weight:500;color:var(--muted)}
 .meal-photo{width:100%;max-height:240px;object-fit:cover;border-radius:var(--r)}
+/* ---------- recording and duels ---------- */
+.rec-dot{position:absolute;top:10px;left:10px;font-size:12px;font-weight:700;color:#fff;background:rgba(220,38,38,.9);padding:3px 9px;border-radius:999px;animation:pulse 1.2s ease-in-out infinite}
+.res-video{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+.res-vid{width:100%;max-height:220px;border-radius:16px;background:#000}
+.add-vid{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;border:1.5px dashed color-mix(in srgb,var(--arena-ink) 30%,transparent);border-radius:16px;padding:14px;cursor:pointer;font-weight:700;text-align:center}
+.add-vid input{position:absolute;width:1px;height:1px;opacity:0}
+.add-vid small{font-weight:500;opacity:.7}
+.ar-go.small-go{height:54px;font-size:24px;animation:none;width:100%;margin-top:0}
+.ar-go:disabled{opacity:.45;box-shadow:none}
+.duel-out{font-family:var(--display);font-size:26px;font-weight:700;text-transform:uppercase}
+.duel-out.win{color:var(--good)}.duel-out.lose{opacity:.8}
+.duel-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px}
+.duel-row>span:first-child{display:flex;flex-direction:column;min-width:0}
+.duel-row.won{background:var(--good-soft)}
+.duel-video{width:100%;max-height:60vh;border-radius:var(--r);background:#000}
+.duel-banner{background:var(--accent);color:var(--accent-ink);border-radius:16px;padding:12px 14px;font-weight:700}
 /* ---------- mode picker: Challenge or Training ---------- */
 #modepick{position:fixed;inset:0;z-index:65;background:var(--bg);overflow:auto}
 #modepick .mp-in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
@@ -2227,13 +2243,13 @@ function drawSkeleton(ctx, w, h, pts){
   SKEL.forEach(([a, b]) => { const p = pts[a], q = pts[b]; if (vis(p) < .5 || vis(q) < .5) return; ctx.beginPath(); ctx.moveTo(p.x * w, p.y * h); ctx.lineTo(q.x * w, q.y * h); ctx.stroke(); });
 }
 // Starts the camera in `box` and calls onUpdate({reps, cue, counted}) for every frame. Resolves with a stop() function.
-async function startCamCounter(box, move, onUpdate){
+async function startCamCounter(box, move, onUpdate, extStream){
   box.innerHTML = '<video playsinline muted autoplay></video><canvas></canvas><span class="cam-cue">Starting camera…</span>';
   const video = box.querySelector('video'), canvas = box.querySelector('canvas'), cueEl = box.querySelector('.cam-cue'), ctx = canvas.getContext('2d');
   let stream = null, stopped = false, raf = 0;
-  const stop = () => { stopped = true; cancelAnimationFrame(raf); if (stream) stream.getTracks().forEach(t => t.stop()); box.innerHTML = ''; };
+  const stop = () => { stopped = true; cancelAnimationFrame(raf); if (stream && !extStream) stream.getTracks().forEach(t => t.stop()); box.innerHTML = ''; };
   try {
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width:{ideal:640}, height:{ideal:480}}, audio:false});
+    stream = extStream || await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width:{ideal:640}, height:{ideal:480}}, audio:false});
     if (stopped){ stop(); return stop; }
     video.srcObject = stream; await video.play();
     cueEl.textContent = 'Loading body tracking…';
@@ -2259,17 +2275,6 @@ async function startCamCounter(box, move, onUpdate){
 
 /* ---------- arena: camera option for push-up and squat challenges ---------- */
 const camMoveFor = ch => ch.moves.length === 1 && (ch.moves[0] === 'pushup' || ch.moves[0] === 'squat') && (ch.fmt === 'amrap' || ch.fmt === 'fortime') ? ch.moves[0] : null;
-async function arenaCamStart(){
-  const box = document.getElementById('ar-cam'); if (!box || !arena) return;
-  try {
-    arena.camStop = await startCamCounter(box, camMoveFor(arena.ch), st => {
-      if (!arena || arena.phase !== 'work' || !st.counted) return;
-      arena.camReps = (arena.camReps || 0) + 1;
-      if (arena.ch.fmt === 'fortime') repDone(1); else setCount(arena.count + 1);
-    });
-  } catch (e){ box.outerHTML = `<p class="ar-ghost">${camError(e)}</p>`; arena.cam = false; }
-}
-function arenaCamStop(){ if (arena && arena.camStop){ arena.camStop(); arena.camStop = null; } }
 
 /* ---------- wake-up alarm (in the prototype it only rings while the app is open) ---------- */
 const alarmCfg = () => ({...ALARM_DEFAULT, ...(store.get('alarm', {}) || {})});
@@ -2465,6 +2470,180 @@ document.addEventListener('click', async ev => {
   }
 });
 
+
+/* ---------- recording an attempt (stays on this phone unless the person shares it in a duel) ---------- */
+const VIDEO_MAX = 20 * 1024 * 1024;
+function pickMime(){
+  if (!window.MediaRecorder) return '';
+  return ['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t => MediaRecorder.isTypeSupported(t)) || '';
+}
+// Bitrate sized so the expected length fits under the upload limit.
+function startRecorder(stream, seconds){
+  const mime = pickMime(); if (!mime) return null;
+  const bps = Math.max(200000, Math.min(800000, Math.floor(VIDEO_MAX * 0.85 * 8 / Math.max(60, seconds))));
+  const rec = new MediaRecorder(stream, {mimeType:mime, videoBitsPerSecond:bps}), chunks = [], type = mime.split(';')[0];
+  rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  rec.start(1000);
+  return {stop: () => new Promise(res => { if (rec.state === 'inactive') return res(new Blob(chunks, {type})); rec.onstop = () => res(new Blob(chunks, {type})); rec.stop(); })};
+}
+const expectedSecs = ch => ch.dur || (ch.fmt === 'hold' ? ch.tiers[3] * 1.2 : ch.tiers[0] * 1.1);
+// Re-encode a phone video to a small file the app can store (480p, real time, on this device).
+async function compressVideo(file, onProgress){
+  const mime = pickMime();
+  if (!mime || !HTMLCanvasElement.prototype.captureStream) throw {code:'unsupported'};
+  const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.src = URL.createObjectURL(file);
+  try {
+    await new Promise((res, rej) => { v.onloadedmetadata = res; v.onerror = () => rej({code:'decode'}); });
+    const dur = v.duration; if (!isFinite(dur) || dur > 16 * 60) throw {code:'too_long'};
+    const k = Math.min(1, 480 / Math.max(v.videoWidth, v.videoHeight));
+    const c = document.createElement('canvas'); c.width = Math.max(2, Math.round(v.videoWidth * k / 2) * 2); c.height = Math.max(2, Math.round(v.videoHeight * k / 2) * 2);
+    const ctx = c.getContext('2d'), rec = startRecorder(c.captureStream(24), dur);
+    await v.play();
+    await new Promise(res => { v.onended = res; (function draw(){ if (v.ended) return res(); ctx.drawImage(v, 0, 0, c.width, c.height); if (onProgress) onProgress(Math.min(1, v.currentTime / dur)); requestAnimationFrame(draw); })(); });
+    const out = await rec.stop();
+    if (out.size > VIDEO_MAX) throw {code:'too_big'};
+    return out;
+  } finally { URL.revokeObjectURL(v.src); }
+}
+async function arenaMediaStart(){
+  const box = document.getElementById('ar-cam'); if (!box || !arena) return;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width:{ideal:640}, height:{ideal:480}}, audio:false});
+    if (!arena || arena.phase !== 'work'){ stream.getTracks().forEach(t => t.stop()); return; }
+    arena.stream = stream;
+    if (arena.rec) arena.recorder = startRecorder(stream, expectedSecs(arena.ch));
+    if (arena.cam){
+      arena.camStop = await startCamCounter(box, camMoveFor(arena.ch), st => {
+        if (!arena || arena.phase !== 'work' || !st.counted) return;
+        arena.camReps = (arena.camReps || 0) + 1;
+        if (arena.ch.fmt === 'fortime') repDone(1); else setCount(arena.count + 1);
+      }, stream);
+    } else {
+      box.innerHTML = '<video playsinline muted autoplay></video>'; const v = box.querySelector('video'); v.srcObject = stream; v.play().catch(() => {});
+    }
+    if (arena.recorder) box.insertAdjacentHTML('beforeend', '<span class="rec-dot">REC</span>');
+  } catch (e){ box.outerHTML = `<p class="ar-ghost">${camError(e)}${arena && arena.rec ? ' You can add a video when you finish.' : ''}</p>`; if (arena){ arena.cam = false; } }
+}
+async function arenaMediaStop(keep){
+  const a = arena; if (!a) return;
+  if (a.camStop){ a.camStop(); a.camStop = null; }
+  if (a.recorder){ const r = a.recorder; a.recorder = null; try { const blob = await r.stop(); if (keep && blob.size) a.video = blob; } catch (e){} }
+  if (a.stream){ a.stream.getTracks().forEach(t => t.stop()); a.stream = null; }
+}
+
+/* ---------- duels: challenge a friend (shared through the app's own storage) ---------- */
+const duel = {db:null, assets:null, user:null, me:null, canWrite:null, list:[], ready:false, names:{}};
+async function duelsInit(){
+  if (!window.claude || typeof window.claude.use !== 'function') return;
+  const [db, assets, user] = await Promise.all([window.claude.use('db'), window.claude.use('assets'), window.claude.use('user')]);
+  if (!db || !user) return;
+  duel.me = await user.id(); if (!duel.me) return;
+  Object.assign(duel, {db, assets, user, canWrite: await user.can('data.write')});
+  db.collection('duels').orderBy('createdAt', 'desc').limit(60).onSnapshot(s => {
+    duel.list = s.docs.map(d => ({id:d.id, ...d.data()})); duel.ready = true;
+    if (ui.mode === 'challenge' && !arena) drawChallenges(false);
+  }, () => { duel.db = null; duel.ready = false; if (ui.mode === 'challenge' && !arena) drawChallenges(false); });
+}
+const duelOn = () => !!(duel.db && duel.me && duel.canWrite !== false);
+async function fillNames(root){
+  const els = [...root.querySelectorAll('[data-uid]')]; if (!els.length || !duel.user) return;
+  const ps = await duel.user.profiles([...new Set(els.map(e => e.dataset.uid))]);
+  els.forEach(e => { const p = ps[e.dataset.uid]; e.textContent = p && p.isMe ? 'You' : (p && p.name) || 'Someone'; });
+}
+function duelWinner(d){
+  const ch = CH[d.challengeId]; if (!ch || !d.to) return null;
+  if (d.to.score === d.from.score) return 'tie';
+  return isBetter(ch, d.to.score, d.from.score) ? 'to' : 'from';
+}
+function duelsHtml(){
+  if (!duel.db) return '';
+  const mine = duel.list.filter(d => d.from && (d.from.uid === duel.me || (d.to && d.to.uid === duel.me)));
+  const open = duel.list.filter(d => d.status === 'open' && d.from && d.from.uid !== duel.me && CH[d.challengeId]);
+  const watch = (id, label) => id ? `<button class="btn sm ghost" data-watch="${esc(id)}">${label}</button>` : '';
+  let h = `<div class="lvl-head"><h3>Duels</h3>${duel.ready ? '' : '<span class="lock">Loading…</span>'}</div>`;
+  if (!open.length && !mine.length) h += `<p class="small muted">Finish any challenge and tap <b>Challenge a friend</b>. Your friend sees it here and tries to beat you.</p>`;
+  if (open.length) h += `<div class="list">${open.slice(0, 8).map(d => { const ch = CH[d.challengeId];
+    return `<div class="duel-row"><span><b><span data-uid="${esc(d.from.uid)}">Someone</span> challenged you</b><span class="small muted">${esc(ch.name)}${d.scaled ? ' (easier)' : ''}: ${chVal(ch, d.from.score)} ${chUnit(ch)}</span></span>
+      <span class="row">${watch(d.from.video, 'Watch')}<button class="btn sm primary" data-accept="${esc(d.id)}">Beat it</button></span></div>`; }).join('')}</div>`;
+  if (mine.length) h += `<div class="list" style="margin-top:8px">${mine.slice(0, 8).map(d => { const ch = CH[d.challengeId]; if (!ch) return '';
+    const iAmFrom = d.from.uid === duel.me, w = duelWinner(d), meSide = iAmFrom ? 'from' : 'to', other = iAmFrom ? d.to : d.from;
+    const status = !d.to ? 'Waiting for an answer' : w === 'tie' ? `Tie: ${chVal(ch, d.from.score)} each` : `${w === meSide ? 'You won' : 'You lost'}: ${chVal(ch, (iAmFrom ? d.from : d.to).score)} vs ${chVal(ch, other.score)}`;
+    return `<div class="duel-row${d.to ? (w === meSide ? ' won' : w === 'tie' ? '' : ' lost') : ''}"><span><b>${esc(ch.name)}</b>${other ? ` <span class="small muted">vs <span data-uid="${esc(other.uid)}">Someone</span></span>` : ''}<span class="small muted">${status}</span></span>
+      <span class="row">${watch(d.from.video, iAmFrom ? 'My video' : 'Their video')}${d.to ? watch(d.to.video, iAmFrom ? 'Their video' : 'My video') : ''}${iAmFrom && !d.to ? `<button class="btn sm ghost" data-withdraw="${esc(d.id)}">Withdraw</button>` : ''}</span></div>`; }).join('')}</div>`;
+  return h;
+}
+function videoSheet(id){
+  showSheet(`<h2>Attempt video</h2><video class="duel-video" controls playsinline src="/_blob/${encodeURIComponent(id)}"></video>
+    <p class="small muted">If it doesn’t play, the video may have been removed or isn’t available to you.</p><div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
+}
+// Result screen: the video of this attempt and the duel actions.
+function resVideoHtml(){
+  const a = arena, d = a.duel, posting = a.posting;
+  let h = '';
+  if (d){
+    const ch = a.ch, w = isBetter(ch, a.res.score, d.from.score) ? 'win' : a.res.score === d.from.score ? 'tie' : 'lose';
+    h += `<p class="duel-out ${w}">${w === 'win' ? 'You beat them!' : w === 'tie' ? 'It’s a tie!' : 'Not this time.'} ${chVal(ch, a.res.score)} vs ${chVal(ch, d.from.score)}</p>`;
+  }
+  if (a.video) h += `<video class="res-vid" controls playsinline src="${a.videoUrl || (a.videoUrl = URL.createObjectURL(a.video))}"></video><span class="small" style="opacity:.6">${(a.video.size / 1048576).toFixed(1)} MB · ${a.posted && duel.assets ? 'shared in the duel' : 'on this phone only'}</span>`;
+  else if (a.recWaiting) h += `<p class="ar-note">Saving your video…</p>`;
+  else if (a.compress != null) h += `<p class="ar-note">Making your video smaller… ${Math.round(a.compress * 100)}%</p>`;
+  else if (duelOn()) h += `<label class="add-vid"><input type="file" accept="video/*" capture="user" id="res-vid-file"><span>Add a video of this attempt</span><small>Optional. Recorded or from your gallery. We shrink it on your phone.</small></label>`;
+  if (a.vidErr) h += `<p class="ar-note">${esc(a.vidErr)}</p>`;
+  if (duelOn() && !a.posted){
+    h += `<label class="ar-switch"><input type="checkbox" id="duel-ok" ${a.duelOk ? 'checked' : ''}><span><b>Share my result${a.video ? ' and video' : ''}</b><small>Everyone with access to this app can see it, and your name. You can withdraw a challenge while nobody has answered.</small></span></label>
+      <button class="ar-go small-go" data-ar="duel" ${a.duelOk && !posting && !a.recWaiting && a.compress == null ? '' : 'disabled'}>${posting ? 'Sending…' : d ? 'Send my answer' : 'Challenge a friend'}</button>`;
+  } else if (a.posted) h += `<p class="ar-note">${d ? 'Answer sent. They’ll see it under Duels.' : 'Challenge posted. Share the app with your friend (Share, invite them as Editor) and they’ll find it under Duels.'}</p>`;
+  return h;
+}
+function refreshResVideo(){ const el = document.getElementById('res-video'); if (el && arena && arena.phase === 'result') el.innerHTML = resVideoHtml(); }
+async function postDuel(){
+  const a = arena; if (!a || !a.res || a.posting) return;
+  a.posting = true; a.vidErr = ''; refreshResVideo();
+  try {
+    let videoId = null;
+    if (a.video){
+      if (!duel.assets) a.vidErr = 'You can’t upload videos here, so only your result was shared.';
+      else { const up = await duel.assets.upload(a.video, {type:a.video.type.split(';')[0]}); videoId = up.id; }
+    }
+    const side = {uid:duel.me, score:a.res.score, medal:a.res.medal || null, video:videoId, at:new Date().toISOString()};
+    if (a.duel) await duel.db.doc('duels/' + a.duel.id).update({to:side, status:'answered'});
+    else await duel.db.collection('duels').add({challengeId:a.ch.id, scaled:!!a.res.scaled, createdAt:new Date().toISOString(), from:side, to:null, status:'open'});
+    a.posted = true; buzz(20);
+  } catch (e){
+    a.vidErr = e && e.code === 'too_large' ? 'The video is too big to share. Your result was not sent; try without the video.'
+      : e && e.code === 'quota_or_state' ? 'Video storage is full. Try sharing without the video.'
+      : 'Couldn’t share it this time. Check you’ve been invited as Editor, then try again.';
+  }
+  a.posting = false; refreshResVideo();
+}
+document.getElementById('arena').addEventListener('change', async ev => {
+  if (!arena) return;
+  if (ev.target.id === 'duel-ok'){ arena.duelOk = ev.target.checked; return refreshResVideo(); }
+  if (ev.target.id === 'res-vid-file' && ev.target.files[0]){
+    const f = ev.target.files[0]; arena.vidErr = '';
+    if (f.size <= VIDEO_MAX && /^video\/(mp4|webm)$/.test(f.type)){ arena.video = f; return refreshResVideo(); }
+    arena.compress = 0; refreshResVideo();
+    try { arena.video = await compressVideo(f, p => { if (arena){ arena.compress = p; const n = document.querySelector('#res-video .ar-note'); if (n) n.textContent = `Making your video smaller… ${Math.round(p * 100)}%`; } }); }
+    catch (e){ arena.vidErr = e && e.code === 'too_long' ? 'That video is longer than 16 minutes.' : e && e.code === 'too_big' ? 'Still over 20 MB after shrinking. Try a shorter clip.' : 'This phone can’t shrink that video. Try a smaller one, or share just the result.'; }
+    if (arena){ arena.compress = null; refreshResVideo(); }
+  }
+});
+document.addEventListener('click', async ev => {
+  const w = ev.target.closest('[data-watch]'); if (w) return videoSheet(w.dataset.watch);
+  const acc = ev.target.closest('[data-accept]');
+  if (acc){ const d = duel.list.find(x => x.id === acc.dataset.accept); if (!d) return;
+    const ch = CH[d.challengeId], ok = challengeAllowed(ch, currentLimits());
+    if (!ok.ok) return toast(ok.why);
+    return openArena(ch.id, d); }
+  const wd = ev.target.closest('[data-withdraw]');
+  if (wd){
+    if (!wd.dataset.armed){ wd.dataset.armed = '1'; wd.textContent = 'Tap again'; return; }
+    const d = duel.list.find(x => x.id === wd.dataset.withdraw); if (!d) return;
+    try { await duel.db.doc('duels/' + d.id).delete(); if (d.from.video && duel.assets) duel.assets.delete(d.from.video).catch(() => {}); toast('Challenge withdrawn'); }
+    catch (e){ toast('Couldn’t withdraw it right now.'); }
+  }
+});
+
 /* ---------- mode: Challenge or Training ---------- */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
 const ICON_DUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg>';
@@ -2551,6 +2730,7 @@ function drawChallenges(anim){
     h += `<div class="feat"><span class="small" style="font-weight:700">Today’s challenge · ${esc(chFmtLabel(feat))}</span><h2>${esc(feat.name)}</h2><p class="small">${esc(feat.blurb)}</p>
       <p class="small"><b>Your target: ${chVal(feat, nt.value)}</b>${nt.medal ? ` for ${MEDAL_NAME[nt.medal]}` : ''}</p>
       <button class="btn" data-ch="${feat.id}">Let’s go</button></div>`; }
+  h += duelsHtml();
   if (L.mode === 'gentle') h += `<p class="banner">High-intensity challenges are locked for now. ${store.get('health', null) ? 'Your safety check suggests talking to a doctor before harder training.' : '<button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
   h += `<div class="chips" style="margin-top:16px">${CH_FILTERS.map(([k, l]) => `<button class="chip" data-chf="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>`;
   let i = 0;
@@ -2573,7 +2753,7 @@ function drawChallenges(anim){
   }
   h += `<p class="small muted" style="margin-top:16px">One or two challenges a day is plenty. Rest days make you faster.</p>`;
   const el = document.getElementById('challenge-content');
-  el.innerHTML = h;
+  el.innerHTML = h; fillNames(el);
   el.querySelectorAll('.ch-grid').forEach(g => { if (anim) g.classList.add('in'); });
   if (anim && !RM()) requestAnimationFrame(() => requestAnimationFrame(() => { const x = document.getElementById('rank-xp'); if (x) x.style.width = pct + '%'; }));
 }
@@ -2601,20 +2781,21 @@ function tone(f, d){
 }
 async function holdWake(){ try { if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen'); } catch (e){} }
 function releaseWake(){ try { if (wakeLock) wakeLock.release(); } catch (e){} wakeLock = null; }
-function openArena(id){
-  arena = {ch:CH[id], scaled:batteryToday() === 'red', lowBatt:batteryToday() === 'red', phase:'intro'};
+function openArena(id, duelDoc){
+  arena = {ch:CH[id], duel:duelDoc || null, scaled:batteryToday() === 'red', lowBatt:batteryToday() === 'red', phase:'intro'};
   document.getElementById('arena').hidden = false; document.body.style.overflow = 'hidden';
   drawArena();
 }
 function closeArena(){
   if (!arena) return;
-  cancelAnimationFrame(arena.raf); clearTimeout(arena.cdT); releaseWake(); arenaCamStop(); arena = null;
+  cancelAnimationFrame(arena.raf); clearTimeout(arena.cdT); releaseWake(); arenaMediaStop(false);
+  if (arena.videoUrl) URL.revokeObjectURL(arena.videoUrl); arena = null;
   const el = document.getElementById('arena'); el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   if (ui.mode === 'challenge') drawChallenges(false);
 }
 function drawArena(){
   const el = document.getElementById('arena');
-  if (arena.phase === 'intro') el.innerHTML = `<div class="ar-in">${arenaIntro()}</div>`;
+  if (arena.phase === 'intro'){ el.innerHTML = `<div class="ar-in">${arenaIntro()}</div>`; fillNames(el); }
   if (arena.phase === 'result'){ el.innerHTML = `<div class="ar-in">${arenaResult()}</div>`; afterResult(); }
   el.scrollTop = 0;
 }
@@ -2622,6 +2803,7 @@ function arenaIntro(){
   const ch = arena.ch, S = chState(), best = S.best[ch.id], nt = nextTarget(ch, best);
   const moves = ch.moves.map(m => `<li><b>${MOVES[m].name}</b> ${esc(MOVES[m].how)}</li>`).join('');
   return `<div class="ar-top"><button class="ar-x" data-ar="close" aria-label="Close">✕</button><span class="ar-fmt">${esc(chFmtLabel(ch))}</span></div>
+    ${arena.duel ? `<p class="duel-banner">Duel: beat <span data-uid="${esc(arena.duel.from.uid)}">their</span> ${chVal(ch, arena.duel.from.score)} ${chUnit(ch)}${arena.duel.scaled ? ' (easier version)' : ''}</p>` : ''}
     <span class="ar-lvl">Level ${ch.level} · ${LEVEL_NAMES[ch.level]}</span>
     <h2 class="ar-name">${esc(ch.name)}</h2>
     <p class="ar-blurb">${esc(ch.scheme || ch.blurb)}</p>
@@ -2631,12 +2813,15 @@ function arenaIntro(){
     ${arena.lowBatt ? '<p class="ar-note">Low battery today, so we switched on the easier version. Switch it off if you feel good.</p>' : ''}
     <label class="ar-switch"><input type="checkbox" id="ar-scaled" ${arena.scaled ? 'checked' : ''}><span><b>Easier version</b><small>${esc(ch.easy)} Counts for XP, not for medals that unlock levels.</small></span></label>
     ${camMoveFor(ch) && camSupported() ? `<label class="ar-switch"><input type="checkbox" id="ar-cam-on" ${arena.cam ? 'checked' : ''}><span><b>Count with the camera</b><small>Phone on the floor, side-on, whole body in the picture. Nothing is recorded or sent.</small></span></label>` : ''}
+    ${camSupported() ? `<label class="ar-switch"><input type="checkbox" id="ar-rec-on" ${arena.rec ? 'checked' : ''}><span><b>Record my attempt</b><small>The video stays on this phone. You choose afterwards whether to share it in a duel.</small></span></label>` : ''}
     <p class="ar-note">Warm up first: a minute of marching, arm circles and a few easy squats. Stop if anything hurts.</p>
     <button class="ar-go" data-ar="go">Start</button>`;
 }
 function startCountdown(){
   arena.scaled = !!(document.getElementById('ar-scaled') || {}).checked;
   arena.cam = !!(document.getElementById('ar-cam-on') || {}).checked; arena.camReps = 0;
+  arena.rec = !!(document.getElementById('ar-rec-on') || {}).checked;
+  Object.assign(arena, {video:null, videoUrl:null, posted:false, duelOk:false, vidErr:'', compress:null, recWaiting:false});
   arena.phase = 'countdown'; holdWake();
   const el = document.getElementById('arena'), seq = ['3','2','1','GO'];
   el.innerHTML = `<div class="ar-in"><div class="ar-top"><button class="ar-x" data-ar="close" aria-label="Close">✕</button><b class="ar-title">${esc(arena.ch.name)}</b></div></div><div class="ar-cd" aria-live="assertive"></div>`;
@@ -2660,16 +2845,16 @@ function startWork(){
   const btns = ch.fmt === 'amrap' && !ch.round ? '<button data-ar="minus">−1</button><button data-ar="plus5">+5</button><button data-ar="end">Finish</button>'
     : ch.fmt === 'amrap' ? '<button data-ar="minus">−1 round</button><button data-ar="end">Finish</button>'
     : ch.fmt === 'fortime' ? '<button data-ar="undo">Undo</button><button data-ar="setdone">Set done</button>' : '';
-  document.getElementById('arena').innerHTML = `<div class="ar-in ar-work${arena.cam ? ' has-cam' : ''}">
+  document.getElementById('arena').innerHTML = `<div class="ar-in ar-work${arena.cam || arena.rec ? ' has-cam' : ''}">
     <div class="ar-top"><button class="ar-x" data-ar="quit" aria-label="Quit">✕</button><b class="ar-title">${esc(ch.name)}${arena.scaled ? ' · easier' : ''}</b><span class="ar-fmt">${chShort(ch)}</span></div>
     <div class="ar-ring"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="54"/><circle class="arc" id="ar-arc" cx="60" cy="60" r="54"/></svg>
       <div class="ar-mid"><b class="ar-count" id="ar-count">${ch.fmt === 'fortime' ? arena.left : ch.fmt === 'hold' ? '0:00' : 0}</b><span class="ar-unit" id="ar-unit">${unit}</span><span class="ar-time" id="ar-time">${ch.dur ? fmtClock(ch.dur) : '0:00'}</span></div></div>
     <div class="ar-track" aria-hidden="true"><div class="bar"><span id="ar-fill"></span></div>${ch.tiers.map((t, i) => `<i class="mk m-${MEDALS[i]}" id="mk-${i}" style="left:${trackPos(ch, t)}%"></i>`).join('')}</div>
     <p class="ar-ghost" id="ar-ghost" aria-live="polite">${sub}</p>
-    ${arena.cam ? '<div class="ar-cam" id="ar-cam"></div>' : ''}
+    ${arena.cam || arena.rec ? '<div class="ar-cam" id="ar-cam"></div>' : ''}
     <button class="ar-tap" id="ar-tap" data-ar="tap">${arena.cam ? 'Tap if the camera misses one' : tap}</button>
     ${btns ? `<div class="ar-row">${btns}</div>` : ''}</div>`;
-  if (arena.cam) arenaCamStart();
+  if (arena.cam || arena.rec) arenaMediaStart();
   loop();
 }
 const $a = id => document.getElementById(id);
@@ -2754,8 +2939,10 @@ function arTap(ev){
   setCount(arena.count + 1); buzz(8);
 }
 function finishWork(score){
-  cancelAnimationFrame(arena.raf); releaseWake(); arenaCamStop();
-  const ch = arena.ch;
+  cancelAnimationFrame(arena.raf); releaseWake();
+  const ch = arena.ch, keep = score > 0, a = arena;
+  if (a.recorder) a.recWaiting = keep;
+  arenaMediaStop(keep).then(() => { a.recWaiting = false; if (arena === a) refreshResVideo(); });
   if (!(score > 0)){ arena.phase = 'intro'; drawArena(); return toast(ch.fmt === 'emom' ? 'The first minute slipped by. Go again!' : 'Nothing counted. Go again when you’re ready.'); }
   arena.before = JSON.parse(JSON.stringify(chState()));
   arena.res = saveChallenge(ch, score, arena.scaled, arena.before);
@@ -2784,6 +2971,7 @@ function arenaResult(){
       <div class="res-xp"><b>+${res.xp} XP</b><div class="xpbar"><span id="res-xp" style="width:${arena.quiet ? Math.round((res.xpAfter - from) / (to - from) * 100) : (res.lvlAfter > res.lvlBefore ? 0 : Math.round((res.xpBefore - from) / (to - from) * 100))}%"></span></div>
         <span class="small" style="opacity:.75">${rankFor(lv)} · Level ${lv} · ${res.xpAfter - from} / ${to - from} XP</span></div>
       <p class="ar-note">${nt.medal ? `Next target: <b>${chVal(ch, nt.value)}</b> for ${MEDAL_NAME[nt.medal]}` : `Next target: <b>${chVal(ch, nt.value)}</b>. You hold every medal here.`}</p>
+      <div id="res-video" class="res-video">${resVideoHtml()}</div>
       ${ch.unit !== 'sec' ? `<div class="ar-row fix"><button data-ar="fix" data-d="-1" aria-label="One less">−1</button><span>Fix count</span><button data-ar="fix" data-d="1" aria-label="One more">+1</button></div>` : ''}
     </div>
     <div class="ar-row"><button data-ar="close">Done</button><button class="primary" data-ar="again">Go again</button></div>`;
@@ -2808,7 +2996,8 @@ document.getElementById('arena').addEventListener('click', ev => {
   if (a === 'tap'){ if (arena.tapByPointer){ arena.tapByPointer = false; return; } return arTap(ev); }
   if (a === 'close') return closeArena();
   if (a === 'go') return startCountdown();
-  if (a === 'again'){ arena.phase = 'intro'; return drawArena(); }
+  if (a === 'again'){ if (arena.posted) arena.duel = null; if (arena.videoUrl) URL.revokeObjectURL(arena.videoUrl); arena.video = null; arena.videoUrl = null; arena.phase = 'intro'; return drawArena(); }
+  if (a === 'duel') return postDuel();
   if (a === 'quit'){
     if (!arena.quitArm){ arena.quitArm = true; t.textContent = 'Quit?'; t.classList.add('arm'); setTimeout(() => { if (arena && arena.phase === 'work'){ arena.quitArm = false; t.textContent = '✕'; t.classList.remove('arm'); } }, 2500); return; }
     return closeArena();
@@ -2968,6 +3157,7 @@ document.addEventListener('click', ev => { if (swallowClick && ev.target.closest
 document.getElementById('today-date').textContent = new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});
 fillForm();
 setTab(['body','today','food','recipes','sched'].includes(ui.tab) ? ui.tab : 'body');
+duelsInit();
 setMode(store.get('mode', 'train'));
 if (/[?#&](survey|setup)\b/.test(location.search + location.hash)) openFlow('gym');
 else openModePicker();
