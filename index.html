@@ -17,7 +17,7 @@
   --text:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
   --amber:#D99A1E; --blue:#4A7BD0;
   --spring:cubic-bezier(.3,1.45,.5,1); --out:cubic-bezier(.2,.8,.2,1);
-  --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
+  --bad:#D63A2F; --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
   --r:14px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -356,6 +356,47 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 @media (max-width:430px){.top-r .date{display:none}}
 
 .why-in{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;font-size:16px;width:100%}
+/* ---------- daily battery ---------- */
+.batt-card{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:13px 14px;width:100%}
+.batt-card .hfs{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.batt-txt{display:flex;flex-direction:column;min-width:0;gap:2px}
+.batt-txt b{font-family:var(--display);font-size:26px;line-height:1}
+.batt-txt span{font-size:13px;color:var(--muted)}
+.batt{position:relative;display:inline-block;width:48px;height:25px;border:2.5px solid var(--ink);border-radius:7px;padding:2px;margin-right:5px}
+.batt::after{content:"";position:absolute;right:-7px;top:6px;width:3px;height:8px;border-radius:0 2px 2px 0;background:var(--ink)}
+.batt span{display:block;height:100%;border-radius:3px;background:var(--line);transition:width .8s var(--spring),background-color .3s}
+.batt.b-green span{background:var(--good)}.batt.b-yellow span{background:var(--amber)}.batt.b-red span{background:var(--bad)}
+.batt.b-red{animation:lowbatt 1.6s ease-in-out infinite}
+@keyframes lowbatt{50%{opacity:.5}}
+.batt.big{width:72px;height:38px;border-width:3px;border-radius:10px}
+.batt.big::after{right:-9px;top:11px;width:4px;height:10px}
+.hf{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--muted)}
+.hf.h-green{background:var(--good-soft);color:var(--ink)}
+.hf.h-yellow{background:color-mix(in srgb,var(--amber) 24%,transparent);color:var(--ink)}
+.hf.h-red{background:color-mix(in srgb,var(--bad) 20%,transparent);color:var(--ink)}
+.batt-head{display:flex;align-items:center;gap:16px}
+.glasses{display:flex;gap:7px;flex-wrap:wrap}
+.glass{width:30px;height:38px;border:2px solid var(--line);border-top-width:0;border-radius:0 0 9px 9px;background:var(--bg);padding:0}
+.glass.full{border-color:var(--blue);background:linear-gradient(to top,color-mix(in srgb,var(--blue) 55%,transparent) 78%,transparent 78%)}
+/* ---------- weekly planning ---------- */
+.phase-card{background:var(--ink);color:var(--bg);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.phase-name{font-family:var(--display);font-size:36px;line-height:1;text-transform:uppercase}
+.pips{display:flex;gap:6px;margin-top:8px}
+.pips i{flex:1;height:6px;border-radius:3px;background:color-mix(in srgb,var(--bg) 22%,transparent)}
+.pips i.past{background:color-mix(in srgb,var(--accent) 55%,transparent)}.pips i.now{background:var(--accent)}
+.planner{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.pl-row{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}
+.pl-row.rest{background:transparent;border-style:dashed}
+.pl-row.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.pl-row.done{background:var(--good-soft);border-color:transparent}
+.pl-day{display:flex;flex-direction:column;align-items:center;font-size:11.5px;color:var(--muted);line-height:1.1}
+.pl-day b{font-family:var(--display);font-size:22px;color:var(--ink)}
+.pl-main{display:flex;flex-direction:column;min-width:0}
+.pl-main span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pl-row.rest .pl-main b{color:var(--muted);font-weight:600}
+.pl-state{font-size:12.5px;font-weight:700;color:var(--accent)}
+.pl-row.done .pl-state{color:var(--good);font-size:18px}
+.habit-line{margin-top:10px;text-align:center}
 /* ---------- mode picker: Challenge or Training ---------- */
 #modepick{position:fixed;inset:0;z-index:65;background:var(--bg);overflow:auto}
 #modepick .mp-in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
@@ -612,10 +653,10 @@ body.mode-challenge .app{padding-bottom:40px}
   <!-- SCHEDULE -->
   <section class="view" id="v-sched" hidden>
     <div class="row" style="justify-content:space-between">
-      <h2>My schedule</h2>
+      <h2>Your plan</h2>
       <button class="btn sm ghost" id="clear-sched">Clear week</button>
     </div>
-    <p class="muted small" style="margin-top:4px">Add exercises from the body view with <b>+ Schedule</b>. They show up here and on the Today tab.</p>
+
     <div id="sched-content" class="stack" style="margin-top:12px"></div>
   </section>
 </div>
@@ -626,7 +667,7 @@ body.mode-challenge .app{padding-bottom:40px}
     <button role="tab" data-tab="today" id="t-today" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/></svg>Today</button>
     <button role="tab" data-tab="food" id="t-food" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2.5 1.5-3.5 4-3.5 8h3.5"/></svg>Food</button>
     <button role="tab" data-tab="recipes" id="t-recipes" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="10" cy="13" r="7"/><circle cx="10" cy="13" r="2.5"/><path d="M16 9l5-5"/></svg>Recipes</button>
-    <button role="tab" data-tab="sched" id="t-sched" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>Schedule</button>
+    <button role="tab" data-tab="sched" id="t-sched" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>Plan</button>
   </div>
 </nav>
 
@@ -973,9 +1014,11 @@ function recommend(day){
   const ap = planForToday();
   if (ap && ap.plan.days.length){
     const d = ap.plan.days.find(x => x.day===day);
-    if (!d) return {plan:{title:'Rest day', focus:[], note:'Your plan has a rest day today. A walk and gentle stretching.'}, items:[], sets:0};
-    return {plan:{title:d.title, focus:['plan'], note:'From your personal plan.'}, sets:d.exercises[0] ? d.exercises[0].sets : 2,
-      items:d.exercises.filter(x => EX[x.id]).map(x => ({id:x.id, sets:x.sets, dose:x.dose}))};
+    if (!d) return {plan:{title:'Rest day', focus:[], note:'Rest is part of the plan. Walk, stretch and sleep 8 hours.'}, items:[], sets:0};
+    const info = planInfo(), ph = info ? info.phase : {delta:0, name:'', week:1}, Lp = currentLimits(), cap = Lp.mode === 'gentle' ? Lp.maxSets : Lp.maxSets + 1;
+    const col = day === todayKey() ? batteryColor(batteryScore(habitLog(todayISO()))) : 'none';
+    const items = d.exercises.filter(x => EX[x.id]).map(x => ({id:x.id, sets:sessionSets(x.sets, ph.delta, col, cap), dose:x.dose}));
+    return {plan:{title:d.title, focus:['plan'], note:`Week ${ph.week} · ${ph.name}${col === 'red' ? ' · one set less today for a low battery' : ''}`}, sets:items[0] ? items[0].sets : 2, items};
   }
   const plan = PLAN[day], p = P_(), L = currentLimits(), lvl = Math.min(+p.level, L.maxLevel);
   if (!plan.focus.length) return {plan, items:[], sets:0};
@@ -1021,9 +1064,11 @@ function drawToday(){
     <h2>${mine.length ? 'Your workout' : esc(rec.plan.title)}</h2>
     <p class="small" style="opacity:.85">${mine.length ? `${mine.length} exercises from your schedule, plus today's suggestions below.` : esc(rec.plan.note)}</p>
     ${why ? `<p class="why">Your why: “${esc(why)}”</p>` : ''}
+    ${(() => { const pi = planInfo(); return pi && pi.a.time && rec.items.length ? `<p class="small" style="opacity:.85">Session at <b>${esc(pi.a.time)}</b>${pi.a.minutes ? ` · ${Math.min(pi.a.minutes, currentLimits().maxMinutes)} min` : ''}</p>` : ''; })()}
     <div class="facts"><span>Goal: <b>${GOAL_TXT[p.goal]}</b></span>${rec.plan.focus.length?`<button class="rest-btn" type="button" data-timer="${REST_SEC[p.goal]}" data-tlabel="Rest between sets">⏱ Rest <b>${REST[p.goal]}</b> · start timer</button>`:''}${cardio?`<span>Cardio <b>${cardio} min</b></span>`:''}</div>
     ${all.length?`<div class="prog-row"><span>${nDone} of ${all.length} done</span><b>${pct}%</b></div><div class="progress" aria-label="${pct}% done"><span style="width:${lastPct===null?pct:lastPct}%"></span></div>`:''}
   </div>`;
+  h += batteryCard();
   h += planCard();
   if (ob && ob.answers && ob.answers.goal && !why && !store.get('whyAsked', false)) h += `<div class="cta-card stack" style="align-items:stretch"><span><b>What’s your why?</b><span class="small muted">One line. We’ll show it on the tough days.</span></span>
     <input id="why-in" class="why-in" maxlength="140" placeholder="e.g. feel strong again" aria-label="Your why"><span class="row"><button class="btn sm primary" id="why-save">Save</button><button class="btn sm ghost" id="why-skip">Not now</button></span></div>`;
@@ -1223,10 +1268,11 @@ function fillForm(){
 
 /* ---------- schedule ---------- */
 function drawSchedule(){
-  const total = DAYS.reduce((n,d)=>n+schedule[d].length,0);
-  let h = '';
-  if (!total){
-    h = `<div class="empty"><p><b>Your week is empty.</b></p><p class="small" style="margin-top:4px">Tap a muscle on the body, then <b>+ Schedule</b> on any exercise. Or start from a sample week and edit it.</p>
+  const total = DAYS.reduce((n,d)=>n+schedule[d].length,0), planned = !!planInfo();
+  let h = plannerHtml();
+  if (planned) h += `<h3>Extra exercises</h3>` + (total ? '' : `<p class="small muted">Add extras from the Body tab with <b>+ Schedule</b>. They show up on Today next to your plan.</p>`);
+  if (!total && !planned){
+    h += `<div class="empty"><p><b>Your week is empty.</b></p><p class="small" style="margin-top:4px">Tap a muscle on the body, then <b>+ Schedule</b> on any exercise. Or start from a sample week and edit it.</p>
       <div class="row" style="justify-content:center;margin-top:12px"><button class="btn primary" data-goto="body">Pick a muscle</button><button class="btn" id="sample-week">Load sample week</button></div></div>`;
   }
   DAYS.forEach(d => {
@@ -1471,6 +1517,60 @@ function challengeAllowed(ch, L){
 }
 /* challenge-core:end */
 
+/* habits-core:start — daily battery and the 4-week training block, pure (no DOM). Tested in tests/habits.test.mjs */
+const SLEEP_OPTS = [['lt6','Under 6 h',15],['6-7','6–7 h',45],['7-8','7–8 h',75],['8+','8 h or more',100]];
+const FOOD_OPTS = [['no','Not really',20],['mostly','Mostly',60],['yes','Yes',100]];
+const MOVE_OPTS = [['lt5','Under 5k',30],['5-8','5–8k',70],['8+','8k or more',100]];
+const WATER_GOAL = 8;
+const BATTERY_W = {sleep:0.5, food:0.2, water:0.15, move:0.15};
+// Sleep comes first: without 8 hours the battery can't be green, and under 6 hours it is always red.
+const SLEEP_CAP = {'lt6':40, '6-7':60, '7-8':74};
+const optScore = (opts, v) => { const o = opts.find(x => x[0] === v); return o ? o[2] : null; };
+function factorScores(log){
+  log = log || {};
+  return {sleep:optScore(SLEEP_OPTS, log.sleep), food:optScore(FOOD_OPTS, log.food),
+    water: log.water == null ? null : Math.round(Math.min(1, Math.max(0, log.water) / WATER_GOAL) * 100), move:optScore(MOVE_OPTS, log.move)};
+}
+function batteryScore(log){
+  const f = factorScores(log); let s = 0, w = 0;
+  Object.keys(BATTERY_W).forEach(k => { if (f[k] != null){ s += f[k] * BATTERY_W[k]; w += BATTERY_W[k]; } });
+  if (!w) return null;
+  let sc = Math.round(s / w);
+  if (log && SLEEP_CAP[log.sleep] != null) sc = Math.min(sc, SLEEP_CAP[log.sleep]);
+  return sc;
+}
+const batteryColor = sc => sc == null ? 'none' : sc >= 75 ? 'green' : sc >= 45 ? 'yellow' : 'red';
+// Which week of the 4-week block a date falls in, counting from the plan's start day.
+function blockWeek(start, now){
+  const p = String(start).slice(0, 10).split('-').map(Number), s = new Date(p[0], p[1] - 1, p[2]);
+  const n = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const d = Math.round((n - s) / 86400000);
+  return d < 0 ? 1 : (Math.floor(d / 7) % 4) + 1;
+}
+// New lifters spend two weeks on habits and technique before adding volume.
+const BLOCKS = {
+  novice:[['Foundations','Habits first: 8 hours of sleep, protein at every meal, water. Light weights, perfect form.',0],
+          ['Foundations','Same weights, cleaner reps. Keep your battery green.',0],
+          ['Build','One more set. Add weight when the last reps feel easy.',1],
+          ['Build','Small jumps in weight. Habits still come first.',1]],
+  standard:[['Base','Find your working weights. Stop 2 or 3 reps before failure.',0],
+            ['Build','Add a little weight or one rep per set.',0],
+            ['Push','Hardest week. Stop 1 or 2 reps before failure.',1],
+            ['Deload','Fewer sets, same technique. Let your body catch up.',-1]]
+};
+function phaseFor(level, week){
+  const b = level === 'start' ? BLOCKS.novice : BLOCKS.standard, [name, tip, delta] = b[(week - 1) % 4];
+  return {name, tip, delta, week};
+}
+// Sets for a session: plan sets + the week's change, one less on a red battery, within safe bounds.
+function sessionSets(base, delta, color, cap){ return Math.max(1, Math.min(cap, base + delta - (color === 'red' ? 1 : 0))); }
+function weekPlanning(planDays, time, minutes){
+  return WEEK.map(day => { const d = (planDays || []).find(x => x.day === day);
+    return d ? {day, type:'train', title:d.title, time:time || null, minutes:+minutes || null, count:d.exercises.length} : {day, type:'rest'}; });
+}
+/* habits-core:end */
+
+
 
 // The generator's standing instructions. The page has no system prompt of its own, so this goes first in every request.
 const PLAN_SYSTEM_PROMPT = `You draft personal weekly plans for Home Reps, a home fitness and nutrition app. A coach, Coach Dani, reviews every draft before the user treats it as final.
@@ -1548,69 +1648,85 @@ function healthInit(){
   return {_hadHealth:!!hl, healthConsent: hl ? true : undefined, hflags: hl ? fromParq(hl.parq) : undefined, injuries: hl ? (hl.injuries.length ? hl.injuries : ['none']) : undefined};
 }
 
-/* ---------- first time in: one-tap age check, then (for training) a 3-screen gym setup ---------- */
+/* ---------- Training setup (the only questionnaire): age, goal, experience, days, time and sleep, safety ---------- */
 const FLOWS = {};
 const GYM_GOALS = [['gain','Build muscle'],['strength','Get stronger'],['lose','Lose fat'],['endure','Get fitter']];
 const GYM_EXP = [['start','New to the gym'],['some','Under a year'],['regular','1–3 years'],['advanced','3+ years']];
 const GYM_MIN = [['30','30'],['45','45'],['60','60'],['75','75']];
-FLOWS.gate = {
-  closable: () => false,
-  init: () => ({}),
-  steps: [
-    {type:'custom', id:'age', hero:true, auto:'age', render:a => `<div class="ob-hero"><div class="brand">Home<span>Reps</span></div><h2>Quick one</h2><p class="muted">How old are you?</p></div>${chips('age', AGE_OPTS, a, {label:'Age'})}`, valid:a => !!a.age},
-    {type:'info', block:true, when:a => a.age === 'u18', title:'Home Reps is for adults for now', body:'You need to be 18 or older to use Home Reps. If you tapped this by mistake, go back and change it.'}
-  ],
-  finish(a){
-    const o = store.get('onboarding', null) || {v:3, at:new Date().toISOString(), answers:{}};
-    o.answers = {...(o.answers || {}), age:a.age}; store.set('onboarding', o);
-    const then = flow.then; setTimeout(() => enterMode(then || 'train'), 60);
-  }
-};
+const TIME_OPTS = [['07:00','Morning · 7:00'],['13:00','Midday · 13:00'],['18:30','After work · 18:30'],['20:30','Late · 20:30']];
+const ageKnown = () => { const o = store.get('onboarding', null), g = o && o.answers && o.answers.age; return g && g !== 'u18' ? g : null; };
+function saveAge(a){
+  if (!a.age || a.age === 'u18' || a._age) return;
+  const o = store.get('onboarding', null) || {v:3, at:new Date().toISOString(), answers:{}};
+  o.answers = {...(o.answers || {}), age:a.age}; store.set('onboarding', o);
+}
+const ageSteps = hint => [
+  {type:'custom', id:'age', auto:'age', when:a => !a._age, q:'How old are you?', hint, render:a => chips('age', AGE_OPTS, a, {label:'Age'}), valid:a => !!a.age},
+  {type:'info', block:true, when:a => !a._age && a.age === 'u18', title:'Home Reps is for adults for now', body:'You need to be 18 or older to use Home Reps. If you tapped this by mistake, go back and change it.'}
+];
+const adultOk = a => !!a._age || a.age !== 'u18';
 FLOWS.gym = {
   closable: () => true,
   init(){
     const o = store.get('onboarding', null), oa = (o && o.answers) || {};
-    return {goal:['gain','strength','lose','endure'].includes(oa.goal) ? oa.goal : undefined, level:oa.level, dpw:String(oa.dpw || 3), minutes:String(oa.minutes >= 30 ? oa.minutes : 60), ...healthInit()};
+    return {_age:ageKnown(), goal:['gain','strength','lose','endure'].includes(oa.goal) ? oa.goal : undefined, level:oa.level, dpw:String(oa.dpw || 3),
+      minutes:String(oa.minutes >= 30 ? oa.minutes : 60), time:oa.time, sleepUsual:oa.sleepUsual, ...healthInit()};
   },
   steps: [
-    {type:'custom', id:'goal', auto:'goal', q:'What’s your goal?', render:a => chips('goal', GYM_GOALS, a, {col:true, label:'Goal'}), valid:a => !!a.goal},
-    {type:'custom', id:'routine', q:'Your training', render:a => block('Gym experience', chips('level', GYM_EXP, a, {label:'Experience'})) +
+    ...ageSteps('Five taps and your week is ready.'),
+    {type:'custom', id:'goal', auto:'goal', when:adultOk, q:'What’s your goal?', render:a => chips('goal', GYM_GOALS, a, {col:true, label:'Goal'}), valid:a => !!a.goal},
+    {type:'custom', id:'routine', when:adultOk, q:'Your training', render:a => block('Gym experience', chips('level', GYM_EXP, a, {label:'Experience'})) +
       block('Days a week', chips('dpw', DPW_OPTS, a, {label:'Days a week'})) + block('Minutes per session', chips('minutes', GYM_MIN, a, {label:'Minutes'})), valid:a => !!(a.level && a.dpw && a.minutes)},
-    {type:'custom', id:'healthConsent', q:'Quick safety check', render:a => safetyHtml(a, false), valid:a => safetyValid(a, false), cta:a => a.healthConsent ? 'Build my week' : 'Skip check and build my week'}
+    {type:'custom', id:'day', when:adultOk, q:'Your day', render:a => block('When do you usually train?', chips('time', TIME_OPTS, a, {col:true, label:'Training time'})) +
+      block('How long do you usually sleep?', chips('sleepUsual', SLEEP_OPTS.map(x => [x[0], x[1]]), a, {label:'Usual sleep'})), valid:a => !!(a.time && a.sleepUsual)},
+    {type:'custom', id:'healthConsent', when:adultOk, q:'Quick safety check', render:a => safetyHtml(a, false), valid:a => safetyValid(a, false), cta:a => a.healthConsent ? 'Build my plan' : 'Skip check and build my plan'}
   ],
   finish(a){
-    syncDerived(a);
-    const now = new Date().toISOString(), prev = store.get('health', null);
+    syncDerived(a); saveAge(a);
+    const now = new Date(), iso = now.toISOString(), prev = store.get('health', null);
     if (a.healthConsent) store.set('health', {...healthRecord(a), eating: prev && prev.eating});
-    const o = store.get('onboarding', null) || {v:3, at:now, answers:{}};
-    o.v = 3; o.answers = {...o.answers, track:'gym', goal:a.goal, level:a.level, dpw:+a.dpw, days:DPW_DAYS[+a.dpw], minutes:+a.minutes};
+    const o = store.get('onboarding', null) || {v:3, at:iso, answers:{}};
+    o.v = 3; o.answers = {...o.answers, track:'gym', goal:a.goal, level:a.level, dpw:+a.dpw, days:DPW_DAYS[+a.dpw], minutes:+a.minutes, time:a.time, sleepUsual:a.sleepUsual};
     store.set('onboarding', o);
     const pa = {...a, kind:'training', track:'gym', days:o.answers.days, minutes:+a.minutes, equipment:GYM_KIT, injuries:a.healthConsent ? (a.injuries || []) : []};
     const c = planContext(pa), res = validatePlan(localDraft(pa, c), c.L, c);
-    store.set('plan', {v:1, at:now, status:'pending_review', source:'auto', kind:'training', note:'', issues:res.issues, plan:res.plan});
-    setTimeout(() => { ui.tab = 'today'; ui.day = null; lastPct = null; setMode('train'); celebrate('Your week is ready!'); }, 60);
+    const start = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    store.set('plan', {v:1, at:iso, start, status:'pending_review', source:'auto', kind:'training', note:'', issues:res.issues, plan:res.plan});
+    setTimeout(() => { ui.tab = 'sched'; ui.day = null; lastPct = null; setMode('train'); celebrate('Your plan is ready. Here’s your week!'); }, 60);
   }
 };
 
-/* ---------- safety check on its own (from Today or Challenges) ---------- */
+/* ---------- safety check on its own (Today or Challenges); asks age if we don't have it ---------- */
 FLOWS.safety = {
   closable: () => true,
-  init: () => ({...healthInit(), _hadHealth:false}),
-  steps: [{type:'custom', id:'healthConsent', q:'Quick safety check', render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)}],
-  finish(a){ const prev = store.get('health', null); store.set('health', {...healthRecord(a), eating: prev && prev.eating}); toast('Safety check saved'); }
+  init: () => ({...healthInit(), _hadHealth:false, _age:ageKnown()}),
+  steps: [...ageSteps('Needed once, before high-intensity training.'),
+    {type:'custom', id:'healthConsent', when:adultOk, q:'Quick safety check', render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)}],
+  finish(a){
+    saveAge(a); const prev = store.get('health', null); store.set('health', {...healthRecord(a), eating: prev && prev.eating});
+    const P = store.get('plan', null), o = store.get('onboarding', null), oa = o && o.answers;
+    if (P && P.source === 'auto' && oa && oa.goal){
+      const pa = {...a, ...oa, kind:'training', track:oa.track || 'gym', equipment:GYM_KIT, injuries:(a.injuries || []).filter(x => x !== 'none')};
+      const c = planContext(pa), res = validatePlan(localDraft(pa, c), c.L, c);
+      store.set('plan', {...P, issues:res.issues, plan:res.plan});
+    }
+    toast('Safety check saved. Your plan is updated.');
+  }
 };
 
 /* ---------- plan builder: 3 or 4 screens ---------- */
 FLOWS.plan = {
   closable: () => true,
   init(){
+    const _age = ageKnown();
     const o = store.get('onboarding', null), oa = (o && o.answers) || {}, p = profile || {};
-    return {...healthInit(), goal: oa.goal || p.goal, level: oa.level, days: oa.days || DPW_DAYS[3], minutes: oa.minutes || 45, track:userTrack(), equipment: userTrack() === 'gym' ? GYM_KIT : undefined,
+    return {...healthInit(), _age, goal: oa.goal || p.goal, level: oa.level, days: oa.days || DPW_DAYS[3], minutes: oa.minutes || 45, track:userTrack(), equipment: userTrack() === 'gym' ? GYM_KIT : undefined,
       sex: p.sex, age: p.age, height: p.height, weight: p.weight, activity: p.activity || '1.375', diet: p.diet, meals: p.meals || '4', pace:'steady'};
   },
   steps: [
-    {type:'custom', id:'healthConsent', when:a => !a._hadHealth, q:'Quick safety check', render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)},
-    {type:'custom', id:'cover', q:'Build your plan', render:a => block('What should it cover?', chips('kind', KIND_OPTS, a, {label:'Plan covers'})) +
+    ...ageSteps(),
+    {type:'custom', id:'healthConsent', when:a => adultOk(a) && !a._hadHealth, q:'Quick safety check', render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)},
+    {type:'custom', id:'cover', when:adultOk, q:'Build your plan', render:a => block('What should it cover?', chips('kind', KIND_OPTS, a, {label:'Plan covers'})) +
       (trn(a) ? block('What do you have at home?', chips('equipment', EQUIP_OPTS, a, {multi:true, none:'none', label:'Equipment'})) : ''),
       valid:a => !!a.kind && (!trn(a) || (a.equipment || []).length > 0)},
     {type:'custom', id:'body', when:nut, q:'About you', hint:'Only used to size your meals.', render:a => block('Sex', chips('sex', [['f','Female'],['m','Male']], a, {label:'Sex'})) +
@@ -1636,7 +1752,7 @@ FLOWS.plan = {
       <label class="consent"><input type="checkbox" id="ob-consent" ${a.aiConsent ? 'checked' : ''}><span>Draft it with AI (Claude)<small>We send your answers without your name or email. Leave it unticked to draft it on your device. Coach Dani reviews every plan.</small></span></label>`,
       valid:() => true, cta:() => 'Create my plan'},
     {type:'custom', id:'gen', q:'', render:() => `<div class="gen"><div class="spin" aria-hidden="true"></div><h2>Drafting your plan</h2><p class="muted" id="gen-s" aria-live="polite">Reading your answers…</p></div>`,
-      valid:() => false, cta:() => 'Working…', after:(el, a) => { if (!a.goal) a.goal = 'tone'; syncDerived(a); runGeneration(a); }}
+      valid:() => false, cta:() => 'Working…', after:(el, a) => { if (!a.goal) a.goal = 'tone'; syncDerived(a); saveAge(a); runGeneration(a); }}
   ]
 };
 
@@ -1796,9 +1912,9 @@ function localDraft(a, c){
   const L = c.L, out = {summary:'', days:[], safetyNotes:[], questionsForCoach:[]};
   if (c.tr){
     const days = ((a.days && a.days.length) ? a.days : ['mon','wed','fri']).slice(0, L.maxDays);
-    const gym = a.track === 'gym';
-    const per = gym ? Math.max(3, Math.min(7, Math.round((+a.minutes || 45) / 10) + 1)) : Math.max(3, Math.min(6, Math.round((+a.minutes || 20) / 6)));
-    const order = gym ? (GYM_SPLITS[days.length] || GYM_SPLITS[3]) : [SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full, SPLITS.legs];
+    const gym = a.track === 'gym', mins = Math.min(+a.minutes || (gym ? 45 : 20), L.maxMinutes);
+    const per = gym ? Math.max(3, Math.min(7, Math.round(mins / 10) + 1)) : Math.max(3, Math.min(6, Math.round((+a.minutes || 20) / 6)));
+    const order = gym ? (a.level === 'start' && days.length <= 3 ? days.map(() => FULL) : (GYM_SPLITS[days.length] || GYM_SPLITS[3])) : [SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full, SPLITS.legs];
     const allowed = new Set(c.allowed);
     out.days = days.map((d, i) => {
       const [title, groups] = (L.mode === 'gentle' || (!gym && days.length <= 3)) ? SPLITS.full : order[i], picked = [];
@@ -1884,13 +2000,86 @@ function planSheet(){
 }
 
 
+
+/* ---------- daily battery: sleep first, then food, water and steps ---------- */
+const todayISO = () => dateStr(new Date());
+const habitLog = d => (store.get('habits', {}) || {})[d] || {};
+function setHabit(k, v){
+  const all = store.get('habits', {}) || {}, d = todayISO();
+  all[d] = {...(all[d] || {}), [k]: v};
+  const keys = Object.keys(all).sort(); while (keys.length > 60) delete all[keys.shift()];
+  store.set('habits', all);
+}
+const BATT_MSG = {none:'Log last night’s sleep to charge it.', green:'Fully charged. Train as planned.',
+  yellow:'Half charged. Train, but don’t chase records today.', red:'Low battery. We trimmed today’s session. Sleep is your best workout tonight.'};
+function battIcon(sc, big){
+  const col = batteryColor(sc);
+  return `<span class="batt b-${col}${big ? ' big' : ''}" aria-hidden="true"><span style="width:${sc || 0}%"></span></span>`;
+}
+function batteryCard(){
+  const log = habitLog(todayISO()), sc = batteryScore(log), col = batteryColor(sc), f = factorScores(log);
+  const dot = (k, l) => `<span class="hf ${f[k] == null ? '' : 'h-' + batteryColor(f[k])}">${l}</span>`;
+  return `<button class="batt-card c-${col}" data-habits="1" type="button" aria-label="Daily battery ${sc == null ? 'not set' : sc + '%'}. Tap to check in">
+    ${battIcon(sc)}<span class="batt-txt"><b>${sc == null ? 'Your battery' : sc + '%'}</b><span>${BATT_MSG[col]}</span></span>
+    <span class="hfs">${dot('sleep','Sleep')}${dot('food','Food')}${dot('water','Water')}${dot('move','Steps')}</span></button>`;
+}
+function habitsSheet(){
+  const log = habitLog(todayISO()), sc = batteryScore(log), col = batteryColor(sc), o = store.get('onboarding', null), lvl = o && o.answers && o.answers.level;
+  const row = (k, opts) => `<div class="chipset">${opts.map(([v, l]) => `<button class="pick" data-hab="${k}" data-v="${v}" aria-pressed="${log[k] === v}">${l}</button>`).join('')}</div>`;
+  const w = log.water || 0;
+  openSheet(`<div class="batt-head">${battIcon(sc, true)}<div><h2>${sc == null ? 'Charge your battery' : sc + '%'}</h2><p class="small muted">${BATT_MSG[col]}</p></div></div>
+    ${lvl === 'start' ? '<p class="note">Your first weeks: these habits matter more than the weights.</p>' : ''}
+    ${block('Sleep last night', row('sleep', SLEEP_OPTS))}
+    ${block(`Water today · ${w} of ${WATER_GOAL} glasses`, `<div class="glasses">${Array.from({length:WATER_GOAL}, (_, i) => `<button class="glass${i < w ? ' full' : ''}" data-water="${i + 1 === w ? i : i + 1}" aria-label="${i + 1} glasses"></button>`).join('')}</div>`)}
+    ${block('Protein and veg at most meals?', row('food', FOOD_OPTS))}
+    ${block('Steps today', row('move', MOVE_OPTS))}
+    <div class="row"><button class="btn primary" data-close="1">Done</button></div>`);
+}
+document.getElementById('sheet-root').addEventListener('click', ev => {
+  const h = ev.target.closest('[data-hab],[data-water]'); if (!h) return;
+  if (h.dataset.hab){ const k = h.dataset.hab, cur = habitLog(todayISO())[k]; setHabit(k, cur === h.dataset.v ? undefined : h.dataset.v); }
+  else setHabit('water', +h.dataset.water);
+  buzz(8);
+  const sc = document.querySelector('.sheet').scrollTop;
+  habitsSheet(); document.querySelector('.sheet').scrollTop = sc; document.querySelector('.scrim').style.animation = 'none'; document.querySelector('.sheet').style.animation = 'none';
+  if (ui.tab === 'today' && ui.mode !== 'challenge'){ todayAnim = false; drawToday(); }
+});
+
+/* ---------- the weekly planning ---------- */
+function planInfo(){
+  const P = planForToday(), o = store.get('onboarding', null), a = (o && o.answers) || {};
+  if (!P || !P.plan.days.length) return null;
+  const week = blockWeek(P.start || P.at.slice(0, 10), new Date());
+  return {P, a, week, phase:phaseFor(a.level, week)};
+}
+function plannerHtml(){
+  const info = planInfo(), o = store.get('onboarding', null);
+  if (!info) return (o && o.answers && o.answers.goal) ? '' : `<div class="cta-card"><span><b>Build your plan</b><span class="small muted">5 taps. We plan your week around your days and hours.</span></span><button class="btn sm primary" data-flow="gym">Start</button></div>`;
+  const {P, a, week, phase} = info, rows = weekPlanning(P.plan.days, a.time, Math.min(+a.minutes || 0, currentLimits().maxMinutes) || null);
+  const now = new Date(), monday = new Date(now); monday.setDate(now.getDate() - DAYS.indexOf(todayKey()));
+  let h = `<div class="phase-card"><span class="small" style="opacity:.75">Week ${week} of 4</span><b class="phase-name">${phase.name}</b><p class="small">${phase.tip}</p>
+    <div class="pips">${[1,2,3,4].map(i => `<i class="${i < week ? 'past' : i === week ? 'now' : ''}"></i>`).join('')}</div></div>`;
+  if (currentLimits().mode === 'gentle') h += `<p class="banner" style="margin-top:10px">${store.get('health', null) ? 'Gentle mode: up to 3 easy sessions a week until a doctor clears harder training.' : 'Gentle mode: up to 3 easy sessions a week until you do the safety check.'}${store.get('health', null) ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do it now</button>'}</p>`;
+  h += `<div class="planner">${rows.map((r, i) => {
+    const dt = new Date(monday); dt.setDate(monday.getDate() + i);
+    const key = dateStr(dt), done = new Set(doneLog[key] || []), isT = r.day === todayKey();
+    const pd = P.plan.days.find(x => x.day === r.day), complete = pd && pd.exercises.length && pd.exercises.every(x => done.has('r:' + x.id));
+    return `<button class="pl-row${isT ? ' today' : ''}${r.type === 'rest' ? ' rest' : ''}${complete ? ' done' : ''}" data-planday="${r.day}" type="button">
+      <span class="pl-day">${DAY_LABEL[r.day]}<b>${dt.getDate()}</b></span>
+      <span class="pl-main">${r.type === 'train' ? `<b>${esc(r.title)}</b><span>${[r.time, r.minutes ? r.minutes + ' min' : '', r.count + ' exercises'].filter(Boolean).join(' · ')}</span>`
+        : `<b>Rest</b><span>Walk, stretch, sleep 8 h</span>`}</span>
+      <span class="pl-state">${complete ? '✓' : isT ? 'Today' : ''}</span></button>`; }).join('')}</div>`;
+  h += `<p class="small muted habit-line">Every day: 8 h sleep · ${WATER_GOAL} glasses of water · protein at every meal · 8k steps</p>`;
+  return h;
+}
+
 /* ---------- mode: Challenge or Training ---------- */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
 const ICON_DUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg>';
 function openModePicker(){
   const el = document.getElementById('modepick'), S = chState(), lvl = levelFromXp(S.xp), hr = new Date().getHours();
   const hello = hr < 12 ? 'Morning' : hr < 19 ? 'Afternoon' : 'Evening', o = store.get('onboarding', null), setUp = !!(o && o.answers && o.answers.goal);
-  const today = setUp ? 'Today: ' + recommend(todayKey()).plan.title : 'Build your week in 30 seconds';
+  const today = setUp ? 'Today: ' + recommend(todayKey()).plan.title : 'Your plan in 5 taps';
   el.className = '';
   el.innerHTML = `<div class="mp-in"><p class="mp-hi">${hello}. What’s it today?</p>
     <button class="mp-card mp-ch" data-mode="challenge"><span class="mp-ico">${ICON_BOLT}</span><span class="mp-t">Challenge</span>
@@ -1901,8 +2090,7 @@ function openModePicker(){
 }
 function enterMode(m){
   const o = store.get('onboarding', null), a = (o && o.answers) || {};
-  if (!a.age || a.age === 'u18') return openFlow('gate', m);
-  if (m === 'train' && !a.goal){ setMode('train'); return openFlow('gym'); }
+  if (m === 'train' && !(a.goal && a.age && a.age !== 'u18')){ setMode('train'); return openFlow('gym'); }
   setMode(m);
 }
 function pickMode(m, card){
@@ -2271,7 +2459,7 @@ function render(){
 }
 
 document.addEventListener('click', ev => {
-  const t = ev.target.closest('[data-timer],[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,[data-flow],[data-plan],#redo-setup,#del-health,#del-all,#mode-pill,#why-save,#why-skip,#clear-sched,#side-front,#side-back');
+  const t = ev.target.closest('[data-timer],[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,[data-flow],[data-plan],#redo-setup,#del-health,#del-all,#mode-pill,#why-save,#why-skip,[data-habits],[data-planday],#clear-sched,#side-front,#side-back');
   if (!t) return;
   if (t.dataset.timer){ ev.preventDefault(); return startTimer(+t.dataset.timer, t.dataset.tlabel); }
   if (t.dataset.close && ev.target!==t && t.classList.contains('scrim')) return;
@@ -2301,6 +2489,8 @@ document.addEventListener('click', ev => {
     store.set('whyAsked', true); todayAnim = false; return drawToday();
   }
   if (t.id==='mode-pill') return openModePicker();
+  if (t.dataset.habits) return habitsSheet();
+  if (t.dataset.planday){ ui.day = t.dataset.planday; lastPct = null; return setTab('today'); }
   if (t.id==='del-health' || t.id==='del-all'){
     if (!t.dataset.armed){ const old = t.textContent; t.dataset.armed = '1'; t.textContent = 'Tap again to confirm'; setTimeout(()=>{ delete t.dataset.armed; t.textContent = old; }, 3000); return; }
     if (t.id==='del-health'){ store.del('health'); store.del('plan'); render(); return toast('Health answers and plan deleted'); }
