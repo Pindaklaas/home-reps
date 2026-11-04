@@ -12,6 +12,6 @@ trap '"${AS[@]}" "$BIN/pg_ctl" -D "$DIR/db" stop -m immediate >/dev/null 2>&1 ||
 "${AS[@]}" "$BIN/pg_ctl" -D "$DIR/db" -o "-k $DIR -c listen_addresses=''" -l "$DIR/log" start -w >/dev/null
 PSQL=("$BIN/psql" -h "$DIR" -U postgres -d postgres -q -v ON_ERROR_STOP=1)
 "${PSQL[@]}" -f supabase/tests/stub-auth.sql
-"${PSQL[@]}" -f supabase/migrations/20261104000000_init.sql
+for f in supabase/migrations/*.sql; do "${PSQL[@]}" -f "$f"; done
 "${PSQL[@]}" -f supabase/seed.sql
 "${PSQL[@]}" -t -f supabase/tests/rules.sql

@@ -7,7 +7,7 @@ import { handleEvent } from '../supabase/functions/_shared/submit.mjs';
 const T0 = Date.parse('2026-11-04T07:30:00');
 function memDb(){
   const m = {profiles:{a:{nickname:'ana_fit', flagged:false}, b:{nickname:'Jorge', flagged:false}, c:{nickname:'Sara', flagged:false}},
-    content:{'ab-pushup':{type:'ab', body:{correct:'a'}}, 'tip-sleep':{type:'tip', body:{}}},
+    content:{'ab-pushup':{type:'ab', body:{correct:'a'}}, 'quiz-ergonomics':{type:'ab', body:{correct:'b'}}, 'tip-sleep':{type:'tip', body:{}}},
     events:[], xp:[], points:[], sessions:[], answers:[], tips:[], leagues:{a:['L'], b:['L'], c:['L']}, tokens:{b:['tok-b'], c:['tok-c']}, pushes:[]};
   const total = uid => m.xp.filter(x => x.user_id === uid).reduce((n, x) => n + x.xp, 0);
   return {m, total, db:{
@@ -80,4 +80,10 @@ test('unknown events and missing profiles are refused', async () => {
   const x = memDb();
   assert.equal((await call(x, 'a', {kind:'hack', xp:9999})).status, 400);
   assert.equal((await call(x, 'zz', {kind:'meal'})).status, 403);
+});
+
+test('quizzes with three options accept C and still check the right answer on the server', async () => {
+  const x = memDb(), r = await call(x, 'a', {kind:'ab', id:'quiz-ergonomics', choice:'c'});
+  assert.equal(r.body.correct, 'b'); assert.equal(x.m.answers[0].choice, 'c'); assert.equal(x.m.answers[0].correct, false);
+  assert.equal((await call(x, 'b', {kind:'ab', id:'quiz-ergonomics', choice:'z'})).body.correct, 'b');
 });

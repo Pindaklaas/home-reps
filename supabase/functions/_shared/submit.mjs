@@ -16,7 +16,7 @@ function clean(ev, now){
       repTimes:verified && Array.isArray(ev.repTimes) ? ev.repTimes.slice(0, 500).map(x => Math.round(+x)) : [],
       startedAt:String(ev.startedAt || ''), endedAt:String(ev.endedAt || ''), conf:ev.conf == null ? null : +ev.conf};
   }
-  if (ev.kind === 'ab') return {kind:'ab', id, at, choice:ev.choice === 'b' ? 'b' : 'a'};
+  if (ev.kind === 'ab') return {kind:'ab', id, at, choice:['a', 'b', 'c'].includes(ev.choice) ? ev.choice : 'a'};
   if (ev.kind === 'challenge') return {kind:'challenge', id, at, xp:Math.max(0, Math.floor(+ev.xp || 0))};
   return {kind:ev.kind, id, at};
 }

@@ -743,6 +743,9 @@ details.steps ol{margin-top:8px}
 .lc-k,.lr-k{font-family:var(--display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:12px;color:var(--accent)}
 .learn-vid,.learn-img{width:100%;border-radius:16px;background:var(--bg);max-height:280px;object-fit:cover}
 .ab-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ab-pair.three{grid-template-columns:repeat(3,1fr);gap:6px}
+.ab-pair.three .ab-k{font-size:20px}
+.ab-pair.three .ab-l{font-size:11.5px;line-height:1.25}
 .ab-opt{position:relative;border:2px solid var(--line);background:var(--bg);border-radius:18px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:border-color .2s,transform .3s var(--spring),opacity .2s}
 .ab-opt:not(:disabled):active{transform:scale(.96)}
 .ab-opt svg,.ab-opt video{width:100%;aspect-ratio:1;height:auto;border-radius:12px;object-fit:cover}
@@ -3784,6 +3787,11 @@ function sagK(k, dy){ const S = addv(k.hip, dirv(k.tr), RIG.shoulder), h = [k.hi
 ANIMS['pushup-sag'] = A(pushupA().map(k => sagK(k, .09)));
 ANIMS['plank-pike'] = (() => { const k = sagK(ANIMS.plank.keys[0], -.13); return two(k, {hip:[k.hip[0], k.hip[1] + .012]}, {move:1600, hold:600}); })();
 ANIMS['squat-half'] = two(ST, squatK({hip:[-.09, .41], tr:76, a:[{h:[.3, .66]}, {h:[.28, .66]}]}));
+// Picking a weight up: right (close, hips back, flat back) and two wrong ways.
+const DBB = [{k:'db', at:'hand0', big:1}];
+ANIMS['lift-good'] = two(mergeP(STA, {hip:[-.19, .3], tr:44, pr:DBB}), {hip:[0, .5], tr:90}, {move:900, hold:900});
+ANIMS['lift-round'] = two(mergeP(STA, {hip:[-.03, .5], tr:-42, hd:-20, pr:DBB}), {hip:[0, .5], tr:90, hd:0}, {move:900, hold:900});
+ANIMS['lift-far'] = two(mergeP(STA, {hip:[-.17, .46], tr:12, a:[{h:[.46, .06], b:-1}, {h:[.44, .06], b:-1}], pr:DBB}), {hip:[0, .5], tr:90, a:[{h:[.4, .58]}, {h:[.38, .58]}]}, {move:900, hold:900});
 // Exercises that share a movement.
 const ANIM_ALIAS = {};
 
@@ -4021,24 +4029,36 @@ const XP_LABEL = {alarm:'Morning alarm', streak:'Streak bonus', tip:'Tip read', 
 
 /* ---------- tips and A/B challenges (content comes from the shared store when there is one) ---------- */
 const LEARN_DEFAULT = [
-  {id:'tip-breathe', type:'tip', order:1, title:'Breathe out on the effort', text:'Exhale as you push up or stand up, inhale on the way down. Your core stays tight and every rep feels steadier.', anim:'squat'},
-  {id:'tip-sleep', type:'tip', order:2, title:'Sleep is part of training', text:'Most muscle repair happens while you sleep. Seven to nine hours does more for your progress than any supplement.'},
-  {id:'tip-protein', type:'tip', order:3, title:'Protein at every meal', text:'A palm-sized portion of protein at each of 3 or 4 meals builds more muscle than one huge serving at dinner.'},
-  {id:'ab-pushup', type:'ab', order:1, title:'Which push-up is right?', a:{label:'Body in one line', anim:'pushup'}, b:{label:'Hips dropping', anim:'pushup-sag'}, correct:'a',
+  {id:'quiz-ergonomics', type:'ab', order:0, day:'2026-11-04', topic:'Ergonomics', title:'How do you pick up the weight?',
+    a:{label:'Round your back, straight legs', anim:'lift-round'}, b:{label:'Close to you, hips back, flat back', anim:'lift-good'}, c:{label:'Reach out in front of you', anim:'lift-far'}, correct:'b',
+    why:'Keep the weight close and push your hips back with a flat back: your legs and glutes do the work. Round-backed or far away, the load lands on your lower back.'},
+  {id:'tip-breathe', type:'tip', order:1, topic:'Breathing', title:'Breathe out on the effort', text:'Exhale as you push up or stand up, inhale on the way down. Your core stays tight and every rep feels steadier.', anim:'squat'},
+  {id:'tip-sleep', type:'tip', order:2, topic:'Sleep', title:'Sleep is part of training', text:'Most muscle repair happens while you sleep. Seven to nine hours does more for your progress than any supplement.'},
+  {id:'tip-protein', type:'tip', order:3, topic:'Protein', title:'Protein at every meal', text:'A palm-sized portion of protein at each of 3 or 4 meals builds more muscle than one huge serving at dinner.'},
+  {id:'ab-pushup', type:'ab', order:1, topic:'Push-up form', title:'Which push-up is right?', a:{label:'Body in one line', anim:'pushup'}, b:{label:'Hips dropping', anim:'pushup-sag'}, correct:'a',
     why:'A straight line from head to heels protects your lower back and makes your chest and core do the work.'},
-  {id:'ab-squat', type:'ab', order:2, title:'Which squat counts?', a:{label:'Half way down', anim:'squat-half'}, b:{label:'Hips below the knees', anim:'squat'}, correct:'b',
+  {id:'ab-squat', type:'ab', order:2, topic:'Squat depth', title:'Which squat counts?', a:{label:'Half way down', anim:'squat-half'}, b:{label:'Hips below the knees', anim:'squat'}, correct:'b',
     why:'Going down until the hips pass the knees works your glutes and quads through the full range. Half reps build half the strength.'},
-  {id:'ab-plank', type:'ab', order:3, title:'Which plank works your core?', a:{label:'Hips up high', anim:'plank-pike'}, b:{label:'Flat like a board', anim:'plank'}, correct:'b',
+  {id:'ab-plank', type:'ab', order:3, topic:'Plank', title:'Which plank works your core?', a:{label:'Hips up high', anim:'plank-pike'}, b:{label:'Flat like a board', anim:'plank'}, correct:'b',
     why:'With the hips high your shoulders take the load and your abs switch off. Flat, your whole core has to hold you.'}
 ];
 const learn = {items:LEARN_DEFAULT, live:false};
 const learnList = type => learn.items.filter(x => x.type === type).sort((a, b) => (a.order || 0) - (b.order || 0));
+function tipOfDay(at){
+  const day = gDay(at || new Date()), pinned = learn.items.find(x => x.day === day); if (pinned) return pinned;
+  const pool = learn.items.filter(x => !x.day).sort((a, b) => String(a.id).localeCompare(String(b.id)));
+  return pool.length ? pool[Math.floor(new Date(day + 'T12:00:00').getTime() / 864e5) % pool.length] : null;
+}
+const tipDone = x => { const g = gameS(); return x.type === 'ab' ? g.answered.includes(x.id) : g.read.includes(x.id); };
 const todayCount = kind => { const d = gDay(new Date()); return gameS().ledger.filter(e => e.kind === kind && gDay(e.at) === d).length; };
 const learnMedia = it => it.video ? `<video class="learn-vid" src="${esc(it.video)}" controls playsinline preload="metadata"></video>` : it.image ? `<img class="learn-img" src="${esc(it.image)}" alt="">` : it.anim && animFor(it.anim) ? `<div class="anim-stage">${animSvg(it.anim, 'big', 'data-ar="1.5"')}</div>` : '';
+// Redraw what's behind a sheet (Today or the Challenge hub) so tiles and dots stay current.
+function refreshHome(){ if (arena) return; if (ui.mode === 'challenge') drawChallenges(false); else if (ui.tab === 'today') drawToday(); }
 function tipSheet(id){
   const t = learn.items.find(x => x.id === id); if (!t) return;
   const first = !gameS().read.includes(id), r = first ? gameEvent({kind:'tip', id}) : null;
-  showSheet(`${learnMedia(t)}<span class="lc-k">Tip</span><h2>${esc(t.title)}</h2><p>${esc(t.text)}</p>
+  if (first) refreshHome();
+  showSheet(`${learnMedia(t)}<span class="lc-k">${t.topic ? esc(t.topic) + ' · ' : ''}Tip</span><h2>${esc(t.title)}</h2><p>${esc(t.text)}</p>
     ${r && !r.xp ? `<p class="small muted">${r.why === 'daily_cap' ? `You’ve had your ${GAME.perDay.tip} tips with XP today. Keep reading, the XP comes back tomorrow.` : ''}</p>` : ''}
     <div class="row">${learnNext('tip', id)}<button class="btn ghost" data-close="1">Close</button></div>`);
 }
@@ -4049,16 +4069,17 @@ function abSheet(id, pick){
   if (pick && !done){
     const r = gameEvent({kind:'ab', id, choice:pick, correct:pick === x.correct});
     const gg = gameS(); gg.abPick = {...(gg.abPick || {}), [id]:pick}; store.set('game', gg);
-    buzz(pick === x.correct ? [20, 40, 20] : 60); tone(pick === x.correct ? 1046 : 330, .2);
+    buzz(pick === x.correct ? [20, 40, 20] : 60); tone(pick === x.correct ? 1046 : 330, .2); refreshHome();
     res = r.why === 'daily_cap' ? `<p class="small muted">No XP: you’ve done ${GAME.perDay.ab} today. It still counts as answered.</p>` : '';
   }
+  const keys = ['a', 'b', 'c'].filter(k => x[k]), kicker = keys.length > 2 ? 'A, B or C?' : 'A or B?';
   const show = done || pick, side = k => { const o = x[k], cls = show ? (k === x.correct ? ' right' : mine === k ? ' wrong' : ' dim') : '';
     return `<button class="ab-opt${cls}" data-abpick="${k}" data-ab="${esc(id)}" ${show ? 'disabled' : ''} aria-label="Option ${k.toUpperCase()}: ${esc(o.label)}">
       <span class="ab-k">${k.toUpperCase()}</span>${o.video ? `<video src="${esc(o.video)}" muted loop autoplay playsinline></video>` : animSvg(o.anim, 'ab-anim', 'data-ar="1"')}<span class="ab-l">${esc(o.label)}</span></button>`; };
-  showSheet(`<span class="lc-k">A or B?</span><h2>${esc(x.title)}</h2>${x.video ? `<video class="learn-vid" src="${esc(x.video)}" controls playsinline></video>` : ''}
-    <div class="ab-pair">${side('a')}${side('b')}</div>
-    ${show ? `<div class="ab-why ${mine === x.correct ? 'ok' : mine ? 'no' : ''}"><b>${mine ? (mine === x.correct ? 'Correct!' : 'Not quite.') : 'Answer'} It’s ${x.correct.toUpperCase()}.</b><span>${esc(x.why)}</span></div>${res}` : `<p class="small muted">Tap A or B. You get one try.</p>`}
-    <div class="row">${show ? learnNext('ab', id) : ''}<button class="btn ghost" data-close="1">Close</button></div>`);
+  showSheet(`<span class="lc-k">${x.topic ? esc(x.topic) + ' · ' : ''}${kicker}</span><h2>${esc(x.title)}</h2>${x.video ? `<video class="learn-vid" src="${esc(x.video)}" ${x.poster ? `poster="${esc(x.poster)}"` : ''} controls playsinline></video>` : ''}
+    <div class="ab-pair${keys.length > 2 ? ' three' : ''}">${keys.map(side).join('')}</div>
+    ${show ? `<div class="ab-why ${mine === x.correct ? 'ok' : mine ? 'no' : ''}"><b>${mine ? (mine === x.correct ? 'Correct!' : 'Not quite.') : 'Answer'} It’s ${x.correct.toUpperCase()}.</b><span>${esc(x.why)}</span></div>${res}` : `<p class="small muted">Tap ${keys.length > 2 ? 'A, B or C' : 'A or B'}. You get one try.</p>`}
+    <div class="row">${show ? learnNext('ab', id) : ''}<button class="btn" data-open="learn">All tips</button><button class="btn ghost" data-close="1">Close</button></div>`);
 }
 function learnNext(type, id){
   const g = gameS(), nextAb = learnList('ab').find(y => y.id !== id && !g.answered.includes(y.id)), nextTip = learnList('tip').find(y => y.id !== id && !g.read.includes(y.id));
@@ -4380,8 +4401,8 @@ const HELP = [
     steps:['Alarm, workouts, challenges, tips and A/B all give XP.', 'Each new level gives you points.', 'Tap the circle at the top to see your profile.'], open:'profile', goLabel:'My profile'},
   {id:'ranks', icon:'trophy', tone:'gold', title:'Rankings and leagues', line:'Compete by sector or in a private league with friends.',
     steps:['Pick a nickname: it’s the only thing others see.', 'Rankings by gym, calisthenics or home, this week or all time.', 'Make a league and share the code. You’ll hear every time someone passes you.'], open:'ranks', goLabel:'Open rankings'},
-  {id:'learn', icon:'bulb', tone:'amber', title:'Tips and A or B', line:'Short tips and quick form quizzes.', anim:'pushup-sag',
-    steps:['A or B? Pick the right form; you get one try.', 'Tips take ten seconds to read.', 'Up to 3 of each a day give XP.'], open:'learn', goLabel:'Play one'},
+  {id:'learn', icon:'bulb', tone:'amber', title:'Daily tip', line:'A new tip or quiz every day.', anim:'lift-good',
+    steps:['Tap Daily tip on Today: a red dot means today’s is new.', 'Quizzes show 2 or 3 ways to do it. Pick the right one; one try.', 'Up to 3 tips and 3 quizzes a day give XP.'], open:'learn', goLabel:'See all tips'},
   {id:'privacy', icon:'shield', tone:'ink', title:'Your data', line:'What stays on your phone and what doesn’t.',
     steps:['Camera video never leaves your phone.', 'Others only see your nickname, level and XP.', 'Delete your answers or everything from Food → Your setup and data.']}
 ];
@@ -4572,7 +4593,8 @@ function homeMenu(mode){
     quests:{icon:'today', tone:'good', name:'Quests', sub:`${qd}/${Q.length} today`, a:'data-open="quests"', ring:qd / Q.length},
     battery:{icon:'battery', tone:bt, name:'Battery', sub:sc == null ? 'Check in' : sc + '%', a:'data-habits="1"'},
     hero:{icon:'star', tone:'gold', name:'My hero', sub:h.cls.name.replace('The ', ''), a:'data-jump="hero"'},
-    ab:{icon:'bulb', tone:'amber', name:'A or B?', sub:ab ? `${ab} new` : 'All done', a:'data-open="learn"', dot:ab > 0},
+    ab:(() => { const t = tipOfDay(); return t ? {icon:'bulb', tone:'amber', name:'Daily tip', sub:t.topic || (t.type === 'ab' ? 'Quiz' : 'Tip'), a:t.type === 'ab' ? `data-ab="${esc(t.id)}"` : `data-tip="${esc(t.id)}"`, dot:!tipDone(t)}
+      : {icon:'bulb', tone:'amber', name:'Tips', sub:ab ? `${ab} new` : 'All done', a:'data-open="learn"', dot:ab > 0}; })(),
     ranks:{icon:'trophy', tone:'gold', name:'Rankings', sub:g.nick ? 'Level ' + L.level : 'Join', a:'data-open="ranks"'},
     alarm:{icon:'alarm', tone:'blue', name:'Alarm', sub:al.on ? al.time : 'Off', a:'data-jump="alarm"'},
     meal:{icon:'photo', tone:'good', name:'Meal', sub:'Snap it', a:'data-jump="meal"'},
