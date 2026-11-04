@@ -17,6 +17,7 @@
   --text:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
   --amber:#D99A1E; --blue:#4A7BD0;
   --spring:cubic-bezier(.3,1.45,.5,1); --out:cubic-bezier(.2,.8,.2,1);
+  --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
   --r:14px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -333,6 +334,171 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 @keyframes toastIn{from{transform:translate(-50%,16px);opacity:0}}
 #onboard .in{animation:viewIn .3s var(--out)}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:80}
+
+/* ---------- compact flow pickers ---------- */
+#onboard .in{gap:18px}
+.ob-hero{display:flex;flex-direction:column;gap:10px;padding-top:6vh}
+.ob-hero .brand{font-size:46px}
+.ob-hero h2{font-size:40px}
+.ob-stack{display:flex;flex-direction:column;gap:18px;transition:opacity .2s}
+.ob-block{display:flex;flex-direction:column;gap:8px}
+.ob-label{font-size:13.5px;font-weight:700}
+.ob-grid.three{grid-template-columns:repeat(3,1fr);gap:8px}
+.chipset{display:flex;flex-wrap:wrap;gap:8px}
+.chipset.col{flex-direction:column}
+.pick{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 16px;font-weight:700;font-size:14.5px;text-align:left;transition:transform .14s var(--out),background-color .2s,border-color .2s,color .2s}
+.chipset.col .pick{border-radius:14px;padding:13px 14px}
+.pick[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);animation:pop .3s var(--spring)}
+.pick:active{transform:scale(.95)}
+.dim{opacity:.45;pointer-events:none}
+.consent small{display:block;font-weight:500;color:var(--muted);font-size:12.5px;margin-top:3px}
+.top-r{display:flex;align-items:center;gap:10px}
+@media (max-width:430px){.top-r .date{display:none}}
+
+/* ---------- mode picker: Challenge or Training ---------- */
+#modepick{position:fixed;inset:0;z-index:65;background:var(--bg);overflow:auto}
+#modepick .mp-in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+.mp-hi{font-family:var(--display);font-weight:700;font-size:32px;line-height:1;text-transform:uppercase;letter-spacing:.02em;animation:drop .5s var(--spring) both}
+.mp-card{position:relative;overflow:hidden;flex:1;min-height:210px;border:0;border-radius:28px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;text-align:left;transition:transform .35s var(--spring),opacity .25s}
+.mp-ch{background:var(--accent);color:var(--accent-ink);animation:inTop .7s var(--spring) .05s both}
+.mp-tr{background:var(--ink);color:var(--bg);animation:inBottom .7s var(--spring) .15s both}
+.mp-t{font-family:var(--display);font-weight:700;font-size:62px;line-height:.85;text-transform:uppercase}
+.mp-s{font-size:15px;opacity:.9;max-width:30ch}
+.mp-tag{margin-top:6px;font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:999px;background:color-mix(in srgb,currentColor 16%,transparent)}
+.mp-ico{position:absolute;top:20px;right:20px;width:96px;height:96px;display:grid;place-items:center;border-radius:50%;background:color-mix(in srgb,currentColor 14%,transparent);animation:float 3.4s ease-in-out infinite}
+.mp-ico svg{width:54px;height:54px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mp-ch .mp-ico svg{fill:currentColor;stroke:none}
+.mp-ico::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid currentColor;animation:ring 2.4s ease-out infinite}
+.mp-tr .mp-ico{animation-delay:-1.7s}.mp-tr .mp-ico::after{animation-delay:-1.2s}
+.mp-card::before{content:"";position:absolute;left:-30%;top:0;width:30%;height:100%;background:linear-gradient(90deg,transparent,color-mix(in srgb,currentColor 18%,transparent),transparent);transform:skewX(-20deg);animation:shine 4.5s ease-in-out 1.2s infinite}
+.mp-tr::before{animation-delay:3.4s}
+.mp-card:active{transform:scale(.97)}
+@media (hover:hover){.mp-card:hover{transform:translateY(-3px) rotate(-.5deg)}}
+#modepick.picking .mp-card{opacity:0;transform:scale(.92)}
+#modepick.picking .mp-card.chosen{opacity:1;transform:scale(1.04)}
+#modepick.leaving{animation:fadeout .24s ease-in forwards}
+@keyframes inTop{from{transform:translateY(-70px) rotate(-3deg);opacity:0}}
+@keyframes inBottom{from{transform:translateY(70px) rotate(3deg);opacity:0}}
+@keyframes drop{from{transform:translateY(-20px);opacity:0}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(-7deg)}}
+@keyframes ring{from{transform:scale(1);opacity:.5}to{transform:scale(1.7);opacity:0}}
+@keyframes shine{0%{left:-30%}35%,100%{left:130%}}
+.mode-pill{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px 5px 8px;font-weight:700;font-size:13px}
+.mode-pill svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+body.mode-challenge .mode-pill svg{fill:var(--accent);stroke:none}
+body.mode-challenge nav.tabs{display:none}
+body.mode-challenge .app{padding-bottom:40px}
+
+/* ---------- challenge hub ---------- */
+.rank-card{display:grid;grid-template-columns:auto 1fr;gap:12px 16px;align-items:center;background:var(--ink);color:var(--bg);border-radius:var(--r);padding:16px}
+.rank-badge{width:66px;height:66px;border-radius:20px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:36px;font-weight:700;transform:rotate(-6deg);box-shadow:0 10px 24px -10px var(--accent);animation:pop .6s var(--spring)}
+.rank-name{font-family:var(--display);font-size:32px;line-height:1;text-transform:uppercase;display:block}
+.xpbar{height:8px;border-radius:4px;background:color-mix(in srgb,currentColor 18%,transparent);overflow:hidden;margin:8px 0 4px}
+.xpbar span{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width 1.1s var(--out)}
+.medal-row{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;font-weight:700}
+.mdot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:-1px;margin-right:5px;background:var(--line)}
+.mdot.bronze,.m-bronze{--m:var(--bronze)}.mdot.silver,.m-silver{--m:var(--silver)}.mdot.gold,.m-gold{--m:var(--gold)}.mdot.legend,.m-legend{--m:var(--legend)}
+.mdot{background:var(--m,var(--line))}
+.m-fill,.m-rib{fill:var(--m,var(--line))}.m-rib{opacity:.55}
+.feat{position:relative;overflow:hidden;background:var(--accent);color:var(--accent-ink);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.feat h2{font-size:44px}
+.feat .btn{align-self:flex-start;margin-top:4px;background:var(--accent-ink);color:var(--accent);border-color:var(--accent-ink);padding:10px 20px}
+.feat::after{content:"";position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;border:20px solid color-mix(in srgb,var(--accent-ink) 14%,transparent);animation:spinslow 18s linear infinite}
+@keyframes spinslow{to{transform:rotate(360deg)}}
+.lvl-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:24px 0 10px}
+.lvl-head h3{margin:0}
+.lvl-head .lock{font-size:12.5px;color:var(--muted);display:inline-flex;align-items:center;gap:4px}
+.lock-i{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.ch-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ch-grid.in>*{animation:rise .42s var(--out) both;animation-delay:calc(min(var(--i,0),12) * 40ms)}
+.ch-tile{position:relative;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:13px;display:flex;flex-direction:column;gap:4px;min-height:138px;min-width:0;transition:transform .15s var(--out),border-color .2s}
+.ch-tile:active{transform:scale(.96)}
+@media (hover:hover){.ch-tile:hover{border-color:var(--accent)}}
+.ch-tile .fmt{font-size:11.5px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.ch-tile b{font-family:var(--display);font-size:24px;line-height:1;text-transform:uppercase;padding-right:26px}
+.ch-tile .pb{margin-top:auto;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ch-tile.locked{opacity:.6}
+.ch-tile.locked .fmt{color:var(--muted)}
+.ch-tile.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.medal-pin{position:absolute;top:10px;right:10px;width:26px;height:26px;color:var(--muted)}
+.medal-pin svg{width:100%;height:100%}
+
+/* ---------- arena (always dark, for focus) ---------- */
+#arena{position:fixed;inset:0;z-index:70;background:var(--arena);color:var(--arena-ink);overflow:auto;color-scheme:dark}
+#arena .ar-in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+.ar-top{display:flex;align-items:center;gap:10px}
+.ar-x{min-width:40px;height:40px;padding:0 12px;border-radius:999px;border:0;background:color-mix(in srgb,var(--arena-ink) 12%,transparent);color:inherit;font-size:15px;font-weight:700}
+.ar-x.arm{background:var(--accent);color:var(--accent-ink)}
+.ar-title{font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar-fmt{margin-left:auto;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:5px 11px;border-radius:999px;background:var(--accent);color:var(--accent-ink);white-space:nowrap}
+.ar-lvl{font-size:13px;opacity:.65;font-weight:600}
+.ar-name{font-family:var(--display);font-size:clamp(50px,15vw,74px);line-height:.85;text-transform:uppercase;animation:drop .5s var(--spring) both}
+.ar-blurb{font-size:15.5px;opacity:.88}
+.ar-tiers{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tier{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border-radius:16px;background:color-mix(in srgb,var(--arena-ink) 7%,transparent);font-size:11.5px;font-weight:700;animation:rise .4s var(--out) both}
+.tier:nth-child(2){animation-delay:.06s}.tier:nth-child(3){animation-delay:.12s}.tier:nth-child(4){animation-delay:.18s}
+.tier-m{width:34px;height:34px}
+.tier-m svg{width:100%;height:100%}
+.tier b{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums}
+.tier span:last-child{opacity:.7}
+.tier.got{background:color-mix(in srgb,var(--m) 22%,transparent);outline:1.5px solid var(--m)}
+.ar-stats{display:flex;gap:10px}
+.ar-stats span{flex:1;display:flex;flex-direction:column;font-size:12.5px;opacity:.85;background:color-mix(in srgb,var(--arena-ink) 7%,transparent);border-radius:14px;padding:10px 12px}
+.ar-stats b{font-family:var(--display);font-size:28px;font-variant-numeric:tabular-nums}
+.ar-moves{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14px;opacity:.88}
+.ar-moves b{display:block}
+.ar-switch{display:flex;gap:12px;align-items:flex-start;background:color-mix(in srgb,var(--arena-ink) 7%,transparent);border-radius:14px;padding:12px 14px;cursor:pointer}
+.ar-switch input{width:22px;height:22px;accent-color:var(--accent);margin:2px 0 0;flex:none}
+.ar-switch small{display:block;opacity:.7;font-size:12.5px;margin-top:2px}
+.ar-note{font-size:13px;opacity:.7}
+.ar-go{margin-top:auto;height:66px;border-radius:22px;border:0;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:32px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;animation:breathe 2.2s ease-in-out infinite;box-shadow:0 14px 34px -12px var(--accent)}
+@keyframes breathe{50%{transform:scale(1.03)}}
+.ar-cd{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;font-family:var(--display);font-size:min(58vw,280px);font-weight:700;color:var(--accent)}
+.ar-cd span{animation:cd .85s var(--out) both}
+@keyframes cd{0%{transform:scale(2.4);opacity:0}22%{opacity:1}100%{transform:scale(.75);opacity:0}}
+.ar-work{gap:10px}
+.ar-ring{position:relative;width:min(74vw,300px,42vh);aspect-ratio:1;align-self:center;margin-top:4px}
+.ar-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ar-ring circle{fill:none;stroke-width:8}
+.ar-ring .trk{stroke:color-mix(in srgb,var(--arena-ink) 13%,transparent)}
+.ar-ring .arc{stroke:var(--accent);stroke-linecap:round;stroke-dasharray:339.3;stroke-dashoffset:0}
+.ar-mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.ar-count{font-family:var(--display);font-size:clamp(76px,24vw,124px);font-weight:700;line-height:.9;font-variant-numeric:tabular-nums}
+.ar-count.bump{animation:bump .26s var(--spring)}
+@keyframes bump{0%{transform:scale(1.2)}100%{transform:scale(1)}}
+.ar-unit{font-size:13.5px;opacity:.65;font-weight:600}
+.ar-time{font-family:var(--display);font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+.ar-track{position:relative;height:30px;margin:0 12px}
+.ar-track .bar{position:absolute;left:0;right:0;top:12px;height:6px;border-radius:3px;background:color-mix(in srgb,var(--arena-ink) 13%,transparent);overflow:hidden}
+.ar-track .bar span{display:block;width:0;height:100%;background:var(--arena-ink);opacity:.8;transition:width .2s}
+.mk{position:absolute;top:4px;width:22px;height:22px;margin-left:-11px;border-radius:50%;background:var(--m);border:3px solid var(--arena);opacity:.35;transition:opacity .2s}
+.mk.hit{opacity:1;animation:pop .5s var(--spring);box-shadow:0 0 0 4px color-mix(in srgb,var(--m) 35%,transparent)}
+.mk.lost{opacity:.1}
+.ar-ghost{text-align:center;font-size:14px;opacity:.8;min-height:1.4em;font-variant-numeric:tabular-nums}
+.ar-tap{position:relative;overflow:hidden;flex:1;min-height:130px;max-height:240px;border:0;border-radius:26px;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:32px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform .08s,opacity .2s}
+.ar-tap:active{transform:scale(.985)}
+.ar-tap:disabled{opacity:.35}
+.rip{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--accent-ink);opacity:.22;animation:rip .45s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(6);opacity:0}}
+#arena .ar-row{display:flex;gap:8px;align-items:center}
+#arena .ar-row button{flex:1;height:50px;border-radius:16px;border:0;background:color-mix(in srgb,var(--arena-ink) 12%,transparent);color:inherit;font-weight:700;font-size:15px}
+#arena .ar-row button.primary{background:var(--accent);color:var(--accent-ink)}
+#arena .ar-row button:active{transform:scale(.95)}
+#arena .fix span{flex:2;text-align:center;font-size:13px;opacity:.7}
+.flash{position:fixed;left:50%;top:52%;transform:translateX(-50%);z-index:72;font-family:var(--display);font-size:46px;font-weight:700;text-transform:uppercase;color:var(--m,var(--arena-ink));text-shadow:0 4px 24px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap;animation:flashup 1s var(--out) forwards}
+@keyframes flashup{0%{transform:translate(-50%,24px) scale(.6);opacity:0}25%{transform:translate(-50%,0) scale(1.12);opacity:1}100%{transform:translate(-50%,-34px) scale(1);opacity:0}}
+.res{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;flex:1;justify-content:center}
+.medal-big{width:150px;height:150px;animation:flipin 1s var(--spring) .15s both;filter:drop-shadow(0 12px 30px color-mix(in srgb,var(--m) 50%,transparent))}
+.medal-big.quiet{animation:none}
+.medal-big svg{width:100%;height:100%}
+@keyframes flipin{0%{transform:perspective(600px) rotateY(200deg) scale(.3);opacity:0}100%{transform:none;opacity:1}}
+.res-medal{font-size:44px;color:var(--m,var(--arena-ink))}
+.res-score{font-family:var(--display);font-size:104px;line-height:.85;font-variant-numeric:tabular-nums}
+.pbtag{background:var(--gold);color:var(--arena);font-weight:700;font-size:13px;border-radius:999px;padding:4px 12px;animation:pop .5s var(--spring) .6s both}
+.res-xp{width:100%;max-width:320px;display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.res-xp b{font-family:var(--display);font-size:24px;color:var(--accent)}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 </style>
@@ -343,7 +509,7 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 <div class="app">
   <header class="top">
     <div class="brand">Home<span>Reps</span></div>
-    <div class="date" id="today-date"></div>
+    <div class="top-r"><span class="date" id="today-date"></span><button class="mode-pill" id="mode-pill" type="button" aria-label="Switch between Challenge and Training"></button></div>
   </header>
 
   <!-- BODY -->
@@ -437,6 +603,11 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
     <div id="recipes-content" class="stack" style="margin-top:4px"></div>
   </section>
 
+  <!-- CHALLENGES -->
+  <section class="view" id="v-challenge" hidden>
+    <div id="challenge-content" class="stack"></div>
+  </section>
+
   <!-- SCHEDULE -->
   <section class="view" id="v-sched" hidden>
     <div class="row" style="justify-content:space-between">
@@ -458,7 +629,9 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
   </div>
 </nav>
 
-<div id="onboard" role="dialog" aria-modal="true" aria-label="Welcome survey" hidden></div>
+<div id="onboard" role="dialog" aria-modal="true" aria-label="Setup" hidden></div>
+<div id="modepick" role="dialog" aria-modal="true" aria-label="Choose Challenge or Training" hidden></div>
+<div id="arena" role="dialog" aria-modal="true" aria-label="Challenge" hidden></div>
 <div id="timer" hidden><div class="tm" role="timer">
   <svg class="ring" viewBox="0 0 44 44" aria-hidden="true"><circle class="trk" cx="22" cy="22" r="19"/><circle class="arc" cx="22" cy="22" r="19"/></svg>
   <div class="tm-txt"><span class="tm-l" id="tm-l">Rest</span><b class="tm-t" id="tm-t">1:00</b></div>
@@ -814,7 +987,7 @@ function drawToday(){
     ${all.length?`<div class="prog-row"><span>${nDone} of ${all.length} done</span><b>${pct}%</b></div><div class="progress" aria-label="${pct}% done"><span style="width:${lastPct===null?pct:lastPct}%"></span></div>`:''}
   </div>`;
   h += planCard();
-  if (Lt.mode==='gentle') h += `<p class="banner">${hl ? 'Gentle mode: based on your health check we keep things easy. Check with your doctor before harder training.' : 'Gentle mode until you do the quick health check.'}${hl ? '' : ' <button class="btn sm" data-flow="plan" style="margin-left:4px">Do the health check</button>'}</p>`;
+  if (Lt.mode==='gentle') h += `<p class="banner">${hl ? 'Gentle mode: based on your health check we keep things easy. Check with your doctor before harder training.' : 'Gentle mode until you do the quick health check.'}${hl ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
   if (mine.length) h += `<h3>From your schedule</h3><div class="${L}">${mine.map(x=>row(x,'s:')).join('')}</div>`;
   if (rec.items.length){
     h += `<h3>${approvedPlan() ? 'Your plan' : 'Recommended'} · ${esc(rec.plan.title)}</h3>
@@ -1061,13 +1234,13 @@ const SCOFF = [
   ['fat','Do you believe you are fat when others say you are too thin?'],
   ['dominates','Would you say that food dominates your life?']
 ];
-const HIGH_IMPACT = ['jump-squat','mountain','skip','wall-hs','decline-pushup','split-squat','hollow','leg-raise','bridge-walk','hip-dips'];
+const HIGH_IMPACT = ['jump-squat','mountain','skip','wall-hs','decline-pushup','split-squat','hollow','leg-raise','bridge-walk','hip-dips','burpee','jacks'];
 const INJURY_AVOID = {
-  knee:['jump-squat','split-squat','lunge','step-up','skip','wall-sit','mountain'],
-  lowerback:['good-morning','superman','leg-raise','sl-rdl','russian-twist','hollow','backpack-row'],
+  knee:['jump-squat','split-squat','lunge','step-up','skip','wall-sit','mountain','burpee','jacks'],
+  lowerback:['good-morning','superman','leg-raise','sl-rdl','russian-twist','hollow','backpack-row','situp'],
   shoulder:['pike-pushup','wall-hs','decline-pushup','backpack-press','chair-dip','diamond-pushup','backpack-ext'],
-  wrist:['pushup','wide-pushup','decline-pushup','diamond-pushup','pike-pushup','wall-hs','shoulder-taps','mountain','bottle-wrist','chair-dip'],
-  neck:['shrug','wall-hs','crunch','bicycle']
+  wrist:['pushup','wide-pushup','decline-pushup','diamond-pushup','pike-pushup','wall-hs','shoulder-taps','mountain','bottle-wrist','chair-dip','burpee'],
+  neck:['shrug','wall-hs','crunch','bicycle','situp']
 };
 const BANNED_TEXT = /\b(detox\w*|cleanse\w*|starv\w*|purg\w*|water[- ]fast\w*|juice[- ]fast\w*|dry[- ]fast\w*|skip(?:ping)? (?:all |your )?meals|no[- ]carb\w*|zero[- ]carb\w*|crash[- ]diet\w*|laxative\w*|diet pills?)\b/i;
 const bmiOf = (kg, cm) => (kg > 0 && cm > 0) ? kg / Math.pow(cm / 100, 2) : null;
@@ -1168,6 +1341,97 @@ function validatePlan(raw, L, c){
 }
 /* safety-core:end */
 
+/* challenge-core:start — challenge catalog and progression rules, pure (no DOM). Tested in tests/challenges.test.mjs */
+const MOVES = {
+  squat:{name:'Air squats', how:'Feet shoulder width, hips below the knees, stand all the way up.'},
+  pushup:{name:'Push-ups', how:'Chest to a fist above the floor, body in one straight line.'},
+  jacks:{name:'Jumping jacks', how:'Jump the feet wide as the arms go overhead, then back together.'},
+  plank:{name:'Plank', how:'Forearms down, elbows under shoulders, straight line from head to heels.'},
+  mountain:{name:'Mountain climbers', how:'High plank, drive the knees to the chest one after another. Count each leg.'},
+  situp:{name:'Sit-ups', how:'Knees bent, roll up until your chest meets your knees, roll back down.'},
+  burpee:{name:'Burpees', how:'Squat, hands down, jump back to a plank, chest to the floor, jump up.'},
+  lunge:{name:'Reverse lunges', how:'Step back until the back knee nearly touches the floor. Alternate legs, count each one.'},
+  'wall-sit':{name:'Wall sit', how:'Back flat on a wall, knees at 90 degrees, weight in the heels.'}
+};
+const MEDALS = ['bronze','silver','gold','legend'];
+const MEDAL_NAME = {bronze:'Bronze', silver:'Silver', gold:'Gold', legend:'Legend'};
+const LEVEL_NAMES = {1:'Rookie', 2:'Grinder', 3:'Athlete', 4:'Beast', 5:'Legend'};
+const ladder = (moves, reps) => reps.flatMap(n => moves.map(m => [m, n]));
+// fmt: amrap (max in time) · fortime (fixed reps, fastest) · hold (max time) · emom (reps every minute)
+// better: higher or lower score wins. tiers: bronze, silver, gold, legend.
+const CHALLENGES = [
+  {id:'squat-sprint', name:'Squat Sprint', level:1, fmt:'amrap', dur:180, better:'higher', unit:'reps', tiers:[40,60,80,100], impact:'low', moves:['squat'],
+    blurb:'As many air squats as you can in 3 minutes.', easy:'Squat down to a chair and stand back up.'},
+  {id:'plank-clock', name:'Plank Clock', level:1, fmt:'hold', better:'higher', unit:'sec', tiers:[45,90,150,240], impact:'low', moves:['plank'],
+    blurb:'Hold a plank as long as you can. Stop the clock when your hips drop.', easy:'Plank on your knees.'},
+  {id:'pushup-pressure', name:'Push-up Pressure', level:1, fmt:'amrap', dur:180, better:'higher', unit:'reps', tiers:[20,35,50,70], impact:'low', moves:['pushup'],
+    blurb:'Max push-ups in 3 minutes. Rest whenever you need to, the clock keeps running.', easy:'Knees down, or hands on the edge of a couch.'},
+  {id:'jack-attack', name:'Jack Attack', level:1, fmt:'amrap', dur:180, better:'higher', unit:'reps', tiers:[90,120,150,180], impact:'high', moves:['jacks'],
+    blurb:'Three minutes of non-stop jumping jacks. How many can you stack?', easy:'Step out to the side instead of jumping.'},
+  {id:'the-hundred', name:'The Hundred', level:2, fmt:'fortime', better:'lower', unit:'sec', tiers:[360,270,210,165], impact:'low', moves:['squat'], parts:[['squat',100]],
+    blurb:'100 air squats. Clock is running.', easy:'Squat to a chair.'},
+  {id:'core-grinder', name:'Core Grinder', level:2, fmt:'amrap', dur:300, better:'higher', unit:'reps', tiers:[50,80,110,140], impact:'low', moves:['situp'],
+    blurb:'Five minutes of sit-ups. Find a rhythm and keep it.', easy:'Crunches: lift only your shoulders.'},
+  {id:'climber-rush', name:'Climber Rush', level:2, fmt:'amrap', dur:180, better:'higher', unit:'reps', tiers:[80,120,160,200], impact:'high', moves:['mountain'],
+    blurb:'Mountain climbers for 3 minutes. Every leg counts.', easy:'Slow climbers, stepping each foot in.'},
+  {id:'minute-maker', name:'Minute Maker', level:2, fmt:'emom', dur:300, per:8, better:'higher', unit:'rounds', tiers:[2,3,4,5], impact:'high', moves:['burpee'],
+    blurb:'8 burpees at the start of every minute, rest for what is left. Miss a minute and it is over.', easy:'5 step-back burpees each minute, no jump.'},
+  {id:'burpee-storm', name:'Burpee Storm', level:3, fmt:'amrap', dur:180, better:'higher', unit:'reps', tiers:[25,35,45,55], impact:'high', moves:['burpee'],
+    blurb:'Max burpees in 3 minutes. The classic.', easy:'Step back and forward instead of jumping, no push-up.'},
+  {id:'lunge-line', name:'Lunge Line', level:3, fmt:'amrap', dur:300, better:'higher', unit:'reps', tiers:[50,70,90,110], impact:'low', moves:['lunge'],
+    blurb:'Five minutes of reverse lunges, alternating legs.', easy:'Shorter steps, hold a wall for balance.'},
+  {id:'thirty-twenty-ten', name:'30-20-10', level:3, fmt:'fortime', better:'lower', unit:'sec', tiers:[720,540,420,330], impact:'low', moves:['squat','pushup','situp'],
+    parts:ladder(['squat','pushup','situp'], [30,20,10]), scheme:'30 squats, 30 push-ups, 30 sit-ups, then 20 of each, then 10 of each.',
+    blurb:'180 reps in a falling ladder. Fastest time wins.', easy:'Knee push-ups and crunches.'},
+  {id:'fifty', name:'Fifty', level:4, fmt:'fortime', better:'lower', unit:'sec', tiers:[360,285,225,180], impact:'high', moves:['burpee'], parts:[['burpee',50]],
+    blurb:'50 burpees for time. Pace it or race it.', easy:'Step-back burpees, no push-up.'},
+  {id:'furnace', name:'The Furnace', level:4, fmt:'amrap', dur:300, better:'higher', unit:'rounds', tiers:[4,6,8,10], impact:'high', moves:['burpee','squat','jacks'],
+    round:[['burpee',5],['squat',10],['jacks',15]], blurb:'Five minutes, as many rounds as you can of 5 burpees, 10 squats and 15 jumping jacks.', easy:'Step-back burpees and step jacks.'},
+  {id:'centurion', name:'The Centurion', level:5, fmt:'fortime', better:'lower', unit:'sec', tiers:[840,660,540,450], impact:'high', moves:['burpee'], parts:[['burpee',100]],
+    blurb:'100 burpees. Only for the ones who earned it.', easy:'Step-back burpees, no push-up.'},
+  {id:'pyramid', name:'The Pyramid', level:5, fmt:'fortime', better:'lower', unit:'sec', tiers:[900,720,600,480], impact:'high', moves:['burpee','squat'],
+    parts:[1,2,3,4,5,6,7,8,9,10].flatMap(n => [['burpee', n], ['squat', n * 2]]), scheme:'1 burpee and 2 squats, then 2 and 4, up to 10 burpees and 20 squats.',
+    blurb:'Climb the pyramid: 55 burpees and 110 squats.', easy:'Step-back burpees.'}
+];
+const CH = Object.fromEntries(CHALLENGES.map(c => [c.id, c]));
+const partsTotal = ch => (ch.parts || []).reduce((n, p) => n + p[1], 0);
+const reached = (ch, score, t) => score != null && score > 0 && (ch.better === 'lower' ? score <= t : score >= t);
+function medalFor(ch, score){ let m = null; ch.tiers.forEach((t, i) => { if (reached(ch, score, t)) m = MEDALS[i]; }); return m; }
+function isBetter(ch, a, b){ if (!(a > 0)) return false; if (b == null) return true; return ch.better === 'lower' ? a < b : a > b; }
+const MEDAL_XP = {bronze:10, silver:20, gold:35, legend:60};
+function xpFor(ch, score, isPB, scaled){
+  if (!(score > 0)) return 0;
+  const m = medalFor(ch, score);
+  const xp = [0, 20, 30, 45, 60, 80][ch.level] + (m ? MEDAL_XP[m] : 0) + (isPB ? 15 : 0);
+  return scaled ? Math.round(xp * 0.6) : xp;
+}
+// Smooth level curve: each level needs a little more XP than the last.
+const xpToReach = lvl => Math.round(40 * Math.pow(Math.max(0, lvl - 1), 1.6));
+function levelFromXp(xp){ let l = 1; while (xp >= xpToReach(l + 1)) l++; return l; }
+const RANKS = [[1,'Rookie'],[5,'Grinder'],[10,'Athlete'],[16,'Beast'],[23,'Legend']];
+function rankFor(level){ let r = RANKS[0][1]; RANKS.forEach(([l, n]) => { if (level >= l) r = n; }); return r; }
+// Next goal: the next medal not yet won, then 5 % better than your best.
+function nextTarget(ch, best){
+  for (let i = 0; i < ch.tiers.length; i++) if (!reached(ch, best, ch.tiers[i])) return {medal:MEDALS[i], value:ch.tiers[i]};
+  return {medal:null, value: ch.better === 'lower' ? Math.max(1, Math.floor(best * 0.95)) : Math.ceil(best * 1.05)};
+}
+// A level opens when you hold medals (full version) in two challenges of the level below.
+function unlockedLevel(best, list){
+  let open = 1;
+  for (let n = 2; n <= 5; n++){
+    const prev = list.filter(c => c.level === n - 1);
+    if (prev.filter(c => medalFor(c, best[c.id])).length >= Math.min(2, prev.length)) open = n; else break;
+  }
+  return open;
+}
+function challengeAllowed(ch, L){
+  if (L.mode === 'gentle' && ch.impact === 'high') return {ok:false, why:'High intensity. Unlocks after a clear safety check.'};
+  if (ch.moves.some(m => L.avoid.includes(m))) return {ok:false, why:'Not right for your injury right now.'};
+  return {ok:true};
+}
+/* challenge-core:end */
+
+
 // The generator's standing instructions. The page has no system prompt of its own, so this goes first in every request.
 const PLAN_SYSTEM_PROMPT = `You draft personal weekly plans for Home Reps, a home fitness and nutrition app. A coach, Coach Dani, reviews every draft before the user treats it as final.
 
@@ -1203,81 +1467,102 @@ function currentLimits(){
   return safetyLimits({health: hl, healthChecked: !!hl, injuries: (hl && hl.injuries) || [], level: +P_().level || LEVEL_MAP[a.level] || 1, eating: hl && hl.eating});
 }
 
-/* step builders shared by both flows */
-const healthConsentStep = (extra) => ({type:'consent', id:'healthConsent', title:'A quick health check',
-  body:'To keep your workouts safe we ask a few health questions. With your OK we use the answers only to adjust your plan. In this prototype they stay on this device, and you can delete them any time in the Food tab.' + (extra || ''),
-  label:'I agree that Home Reps uses my health answers to keep my plan safe.'});
-const parqStep = () => ({type:'yesno', id:'parq', q:'Health check', hint:'Answer honestly. A “yes” doesn’t stop you training; it helps us keep you safe.', items:PARQ});
-const riskStep = () => ({type:'info', title:'Let’s start gently', body:'Based on your answers, please check with a doctor before harder training. Until then we’ll keep things gentle: mobility, walking and easy strength moves.', cta:'I understand'});
-const injuryStep = () => ({type:'multi', id:'injuries', q:'Any pain or injuries?', hint:'We’ll leave out moves that could make them worse.', opts:INJ_OPTS, none:'none'});
-const schedHtml = (a, withWake) => `<div class="stack">
-  ${withWake ? `<label class="ob-field">Wake-up time<input type="time" data-field="wake" value="${esc(a.wake || '07:30')}"></label>` : ''}
-  <div class="ob-field" role="group" aria-label="Training days">Training days<div class="days">${DAYS.map(d => `<button data-fx="day" data-d="${d}" aria-pressed="${(a.days || []).includes(d)}">${DAY_LABEL[d]}</button>`).join('')}</div></div>
-  <label class="ob-field">Time per workout<select data-field="minutes">${[10,20,30,45,60].map(m => `<option value="${m}" ${+a.minutes===m ? 'selected' : ''}>${m} min</option>`).join('')}</select></label></div>`;
+/* compact pickers shared by the flows: one screen does what used to take several */
+const HEALTH_FLAGS = [['heart','Heart condition or high blood pressure'],['chest','Chest pain'],['dizzy','Dizziness or fainting'],
+  ['chronic','Another long-term condition or daily medication'],['joint','A bone or joint problem that exercise could make worse'],
+  ['supervised','A doctor said to exercise only under supervision'],['pregnant','Pregnant, or gave birth in the last 6 months'],['none','None of these']];
+const EAT_FLAGS = [['sick','I make myself sick because I feel uncomfortably full'],['control','I worry I’ve lost control over how much I eat'],
+  ['lost','I’ve lost more than 6 kg in the last 3 months'],['fat','I believe I’m fat when others say I’m too thin'],['dominates','Food dominates my life'],['none','None of these']];
+const LEVEL_OPTS = [['start','Just starting'],['some','Now and then'],['regular','Regularly'],['advanced','Advanced']];
+const DPW_OPTS = [['2','2'],['3','3'],['4','4'],['5','5'],['6','6']];
+const DPW_DAYS = {2:['tue','thu'], 3:['mon','wed','fri'], 4:['mon','tue','thu','fri'], 5:['mon','tue','wed','thu','fri'], 6:['mon','tue','wed','thu','fri','sat']};
+const MIN_OPTS = [['10','10'],['20','20'],['30','30'],['45','45']];
+const KIND_OPTS = [['training','Training'],['nutrition','Nutrition'],['both','Both']];
+const DIET_OPTS = [['any','Everything'],['veg','Vegetarian'],['vegan','Vegan']];
+const toParq = flags => { const f = new Set(flags || []), o = Object.fromEntries(PARQ.map(q => [q[0], f.has(q[0])])); if (f.has('chronic')) o.meds = true; return o; };
+const toScoff = flags => { const f = new Set(flags || []); return Object.fromEntries(SCOFF.map(q => [q[0], f.has(q[0])])); };
+const fromParq = parq => { if (!parq) return undefined; const f = HEALTH_FLAGS.map(x => x[0]).filter(k => k !== 'none' && (parq[k] || (k === 'chronic' && parq.meds))); return f.length ? f : ['none']; };
+function syncDerived(a){ if (a.hflags) a.parq = toParq(a.hflags); if (a.eflags) a.scoff = toScoff(a.eflags); return a; }
+function chips(key, opts, a, o){
+  o = o || {}; const cur = a[key];
+  return `<div class="chipset${o.col ? ' col' : ''}" role="${o.multi ? 'group' : 'radiogroup'}"${o.label ? ` aria-label="${esc(o.label)}"` : ''}>${opts.map(([v, l]) => {
+    const on = o.multi ? (cur || []).includes(v) : String(cur) === String(v);
+    return `<button class="pick" data-fx="pick" data-key="${key}" data-v="${esc(v)}"${o.multi ? ' data-multi="1"' : ''}${o.none ? ` data-none="${o.none}"` : ''} aria-pressed="${on}"${o.disabled ? ' disabled' : ''}>${esc(l)}</button>`; }).join('')}</div>`;
+}
+const block = (label, inner) => `<div class="ob-block"><span class="ob-label">${label}</span>${inner}</div>`;
+function safetyHtml(a, required){
+  const on = !!a.healthConsent;
+  return `<label class="consent"><input type="checkbox" id="ob-consent" ${on ? 'checked' : ''}><span>Use my answers only to keep my training safe.${required ? ' A personal plan needs this.' : ''}<small>In this prototype they stay on this device. Delete them any time in Food.</small></span></label>
+    <div class="ob-stack${on ? '' : ' dim'}">${block('Does any of this apply to you?', chips('hflags', HEALTH_FLAGS, a, {multi:true, none:'none', col:true, disabled:!on, label:'Health'}))}
+    ${block('Any pain or injuries?', chips('injuries', INJ_OPTS, a, {multi:true, none:'none', disabled:!on, label:'Pain or injuries'}))}</div>`;
+}
+const safetyValid = (a, required) => a.healthConsent ? (a.hflags || []).length > 0 && (a.injuries || []).length > 0 : !required;
+const safetyCta = (a, required) => a.healthConsent ? 'Agree and continue' : required ? 'Tick the box to continue' : 'Skip safety check';
 function healthRecord(a){
+  syncDerived(a);
   return {v:1, at:new Date().toISOString(), consent:{granted:true, at:new Date().toISOString(), version:CONSENT_V}, parq:a.parq || {}, injuries:(a.injuries || []).filter(x => x !== 'none')};
 }
-
-/* ---------- onboarding ---------- */
+function healthInit(){
+  const hl = store.get('health', null);
+  return {_hadHealth:!!hl, healthConsent: hl ? true : undefined, hflags: hl ? fromParq(hl.parq) : undefined, injuries: hl ? (hl.injuries.length ? hl.injuries : ['none']) : undefined};
+}
 function prefillFromSurvey(){
   const sv = store.get('survey', null), x = (sv && sv.answers) || {};
   const age = {'Under 18':'u18','18–24':'18-24','25–34':'25-34','35–44':'35-44','45–54':'45-54','55 or older':'55+'}[x.age];
   const goal = {'Lose fat':'lose','Build muscle':'gain','Tone and stay in shape':'tone','Better fitness and stamina':'endure','Move better, less pain':'move'}[x.goal];
   const level = {'Not at all, I am just starting':'start','Now and then':'some','Regularly, for over a year':'regular','A lot, I am advanced':'advanced'}[x.level];
-  const track = x.where === 'At the gym and at home' ? 'gym' : x.where ? 'home' : undefined;
-  const days = {'1 or 2':['tue','thu'],'3 or 4':['mon','wed','fri'],'5 or more':['mon','tue','wed','thu','fri']}[x.days];
-  const minutes = {'10–15 min':10,'20–30 min':20,'30–45 min':30,'More than 45 min':45}[x.time];
-  return {age, goal, level, track, days, minutes};
+  const dpw = {'1 or 2':'2','3 or 4':'3','5 or more':'5'}[x.days];
+  const minutes = {'10–15 min':'10','20–30 min':'20','30–45 min':'30','More than 45 min':'45'}[x.time];
+  return Object.fromEntries(Object.entries({age, goal, level, dpw, minutes}).filter(([, v]) => v !== undefined));
 }
+
+/* ---------- onboarding: 5 screens ---------- */
 const FLOWS = {};
 FLOWS.onboarding = {
   closable: () => !!store.get('onboarding', null),
   init(){
-    const o = store.get('onboarding', null), oa = (o && o.answers) || {}, hl = store.get('health', null), pre = prefillFromSurvey();
-    return {wake:'07:30', minutes:20, days:['mon','wed','fri'], ...Object.fromEntries(Object.entries(pre).filter(([,v]) => v !== undefined)), ...oa,
-      healthConsent: hl ? true : undefined, parq: hl ? hl.parq : undefined, injuries: hl ? (hl.injuries.length ? hl.injuries : ['none']) : undefined};
+    const o = store.get('onboarding', null), oa = (o && o.answers) || {};
+    const a = {dpw:'3', minutes:'20', ...prefillFromSurvey(), ...oa, ...healthInit()};
+    if (oa.days && !oa.dpw) a.dpw = String(Math.min(6, Math.max(2, oa.days.length)));
+    if (oa.minutes) a.minutes = String(oa.minutes);
+    return a;
   },
   steps: [
-    {type:'info', hero:true, title:'Let’s set you up', body:'About 2 minutes: your goal, your schedule, a quick health check and your first win.', cta:'Start'},
-    {type:'single', id:'age', q:'How old are you?', opts:AGE_OPTS},
-    {type:'info', block:true, when:a => a.age === 'u18', title:'Home Reps is for adults for now', body:'You need to be 18 or older to use Home Reps. If you picked this by mistake, go back and change it.'},
-    {type:'single', id:'track', when:adult, q:'How do you like to train?', opts:[['home','At home, no equipment','Bodyweight moves you can do anywhere'],['cali','Calisthenics','Bodyweight skills: pull-ups, dips, holds'],['gym','At the gym','Coming soon. We’ll start you with home workouts']]},
-    {type:'single', id:'goal', when:adult, q:'What’s your main goal?', opts:GOAL_OPTS},
-    {type:'text', id:'why', when:adult, q:'Why now?', hint:'In your own words. We’ll show it to you on tough mornings.', placeholder:'e.g. I want to keep up with my kids', optional:true, max:140},
-    {type:'single', id:'level', when:adult, q:'How much do you train right now?', opts:[['start','Not at all, just starting'],['some','Now and then'],['regular','Regularly, for over a year'],['advanced','A lot, I’m advanced']]},
-    {type:'custom', id:'schedule', when:adult, q:'When do you want to train?', render:a => schedHtml(a, true), valid:a => (a.days || []).length > 0},
-    {...healthConsentStep(), when:adult, skipLabel:'Skip for now'},
-    {...parqStep(), when:a => adult(a) && a.healthConsent},
-    {...riskStep(), when:a => adult(a) && a.healthConsent && assessHealth({parq:a.parq}).risk},
-    {...injuryStep(), when:a => adult(a) && a.healthConsent},
-    {type:'custom', id:'firstWin', when:adult, q:'Your first win', render:firstWinHtml, valid:a => !!(a.firstWin || a.firstWinSkipped), click:firstWinClick},
-    {type:'single', id:'alarm', when:adult, q:'How should your morning alarm work?', hint:'Alarms come with the mobile app. We’ll remember your choice.',
-      opts:[['gentle','Gentle','A normal alarm with your task as a reminder'],['commit','Commitment mode','It rings again every few minutes until you do your task. You can always stop it in an emergency.']]},
-    {type:'custom', id:'obDone', when:adult, q:'You’re all set', render:a => `${a.why ? `<p class="why-big">“${esc(a.why)}”</p><p class="muted small">We’ll remind you of this when it counts.</p>` : ''}
-      <dl class="sv-sum"><dt>Goal</dt><dd>${esc(GOAL_LABEL[a.goal] || '')}</dd><dt>Training days</dt><dd>${(a.days || []).map(d => DAY_LABEL[d]).join(', ')}</dd><dt>Wake-up</dt><dd>${esc(a.wake || '')}</dd>
-      <dt>Alarm</dt><dd>${a.alarm === 'commit' ? 'Commitment mode' : 'Gentle'}</dd><dt>Health check</dt><dd>${a.healthConsent ? (assessHealth({parq:a.parq}).risk ? 'Done. Gentle mode for now' : 'Done') : 'Skipped. We’ll keep things gentle'}</dd></dl>
-      <p class="muted small">Next: get your personal plan from the Today tab.</p>`, cta:'Let’s go'}
+    {type:'custom', id:'age', hero:true, auto:'age', render:a => `<div class="ob-hero"><div class="brand">Home<span>Reps</span></div><h2>Let’s get you moving</h2>
+      <p class="muted">Four quick taps, then your first win. How old are you?</p></div>${chips('age', AGE_OPTS, a, {label:'Age'})}`, valid:a => !!a.age},
+    {type:'info', block:true, when:a => a.age === 'u18', title:'Home Reps is for adults for now', body:'You need to be 18 or older to use Home Reps. If you tapped this by mistake, go back and change it.'},
+    {type:'custom', id:'goal', textKey:'why', when:adult, q:'What’s your goal?', render:a => chips('goal', GOAL_OPTS, a, {col:true, label:'Goal'}) +
+      `<label class="ob-field">Why now? <span class="muted" style="font-weight:500">Optional. We’ll remind you on tough mornings.</span><input id="ob-text" maxlength="140" placeholder="e.g. keep up with my kids" value="${esc(a.why || '')}"></label>`, valid:a => !!a.goal},
+    {type:'custom', id:'rhythm', when:adult, q:'Your rhythm', render:a => block('Training right now', chips('level', LEVEL_OPTS, a, {label:'Level'})) +
+      block('Days a week', chips('dpw', DPW_OPTS, a, {label:'Days a week'})) + block('Minutes per workout', chips('minutes', MIN_OPTS, a, {label:'Minutes'})), valid:a => !!(a.level && a.dpw && a.minutes)},
+    {type:'custom', id:'healthConsent', when:adult, q:'Quick safety check', render:a => safetyHtml(a, false), valid:a => safetyValid(a, false), cta:a => safetyCta(a, false)},
+    {type:'custom', id:'firstWin', when:adult, q:'Your first win', render:firstWinHtml, valid:a => !!(a.firstWin || a.firstWinSkipped), click:firstWinClick, cta:() => 'Finish'}
   ],
   finish(a){
+    syncDerived(a);
     if (a.healthConsent){ const prev = store.get('health', null); store.set('health', {...healthRecord(a), eating: prev && prev.eating}); }
-    store.set('onboarding', {v:1, at:new Date().toISOString(), answers:{age:a.age, track:a.track, goal:a.goal, why:String(a.why || '').trim().slice(0,140), level:a.level, wake:a.wake, days:a.days, minutes:+a.minutes, alarm:a.alarm}});
+    store.set('onboarding', {v:2, at:new Date().toISOString(), answers:{age:a.age, goal:a.goal, why:String(a.why || '').trim().slice(0, 140), level:a.level,
+      dpw:+a.dpw, days:DPW_DAYS[+a.dpw] || DPW_DAYS[3], minutes:+a.minutes}});
     if (a.firstWin && !store.get('points', []).some(x => x.r === 'first_win')) addPoints(10, 'first_win');
-    toast(a.firstWin ? 'Welcome! Day 1 is done.' : 'Welcome to Home Reps!');
+    setTimeout(openModePicker, 60);
   }
 };
 function firstWinHtml(a){
-  const gentle = !a.healthConsent || assessHealth({parq:a.parq}).risk;
+  syncDerived(a);
+  const risk = a.healthConsent && assessHealth({parq:a.parq}).risk, gentle = !a.healthConsent || risk;
   if (a.firstWin) return `<div class="gen"><div class="tapper done" aria-hidden="true">✓</div><h2>Day 1 done!</h2><p class="muted">+10 points. Your streak starts today.</p></div>`;
+  const note = risk ? '<p class="note">Based on your answers, check with a doctor before harder training. We’ll keep things gentle until then.</p>'
+    : !a.healthConsent ? '<p class="note">No safety check, so we keep things gentle for now.</p>' : '';
   const skip = `<button class="linkish" data-fx="win-skip">I’ll do it later</button>`;
-  if (gentle) return `<p>One easy minute: march on the spot and roll your shoulders. Stop if anything hurts.</p>
+  if (gentle) return `${note}<p>One easy minute: march on the spot and roll your shoulders. Stop if anything hurts.</p>
     <button class="tapper" data-fx="win-timer" id="win-btn">60<small>Tap to start</small></button>${skip}`;
-  return `<p>Do 5 push-ups. Too hard? Knee push-ups or push-ups against a wall count too. Tap the circle after each one.</p>
+  return `<p>5 push-ups. Knee push-ups or push-ups against a wall count too. Tap the circle after each one.</p>
     <button class="tapper" data-fx="win-tap" id="win-btn" aria-label="Count a push-up">${a.reps || 0}<small>of 5</small></button>${skip}`;
 }
 function firstWinDone(a){ a.firstWin = true; flow.dir = 0; drawFlow(); celebrate('Nice! Your first win.'); }
 function firstWinClick(t, a){
   if (t.dataset.fx === 'win-skip'){ a.firstWinSkipped = true; return next(); }
-  if (t.dataset.fx === 'win-tap'){ a.reps = (a.reps || 0) + 1; buzz(10); if (a.reps >= 5) return firstWinDone(a); const b = document.getElementById('win-btn'); b.innerHTML = `${a.reps}<small>of 5</small>`; return; }
+  if (t.dataset.fx === 'win-tap'){ a.reps = (a.reps || 0) + 1; buzz(10); if (a.reps >= 5) return firstWinDone(a); const b = document.getElementById('win-btn'); b.innerHTML = `${a.reps}<small>of 5</small>`; bump(b); return; }
   if (t.dataset.fx === 'win-timer' && !a.timing){
     a.timing = true; const end = Date.now() + 60000;
     (function tick(){ if (!flow || flow.a !== a) return; const left = Math.ceil((end - Date.now()) / 1000), b = document.getElementById('win-btn');
@@ -1286,50 +1571,51 @@ function firstWinClick(t, a){
   }
 }
 
-/* ---------- plan builder ---------- */
+/* ---------- safety check on its own (from Today or Challenges) ---------- */
+FLOWS.safety = {
+  closable: () => true,
+  init: () => ({...healthInit(), _hadHealth:false}),
+  steps: [{type:'custom', id:'healthConsent', q:'Quick safety check', render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)}],
+  finish(a){ const prev = store.get('health', null); store.set('health', {...healthRecord(a), eating: prev && prev.eating}); toast('Safety check saved'); }
+};
+
+/* ---------- plan builder: 3 or 4 screens ---------- */
 FLOWS.plan = {
   closable: () => true,
   init(){
-    const o = store.get('onboarding', null), oa = (o && o.answers) || {}, hl = store.get('health', null), p = profile || {};
-    return {_hadHealth: !!hl, healthConsent: hl ? true : undefined, parq: hl ? hl.parq : undefined, injuries: hl ? (hl.injuries.length ? hl.injuries : ['none']) : undefined,
-      goal: oa.goal || p.goal, level: oa.level, days: oa.days || ['mon','wed','fri'], minutes: oa.minutes || 20, track: oa.track || 'home',
-      sex: p.sex, age: p.age, height: p.height, weight: p.weight, activity: p.activity || '1.375', diet: p.diet, meals: p.meals};
+    const o = store.get('onboarding', null), oa = (o && o.answers) || {}, p = profile || {};
+    return {...healthInit(), goal: oa.goal || p.goal, level: oa.level, days: oa.days || DPW_DAYS[3], minutes: oa.minutes || 20, track:'home',
+      sex: p.sex, age: p.age, height: p.height, weight: p.weight, activity: p.activity || '1.375', diet: p.diet, meals: p.meals || '4', pace:'steady'};
   },
   steps: [
-    {type:'info', hero:true, title:'Your personal plan', body:'About 3 minutes. Your answers shape a plan for your body, your time and your kit. Coach Dani reviews every plan before it’s final.', cta:'Start'},
-    {...healthConsentStep(' A personal plan needs this check.'), required:true, when:a => !a._hadHealth},
-    {...parqStep(), when:a => !a._hadHealth && a.healthConsent},
-    {...riskStep(), when:a => !a._hadHealth && a.healthConsent && assessHealth({parq:a.parq}).risk},
-    {type:'single', id:'kind', q:'What should your plan cover?', opts:[['training','Training'],['nutrition','Nutrition'],['both','Training and nutrition']]},
-    {type:'single', id:'goal', q:'What’s your main goal?', opts:GOAL_OPTS},
-    {type:'custom', id:'body', when:nut, q:'About you', hint:'Used only to estimate how much energy you need.', render:a => `<div class="ob-grid">
-      <label class="ob-field">Sex<select data-field="sex"><option value="">Choose</option><option value="f" ${a.sex==='f'?'selected':''}>Female</option><option value="m" ${a.sex==='m'?'selected':''}>Male</option></select></label>
-      <label class="ob-field">Age<input type="number" inputmode="numeric" data-field="age" min="18" max="90" value="${esc(a.age || '')}"></label>
-      <label class="ob-field">Height (cm)<input type="number" inputmode="numeric" data-field="height" min="120" max="230" value="${esc(a.height || '')}"></label>
-      <label class="ob-field">Weight (kg)<input type="number" inputmode="decimal" step="0.1" data-field="weight" min="35" max="250" value="${esc(a.weight || '')}"></label>
-      <label class="ob-field full">How active are you outside workouts?<select data-field="activity">${[['1.2','Mostly sitting'],['1.375','Lightly active'],['1.55','On my feet most of the day'],['1.725','Physical job']].map(([v,l]) => `<option value="${v}" ${a.activity===v?'selected':''}>${l}</option>`).join('')}</select></label></div>`,
-      valid:a => (a.sex==='f' || a.sex==='m') && +a.age>=18 && +a.age<=90 && +a.height>=120 && +a.height<=230 && +a.weight>=35 && +a.weight<=250},
-    {type:'single', id:'pace', when:a => nut(a) && a.goal==='lose', q:'How fast do you want to go?', opts:[['slow','Slow and steady','About 0.25 kg a week'],['steady','Steady','About 0.5 kg a week'],['fast','As fast as is safe','We cap it at a safe pace for your body']]},
-    {type:'custom', id:'tsched', when:trn, q:'When can you train?', render:a => schedHtml(a, false), valid:a => (a.days || []).length > 0},
-    {type:'multi', id:'equipment', when:trn, q:'What do you have at home?', opts:EQUIP_OPTS, none:'none'},
-    {...injuryStep(), when:trn},
-    {type:'text', id:'injNote', when:trn, q:'Anything else Coach Dani should know?', hint:'Optional. Don’t include your name or contact details.', placeholder:'e.g. I sit all day and my hips feel tight', optional:true, max:200},
-    {type:'single', id:'diet', when:nut, q:'How do you eat?', opts:[['any','Everything'],['veg','Vegetarian'],['vegan','Vegan']]},
-    {type:'multi', id:'allergies', when:nut, q:'Any allergies or intolerances?', opts:ALLERGY_OPTS, none:'none'},
-    {type:'single', id:'meals', when:nut, q:'How many times a day do you eat?', opts:[['3','3 meals'],['4','3 meals and 1 snack'],['5','3 meals and 2 snacks']]},
-    {type:'yesno', id:'scoff', when:nut, q:'You and food', hint:'These questions help us keep your plan safe. There are no wrong answers.', items:SCOFF},
-    {type:'info', id:'edRefer', when:a => nut(a) && screenEating({scoff:a.scoff, weight:a.weight, height:a.height, goal:a.goal}).refer, title:'Let’s look after you first',
+    {type:'custom', id:'healthConsent', when:a => !a._hadHealth, q:'Quick safety check', render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)},
+    {type:'custom', id:'cover', q:'Build your plan', render:a => block('What should it cover?', chips('kind', KIND_OPTS, a, {label:'Plan covers'})) +
+      (trn(a) ? block('What do you have at home?', chips('equipment', EQUIP_OPTS, a, {multi:true, none:'none', label:'Equipment'})) : ''),
+      valid:a => !!a.kind && (!trn(a) || (a.equipment || []).length > 0)},
+    {type:'custom', id:'body', when:nut, q:'About you', hint:'Only used to size your meals.', render:a => block('Sex', chips('sex', [['f','Female'],['m','Male']], a, {label:'Sex'})) +
+      `<div class="ob-grid three"><label class="ob-field">Age<input type="number" inputmode="numeric" data-field="age" min="18" max="90" value="${esc(a.age || '')}"></label>
+      <label class="ob-field">Height cm<input type="number" inputmode="numeric" data-field="height" min="120" max="230" value="${esc(a.height || '')}"></label>
+      <label class="ob-field">Weight kg<input type="number" inputmode="decimal" step="0.1" data-field="weight" min="35" max="250" value="${esc(a.weight || '')}"></label></div>` +
+      block('You eat', chips('diet', DIET_OPTS, a, {label:'Diet'})) + block('Allergies', chips('allergies', ALLERGY_OPTS, a, {multi:true, none:'none', label:'Allergies'})),
+      valid:a => (a.sex === 'f' || a.sex === 'm') && +a.age >= 18 && +a.age <= 90 && +a.height >= 120 && +a.height <= 230 && +a.weight >= 35 && +a.weight <= 250 && !!a.diet && (a.allergies || []).length > 0},
+    {type:'custom', id:'food', when:nut, q:'You and food', hint:'Tap any that are true for you lately. It keeps your plan safe; there are no wrong answers.',
+      render:a => chips('eflags', EAT_FLAGS, a, {multi:true, none:'none', col:true, label:'You and food'}), valid:a => (a.eflags || []).length > 0},
+    {type:'info', id:'edRefer', when:a => nut(a) && screenEating({scoff:toScoff(a.eflags), weight:a.weight, height:a.height, goal:a.goal}).refer, title:'Let’s look after you first',
       body:a => 'Some of your answers suggest food may be taking up a lot of headspace right now. That’s more common than people think, and you deserve proper support. We won’t make a nutrition plan for now. Please consider talking to your doctor or an eating disorder support service in your country.' + (a.kind === 'both' ? ' We can still build you a gentle training plan.' : ''),
       cta:a => a.kind === 'both' ? 'Continue with training only' : 'Close',
       onNext(a){
+        syncDerived(a);
         const hl = store.get('health', null) || (a.healthConsent ? healthRecord(a) : null);
         if (hl){ hl.eating = {scoff:a.scoff, weight:+a.weight, height:+a.height, goal:a.goal, refer:true, at:new Date().toISOString()}; store.set('health', hl); }
         if (a.kind === 'both'){ a.kind = 'training'; return 'goto:aiConsent'; }
         return 'close';
       }},
-    {type:'consent', id:'aiConsent', q:'Draft it with AI?', body:'We send your answers to Claude, Anthropic’s AI, to draft your plan. We never send your name or email. Coach Dani then reviews the draft. If you say no, we draft it on your device with simpler rules.', label:'Yes, draft my plan with AI', skipLabel:'No, draft it on my device'},
+    {type:'custom', id:'aiConsent', consentKey:'aiConsent', q:'Ready?', render:a => `<dl class="sv-sum"><dt>Plan</dt><dd>${a.kind === 'both' ? 'Training and nutrition' : a.kind === 'training' ? 'Training' : 'Nutrition'}</dd>
+      <dt>Goal</dt><dd>${esc(GOAL_LABEL[a.goal] || 'Stay in shape')}</dd>${trn(a) ? `<dt>Training</dt><dd>${(a.days || []).length} days, ${a.minutes} min</dd>` : ''}</dl>
+      <label class="consent"><input type="checkbox" id="ob-consent" ${a.aiConsent ? 'checked' : ''}><span>Draft it with AI (Claude)<small>We send your answers without your name or email. Leave it unticked to draft it on your device. Coach Dani reviews every plan.</small></span></label>`,
+      valid:() => true, cta:() => 'Create my plan'},
     {type:'custom', id:'gen', q:'', render:() => `<div class="gen"><div class="spin" aria-hidden="true"></div><h2>Drafting your plan</h2><p class="muted" id="gen-s" aria-live="polite">Reading your answers…</p></div>`,
-      valid:() => false, cta:() => 'Working…', after:(el, a) => runGeneration(a)}
+      valid:() => false, cta:() => 'Working…', after:(el, a) => { if (!a.goal) a.goal = 'tone'; syncDerived(a); runGeneration(a); }}
   ]
 };
 
@@ -1415,6 +1701,16 @@ document.getElementById('onboard').addEventListener('click', ev => {
   if (!flow) return;
   const t = ev.target.closest('[data-fx]'); if (!t || t.disabled) return;
   const st = steps()[flow.i], a = flow.a, fx = t.dataset.fx;
+  if (fx === 'pick'){
+    const k = t.dataset.key, v = t.dataset.v;
+    if (t.dataset.multi){ let cur = new Set(a[k] || []); const none = t.dataset.none;
+      if (v === none) cur = new Set(cur.has(v) ? [] : [v]); else { cur.delete(none); cur.has(v) ? cur.delete(v) : cur.add(v); }
+      a[k] = [...cur]; }
+    else a[k] = v;
+    flow.dir = 0; drawFlow(); buzz(8);
+    if (st.auto === k) setTimeout(() => { if (flow && flow.a === a && steps()[flow.i] === st) next(); }, 280);
+    return;
+  }
   if (fx === 'opt'){
     const v = st.opts[+t.dataset.j][0];
     if (st.type === 'multi'){
@@ -1435,8 +1731,8 @@ document.getElementById('onboard').addEventListener('click', ev => {
 ['input','change'].forEach(evt => document.getElementById('onboard').addEventListener(evt, ev => {
   if (!flow) return;
   const st = steps()[flow.i], a = flow.a, t = ev.target;
-  if (t.id === 'ob-text') a[st.id] = t.value;
-  else if (t.id === 'ob-consent') a[st.id] = t.checked;
+  if (t.id === 'ob-text') a[st.textKey || st.id] = t.value;
+  else if (t.id === 'ob-consent'){ a[st.consentKey || st.id] = t.checked; if (st.type === 'custom' && ev.type === 'change'){ flow.dir = 0; return drawFlow(); } }
   else if (t.dataset.field) a[t.dataset.field] = t.value;
   else return;
   refreshNext();
@@ -1557,6 +1853,357 @@ function planSheet(){
     <div class="row">${ok ? '' : '<button class="btn primary" data-plan="approve">Prototype: approve as Coach Dani</button>'}<button class="btn" data-flow="plan">Redo questionnaire</button><button class="btn ghost" data-plan="discard">Delete plan</button></div>`);
 }
 
+
+/* ---------- mode: Challenge or Training ---------- */
+const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
+const ICON_DUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg>';
+function openModePicker(){
+  const el = document.getElementById('modepick'), S = chState(), lvl = levelFromXp(S.xp), hr = new Date().getHours();
+  const hello = hr < 12 ? 'Morning' : hr < 19 ? 'Afternoon' : 'Evening', today = recommend(todayKey()).plan.title;
+  el.className = '';
+  el.innerHTML = `<div class="mp-in"><p class="mp-hi">${hello}! What’s it going to be?</p>
+    <button class="mp-card mp-ch" data-mode="challenge"><span class="mp-ico">${ICON_BOLT}</span><span class="mp-t">Challenge</span>
+      <span class="mp-s">3 and 5 minute battles. Beat your best, win medals, climb the ranks.</span><span class="mp-tag">${rankFor(lvl)} · Level ${lvl}</span></button>
+    <button class="mp-card mp-tr" data-mode="train"><span class="mp-ico">${ICON_DUMB}</span><span class="mp-t">Training</span>
+      <span class="mp-s">Your plan, today’s workout, food and recipes.</span><span class="mp-tag">Today: ${esc(today)}</span></button></div>`;
+  el.hidden = false; document.body.style.overflow = 'hidden';
+}
+function pickMode(m, card){
+  const el = document.getElementById('modepick');
+  buzz(15);
+  const done = () => { el.hidden = true; el.innerHTML = ''; document.body.style.overflow = ''; setMode(m); };
+  if (RM()) return done();
+  card.classList.add('chosen'); el.classList.add('picking');
+  setTimeout(() => el.classList.add('leaving'), 280);
+  setTimeout(done, 520);
+}
+function setMode(m){
+  ui.mode = m === 'challenge' ? 'challenge' : 'train'; store.set('mode', ui.mode);
+  document.body.classList.toggle('mode-challenge', ui.mode === 'challenge');
+  document.getElementById('mode-pill').innerHTML = ui.mode === 'challenge' ? `${ICON_BOLT}<span>Challenge</span>` : `${ICON_DUMB}<span>Training</span>`;
+  const v = document.getElementById('v-challenge');
+  if (ui.mode === 'challenge'){
+    TABS.forEach(k => { document.getElementById('v-' + k).hidden = true; });
+    v.hidden = false; v.classList.remove('enter'); v.style.setProperty('--dx', '0px'); void v.offsetWidth; v.classList.add('enter');
+    drawChallenges(true); window.scrollTo({top:0});
+  } else { v.hidden = true; setTab(ui.tab); }
+}
+document.getElementById('modepick').addEventListener('click', ev => {
+  const b = ev.target.closest('[data-mode]'); if (b) pickMode(b.dataset.mode, b);
+});
+
+/* ---------- challenge hub ---------- */
+function chState(){ const s = store.get('challenges', null); return s && s.v === 1 ? s : {v:1, xp:0, best:{}, bestScaled:{}, history:[]}; }
+const fmtClock = s => { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const chVal = (ch, v) => v == null ? '–' : ch.unit === 'sec' ? fmtClock(v) : String(v);
+const chUnit = ch => ch.unit === 'sec' ? (ch.fmt === 'hold' ? 'held' : 'time') : ch.unit;
+const chShort = ch => ch.fmt === 'amrap' ? (ch.dur / 60) + ' min' : ch.fmt === 'emom' ? 'EMOM ' + (ch.dur / 60) : ch.fmt === 'hold' ? 'Hold' : 'Race';
+function chFmtLabel(ch){
+  if (ch.fmt === 'amrap') return (ch.dur / 60) + ' min · max ' + (ch.round ? 'rounds' : 'reps');
+  if (ch.fmt === 'emom') return 'Every minute · ' + (ch.dur / 60) + ' min';
+  if (ch.fmt === 'hold') return 'Hold · max time';
+  return 'For time · ' + partsTotal(ch) + ' reps';
+}
+const CH_FILTERS = [['all','All'],['3','3 min'],['5','5 min'],['race','For time'],['hold','Holds']];
+const chCat = ch => ch.fmt === 'fortime' ? 'race' : ch.fmt === 'hold' ? 'hold' : String(ch.dur / 60);
+const MEDAL_SVG = '<svg viewBox="0 0 100 100" aria-hidden="true"><path class="m-rib" d="M30 2 46 38h8L70 2z"/><circle class="m-fill" cx="50" cy="62" r="34"/><circle cx="50" cy="62" r="25" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="3"/><path d="M50 46l5 10 11 1.5-8 7.5 2 11-10-5.5-10 5.5 2-11-8-7.5 11-1.5z" fill="rgba(255,255,255,.7)"/></svg>';
+const ICON_LOCK = '<svg viewBox="0 0 24 24" class="lock-i" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+function chAvailability(ch, S, L, open){
+  if (ch.level > open) return {ok:false, locked:true, why:`Win medals in 2 ${LEVEL_NAMES[ch.level - 1]} challenges to unlock.`};
+  return challengeAllowed(ch, L);
+}
+function drawChallenges(anim){
+  const S = chState(), L = currentLimits(), open = unlockedLevel(S.best, CHALLENGES), lvl = levelFromXp(S.xp);
+  const from = xpToReach(lvl), to = xpToReach(lvl + 1), pct = Math.round((S.xp - from) / (to - from) * 100);
+  const tally = {bronze:0, silver:0, gold:0, legend:0};
+  CHALLENGES.forEach(c => { const m = medalFor(c, S.best[c.id]); if (m) tally[m]++; });
+  const avail = CHALLENGES.filter(c => chAvailability(c, S, L, open).ok);
+  const dayNo = Math.floor(Date.now() / 86400000), feat = avail.length ? avail[dayNo % avail.length] : null;
+  const f = ui.chFilter || 'all';
+  let h = `<div class="rank-card">
+      <div class="rank-badge">${lvl}</div>
+      <div><span class="small" style="opacity:.7">Your rank</span><b class="rank-name">${rankFor(lvl)}</b>
+        <div class="xpbar"><span id="rank-xp" style="width:${anim && !RM() ? 0 : pct}%"></span></div>
+        <span class="small" style="opacity:.75">${S.xp - from} / ${to - from} XP to level ${lvl + 1}</span></div>
+      <div class="medal-row">${MEDALS.map(m => `<span><i class="mdot ${m}"></i>${tally[m]} ${MEDAL_NAME[m]}</span>`).join('')}</div>
+    </div>`;
+  if (feat){ const nt = nextTarget(feat, S.best[feat.id]);
+    h += `<div class="feat"><span class="small" style="font-weight:700">Today’s challenge · ${esc(chFmtLabel(feat))}</span><h2>${esc(feat.name)}</h2><p class="small">${esc(feat.blurb)}</p>
+      <p class="small"><b>Your target: ${chVal(feat, nt.value)}</b>${nt.medal ? ` for ${MEDAL_NAME[nt.medal]}` : ''}</p>
+      <button class="btn" data-ch="${feat.id}">Let’s go</button></div>`; }
+  if (L.mode === 'gentle') h += `<p class="banner">High-intensity challenges are locked for now. ${store.get('health', null) ? 'Your safety check suggests talking to a doctor before harder training.' : '<button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
+  h += `<div class="chips" style="margin-top:16px">${CH_FILTERS.map(([k, l]) => `<button class="chip" data-chf="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>`;
+  let i = 0;
+  for (let n = 1; n <= 5; n++){
+    const list = CHALLENGES.filter(c => c.level === n && (f === 'all' || chCat(c) === f));
+    if (!list.length) continue;
+    h += `<div class="lvl-head"><h3>Level ${n} · ${LEVEL_NAMES[n]}</h3>${n > open ? `<span class="lock">${ICON_LOCK} Locked</span>` : ''}</div><div class="ch-grid">`;
+    h += list.map(c => {
+      const a = chAvailability(c, S, L, open), best = S.best[c.id], m = medalFor(c, best), nt = nextTarget(c, best);
+      return `<button class="ch-tile${a.ok ? '' : ' locked'}" data-ch="${c.id}" style="--i:${i++}">
+        ${m ? `<span class="medal-pin m-${m}">${MEDAL_SVG}</span>` : (a.ok ? '' : `<span class="medal-pin">${ICON_LOCK}</span>`)}
+        <span class="fmt">${chShort(c)}</span><b>${esc(c.name)}</b>
+        <span class="pb">${a.ok ? (best != null ? `Best ${chVal(c, best)} · next ${chVal(c, nt.value)}` : `Target ${chVal(c, nt.value)}`) : esc(a.why)}</span></button>`; }).join('');
+    h += `</div>`;
+  }
+  if (S.history.length){
+    h += `<h3>Recent battles</h3><div class="list">${S.history.slice(0, 6).map(r => { const c = CH[r.id]; if (!c) return '';
+      return `<div class="meal"><span class="t">${r.medal ? `<i class="mdot ${r.medal}"></i>` : ''}${esc(c.name)}${r.scaled ? ' <span class="muted small">(easier)</span>' : ''}${r.pb ? ' <span class="badge ok">PB</span>' : ''}</span>
+        <span class="n">${chVal(c, r.score)} ${chUnit(c)} · +${r.xp} XP · ${new Date(r.at).toLocaleDateString(undefined, {day:'numeric', month:'short'})}</span></div>`; }).join('')}</div>`;
+  }
+  h += `<p class="small muted" style="margin-top:16px">One or two challenges a day is plenty. Rest days make you faster.</p>`;
+  const el = document.getElementById('challenge-content');
+  el.innerHTML = h;
+  el.querySelectorAll('.ch-grid').forEach(g => { if (anim) g.classList.add('in'); });
+  if (anim && !RM()) requestAnimationFrame(() => requestAnimationFrame(() => { const x = document.getElementById('rank-xp'); if (x) x.style.width = pct + '%'; }));
+}
+document.getElementById('v-challenge').addEventListener('click', ev => {
+  const fb = ev.target.closest('[data-chf]');
+  if (fb){ ui.chFilter = fb.dataset.chf; return drawChallenges(false); }
+  const t = ev.target.closest('[data-ch]'); if (!t) return;
+  const ch = CH[t.dataset.ch], S = chState(), a = chAvailability(ch, S, currentLimits(), unlockedLevel(S.best, CHALLENGES));
+  if (!a.ok){ t.classList.remove('shake'); void t.offsetWidth; t.classList.add('shake'); buzz([10,30,10]); return toast(a.why); }
+  openArena(ch.id);
+});
+
+/* ---------- arena: the challenge itself ---------- */
+let arena = null, wakeLock = null;
+const ARC = 339.3;
+function tone(f, d){
+  try {
+    const A = window.AudioContext || window.webkitAudioContext; if (!A) return;
+    const ac = beep.ac || (beep.ac = new A()); if (ac.state === 'suspended') ac.resume();
+    const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime;
+    o.frequency.value = f; o.connect(g); g.connect(ac.destination);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.22, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.start(t); o.stop(t + d + .02);
+  } catch (e){}
+}
+async function holdWake(){ try { if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen'); } catch (e){} }
+function releaseWake(){ try { if (wakeLock) wakeLock.release(); } catch (e){} wakeLock = null; }
+function openArena(id){
+  arena = {ch:CH[id], scaled:false, phase:'intro'};
+  document.getElementById('arena').hidden = false; document.body.style.overflow = 'hidden';
+  drawArena();
+}
+function closeArena(){
+  if (!arena) return;
+  cancelAnimationFrame(arena.raf); clearTimeout(arena.cdT); releaseWake(); arena = null;
+  const el = document.getElementById('arena'); el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
+  if (ui.mode === 'challenge') drawChallenges(false);
+}
+function drawArena(){
+  const el = document.getElementById('arena');
+  if (arena.phase === 'intro') el.innerHTML = `<div class="ar-in">${arenaIntro()}</div>`;
+  if (arena.phase === 'result'){ el.innerHTML = `<div class="ar-in">${arenaResult()}</div>`; afterResult(); }
+  el.scrollTop = 0;
+}
+function arenaIntro(){
+  const ch = arena.ch, S = chState(), best = S.best[ch.id], nt = nextTarget(ch, best);
+  const moves = ch.moves.map(m => `<li><b>${MOVES[m].name}</b> ${esc(MOVES[m].how)}</li>`).join('');
+  return `<div class="ar-top"><button class="ar-x" data-ar="close" aria-label="Close">✕</button><span class="ar-fmt">${esc(chFmtLabel(ch))}</span></div>
+    <span class="ar-lvl">Level ${ch.level} · ${LEVEL_NAMES[ch.level]}</span>
+    <h2 class="ar-name">${esc(ch.name)}</h2>
+    <p class="ar-blurb">${esc(ch.scheme || ch.blurb)}</p>
+    <div class="ar-tiers">${ch.tiers.map((t, i) => `<div class="tier m-${MEDALS[i]}${reached(ch, best, t) ? ' got' : ''}"><span class="tier-m m-${MEDALS[i]}">${MEDAL_SVG}</span><b>${chVal(ch, t)}</b><span>${MEDAL_NAME[MEDALS[i]]}</span></div>`).join('')}</div>
+    <div class="ar-stats"><span>Your best<b>${chVal(ch, best)}</b></span><span>Next target<b>${chVal(ch, nt.value)}</b></span></div>
+    <ul class="ar-moves">${moves}</ul>
+    <label class="ar-switch"><input type="checkbox" id="ar-scaled" ${arena.scaled ? 'checked' : ''}><span><b>Easier version</b><small>${esc(ch.easy)} Counts for XP, not for medals that unlock levels.</small></span></label>
+    <p class="ar-note">Warm up first: a minute of marching, arm circles and a few easy squats. Stop if anything hurts.</p>
+    <button class="ar-go" data-ar="go">Start</button>`;
+}
+function startCountdown(){
+  arena.scaled = !!(document.getElementById('ar-scaled') || {}).checked;
+  arena.phase = 'countdown'; holdWake();
+  const el = document.getElementById('arena'), seq = ['3','2','1','GO'];
+  el.innerHTML = `<div class="ar-in"><div class="ar-top"><button class="ar-x" data-ar="close" aria-label="Close">✕</button><b class="ar-title">${esc(arena.ch.name)}</b></div></div><div class="ar-cd" aria-live="assertive"></div>`;
+  let i = 0;
+  (function step(){
+    if (!arena || arena.phase !== 'countdown') return;
+    if (i >= seq.length) return startWork();
+    el.querySelector('.ar-cd').innerHTML = `<span>${seq[i]}</span>`;
+    tone(seq[i] === 'GO' ? 1046 : 660, seq[i] === 'GO' ? .35 : .15); buzz(seq[i] === 'GO' ? 60 : 20);
+    i++; arena.cdT = setTimeout(step, RM() ? 450 : 850);
+  })();
+}
+function trackPos(ch, v){ const max = ch.better === 'lower' ? ch.tiers[0] * 1.08 : ch.tiers[3] * 1.1; return Math.max(2, Math.min(98, v / max * 100)); }
+function startWork(){
+  const ch = arena.ch;
+  Object.assign(arena, {phase:'work', t0:performance.now(), count:0, part:0, done:0, left: ch.parts ? ch.parts[0][1] : 0, round:1, roundDone:false, hits:new Set(), lastBeep:null, quitArm:false});
+  const unit = ch.fmt === 'fortime' ? MOVES[ch.parts[0][0]].name.toLowerCase() + ' left' : ch.fmt === 'hold' ? 'hold it' : ch.fmt === 'emom' ? 'rounds done' : ch.unit;
+  const tap = ch.fmt === 'hold' ? 'Stop: I dropped' : (ch.fmt === 'emom' || ch.round) ? 'Round done' : 'Tap every rep';
+  const sub = ch.round ? ch.round.map(([m, n]) => n + ' ' + MOVES[m].name.toLowerCase()).join(' · ')
+    : ch.fmt === 'emom' ? `Round 1: ${ch.per} ${MOVES[ch.moves[0]].name.toLowerCase()}` : ch.fmt === 'fortime' ? `Part 1 of ${ch.parts.length}` : '';
+  const btns = ch.fmt === 'amrap' && !ch.round ? '<button data-ar="minus">−1</button><button data-ar="plus5">+5</button><button data-ar="end">Finish</button>'
+    : ch.fmt === 'amrap' ? '<button data-ar="minus">−1 round</button><button data-ar="end">Finish</button>'
+    : ch.fmt === 'fortime' ? '<button data-ar="undo">Undo</button><button data-ar="setdone">Set done</button>' : '';
+  document.getElementById('arena').innerHTML = `<div class="ar-in ar-work">
+    <div class="ar-top"><button class="ar-x" data-ar="quit" aria-label="Quit">✕</button><b class="ar-title">${esc(ch.name)}${arena.scaled ? ' · easier' : ''}</b><span class="ar-fmt">${chShort(ch)}</span></div>
+    <div class="ar-ring"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="54"/><circle class="arc" id="ar-arc" cx="60" cy="60" r="54"/></svg>
+      <div class="ar-mid"><b class="ar-count" id="ar-count">${ch.fmt === 'fortime' ? arena.left : ch.fmt === 'hold' ? '0:00' : 0}</b><span class="ar-unit" id="ar-unit">${unit}</span><span class="ar-time" id="ar-time">${ch.dur ? fmtClock(ch.dur) : '0:00'}</span></div></div>
+    <div class="ar-track" aria-hidden="true"><div class="bar"><span id="ar-fill"></span></div>${ch.tiers.map((t, i) => `<i class="mk m-${MEDALS[i]}" id="mk-${i}" style="left:${trackPos(ch, t)}%"></i>`).join('')}</div>
+    <p class="ar-ghost" id="ar-ghost" aria-live="polite">${sub}</p>
+    <button class="ar-tap" id="ar-tap" data-ar="tap">${tap}</button>
+    ${btns ? `<div class="ar-row">${btns}</div>` : ''}</div>`;
+  loop();
+}
+const $a = id => document.getElementById(id);
+function loop(){
+  if (!arena || arena.phase !== 'work') return;
+  const ch = arena.ch, t = (performance.now() - arena.t0) / 1000;
+  if (ch.fmt === 'amrap'){
+    const left = Math.max(0, ch.dur - t), sl = Math.ceil(left);
+    $a('ar-time').textContent = fmtClock(sl); $a('ar-arc').style.strokeDashoffset = ARC * Math.min(1, t / ch.dur);
+    const pb = (arena.scaled ? chState().bestScaled : chState().best)[ch.id];
+    if (pb && !ch.round){ const g = Math.floor(pb * Math.min(1, t / ch.dur)), d = arena.count - g; $a('ar-ghost').textContent = `Ghost of your best: ${g} · you ${d >= 0 ? '+' : ''}${d}`; }
+    if (sl <= 3 && sl > 0 && arena.lastBeep !== sl){ arena.lastBeep = sl; tone(660, .12); }
+    if (left <= 0) return finishWork(arena.count);
+  } else if (ch.fmt === 'hold'){
+    arena.count = Math.floor(t); $a('ar-count').textContent = fmtClock(t); $a('ar-time').textContent = '';
+    const nt = ch.tiers.find(x => x > t) || ch.tiers[3] * 1.2;
+    $a('ar-arc').style.strokeDashoffset = ARC * (1 - Math.min(1, t / nt));
+    $a('ar-fill').style.width = trackPos(ch, t) + '%'; checkHits(arena.count);
+    const next = ch.tiers.findIndex(x => x > t); $a('ar-ghost').textContent = next >= 0 ? `${MEDAL_NAME[MEDALS[next]]} at ${fmtClock(ch.tiers[next])}` : 'Legend time. Keep going!';
+  } else if (ch.fmt === 'fortime'){
+    $a('ar-time').textContent = fmtClock(t); $a('ar-fill').style.width = trackPos(ch, t) + '%';
+    $a('ar-arc').style.strokeDashoffset = ARC * (1 - arena.done / partsTotal(ch));
+    ch.tiers.forEach((x, i) => { if (t > x) $a('mk-' + i).classList.add('lost'); });
+  } else if (ch.fmt === 'emom'){
+    const r = Math.floor(t / 60) + 1, rounds = ch.dur / 60;
+    if (r > arena.round){
+      if (!arena.roundDone) return finishWork(arena.round - 1);
+      if (r > rounds) return finishWork(rounds);
+      arena.round = r; arena.roundDone = false; tone(880, .25); buzz(40);
+      $a('ar-tap').textContent = 'Round done'; $a('ar-tap').disabled = false;
+      $a('ar-ghost').textContent = `Round ${r}: ${ch.per} ${MOVES[ch.moves[0]].name.toLowerCase()}`;
+    }
+    const inMin = t % 60, sl = Math.ceil(60 - inMin);
+    $a('ar-time').textContent = fmtClock(sl); $a('ar-arc').style.strokeDashoffset = ARC * (inMin / 60);
+    if (sl <= 3 && arena.lastBeep !== r + ':' + sl){ arena.lastBeep = r + ':' + sl; tone(660, .1); }
+  }
+  arena.raf = requestAnimationFrame(loop);
+}
+function bump(el){ el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+function ripple(ev){
+  const b = $a('ar-tap'); if (!b || RM()) return;
+  const r = b.getBoundingClientRect(), s = document.createElement('span'); s.className = 'rip';
+  s.style.left = ((ev && ev.clientX ? ev.clientX : r.left + r.width / 2) - r.left) + 'px'; s.style.top = ((ev && ev.clientY ? ev.clientY : r.top + r.height / 2) - r.top) + 'px';
+  b.appendChild(s); setTimeout(() => s.remove(), 520);
+}
+function flash(text, cls){
+  if (RM()) return;
+  const f = document.createElement('div'); f.className = 'flash ' + (cls || ''); f.textContent = text;
+  document.getElementById('arena').appendChild(f); setTimeout(() => f.remove(), 1000);
+}
+function checkHits(score){
+  const ch = arena.ch; if (ch.better !== 'higher') return;
+  ch.tiers.forEach((x, i) => { if (score >= x && !arena.hits.has(i)){ arena.hits.add(i); const mk = $a('mk-' + i); if (mk) mk.classList.add('hit'); flash(MEDAL_NAME[MEDALS[i]] + '!', 'm-' + MEDALS[i]); tone(1175, .18); buzz([20, 40, 20]); } });
+}
+function setCount(n){
+  arena.count = Math.max(0, n); const c = $a('ar-count'); c.textContent = arena.count; bump(c);
+  $a('ar-fill').style.width = trackPos(arena.ch, arena.count) + '%'; checkHits(arena.count);
+}
+function repDone(k){
+  const ch = arena.ch; k = Math.min(k, arena.left); if (k <= 0) return;
+  arena.left -= k; arena.done += k;
+  if (arena.left <= 0){
+    arena.part++;
+    if (arena.part >= ch.parts.length) return finishWork(Math.max(1, Math.round((performance.now() - arena.t0) / 1000)));
+    const [m, n] = ch.parts[arena.part]; arena.left = n; tone(880, .15); buzz(30);
+    $a('ar-unit').textContent = MOVES[m].name.toLowerCase() + ' left'; $a('ar-ghost').textContent = `Part ${arena.part + 1} of ${ch.parts.length}`;
+    if (ch.parts.length > 1) flash(n + ' ' + MOVES[m].name);
+  }
+  const c = $a('ar-count'); c.textContent = arena.left; bump(c); buzz(8);
+}
+function arTap(ev){
+  if (!arena || arena.phase !== 'work') return;
+  const ch = arena.ch; ripple(ev);
+  if (ch.fmt === 'hold') return finishWork(Math.floor((performance.now() - arena.t0) / 1000));
+  if (ch.fmt === 'emom'){
+    if (arena.roundDone) return;
+    arena.roundDone = true; arena.count = arena.round; const c = $a('ar-count'); c.textContent = arena.round; bump(c); checkHits(arena.round); tone(988, .12); buzz(15);
+    if (arena.round >= ch.dur / 60) return finishWork(arena.round);
+    $a('ar-tap').textContent = 'Rest until the next minute'; $a('ar-tap').disabled = true; return;
+  }
+  if (ch.fmt === 'fortime') return repDone(1);
+  setCount(arena.count + 1); buzz(8);
+}
+function finishWork(score){
+  cancelAnimationFrame(arena.raf); releaseWake();
+  const ch = arena.ch;
+  if (!(score > 0)){ arena.phase = 'intro'; drawArena(); return toast(ch.fmt === 'emom' ? 'The first minute slipped by. Go again!' : 'Nothing counted. Go again when you’re ready.'); }
+  arena.before = JSON.parse(JSON.stringify(chState()));
+  arena.res = saveChallenge(ch, score, arena.scaled, arena.before);
+  arena.phase = 'result'; drawArena();
+}
+function saveChallenge(ch, score, scaled, before){
+  const S = JSON.parse(JSON.stringify(before)), key = scaled ? 'bestScaled' : 'best', prev = S[key][ch.id];
+  const pb = isBetter(ch, score, prev), xp = xpFor(ch, score, pb, scaled), medal = medalFor(ch, score);
+  const lvlBefore = levelFromXp(S.xp);
+  if (pb) S[key][ch.id] = score;
+  S.xp += xp;
+  S.history.unshift({id:ch.id, at:new Date().toISOString(), score, scaled, medal, xp, pb});
+  S.history = S.history.slice(0, 60);
+  store.set('challenges', S);
+  return {score, medal, xp, pb, scaled, xpBefore:before.xp, xpAfter:S.xp, lvlBefore, lvlAfter:levelFromXp(S.xp)};
+}
+function arenaResult(){
+  const {ch, res} = arena, lv = res.lvlAfter, from = xpToReach(lv), to = xpToReach(lv + 1);
+  const nt = nextTarget(ch, (res.scaled ? chState().bestScaled : chState().best)[ch.id]);
+  return `<div class="ar-top"><button class="ar-x" data-ar="close" aria-label="Close">✕</button><span class="ar-fmt">${chShort(ch)}</span></div>
+    <div class="res m-${res.medal || 'none'}">
+      <span class="ar-lvl">${esc(ch.name)}${res.scaled ? ' · easier version' : ''}</span>
+      ${res.medal ? `<div class="medal-big m-${res.medal}${arena.quiet ? ' quiet' : ''}">${MEDAL_SVG}</div><h2 class="res-medal">${MEDAL_NAME[res.medal]}${res.scaled ? ' (easier)' : ''}</h2>` : `<h2 class="res-medal">Done!</h2>`}
+      <b class="res-score" id="res-score">${chVal(ch, res.score)}</b><span class="ar-unit">${chUnit(ch)}</span>
+      ${res.pb ? '<span class="pbtag">New personal best</span>' : ''}
+      <div class="res-xp"><b>+${res.xp} XP</b><div class="xpbar"><span id="res-xp" style="width:${arena.quiet ? Math.round((res.xpAfter - from) / (to - from) * 100) : (res.lvlAfter > res.lvlBefore ? 0 : Math.round((res.xpBefore - from) / (to - from) * 100))}%"></span></div>
+        <span class="small" style="opacity:.75">${rankFor(lv)} · Level ${lv} · ${res.xpAfter - from} / ${to - from} XP</span></div>
+      <p class="ar-note">${nt.medal ? `Next target: <b>${chVal(ch, nt.value)}</b> for ${MEDAL_NAME[nt.medal]}` : `Next target: <b>${chVal(ch, nt.value)}</b>. You hold every medal here.`}</p>
+      ${ch.unit !== 'sec' ? `<div class="ar-row fix"><button data-ar="fix" data-d="-1" aria-label="One less">−1</button><span>Fix count</span><button data-ar="fix" data-d="1" aria-label="One more">+1</button></div>` : ''}
+    </div>
+    <div class="ar-row"><button data-ar="close">Done</button><button class="primary" data-ar="again">Go again</button></div>`;
+}
+function afterResult(){
+  const {ch, res} = arena, lv = res.lvlAfter, from = xpToReach(lv), to = xpToReach(lv + 1), pct = Math.round((res.xpAfter - from) / (to - from) * 100);
+  if (arena.quiet){ arena.quiet = false; return; }
+  requestAnimationFrame(() => requestAnimationFrame(() => { const x = $a('res-xp'); if (x) x.style.width = pct + '%'; }));
+  if (ch.unit !== 'sec' && !RM()){ const e = $a('res-score'), t0 = performance.now();
+    (function f(t){ const k = Math.min(1, (t - t0) / 700); e.textContent = Math.round(res.score * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f); })(t0); }
+  [523, 659, 784].forEach((f, i) => setTimeout(() => tone(f, .18), 250 + i * 140));
+  if (res.lvlAfter > res.lvlBefore) setTimeout(() => celebrate(`Level up! You’re level ${res.lvlAfter}${rankFor(res.lvlAfter) !== rankFor(res.lvlBefore) ? ', rank ' + rankFor(res.lvlAfter) : ''}.`), 700);
+  else if (res.pb || res.medal === 'gold' || res.medal === 'legend') setTimeout(() => celebrate(res.pb ? 'New personal best!' : MEDAL_NAME[res.medal] + ' medal!'), 700);
+}
+document.getElementById('arena').addEventListener('pointerdown', ev => {
+  const t = ev.target.closest('[data-ar="tap"]'); if (!t || t.disabled) return;
+  ev.preventDefault(); arena.tapByPointer = true; arTap(ev);
+});
+document.getElementById('arena').addEventListener('click', ev => {
+  const t = ev.target.closest('[data-ar]'); if (!t || !arena) return;
+  const a = t.dataset.ar;
+  if (a === 'tap'){ if (arena.tapByPointer){ arena.tapByPointer = false; return; } return arTap(ev); }
+  if (a === 'close') return closeArena();
+  if (a === 'go') return startCountdown();
+  if (a === 'again'){ arena.phase = 'intro'; return drawArena(); }
+  if (a === 'quit'){
+    if (!arena.quitArm){ arena.quitArm = true; t.textContent = 'Quit?'; t.classList.add('arm'); setTimeout(() => { if (arena && arena.phase === 'work'){ arena.quitArm = false; t.textContent = '✕'; t.classList.remove('arm'); } }, 2500); return; }
+    return closeArena();
+  }
+  if (a === 'minus') return setCount(arena.count - 1);
+  if (a === 'plus5') return setCount(arena.count + 5);
+  if (a === 'end') return finishWork(arena.count);
+  if (a === 'setdone') return repDone(arena.left);
+  if (a === 'undo'){
+    const ch = arena.ch; if (arena.left < ch.parts[arena.part][1]){ arena.left++; arena.done--; const c = $a('ar-count'); c.textContent = arena.left; bump(c); } return;
+  }
+  if (a === 'fix'){
+    const n = Math.max(1, arena.res.score + (+t.dataset.d));
+    if (n === arena.res.score) return;
+    store.set('challenges', arena.before);
+    arena.res = saveChallenge(arena.ch, n, arena.res.scaled, arena.before);
+    arena.quiet = true; drawArena();
+  }
+});
+
 /* ---------- render + events ---------- */
 const TABS = ['body','today','food','recipes','sched'];
 function placePill(){
@@ -1567,6 +2214,7 @@ addEventListener('resize', placePill);
 function setTab(t){
   const from = TABS.indexOf(ui.tab), to = TABS.indexOf(t), changed = from!==to;
   ui.tab = t; store.set('tab', t);
+  document.getElementById('v-challenge').hidden = true;
   ['body','today','food','recipes','sched'].forEach(k => {
     document.getElementById('v-'+k).hidden = k!==t;
     document.getElementById('t-'+k).setAttribute('aria-selected', k===t);
@@ -1577,6 +2225,7 @@ function setTab(t){
   todayAnim = true; render(); placePill(); window.scrollTo({top:0});
 }
 function render(){
+  if (ui.mode === 'challenge') return drawChallenges(false);
   if (ui.tab==='body'){ drawFigure(); drawGroupDetail(); }
   if (ui.tab==='today') drawToday();
   if (ui.tab==='food') drawFood();
@@ -1585,7 +2234,7 @@ function render(){
 }
 
 document.addEventListener('click', ev => {
-  const t = ev.target.closest('[data-timer],[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,[data-flow],[data-plan],#redo-setup,#del-health,#del-all,#clear-sched,#side-front,#side-back');
+  const t = ev.target.closest('[data-timer],[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,[data-flow],[data-plan],#redo-setup,#del-health,#del-all,#mode-pill,#clear-sched,#side-front,#side-back');
   if (!t) return;
   if (t.dataset.timer){ ev.preventDefault(); return startTimer(+t.dataset.timer, t.dataset.tlabel); }
   if (t.dataset.close && ev.target!==t && t.classList.contains('scrim')) return;
@@ -1609,6 +2258,7 @@ document.addEventListener('click', ev => {
   if (t.dataset.plan==='discard'){ if (!t.dataset.armed){ t.dataset.armed = '1'; t.textContent = 'Tap again to delete'; return; }
     store.del('plan'); closeSheet(); render(); return toast('Plan deleted'); }
   if (t.id==='redo-setup') return openFlow('onboarding');
+  if (t.id==='mode-pill') return openModePicker();
   if (t.id==='del-health' || t.id==='del-all'){
     if (!t.dataset.armed){ const old = t.textContent; t.dataset.armed = '1'; t.textContent = 'Tap again to confirm'; setTimeout(()=>{ delete t.dataset.armed; t.textContent = old; }, 3000); return; }
     if (t.id==='del-health'){ store.del('health'); store.del('plan'); render(); return toast('Health answers and plan deleted'); }
@@ -1632,6 +2282,7 @@ document.addEventListener('click', ev => {
     if (RM() || !row || row.classList.contains('leaving')) return go(); row.classList.add('leaving'); setTimeout(go, 200); return; }
 });
 document.addEventListener('keydown', ev => {
+  if (ev.key==='Escape' && arena){ if (arena.phase !== 'work' && arena.phase !== 'countdown') closeArena(); return; }
   if (ev.key==='Escape'){ if (flow){ if (flowClosable()) closeFlow(); return; } closeSheet(); }
   if ((ev.key==='Enter'||ev.key===' ') && ev.target.matches('path.m')){ ev.preventDefault(); selectGroup(ev.target.dataset.g); }
 });
@@ -1685,7 +2336,9 @@ document.addEventListener('click', ev => { if (swallowClick && ev.target.closest
 document.getElementById('today-date').textContent = new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});
 fillForm();
 setTab(['body','today','food','recipes','sched'].includes(ui.tab) ? ui.tab : 'body');
+setMode(store.get('mode', 'train'));
 if (!store.get('onboarding', null) || /[?#&](survey|setup)\b/.test(location.search + location.hash)) openFlow('onboarding');
+else openModePicker();
 </script>
 </body>
 </html>
