@@ -8,8 +8,8 @@ import vm from 'node:vm';
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const block = (name) => html.split(`/* ${name}:start`)[1].split(`/* ${name}:end */`)[0].replace(/^[^\n]*\n/, '');
 const ctx = {};
-vm.runInNewContext(block('alarm-core') + '\nObject.assign(this, {ALARM_DEFAULT, nextAlarmAt, alarmTask, afterAbandon, alarmPoints, localDay});', ctx);
-const { ALARM_DEFAULT, nextAlarmAt, alarmTask, afterAbandon, alarmPoints, localDay } = ctx;
+vm.runInNewContext(block('alarm-core') + '\nObject.assign(this, {ALARM_DEFAULT, nextAlarmAt, alarmTask, afterAbandon, localDay});', ctx);
+const { ALARM_DEFAULT, nextAlarmAt, alarmTask, afterAbandon, localDay } = ctx;
 const cfg = p => ({...ALARM_DEFAULT, on:true, ...p});
 
 test('off means no alarm', () => {
@@ -47,8 +47,7 @@ test('leaving the task: commitment rings again, gentle stops, and it never runs 
   assert.equal(afterAbandon(cfg({mode:'commit', rearm:5, maxMin:60}), first, new Date(2026, 10, 4, 7, 58)).status, 'expired');
 });
 
-test('points: camera-verified earns most, tapping less, emergency stop nothing (never negative)', () => {
-  assert.equal(alarmPoints('camera'), 10);
-  assert.equal(alarmPoints('tap'), 4);
-  assert.equal(alarmPoints('stopped'), 0);
+test('the alarm task can be squats; anything else falls back to push-ups', () => {
+  assert.equal(alarmTask(cfg({move:'squat'}), false).move, 'squat');
+  assert.equal(alarmTask(cfg({move:'burpee'}), false).move, 'pushup');
 });
