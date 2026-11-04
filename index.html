@@ -355,6 +355,7 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .top-r{display:flex;align-items:center;gap:10px}
 @media (max-width:430px){.top-r .date{display:none}}
 
+.why-in{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 12px;font-size:16px;width:100%}
 /* ---------- mode picker: Challenge or Training ---------- */
 #modepick{position:fixed;inset:0;z-index:65;background:var(--bg);overflow:auto}
 #modepick .mp-in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
@@ -716,7 +717,39 @@ const EX_RAW = [
  ['calf-raise','Step calf raise',['calves'],'Stair',1,20,'reps',['Balls of your feet on the edge of a stair.','Lower heels below the step.','Rise as high as you can, pause, lower slowly.']],
  ['sl-calf','Single-leg calf raise',['calves'],'Wall for balance',2,12,'reps',['Stand on one foot, fingertips on a wall.','Rise onto the ball of your foot.','Lower slowly. Switch legs.']],
  ['skip','Jump rope (with or without rope)',['calves'],'Optional rope',1,60,'sec',['Stay on the balls of your feet.','Small, quick hops with soft knees.','Turn your wrists as if swinging a rope.']],
- ['tib-raise','Wall tibialis raise',['calves'],'Wall',1,15,'reps',['Lean your back against a wall, feet a step forward.','Lift your toes as high as you can.','Lower slowly. Works the front of your shins.']]
+ ['tib-raise','Wall tibialis raise',['calves'],'Wall',1,15,'reps',['Lean your back against a wall, feet a step forward.','Lift your toes as high as you can.','Lower slowly. Works the front of your shins.']],
+ // gym: barbell, dumbbells, cables and machines
+ ['db-bench','Dumbbell bench press',['chest','triceps','shoulders'],'Dumbbells and bench',1,10,'reps',['Lie on a flat bench, dumbbells over your chest.','Lower them to the sides of your chest, elbows at about 45 degrees.','Press back up without clanking them together.']],
+ ['bench-press','Barbell bench press',['chest','triceps','shoulders'],'Barbell and bench',2,8,'reps',['Eyes under the bar, feet flat, shoulder blades pinched.','Lower the bar to your lower chest with control.','Press up and slightly back. Use a spotter or safety pins.']],
+ ['incline-db','Incline dumbbell press',['chest','shoulders'],'Dumbbells and bench',1,10,'reps',['Set the bench to about 30 degrees.','Lower the dumbbells to your upper chest.','Press up until your arms are straight.']],
+ ['cable-fly','Cable fly',['chest'],'Cable machine',1,12,'reps',['Handles at chest height, step forward, soft elbows.','Bring your hands together in a wide hug.','Open back slowly until you feel a chest stretch.']],
+ ['machine-press','Machine chest press',['chest','triceps'],'Machine',1,12,'reps',['Seat so the handles are at mid-chest.','Press forward until your arms are almost straight.','Return slowly without letting the weights touch.']],
+ ['lat-pulldown','Lat pulldown',['upperback','biceps'],'Cable machine',1,10,'reps',['Grip a bit wider than shoulders, thighs under the pad.','Pull the bar to your upper chest, elbows down.','Let it rise slowly until your arms are straight.']],
+ ['cable-row','Seated cable row',['upperback','biceps'],'Cable machine',1,12,'reps',['Sit tall, slight bend in the knees.','Pull the handle to your belly, squeezing shoulder blades.','Reach forward slowly without rounding your back.']],
+ ['db-row','One-arm dumbbell row',['upperback','biceps'],'Dumbbells and bench',1,10,'reps',['One hand and knee on a bench, back flat.','Row the dumbbell to your hip.','Lower slowly. Switch sides.']],
+ ['barbell-row','Barbell row',['upperback','biceps','lowerback'],'Barbell',2,8,'reps',['Hinge forward with a flat back, bar hanging below your shoulders.','Pull the bar to your lower ribs.','Lower with control.']],
+ ['pull-up','Pull-up',['upperback','biceps'],'Pull-up bar',3,6,'reps',['Hang with hands just wider than shoulders.','Pull until your chin is over the bar.','Lower all the way down. Use a band or machine to help.']],
+ ['db-press','Seated dumbbell shoulder press',['shoulders','triceps'],'Dumbbells and bench',1,10,'reps',['Sit tall with back support, dumbbells at shoulder height.','Press up until your arms are straight.','Lower to ear height.']],
+ ['ohp','Standing overhead press',['shoulders','triceps'],'Barbell',2,8,'reps',['Bar on your front shoulders, glutes and abs tight.','Press straight up, moving your head back slightly.','Lower to your collarbone.']],
+ ['lateral-raise','Dumbbell lateral raise',['shoulders'],'Dumbbells',1,12,'reps',['Stand tall, light dumbbells at your sides.','Raise your arms out to shoulder height.','Lower slowly over 2 seconds.']],
+ ['face-pull','Cable face pull',['shoulders','traps','upperback'],'Cable machine',1,15,'reps',['Rope at face height, step back.','Pull towards your eyes, elbows high and wide.','Return slowly.']],
+ ['db-curl','Dumbbell curl',['biceps','forearms'],'Dumbbells',1,10,'reps',['Stand tall, palms forward.','Curl up without swinging, elbows by your sides.','Lower slowly.']],
+ ['cable-curl','Cable curl',['biceps'],'Cable machine',1,12,'reps',['Bar on the low pulley, elbows pinned.','Curl to your shoulders.','Lower slowly until your arms are straight.']],
+ ['pushdown','Rope triceps pushdown',['triceps'],'Cable machine',1,12,'reps',['Rope on the high pulley, elbows by your sides.','Push down and spread the rope at the bottom.','Let it rise to 90 degrees.']],
+ ['skull-crusher','EZ-bar skull crusher',['triceps'],'Barbell and bench',2,10,'reps',['Lie on a bench, bar over your chest.','Bend only the elbows to lower the bar to your forehead.','Straighten your arms.']],
+ ['goblet-squat','Goblet squat',['quads','glutes'],'Dumbbells',1,10,'reps',['Hold a dumbbell at your chest.','Squat between your knees, chest up.','Drive up through your whole foot.']],
+ ['back-squat','Barbell back squat',['quads','glutes','lowerback'],'Barbell and rack',2,6,'reps',['Bar on your upper back, feet shoulder width.','Sit down until your thighs are at least parallel.','Stand up, keeping your chest up. Use safety pins.']],
+ ['leg-press','Leg press',['quads','glutes'],'Machine',1,12,'reps',['Feet shoulder width on the platform.','Lower until your knees reach 90 degrees.','Press back without locking your knees.']],
+ ['leg-extension','Leg extension',['quads'],'Machine',1,12,'reps',['Pad on your lower shins, knees in line with the pivot.','Straighten your legs.','Lower slowly.']],
+ ['rdl','Romanian deadlift',['hamstrings','glutes','lowerback'],'Barbell',2,8,'reps',['Bar at your hips, knees soft.','Push your hips back, bar close to your legs, back flat.','Stand up when you feel your hamstrings stretch.']],
+ ['deadlift','Deadlift',['hamstrings','glutes','lowerback','upperback'],'Barbell',3,5,'reps',['Bar over mid-foot, grip just outside your legs.','Brace, push the floor away, bar close to your body.','Lock out tall, then lower under control.']],
+ ['leg-curl','Lying leg curl',['hamstrings'],'Machine',1,12,'reps',['Pad just above your heels.','Curl your heels towards your glutes.','Lower slowly.']],
+ ['hip-thrust','Barbell hip thrust',['glutes','hamstrings'],'Barbell and bench',2,10,'reps',['Upper back on a bench, padded bar across your hips.','Drive your hips up until your body is straight.','Squeeze for a second, then lower.']],
+ ['machine-calf','Machine calf raise',['calves'],'Machine',1,15,'reps',['Balls of your feet on the edge.','Lower your heels for a stretch.','Rise as high as you can and pause.']],
+ ['cable-crunch','Cable crunch',['abs'],'Cable machine',1,12,'reps',['Kneel below the rope, hands by your head.','Curl your ribs towards your hips.','Return slowly.']],
+ ['knee-raise','Hanging knee raise',['abs','obliques'],'Pull-up bar',2,10,'reps',['Hang from a bar or use dip handles.','Raise your knees to your chest without swinging.','Lower slowly.']],
+ ['db-shrug','Dumbbell shrug',['traps'],'Dumbbells',1,12,'reps',['Heavy dumbbells at your sides.','Lift your shoulders to your ears.','Pause, then lower slowly.']],
+ ['farmer-walk','Farmer’s walk',['forearms','traps'],'Dumbbells',1,40,'sec',['Heavy dumbbell in each hand.','Walk tall with short, quick steps.','Keep your shoulders down and back.']]
 ];
 const EX = {};
 EX_RAW.forEach(([id,name,groups,equip,level,dose,unit,steps]) => EX[id] = {id,name,groups,equip,level,dose,unit,steps});
@@ -744,8 +777,11 @@ const STRETCH = {};
 STRETCH_RAW.forEach(([id,name,groups,hold,steps]) => STRETCH[id] = {id,name,groups,hold,steps});
 const stretchesFor = gs => STRETCH_RAW.map(r => STRETCH[r[0]]).filter(s => s.groups.some(g => gs.includes(g)))
   .sort((a,b) => gs.indexOf(a.groups.find(g=>gs.includes(g))) - gs.indexOf(b.groups.find(g=>gs.includes(g))));
-const exFor = g => EX_RAW.map(r => EX[r[0]]).filter(e => e.groups.includes(g))
-  .sort((a,b) => (a.groups[0]===g?0:1)-(b.groups[0]===g?0:1) || a.level-b.level);
+const isGymEx = e => /barbell|dumbbell|cable|machine/i.test(e.equip);
+const userTrack = () => { const o = store.get('onboarding', null), t = o && o.answers && o.answers.track; return t || (o && o.answers && o.answers.goal ? 'home' : 'gym'); };
+const exFor = g => { const gym = userTrack() === 'gym';
+  return EX_RAW.map(r => EX[r[0]]).filter(e => e.groups.includes(g) && (gym || !isGymEx(e)))
+    .sort((a,b) => (a.groups[0]===g?0:1)-(b.groups[0]===g?0:1) || (gym ? (isGymEx(b)?1:0)-(isGymEx(a)?1:0) : 0) || a.level-b.level); };
 
 /* ---------- state ---------- */
 const DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
@@ -924,15 +960,17 @@ const PLAN = {
 };
 const STRETCHES = [['Cat-cow','10 slow rounds'],['Hip flexor stretch','45 sec each side'],['Hamstring stretch','45 sec each side'],['Chest doorway stretch','30 sec each side'],["Child's pose",'60 sec'],['Easy walk','20–30 min']];
 const LEVEL_MAP = {start:1, some:1, regular:2, advanced:3};
-const GOAL_FOR_FOOD = {lose:'lose', gain:'gain', tone:'tone', endure:'endure', move:'tone'};
+const GYM_LEVEL_MAP = {start:1, some:2, regular:2, advanced:3};
+const levelOf = (lv, track) => (track === 'gym' ? GYM_LEVEL_MAP : LEVEL_MAP)[lv] || 1;
+const GOAL_FOR_FOOD = {lose:'lose', gain:'gain', strength:'gain', tone:'tone', endure:'endure', move:'tone'};
 const P_ = () => {
   if (profile) return profile;
   const o = store.get('onboarding', null), a = (o && o.answers) || {};
-  return {...EXAMPLE_PROFILE, goal: GOAL_FOR_FOOD[a.goal] || EXAMPLE_PROFILE.goal, level: String(LEVEL_MAP[a.level] || EXAMPLE_PROFILE.level)};
+  return {...EXAMPLE_PROFILE, goal: GOAL_FOR_FOOD[a.goal] || EXAMPLE_PROFILE.goal, level: String(a.level ? levelOf(a.level, a.track) : EXAMPLE_PROFILE.level)};
 };
 function weekNo(){ const d=new Date(); const s=new Date(d.getFullYear(),0,1); return Math.floor((d-s)/604800000); }
 function recommend(day){
-  const ap = approvedPlan();
+  const ap = planForToday();
   if (ap && ap.plan.days.length){
     const d = ap.plan.days.find(x => x.day===day);
     if (!d) return {plan:{title:'Rest day', focus:[], note:'Your plan has a rest day today. A walk and gentle stretching.'}, items:[], sets:0};
@@ -987,10 +1025,12 @@ function drawToday(){
     ${all.length?`<div class="prog-row"><span>${nDone} of ${all.length} done</span><b>${pct}%</b></div><div class="progress" aria-label="${pct}% done"><span style="width:${lastPct===null?pct:lastPct}%"></span></div>`:''}
   </div>`;
   h += planCard();
+  if (ob && ob.answers && ob.answers.goal && !why && !store.get('whyAsked', false)) h += `<div class="cta-card stack" style="align-items:stretch"><span><b>What’s your why?</b><span class="small muted">One line. We’ll show it on the tough days.</span></span>
+    <input id="why-in" class="why-in" maxlength="140" placeholder="e.g. feel strong again" aria-label="Your why"><span class="row"><button class="btn sm primary" id="why-save">Save</button><button class="btn sm ghost" id="why-skip">Not now</button></span></div>`;
   if (Lt.mode==='gentle') h += `<p class="banner">${hl ? 'Gentle mode: based on your health check we keep things easy. Check with your doctor before harder training.' : 'Gentle mode until you do the quick health check.'}${hl ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
   if (mine.length) h += `<h3>From your schedule</h3><div class="${L}">${mine.map(x=>row(x,'s:')).join('')}</div>`;
   if (rec.items.length){
-    h += `<h3>${approvedPlan() ? 'Your plan' : 'Recommended'} · ${esc(rec.plan.title)}</h3>
+    h += `<h3>${planForToday() ? 'Your plan' : 'Recommended'} · ${esc(rec.plan.title)}</h3>
       <p class="muted small">Warm up first: 1 min marching on the spot, 10 arm circles, 10 bodyweight squats.</p>
       <div class="${L}">${rec.items.map(x=>row(x,'r:')).join('')}</div>`;
     if (cardio) h += `<div class="panel small"><b>Finisher:</b> ${cardio} min of cardio at home. Try 30 sec jumping jacks, 30 sec high knees, 30 sec rest, repeated.</div>`;
@@ -1236,11 +1276,11 @@ const SCOFF = [
 ];
 const HIGH_IMPACT = ['jump-squat','mountain','skip','wall-hs','decline-pushup','split-squat','hollow','leg-raise','bridge-walk','hip-dips','burpee','jacks'];
 const INJURY_AVOID = {
-  knee:['jump-squat','split-squat','lunge','step-up','skip','wall-sit','mountain','burpee','jacks'],
-  lowerback:['good-morning','superman','leg-raise','sl-rdl','russian-twist','hollow','backpack-row','situp'],
-  shoulder:['pike-pushup','wall-hs','decline-pushup','backpack-press','chair-dip','diamond-pushup','backpack-ext'],
-  wrist:['pushup','wide-pushup','decline-pushup','diamond-pushup','pike-pushup','wall-hs','shoulder-taps','mountain','bottle-wrist','chair-dip','burpee'],
-  neck:['shrug','wall-hs','crunch','bicycle','situp']
+  knee:['jump-squat','split-squat','lunge','step-up','skip','wall-sit','mountain','burpee','jacks','back-squat','leg-press','leg-extension'],
+  lowerback:['good-morning','superman','leg-raise','sl-rdl','russian-twist','hollow','backpack-row','situp','deadlift','rdl','barbell-row','back-squat'],
+  shoulder:['pike-pushup','wall-hs','decline-pushup','backpack-press','chair-dip','diamond-pushup','backpack-ext','bench-press','ohp','skull-crusher','pull-up'],
+  wrist:['pushup','wide-pushup','decline-pushup','diamond-pushup','pike-pushup','wall-hs','shoulder-taps','mountain','bottle-wrist','chair-dip','burpee','bench-press','skull-crusher'],
+  neck:['shrug','wall-hs','crunch','bicycle','situp','db-shrug','ohp']
 };
 const BANNED_TEXT = /\b(detox\w*|cleanse\w*|starv\w*|purg\w*|water[- ]fast\w*|juice[- ]fast\w*|dry[- ]fast\w*|skip(?:ping)? (?:all |your )?meals|no[- ]carb\w*|zero[- ]carb\w*|crash[- ]diet\w*|laxative\w*|diet pills?)\b/i;
 const bmiOf = (kg, cm) => (kg > 0 && cm > 0) ? kg / Math.pow(cm / 100, 2) : null;
@@ -1276,7 +1316,7 @@ function safetyLimits(i){
     mode: gentle ? 'gentle' : 'normal',
     nutrition: ed.refer ? 'blocked' : 'ok',
     maxDays: gentle ? 3 : [0, 4, 5, 6][lvl],
-    maxMinutes: gentle ? 30 : 60,
+    maxMinutes: gentle ? 30 : 90,
     maxLevel: gentle ? 1 : lvl,
     maxSets: gentle ? 2 : lvl + 1,
     avoid: [...avoid],
@@ -1446,7 +1486,7 @@ Hard rules:
 Reply with only one JSON object in the OUTPUT FORMAT.`;
 
 const AGE_OPTS = [['u18','Under 18'],['18-24','18–24'],['25-34','25–34'],['35-44','35–44'],['45-54','45–54'],['55+','55 or older']];
-const GOAL_OPTS = [['lose','Lose fat'],['gain','Build muscle'],['tone','Tone and stay in shape'],['endure','Better fitness and stamina'],['move','Move better, less pain']];
+const GOAL_OPTS = [['gain','Build muscle'],['strength','Get stronger'],['lose','Lose fat'],['endure','Get fitter'],['tone','Stay in shape'],['move','Move better, less pain']];
 const GOAL_LABEL = Object.fromEntries(GOAL_OPTS);
 const INJ_OPTS = [['none','No pain or injuries'],['knee','Knee'],['lowerback','Lower back'],['shoulder','Shoulder'],['wrist','Wrist'],['neck','Neck']];
 const EQUIP_OPTS = [['none','Just me'],['furniture','Chair, table or couch'],['weights','Backpack or water bottles'],['bar','Pull-up bar'],['bands','Resistance bands']];
@@ -1454,13 +1494,14 @@ const ALLERGY_OPTS = [['none','None'],['gluten','Gluten'],['lactose','Lactose'],
 const ALLERGEN_WORDS = {gluten:/bread|toast|oats|pasta|noodle|wrap|tortilla|wholegrain|wholewheat/i, lactose:/yogurt|skyr|cheese|feta|halloumi|cottage|milk|whey|butter/i,
   nuts:/nut|almond|peanut|walnut/i, eggs:/egg/i, fish:/salmon|tuna|fish|shellfish|prawn/i, soy:/soy|tofu|edamame/i};
 const CONSENT_V = 'proto-2026-11';
-const equipNeed = e => { const q = e.equip.toLowerCase(); if (/optional|none|wall|towel|stair|rope/.test(q)) return null; if (/backpack|bottle|jug|bag/.test(q)) return 'weights'; if (/chair|couch|table|door/.test(q)) return 'furniture'; return null; };
+const equipNeed = e => { const q = e.equip.toLowerCase(); if (/barbell|dumbbell|cable|machine/.test(q)) return 'gym'; if (/pull-up bar/.test(q)) return 'bar'; if (/optional|none|wall|towel|stair|rope/.test(q)) return null; if (/backpack|bottle|jug|bag/.test(q)) return 'weights'; if (/chair|couch|table|door/.test(q)) return 'furniture'; return null; };
 const dietOk = (m, d) => !d || d==='any' || (d==='veg' && m[2]!=='any') || (d==='vegan' && m[2]==='vegan');
 const allergyOk = (m, al) => (al || []).every(k => !ALLERGEN_WORDS[k] || !ALLERGEN_WORDS[k].test(m[1] + ' ' + m[5]));
 const adult = a => !!a.age && a.age !== 'u18';
 const nut = a => a.kind === 'nutrition' || a.kind === 'both';
 const trn = a => a.kind === 'training' || a.kind === 'both';
 function addPoints(d, r){ const l = store.get('points', []); l.push({d, r, at:new Date().toISOString()}); store.set('points', l); }
+function planForToday(){ const P = store.get('plan', null); return P && (P.status === 'approved' || P.source === 'auto') ? P : null; }
 function approvedPlan(){ const P = store.get('plan', null); return P && P.status === 'approved' ? P : null; }
 function currentLimits(){
   const hl = store.get('health', null), o = store.get('onboarding', null), a = (o && o.answers) || {};
@@ -1506,70 +1547,50 @@ function healthInit(){
   const hl = store.get('health', null);
   return {_hadHealth:!!hl, healthConsent: hl ? true : undefined, hflags: hl ? fromParq(hl.parq) : undefined, injuries: hl ? (hl.injuries.length ? hl.injuries : ['none']) : undefined};
 }
-function prefillFromSurvey(){
-  const sv = store.get('survey', null), x = (sv && sv.answers) || {};
-  const age = {'Under 18':'u18','18–24':'18-24','25–34':'25-34','35–44':'35-44','45–54':'45-54','55 or older':'55+'}[x.age];
-  const goal = {'Lose fat':'lose','Build muscle':'gain','Tone and stay in shape':'tone','Better fitness and stamina':'endure','Move better, less pain':'move'}[x.goal];
-  const level = {'Not at all, I am just starting':'start','Now and then':'some','Regularly, for over a year':'regular','A lot, I am advanced':'advanced'}[x.level];
-  const dpw = {'1 or 2':'2','3 or 4':'3','5 or more':'5'}[x.days];
-  const minutes = {'10–15 min':'10','20–30 min':'20','30–45 min':'30','More than 45 min':'45'}[x.time];
-  return Object.fromEntries(Object.entries({age, goal, level, dpw, minutes}).filter(([, v]) => v !== undefined));
-}
 
-/* ---------- onboarding: 5 screens ---------- */
+/* ---------- first time in: one-tap age check, then (for training) a 3-screen gym setup ---------- */
 const FLOWS = {};
-FLOWS.onboarding = {
-  closable: () => !!store.get('onboarding', null),
+const GYM_GOALS = [['gain','Build muscle'],['strength','Get stronger'],['lose','Lose fat'],['endure','Get fitter']];
+const GYM_EXP = [['start','New to the gym'],['some','Under a year'],['regular','1–3 years'],['advanced','3+ years']];
+const GYM_MIN = [['30','30'],['45','45'],['60','60'],['75','75']];
+FLOWS.gate = {
+  closable: () => false,
+  init: () => ({}),
+  steps: [
+    {type:'custom', id:'age', hero:true, auto:'age', render:a => `<div class="ob-hero"><div class="brand">Home<span>Reps</span></div><h2>Quick one</h2><p class="muted">How old are you?</p></div>${chips('age', AGE_OPTS, a, {label:'Age'})}`, valid:a => !!a.age},
+    {type:'info', block:true, when:a => a.age === 'u18', title:'Home Reps is for adults for now', body:'You need to be 18 or older to use Home Reps. If you tapped this by mistake, go back and change it.'}
+  ],
+  finish(a){
+    const o = store.get('onboarding', null) || {v:3, at:new Date().toISOString(), answers:{}};
+    o.answers = {...(o.answers || {}), age:a.age}; store.set('onboarding', o);
+    const then = flow.then; setTimeout(() => enterMode(then || 'train'), 60);
+  }
+};
+FLOWS.gym = {
+  closable: () => true,
   init(){
     const o = store.get('onboarding', null), oa = (o && o.answers) || {};
-    const a = {dpw:'3', minutes:'20', ...prefillFromSurvey(), ...oa, ...healthInit()};
-    if (oa.days && !oa.dpw) a.dpw = String(Math.min(6, Math.max(2, oa.days.length)));
-    if (oa.minutes) a.minutes = String(oa.minutes);
-    return a;
+    return {goal:['gain','strength','lose','endure'].includes(oa.goal) ? oa.goal : undefined, level:oa.level, dpw:String(oa.dpw || 3), minutes:String(oa.minutes >= 30 ? oa.minutes : 60), ...healthInit()};
   },
   steps: [
-    {type:'custom', id:'age', hero:true, auto:'age', render:a => `<div class="ob-hero"><div class="brand">Home<span>Reps</span></div><h2>Let’s get you moving</h2>
-      <p class="muted">Four quick taps, then your first win. How old are you?</p></div>${chips('age', AGE_OPTS, a, {label:'Age'})}`, valid:a => !!a.age},
-    {type:'info', block:true, when:a => a.age === 'u18', title:'Home Reps is for adults for now', body:'You need to be 18 or older to use Home Reps. If you tapped this by mistake, go back and change it.'},
-    {type:'custom', id:'goal', textKey:'why', when:adult, q:'What’s your goal?', render:a => chips('goal', GOAL_OPTS, a, {col:true, label:'Goal'}) +
-      `<label class="ob-field">Why now? <span class="muted" style="font-weight:500">Optional. We’ll remind you on tough mornings.</span><input id="ob-text" maxlength="140" placeholder="e.g. keep up with my kids" value="${esc(a.why || '')}"></label>`, valid:a => !!a.goal},
-    {type:'custom', id:'rhythm', when:adult, q:'Your rhythm', render:a => block('Training right now', chips('level', LEVEL_OPTS, a, {label:'Level'})) +
-      block('Days a week', chips('dpw', DPW_OPTS, a, {label:'Days a week'})) + block('Minutes per workout', chips('minutes', MIN_OPTS, a, {label:'Minutes'})), valid:a => !!(a.level && a.dpw && a.minutes)},
-    {type:'custom', id:'healthConsent', when:adult, q:'Quick safety check', render:a => safetyHtml(a, false), valid:a => safetyValid(a, false), cta:a => safetyCta(a, false)},
-    {type:'custom', id:'firstWin', when:adult, q:'Your first win', render:firstWinHtml, valid:a => !!(a.firstWin || a.firstWinSkipped), click:firstWinClick, cta:() => 'Finish'}
+    {type:'custom', id:'goal', auto:'goal', q:'What’s your goal?', render:a => chips('goal', GYM_GOALS, a, {col:true, label:'Goal'}), valid:a => !!a.goal},
+    {type:'custom', id:'routine', q:'Your training', render:a => block('Gym experience', chips('level', GYM_EXP, a, {label:'Experience'})) +
+      block('Days a week', chips('dpw', DPW_OPTS, a, {label:'Days a week'})) + block('Minutes per session', chips('minutes', GYM_MIN, a, {label:'Minutes'})), valid:a => !!(a.level && a.dpw && a.minutes)},
+    {type:'custom', id:'healthConsent', q:'Quick safety check', render:a => safetyHtml(a, false), valid:a => safetyValid(a, false), cta:a => a.healthConsent ? 'Build my week' : 'Skip check and build my week'}
   ],
   finish(a){
     syncDerived(a);
-    if (a.healthConsent){ const prev = store.get('health', null); store.set('health', {...healthRecord(a), eating: prev && prev.eating}); }
-    store.set('onboarding', {v:2, at:new Date().toISOString(), answers:{age:a.age, goal:a.goal, why:String(a.why || '').trim().slice(0, 140), level:a.level,
-      dpw:+a.dpw, days:DPW_DAYS[+a.dpw] || DPW_DAYS[3], minutes:+a.minutes}});
-    if (a.firstWin && !store.get('points', []).some(x => x.r === 'first_win')) addPoints(10, 'first_win');
-    setTimeout(openModePicker, 60);
+    const now = new Date().toISOString(), prev = store.get('health', null);
+    if (a.healthConsent) store.set('health', {...healthRecord(a), eating: prev && prev.eating});
+    const o = store.get('onboarding', null) || {v:3, at:now, answers:{}};
+    o.v = 3; o.answers = {...o.answers, track:'gym', goal:a.goal, level:a.level, dpw:+a.dpw, days:DPW_DAYS[+a.dpw], minutes:+a.minutes};
+    store.set('onboarding', o);
+    const pa = {...a, kind:'training', track:'gym', days:o.answers.days, minutes:+a.minutes, equipment:GYM_KIT, injuries:a.healthConsent ? (a.injuries || []) : []};
+    const c = planContext(pa), res = validatePlan(localDraft(pa, c), c.L, c);
+    store.set('plan', {v:1, at:now, status:'pending_review', source:'auto', kind:'training', note:'', issues:res.issues, plan:res.plan});
+    setTimeout(() => { ui.tab = 'today'; ui.day = null; lastPct = null; setMode('train'); celebrate('Your week is ready!'); }, 60);
   }
 };
-function firstWinHtml(a){
-  syncDerived(a);
-  const risk = a.healthConsent && assessHealth({parq:a.parq}).risk, gentle = !a.healthConsent || risk;
-  if (a.firstWin) return `<div class="gen"><div class="tapper done" aria-hidden="true">✓</div><h2>Day 1 done!</h2><p class="muted">+10 points. Your streak starts today.</p></div>`;
-  const note = risk ? '<p class="note">Based on your answers, check with a doctor before harder training. We’ll keep things gentle until then.</p>'
-    : !a.healthConsent ? '<p class="note">No safety check, so we keep things gentle for now.</p>' : '';
-  const skip = `<button class="linkish" data-fx="win-skip">I’ll do it later</button>`;
-  if (gentle) return `${note}<p>One easy minute: march on the spot and roll your shoulders. Stop if anything hurts.</p>
-    <button class="tapper" data-fx="win-timer" id="win-btn">60<small>Tap to start</small></button>${skip}`;
-  return `<p>5 push-ups. Knee push-ups or push-ups against a wall count too. Tap the circle after each one.</p>
-    <button class="tapper" data-fx="win-tap" id="win-btn" aria-label="Count a push-up">${a.reps || 0}<small>of 5</small></button>${skip}`;
-}
-function firstWinDone(a){ a.firstWin = true; flow.dir = 0; drawFlow(); celebrate('Nice! Your first win.'); }
-function firstWinClick(t, a){
-  if (t.dataset.fx === 'win-skip'){ a.firstWinSkipped = true; return next(); }
-  if (t.dataset.fx === 'win-tap'){ a.reps = (a.reps || 0) + 1; buzz(10); if (a.reps >= 5) return firstWinDone(a); const b = document.getElementById('win-btn'); b.innerHTML = `${a.reps}<small>of 5</small>`; bump(b); return; }
-  if (t.dataset.fx === 'win-timer' && !a.timing){
-    a.timing = true; const end = Date.now() + 60000;
-    (function tick(){ if (!flow || flow.a !== a) return; const left = Math.ceil((end - Date.now()) / 1000), b = document.getElementById('win-btn');
-      if (left <= 0) return firstWinDone(a);
-      if (b) b.innerHTML = `${left}<small>seconds</small>`; setTimeout(tick, 250); })();
-  }
-}
 
 /* ---------- safety check on its own (from Today or Challenges) ---------- */
 FLOWS.safety = {
@@ -1584,7 +1605,7 @@ FLOWS.plan = {
   closable: () => true,
   init(){
     const o = store.get('onboarding', null), oa = (o && o.answers) || {}, p = profile || {};
-    return {...healthInit(), goal: oa.goal || p.goal, level: oa.level, days: oa.days || DPW_DAYS[3], minutes: oa.minutes || 20, track:'home',
+    return {...healthInit(), goal: oa.goal || p.goal, level: oa.level, days: oa.days || DPW_DAYS[3], minutes: oa.minutes || 45, track:userTrack(), equipment: userTrack() === 'gym' ? GYM_KIT : undefined,
       sex: p.sex, age: p.age, height: p.height, weight: p.weight, activity: p.activity || '1.375', diet: p.diet, meals: p.meals || '4', pace:'steady'};
   },
   steps: [
@@ -1623,9 +1644,9 @@ FLOWS.plan = {
 let flow = null;
 const steps = () => flow.def.steps.filter(st => !st.when || st.when(flow.a));
 const flowClosable = () => !!(flow && flow.def.closable());
-function openFlow(name){
+function openFlow(name, then){
   closeSheet();
-  flow = {name, def:FLOWS[name], i:0, a:FLOWS[name].init(), dir:1};
+  flow = {name, def:FLOWS[name], i:0, a:FLOWS[name].init(), dir:1, then};
   document.getElementById('onboard').hidden = false; document.body.style.overflow = 'hidden';
   drawFlow();
 }
@@ -1739,11 +1760,16 @@ document.getElementById('onboard').addEventListener('click', ev => {
 }));
 
 /* ---------- plan generation ---------- */
+const GYM_KIT = ['gym','bar','weights','furniture'];
+const UPPER = ['Upper body',['chest','upperback','shoulders','biceps','triceps']], LOWER = ['Lower body',['quads','hamstrings','glutes','calves','abs']];
+const PUSH = ['Push',['chest','shoulders','triceps']], PULL = ['Pull',['upperback','biceps','traps']], LEGS = ['Legs',['quads','hamstrings','glutes','calves']];
+const FULL = ['Full body',['quads','chest','upperback','hamstrings','shoulders','abs']];
+const GYM_SPLITS = {2:[FULL, FULL], 3:[PUSH, PULL, LEGS], 4:[UPPER, LOWER, UPPER, LOWER], 5:[PUSH, PULL, LEGS, UPPER, LOWER], 6:[PUSH, PULL, LEGS, PUSH, PULL, LEGS]};
 const SPLITS = {push:['Push',['chest','shoulders','triceps']], legs:['Legs',['quads','glutes','hamstrings','calves']], pull:['Pull',['upperback','biceps','traps','forearms']],
   core:['Core',['abs','obliques','lowerback']], full:['Full body',['chest','quads','upperback','abs','glutes']]};
 function planContext(a){
   const eating = nut(a) ? {scoff:a.scoff || {}, weight:+a.weight, height:+a.height, goal:a.goal} : null;
-  const L = safetyLimits({health:{parq:a.parq || {}}, healthChecked:!!a.healthConsent, injuries:(a.injuries || []).filter(x => x !== 'none'), level:LEVEL_MAP[a.level] || 1, eating});
+  const L = safetyLimits({health:{parq:a.parq || {}}, healthChecked:!!a.healthConsent, injuries:(a.injuries || []).filter(x => x !== 'none'), level:levelOf(a.level, a.track), eating});
   const wantsNut = nut(a) && L.nutrition !== 'blocked';
   let tdee = null, bmr = null;
   if (wantsNut){ const t = targets({goal:'tone', weight:a.weight, height:a.height, age:a.age, sex:a.sex, activity:a.activity}); tdee = t.tdee; bmr = t.bmr; }
@@ -1770,25 +1796,27 @@ function localDraft(a, c){
   const L = c.L, out = {summary:'', days:[], safetyNotes:[], questionsForCoach:[]};
   if (c.tr){
     const days = ((a.days && a.days.length) ? a.days : ['mon','wed','fri']).slice(0, L.maxDays);
-    const per = Math.max(3, Math.min(6, Math.round((+a.minutes || 20) / 6)));
-    const order = [SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full, SPLITS.legs];
+    const gym = a.track === 'gym';
+    const per = gym ? Math.max(3, Math.min(7, Math.round((+a.minutes || 45) / 10) + 1)) : Math.max(3, Math.min(6, Math.round((+a.minutes || 20) / 6)));
+    const order = gym ? (GYM_SPLITS[days.length] || GYM_SPLITS[3]) : [SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full, SPLITS.legs];
     const allowed = new Set(c.allowed);
     out.days = days.map((d, i) => {
-      const [title, groups] = (L.mode === 'gentle' || days.length <= 3) ? SPLITS.full : order[i], picked = [];
+      const [title, groups] = (L.mode === 'gentle' || (!gym && days.length <= 3)) ? SPLITS.full : order[i], picked = [];
       for (let k = 0; picked.length < per && k < 40; k++){
-        const pool = exFor(groups[k % groups.length]).filter(e => allowed.has(e.id) && !picked.includes(e.id));
+        let pool = exFor(groups[k % groups.length]).filter(e => allowed.has(e.id) && !picked.includes(e.id));
+        if (gym && pool.some(isGymEx)) pool = pool.filter(isGymEx);
         if (pool.length) picked.push(pool[(i + Math.floor(k / groups.length)) % pool.length].id);
       }
       return {day:d, title: L.mode === 'gentle' ? 'Gentle strength' : title, exercises: picked.map(id => ({id, sets:L.maxSets, dose:EX[id].dose, restSec:60}))};
     });
-    out.summary = L.mode === 'gentle' ? `A gentle plan with ${days.length} short sessions a week to build the habit safely.` : `${days.length} workouts a week, about ${a.minutes} minutes each, with what you have at home.`;
+    out.summary = L.mode === 'gentle' ? `A gentle plan with ${days.length} short sessions a week to build the habit safely.` : gym ? `${days.length} gym sessions a week, about ${a.minutes} minutes each. Start light and add weight when the last reps feel easy.` : `${days.length} workouts a week, about ${a.minutes} minutes each, with what you have at home.`;
   }
   if (c.nut && c.tdee){
     const b = calorieBounds(L, c), want = c.tdee - (a.goal === 'lose' ? c.paceKg * 1100 : 0) + (a.goal === 'gain' ? c.tdee * 0.1 : 0);
     const kcal = Math.min(b.ceil, Math.max(b.floor, Math.round(want / 10) * 10));
     if (kcal > want + 5) out.safetyNotes.push('We set a safe pace of about ' + (Math.round((c.tdee - kcal) / 1100 * 20) / 20) + ' kg a week for your body.');
     const slots = ['breakfast','lunch','dinner'].concat(+a.meals > 3 ? ['snack'] : []);
-    out.nutrition = {kcal, protein:Math.round(+a.weight * ({lose:2.0, gain:1.8}[a.goal] || 1.6)), fat:Math.round(kcal * 0.28 / 9), carbs:0,
+    out.nutrition = {kcal, protein:Math.round(+a.weight * ({lose:2.0, gain:1.8, strength:1.8}[a.goal] || 1.6)), fat:Math.round(kcal * 0.28 / 9), carbs:0,
       meals: slots.map(sl => c.meals.find(m => m[0] === sl)).filter(Boolean).map(m => ({slot:m[0], idea:m[1], note:m[5]})), tips:(GOAL_TIPS[a.goal] || GOAL_TIPS.tone).slice(0, 3)};
     out.summary += (out.summary ? ' ' : '') + 'Meals are built from simple ideas that fit how you eat.';
   }
@@ -1820,7 +1848,7 @@ async function runGeneration(a){
   const now = new Date().toISOString();
   if (!a._hadHealth && a.healthConsent) store.set('health', healthRecord(a));
   if (nut(a)){ const hl = store.get('health', null); if (hl){ hl.eating = {scoff:a.scoff, weight:+a.weight, height:+a.height, goal:a.goal, refer:false, at:now}; store.set('health', hl); } }
-  if (c.nut){ profile = {goal:GOAL_FOR_FOOD[a.goal] || 'tone', sex:a.sex, age:String(a.age), height:String(a.height), weight:String(a.weight), activity:a.activity, level:String(LEVEL_MAP[a.level] || 1), diet:a.diet || 'any', meals:String(a.meals || 4)}; store.set('profile', profile); fillForm(); }
+  if (c.nut){ profile = {goal:GOAL_FOR_FOOD[a.goal] || 'tone', sex:a.sex, age:String(a.age), height:String(a.height), weight:String(a.weight), activity:a.activity, level:String(levelOf(a.level, a.track)), diet:a.diet || 'any', meals:String(a.meals || 4)}; store.set('profile', profile); fillForm(); }
   store.set('plan', {v:1, at:now, status:'pending_review', source, kind:a.kind, note, issues:res.issues, plan:res.plan});
   const first = !store.get('points', []).some(x => x.r === 'plan_questionnaire');
   if (first) addPoints(50, 'plan_questionnaire');
@@ -1830,7 +1858,9 @@ async function runGeneration(a){
 
 /* ---------- plan views ---------- */
 function planCard(){
-  const P = store.get('plan', null);
+  const P = store.get('plan', null), o = store.get('onboarding', null);
+  if (!(o && o.answers && o.answers.goal)) return `<div class="cta-card"><span><b>Build your gym week</b><span class="small muted">3 taps, 30 seconds.</span></span><button class="btn sm primary" data-flow="gym">Start</button></div>`;
+  if (P && P.source === 'auto' && P.status !== 'approved') return `<div class="cta-card"><span><b>Your starter week</b><span class="small muted">Today follows it. Coach Dani will fine-tune it.</span></span><button class="btn sm" data-plan="view">View week</button></div>`;
   if (!P) return `<div class="cta-card"><span><b>Get your personal plan</b><span class="small muted">Built from your goals and health check. Coach Dani reviews it.</span></span><button class="btn sm primary" data-flow="plan">Start</button></div>`;
   if (P.status !== 'approved') return `<div class="cta-card"><span><b>Your plan is with Coach Dani</b><span class="small muted">Usually reviewed within 48 hours. Today’s suggestions below are safe to start with.</span></span><button class="btn sm" data-plan="view">View draft</button></div>`;
   return `<div class="cta-card"><span><b>Your personal plan</b><span class="small muted">Approved by Coach Dani. Today follows it.</span></span><button class="btn sm" data-plan="view">View plan</button></div>`;
@@ -1859,19 +1889,26 @@ const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 
 const ICON_DUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg>';
 function openModePicker(){
   const el = document.getElementById('modepick'), S = chState(), lvl = levelFromXp(S.xp), hr = new Date().getHours();
-  const hello = hr < 12 ? 'Morning' : hr < 19 ? 'Afternoon' : 'Evening', today = recommend(todayKey()).plan.title;
+  const hello = hr < 12 ? 'Morning' : hr < 19 ? 'Afternoon' : 'Evening', o = store.get('onboarding', null), setUp = !!(o && o.answers && o.answers.goal);
+  const today = setUp ? 'Today: ' + recommend(todayKey()).plan.title : 'Build your week in 30 seconds';
   el.className = '';
-  el.innerHTML = `<div class="mp-in"><p class="mp-hi">${hello}! What’s it going to be?</p>
+  el.innerHTML = `<div class="mp-in"><p class="mp-hi">${hello}. What’s it today?</p>
     <button class="mp-card mp-ch" data-mode="challenge"><span class="mp-ico">${ICON_BOLT}</span><span class="mp-t">Challenge</span>
-      <span class="mp-s">3 and 5 minute battles. Beat your best, win medals, climb the ranks.</span><span class="mp-tag">${rankFor(lvl)} · Level ${lvl}</span></button>
+      <span class="mp-s">3 and 5 minute battles. Beat your best, win medals.</span><span class="mp-tag">${rankFor(lvl)} · Level ${lvl}</span></button>
     <button class="mp-card mp-tr" data-mode="train"><span class="mp-ico">${ICON_DUMB}</span><span class="mp-t">Training</span>
-      <span class="mp-s">Your plan, today’s workout, food and recipes.</span><span class="mp-tag">Today: ${esc(today)}</span></button></div>`;
+      <span class="mp-s">Your gym week, built around you.</span><span class="mp-tag">${esc(today)}</span></button></div>`;
   el.hidden = false; document.body.style.overflow = 'hidden';
+}
+function enterMode(m){
+  const o = store.get('onboarding', null), a = (o && o.answers) || {};
+  if (!a.age || a.age === 'u18') return openFlow('gate', m);
+  if (m === 'train' && !a.goal){ setMode('train'); return openFlow('gym'); }
+  setMode(m);
 }
 function pickMode(m, card){
   const el = document.getElementById('modepick');
   buzz(15);
-  const done = () => { el.hidden = true; el.innerHTML = ''; document.body.style.overflow = ''; setMode(m); };
+  const done = () => { el.hidden = true; el.innerHTML = ''; document.body.style.overflow = ''; enterMode(m); };
   if (RM()) return done();
   card.classList.add('chosen'); el.classList.add('picking');
   setTimeout(() => el.classList.add('leaving'), 280);
@@ -2234,7 +2271,7 @@ function render(){
 }
 
 document.addEventListener('click', ev => {
-  const t = ev.target.closest('[data-timer],[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,[data-flow],[data-plan],#redo-setup,#del-health,#del-all,#mode-pill,#clear-sched,#side-front,#side-back');
+  const t = ev.target.closest('[data-timer],[data-tab],[data-g],[data-add],[data-info],[data-stretch],[data-close],[data-day],#save-days,[data-pickday],[data-goto],[data-step],[data-move],[data-del],#sample-week,[data-flow],[data-plan],#redo-setup,#del-health,#del-all,#mode-pill,#why-save,#why-skip,#clear-sched,#side-front,#side-back');
   if (!t) return;
   if (t.dataset.timer){ ev.preventDefault(); return startTimer(+t.dataset.timer, t.dataset.tlabel); }
   if (t.dataset.close && ev.target!==t && t.classList.contains('scrim')) return;
@@ -2257,7 +2294,12 @@ document.addEventListener('click', ev => {
     closeSheet(); lastPct = null; render(); return toast('Plan approved (prototype). Today now follows your plan.'); }
   if (t.dataset.plan==='discard'){ if (!t.dataset.armed){ t.dataset.armed = '1'; t.textContent = 'Tap again to delete'; return; }
     store.del('plan'); closeSheet(); render(); return toast('Plan deleted'); }
-  if (t.id==='redo-setup') return openFlow('onboarding');
+  if (t.id==='redo-setup') return openFlow('gym');
+  if (t.id==='why-save' || t.id==='why-skip'){
+    const v = (document.getElementById('why-in') || {}).value || '';
+    if (t.id==='why-save' && v.trim()){ const o = store.get('onboarding', null); o.answers.why = v.trim().slice(0, 140); store.set('onboarding', o); toast('Saved. We’ll remind you when it counts.'); }
+    store.set('whyAsked', true); todayAnim = false; return drawToday();
+  }
   if (t.id==='mode-pill') return openModePicker();
   if (t.id==='del-health' || t.id==='del-all'){
     if (!t.dataset.armed){ const old = t.textContent; t.dataset.armed = '1'; t.textContent = 'Tap again to confirm'; setTimeout(()=>{ delete t.dataset.armed; t.textContent = old; }, 3000); return; }
@@ -2337,7 +2379,7 @@ document.getElementById('today-date').textContent = new Date().toLocaleDateStrin
 fillForm();
 setTab(['body','today','food','recipes','sched'].includes(ui.tab) ? ui.tab : 'body');
 setMode(store.get('mode', 'train'));
-if (!store.get('onboarding', null) || /[?#&](survey|setup)\b/.test(location.search + location.hash)) openFlow('onboarding');
+if (/[?#&](survey|setup)\b/.test(location.search + location.hash)) openFlow('gym');
 else openModePicker();
 </script>
 </body>

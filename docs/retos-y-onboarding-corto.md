@@ -2,6 +2,25 @@
 
 Estado: **implementado en el prototipo** (`index.html`).
 
+## 0. Entrada actual (versión 3: minimalista y orientada al gimnasio)
+
+Sustituye al onboarding de 5 pantallas descrito más abajo.
+
+1. **La primera pantalla siempre es el selector Challenge / Training,** también en la primera visita: valor antes que preguntas.
+2. **Edad en un toque** la primera vez que eliges cualquier modo (flujo `gate`). Es obligatorio (18+) y no se puede saltar.
+3. **Challenge:** entras directo al centro de retos. Tu primer reto es tu primera victoria.
+4. **Training:** cuestionario de gimnasio de **3 pantallas** (flujo `gym`):
+   - Objetivo: ganar músculo, más fuerza, perder grasa o estar en forma. Se avanza con un toque.
+   - Tu entreno: experiencia en el gimnasio, días a la semana y minutos por sesión.
+   - Revisión de seguridad: consentimiento + lista + lesiones, que se puede saltar (entonces, modo suave).
+5. **Al terminar, la semana ya está montada en el dispositivo:**
+   - División según los días: 3 → Push/Pull/Legs, 4 → Upper/Lower, 5 → PPL + Upper/Lower, 6 → PPL ×2.
+   - Usa ejercicios de gimnasio (barra, mancuernas, poleas y máquinas) y pasa por el validador de seguridad.
+   - Today la sigue desde el primer momento como "starter week", y Dani la puede afinar.
+6. **El "¿por qué?" se pregunta después,** en una tarjeta opcional en Today, para no frenar la entrada.
+
+Catálogo: 31 ejercicios de gimnasio nuevos en `EX_RAW`. Solo los ven los usuarios con `track: 'gym'`; los usuarios antiguos de casa siguen viendo sus ejercicios.
+
 ## 1. Menos preguntas
 
 | Flujo | Antes | Ahora |
