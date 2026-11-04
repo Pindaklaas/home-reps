@@ -1,21 +1,60 @@
 # Home Reps
 
-A mobile-friendly home workout app. Open `index.html` in any browser, no build step needed.
+A fitness and nutrition app that gets you to train every day. The alarm only stops after you do your push-ups or squats in front of the camera. You earn XP and levels, compete in rankings and private leagues, and learn from short tips and A/B challenges.
 
-## Features
+This repository has two parts:
 
-- **Body**: front and back figure. Tap a muscle group to see exercises you can do at home, with step-by-step instructions.
-- **Today**: a recommended workout for each weekday, adjusted to your goal and level, plus anything you scheduled yourself. Tick exercises off as you go.
-- **Food**: a questionnaire (goal, body stats, activity, diet) that calculates daily calories and macros and suggests meals.
-- **Schedule**: build your own week from exercises picked in the Body tab. Change sets, reps and order.
+- **`index.html`**: the working prototype (web, single file, no build step). It is the reference for the native app (React Native + Expo).
+- **`supabase/`**: the real backend for the app: database, security rules and server functions.
 
-Your answers, schedule and progress are saved in the browser (`localStorage`) on the device you use.
+## Run the prototype
 
-## Run it
+- Open `index.html` in a browser, or run `python3 -m http.server` and visit http://localhost:8000.
+- Rankings, leagues and duels need shared storage. They work in the published version (the Claude link). On GitHub Pages or a local file, everything else works and your data stays on the phone.
 
-- Locally: open `index.html`, or run `python3 -m http.server` and visit http://localhost:8000.
-- Online: enable GitHub Pages (Settings → Pages → Deploy from branch `main`, folder `/`) to get a public link you can open on your phone.
+## Run the tests
 
-## Project layout
+```bash
+node --test tests/*.test.mjs        # app rules: XP, levels, caps, anti-cheat, rep counting, alarm, plans, animations, server logic
+scripts/test-supabase.sh            # database security rules on a throwaway Postgres (needs Postgres 15+ installed)
+```
 
-Everything lives in `index.html`: styles at the top, markup in the middle, and one script at the bottom with the data (`EX_RAW` exercises, `MEALS`, `PLAN` weekly split) followed by the rendering code.
+## Set up the backend (Supabase)
+
+1. Create a project at supabase.com (EU region) and install the Supabase CLI.
+2. In this folder: `supabase init` (keep the existing files), then `supabase link --project-ref <your-ref>`.
+3. `supabase db push` creates the tables and rules. `psql "$DB_URL" -f supabase/seed.sql` adds the starter tips and A/B challenges.
+4. `supabase functions deploy submit-event` and `supabase functions deploy delete-account`.
+5. In Authentication, turn on email, Apple and Google sign-in.
+
+How it fits together:
+
+- The app signs in, creates its row in `profiles` (nickname, sector, questionnaire answers), and sends every activity to `submit-event`.
+- The function checks the event with `game-core` (the same rules as the app), writes the XP and points ledgers, flags suspicious accounts and sends a push to every league mate you pass.
+- The app can only read its own data. Rankings come from the `ranking(scope, key, period)` function, which returns nicknames only.
+- Add tips and A/B challenges as rows in `content` (from the dashboard); no app update needed.
+
+Known limit: the server counts days in UTC, so "one alarm a day" resets at 01:00 or 02:00 in Spain. A per-user time zone is a later step.
+
+## How to add an exercise
+
+1. Add a row to `EX_RAW` in `index.html`: id, name, muscle groups, equipment, level 1-3, dose, unit, steps.
+2. Add its animation to `ANIMS` (one or more key poses; copy a similar exercise). `tests/anim.test.mjs` fails until you do.
+3. For camera counting, add the joint angles to `REP_RULES` and the cues to `CUES` in the `pose-core` block, the limits to `GAME.limits.rep` in `game-core`, and the move to `KINDS` and `clean()` in `supabase/functions/_shared/submit.mjs`. Add a test with a recorded or simulated pose sequence in `tests/pose.test.mjs`.
+
+## How to tune XP, levels and limits
+
+Every number is in the `GAME` object at the top of the `game-core` block in `index.html`:
+
+- `xp`: XP for each activity (alarm 30 + 1 per rep, streak +10 per day up to +50, tip 2, A/B 5, questionnaire 20, workout, meal, challenge).
+- `perDay`: daily caps (one alarm a day, 3 tips, 3 A/B…). `once`: rewards given only once.
+- `level`: the curve (XP for the next level = base × level^exp). `pointsPerLevel`: points on each level-up.
+- `limits`: anti-cheat (events per minute, minimum time per rep, reps per minute, reps per day, replay tolerance, minimum camera confidence). `suspicious`: the flags that take an account out of the rankings.
+
+After changing it, run `node scripts/sync-game-core.mjs` so the server uses the same numbers, then run the tests.
+
+## Privacy
+
+- Camera frames are processed on the phone and never stored or sent. Only counts and rep timings reach the server.
+- Other people only ever see your nickname, level and XP.
+- Health and questionnaire answers are only sent with your consent, and you can delete your account (and everything in it) from the app.

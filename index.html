@@ -17,7 +17,7 @@
   --text:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
   --amber:#D99A1E; --blue:#4A7BD0;
   --spring:cubic-bezier(.3,1.45,.5,1); --out:cubic-bezier(.2,.8,.2,1);
-  --bad:#D63A2F; --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
+  --bad:#D63A2F; --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --gold-hi:#FFF3C4; --gold-lo:#A9781A; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
   --fig:#2B333E; --fig-hl:rgba(255,255,255,.2); --prop:#8D97A4; --prop-soft:#DCE1E7;
   --r:14px;
 }
@@ -87,6 +87,7 @@ svg.body .detail{stroke:var(--bg);stroke-width:1.2;fill:none;pointer-events:none
 .btn.ghost{background:transparent}
 .btn.sm{padding:5px 10px;font-size:13px}
 .btn.wide{width:100%;padding:12px}
+a.btn{display:inline-block;text-align:center;text-decoration:none;color:inherit}
 .empty{border:1.5px dashed var(--line);border-radius:var(--r);padding:18px;text-align:center;color:var(--muted)}
 
 /* panel */
@@ -704,6 +705,92 @@ details.steps ol{margin-top:8px}
 .al-task.has-th{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
 .al-task .mv-th{width:96px;height:72px;flex:none}
 .al-task .mv-th svg{width:100%;height:100%}
+/* game: level chip, XP pop, level-up, profile, learn, rankings, MÁSTER */
+.lvl-chip{position:relative;width:34px;height:34px;border:0;background:none;padding:0;display:grid;place-items:center;flex:none}
+.lvl-chip svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.lvl-chip .trk{fill:none;stroke:var(--line);stroke-width:3.5}
+.lvl-chip .arc{fill:none;stroke:var(--accent);stroke-width:3.5;stroke-linecap:round;transition:stroke-dasharray .8s var(--out)}
+.lvl-chip b{position:relative;font-family:var(--display);font-size:16px;line-height:1}
+.master-chip{border:1px solid var(--gold);background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--ink);border-radius:999px;padding:3px 8px;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.06em}
+.xp-pop{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:120;transform:translateX(-50%);background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:700;font-size:22px;padding:6px 16px;border-radius:999px;box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 40%,transparent);pointer-events:none;animation:xpop 1.5s var(--out) forwards}
+@keyframes xpop{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}18%{opacity:1;transform:translate(-50%,0) scale(1.08)}30%{transform:translate(-50%,0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-18px)}}
+#lvlup{position:fixed;inset:0;z-index:130;display:grid;place-items:center;padding:24px;background:color-mix(in srgb,var(--arena) 78%,transparent)}
+.lu-card{background:var(--surface);border-radius:24px;padding:24px 22px;width:min(340px,100%);display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;animation:lupop .6s var(--spring)}
+.lu-k{font-family:var(--display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lu-n{font-family:var(--display);font-size:96px;line-height:.95;color:var(--accent);animation:lunum .9s var(--spring) .1s both}
+.lu-r{font-weight:700;font-size:18px}
+.lu-p{background:var(--accent-soft);border-radius:999px;padding:4px 12px;font-weight:700;margin:6px 0 12px}
+@keyframes lupop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes lunum{from{transform:scale(2.2) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+.prof{display:flex;flex-direction:column;gap:12px}
+.prof-top{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center}
+.prof-lvl{width:72px;height:72px;border-radius:20px;background:var(--ink);color:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.prof-lvl span{font-size:11px;text-transform:uppercase;letter-spacing:.1em;opacity:.7}
+.prof-lvl b{font-family:var(--display);font-size:36px}
+.prof-id{display:flex;flex-direction:column;min-width:0}
+.prof-id>b{font-size:18px;overflow-wrap:anywhere}
+.prof-bar{margin:6px 0 2px}
+.prof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.prof-stats span{background:var(--bg);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;align-items:flex-start;gap:0}
+.prof-stats .flame{width:18px;height:18px}
+.prof-stats b{font-family:var(--display);font-size:24px;line-height:1.05;font-variant-numeric:tabular-nums}
+.prof-stats small{font-size:11.5px;color:var(--muted)}
+.xp-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.xp-list li{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0}
+.xp-list b{color:var(--accent);font-variant-numeric:tabular-nums}
+.learn-card{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.learn-card button{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;min-width:0}
+.learn-card button:only-child{grid-column:1/-1}
+.learn-card b{font-size:14.5px;line-height:1.25}
+.learn-card .small{color:var(--muted)}
+.lc-k,.lr-k{font-family:var(--display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:12px;color:var(--accent)}
+.lc-pair{display:grid;grid-template-columns:1fr 1fr;gap:4px;width:100%}
+.lc-pair svg{width:100%;aspect-ratio:1;height:auto;background:var(--bg);border-radius:10px}
+.lc-tip{background:linear-gradient(160deg,var(--accent-soft),var(--surface) 70%)!important}
+.learn-vid,.learn-img{width:100%;border-radius:16px;background:var(--bg);max-height:280px;object-fit:cover}
+.ab-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ab-opt{position:relative;border:2px solid var(--line);background:var(--bg);border-radius:18px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:border-color .2s,transform .3s var(--spring),opacity .2s}
+.ab-opt:not(:disabled):active{transform:scale(.96)}
+.ab-opt svg,.ab-opt video{width:100%;aspect-ratio:1;height:auto;border-radius:12px;object-fit:cover}
+.ab-k{position:absolute;left:8px;top:6px;font-family:var(--display);font-weight:700;font-size:26px;line-height:1}
+.ab-l{font-size:13px;font-weight:600;text-align:center}
+.ab-opt.right{border-color:var(--good);background:var(--good-soft);transform:scale(1.03)}
+.ab-opt.right .ab-k{color:var(--good)}
+.ab-opt.wrong{border-color:var(--bad)}
+.ab-opt.wrong .ab-k{color:var(--bad)}
+.ab-opt.dim{opacity:.55}
+.ab-why{display:flex;flex-direction:column;gap:2px;background:var(--bg);border-radius:14px;padding:12px;animation:rise .35s var(--out)}
+.ab-why.ok{background:var(--good-soft)}
+.ab-why.no{background:var(--accent-soft)}
+.learn-row{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;text-align:left}
+.seg.wide{display:flex;width:100%}
+.seg.wide button{flex:1;padding-inline:8px}
+.rank-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rank-list li{display:grid;grid-template-columns:30px 1fr auto auto;gap:8px;align-items:center;background:var(--bg);border-radius:12px;padding:9px 12px;font-variant-numeric:tabular-nums}
+.rank-list li b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-list li.me{background:var(--accent-soft);outline:1.5px solid var(--accent)}
+.rank-list li.gap{background:none;padding:0 12px;display:block;color:var(--muted)}
+.rank-list .rp{font-family:var(--display);font-weight:700;font-size:20px}
+.rank-list .top1 .rp{color:var(--gold)}.rank-list .top2 .rp{color:var(--silver)}.rank-list .top3 .rp{color:var(--bronze)}
+.rank-list .rl{font-size:12px;color:var(--muted)}
+.rank-list .rx{font-weight:700}
+.ch-links{margin-top:12px}
+.cam-cue.warn{background:var(--bad);border-radius:10px;padding:4px 8px;text-shadow:none}
+.master-btn{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 18%,transparent)}
+.master-h{background:linear-gradient(90deg,var(--gold),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;font-size:34px}
+.master-opt{border:1px solid color-mix(in srgb,var(--gold) 60%,var(--line));background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}
+#master-in{position:fixed;inset:0;z-index:140;display:grid;place-items:center;padding:24px;background:var(--arena);color:var(--arena-ink);overflow:hidden}
+.mi-rays{position:absolute;inset:-50%;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--gold) 22%,transparent) 0 8deg,transparent 8deg 22deg);animation:mispin 14s linear infinite,mifade 1.2s ease-out both}
+.mi-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;max-width:340px}
+.mi-crown{width:84px;fill:var(--gold);filter:drop-shadow(0 0 18px var(--gold));animation:micrown 1.1s var(--spring) .2s both}
+.mi-k{font-family:var(--display);letter-spacing:.3em;text-transform:uppercase;opacity:.75;animation:rise .6s var(--out) .6s both}
+.mi-t{font-family:var(--display);font-size:clamp(64px,22vw,96px);line-height:.9;letter-spacing:.04em;background:linear-gradient(180deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));-webkit-background-clip:text;background-clip:text;color:transparent;animation:mitit 1s var(--spring) .8s both}
+.mi-m{font-size:18px;font-weight:600;animation:rise .6s var(--out) 1.4s both}
+.mi-go{background:var(--gold);border-color:var(--gold);color:var(--arena);animation:rise .6s var(--out) 1.8s both}
+@keyframes mispin{to{transform:rotate(360deg)}}
+@keyframes mifade{from{opacity:0}to{opacity:1}}
+@keyframes micrown{from{transform:translateY(-60px) scale(.3) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes mitit{from{transform:scale(2.4);opacity:0;filter:blur(8px)}to{transform:none;opacity:1;filter:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -715,7 +802,7 @@ details.steps ol{margin-top:8px}
 <div class="app">
   <header class="top">
     <div class="brand">Home<span>Reps</span></div>
-    <div class="top-r"><span class="date" id="today-date"></span><span class="streak-chip" id="streak-chip" hidden></span><button class="mode-pill" id="mode-pill" type="button" aria-label="Switch between Challenge and Training"></button></div>
+    <div class="top-r"><span class="date" id="today-date"></span><span class="streak-chip" id="streak-chip" hidden></span><button class="master-chip" id="master-chip" type="button" hidden>MÁSTER</button><button class="lvl-chip" id="lvl-chip" type="button"></button><button class="mode-pill" id="mode-pill" type="button" aria-label="Switch between Challenge and Training"></button></div>
   </header>
 
   <!-- BODY -->
@@ -1257,6 +1344,7 @@ function drawToday(){
   </div>`;
   h = batteryCard() + h;
   h += planCard();
+  h += learnCardHtml();
   if (ob && ob.answers && ob.answers.goal && !why && !store.get('whyAsked', false)) h += `<div class="cta-card stack" style="align-items:stretch"><span><b>What’s your why?</b><span class="small muted">One line. We’ll show it on the tough days.</span></span>
     <input id="why-in" class="why-in" maxlength="140" placeholder="e.g. feel strong again" aria-label="Your why"><span class="row"><button class="btn sm primary" id="why-save">Save</button><button class="btn sm ghost" id="why-skip">Not now</button></span></div>`;
   if (Lt.mode==='gentle') h += `<p class="banner">${hl ? 'Gentle mode: based on your health check we keep things easy. Check with your doctor before harder training.' : 'Gentle mode until you do the quick health check.'}${hl ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
@@ -1418,7 +1506,7 @@ function drawFood(){
   }
   let h = mealCard() + (profile ? '' : `<p class="banner">Showing an <b>example profile</b> (30-year-old woman, 68 kg). Fill in your answers below to get your own numbers.</p>`);
   if (pl && pl.plan.nutrition){ const n = pl.plan.nutrition;
-    h += `<div class="panel stack"><div class="row" style="justify-content:space-between"><b>Your plan’s nutrition</b><span class="badge ${pl.status==='approved'?'ok':''}">${pl.status==='approved'?'Approved by Coach Dani':'Waiting for review'}</span></div>
+    h += `<div class="panel stack"><div class="row" style="justify-content:space-between"><b>Your plan’s nutrition</b><span class="badge ${pl.status==='approved'?'ok':''}">${pl.status==='approved'?'Approved by your coach':'Waiting for review'}</span></div>
       <div class="kpis" style="margin-top:0"><div class="kpi"><span class="v">${n.kcal}</span><span class="l">kcal / day</span></div><div class="kpi"><span class="v">${n.protein}g</span><span class="l">Protein</span></div><div class="kpi"><span class="v">${n.carbs}g</span><span class="l">Carbs</span></div><div class="kpi"><span class="v">${n.fat}g</span><span class="l">Fat</span></div></div>
       <button class="btn sm" data-plan="view" style="align-self:flex-start">View full plan</button></div>`; }
   if (!(pl && pl.plan.nutrition)) h += `<div class="panel">
@@ -1997,7 +2085,7 @@ function poseAt(anim, ms){
 }
 /* anim-core:end */
 
-/* game-core:start — XP, levels, points, daily caps, rankings and anti-cheat checks, pure (no DOM). The Supabase functions run a copy of this block (supabase/functions/_shared/game-core.js, kept identical by tests). Tested in tests/game.test.mjs */
+/* game-core:start — XP, levels, points, daily caps, rankings and anti-cheat checks, pure (no DOM). The Supabase functions run a copy of this block (supabase/functions/_shared/game-core.mjs, kept identical by tests). Tested in tests/game.test.mjs */
 // Every number for XP, levels, points and limits lives here.
 const GAME = {
   xp:{alarm:30, alarmTap:10, perRep:1, streakDay:10, streakMax:50, ab:5, tip:2, questionnaire:20, workout:15, meal:3, challengeMax:150},
@@ -2009,8 +2097,11 @@ const GAME = {
     eventsPerMin:20, maxSessionReps:200, replayTolMs:40, minConf:.5,
     rep:{pushup:{minMs:450, maxPerMin:60, perDay:600}, squat:{minMs:500, maxPerMin:60, perDay:800}}
   },
-  streakKinds:['alarm', 'workout', 'challenge']
+  streakKinds:['alarm', 'workout', 'challenge'],
+  // Flags that take an account out of the rankings until someone reviews it (others only cost that session's XP).
+  suspicious:['replay', 'pace_not_human', 'rep_times_outside_session', 'rep_times_mismatch', 'daily_volume']
 };
+const isSuspicious = flags => (flags || []).some(f => GAME.suspicious.includes(f));
 const SECTORS = [['gym', 'Gym'], ['calisthenics', 'Calisthenics'], ['home', 'Home bodyweight']];
 const OVERTAKE_LINES = [
   '{nick} just passed you in XP!! COME ON CHAMP, WAKE UP',
@@ -2175,7 +2266,6 @@ const allergyOk = (m, al) => (al || []).every(k => !ALLERGEN_WORDS[k] || !ALLERG
 const adult = a => !!a.age && a.age !== 'u18';
 const nut = a => a.kind === 'nutrition' || a.kind === 'both';
 const trn = a => a.kind === 'training' || a.kind === 'both';
-function addPoints(d, r){ const l = store.get('points', []); l.push({d, r, at:new Date().toISOString()}); store.set('points', l); }
 function planForToday(){ const P = store.get('plan', null); return P && (P.status === 'approved' || P.source === 'auto') ? P : null; }
 function approvedPlan(){ const P = store.get('plan', null); return P && P.status === 'approved' ? P : null; }
 function currentLimits(){
@@ -2228,6 +2318,11 @@ const FLOWS = {};
 const GYM_GOALS = [['gain','Build muscle'],['strength','Get stronger'],['lose','Lose fat'],['endure','Get fitter']];
 const GYM_EXP = [['start','New to the gym'],['some','Under a year'],['regular','1–3 years'],['advanced','3+ years']];
 const GYM_MIN = [['30','30'],['45','45'],['60','60'],['75','75']];
+const KIT_OPTS = [['none','Nothing'],['db','Dumbbells or bands'],['gym','A full gym']];
+const EXP_ANY = [['start','Just starting'],['some','Under a year'],['regular','1–3 years'],['advanced','3+ years']];
+const WAKE_OPTS = [['06:00','6:00'],['06:30','6:30'],['07:00','7:00'],['07:30','7:30'],['08:00','8:00'],['09:00','9:00']];
+// Equipment for the plan from where and with what you train.
+const kitEquip = a => a.kit === 'gym' ? GYM_KIT : [...(a.kit === 'db' ? ['weights','bands','furniture'] : ['furniture']), ...(a.sector === 'calisthenics' ? ['bar'] : [])];
 const TIME_OPTS = [['07:00','Morning · 7:00'],['13:00','Midday · 13:00'],['18:30','After work · 18:30'],['20:30','Late · 20:30']];
 const ageKnown = () => { const o = store.get('onboarding', null), g = o && o.answers && o.answers.age; return g && g !== 'u18' ? g : null; };
 function saveAge(a){
@@ -2245,15 +2340,18 @@ FLOWS.gym = {
   init(){
     const o = store.get('onboarding', null), oa = (o && o.answers) || {};
     return {_age:ageKnown(), goal:['gain','strength','lose','endure'].includes(oa.goal) ? oa.goal : undefined, level:oa.level, dpw:String(oa.dpw || 3),
-      minutes:String(oa.minutes >= 30 ? oa.minutes : 60), time:oa.time, sleepUsual:oa.sleepUsual, ...healthInit()};
+      minutes:String(oa.minutes >= 30 ? oa.minutes : 60), time:oa.time, sleepUsual:oa.sleepUsual, sector:oa.sector, kit:oa.kit, wake:oa.wake, ...healthInit()};
   },
   steps: [
-    ...ageSteps('Five taps and your week is ready.'),
+    ...ageSteps('Six taps and your week is ready.'),
     {type:'custom', id:'goal', auto:'goal', when:adultOk, q:'What’s your goal?', render:a => chips('goal', GYM_GOALS, a, {col:true, label:'Goal'}), valid:a => !!a.goal},
-    {type:'custom', id:'routine', when:adultOk, q:'Your training', render:a => block('Gym experience', chips('level', GYM_EXP, a, {label:'Experience'})) +
+    {type:'custom', id:'sector', when:adultOk, q:'How do you train today?', render:a => block('Where', chips('sector', SECTORS, a, {col:true, label:'How you train'})) +
+      block('What do you have?', chips('kit', KIT_OPTS, a, {label:'Equipment'})), valid:a => !!(a.sector && a.kit)},
+    {type:'custom', id:'routine', when:adultOk, q:'Your training', render:a => block(a.kit === 'gym' ? 'Gym experience' : 'Training experience', chips('level', a.kit === 'gym' ? GYM_EXP : EXP_ANY, a, {label:'Experience'})) +
       block('Days a week', chips('dpw', DPW_OPTS, a, {label:'Days a week'})) + block('Minutes per session', chips('minutes', GYM_MIN, a, {label:'Minutes'})), valid:a => !!(a.level && a.dpw && a.minutes)},
     {type:'custom', id:'day', when:adultOk, q:'Your day', render:a => block('When do you usually train?', chips('time', TIME_OPTS, a, {col:true, label:'Training time'})) +
-      block('How long do you usually sleep?', chips('sleepUsual', SLEEP_OPTS.map(x => [x[0], x[1]]), a, {label:'Usual sleep'})), valid:a => !!(a.time && a.sleepUsual)},
+      block('When do you wake up?', chips('wake', WAKE_OPTS, a, {label:'Wake-up time'})) +
+      block('How long do you usually sleep?', chips('sleepUsual', SLEEP_OPTS.map(x => [x[0], x[1]]), a, {label:'Usual sleep'})), valid:a => !!(a.time && a.wake && a.sleepUsual)},
     {type:'custom', id:'healthConsent', when:adultOk, q:'Quick safety check', render:a => safetyHtml(a, false), valid:a => safetyValid(a, false), cta:a => a.healthConsent ? 'Build my plan' : 'Skip check and build my plan'}
   ],
   finish(a){
@@ -2261,13 +2359,15 @@ FLOWS.gym = {
     const now = new Date(), iso = now.toISOString(), prev = store.get('health', null);
     if (a.healthConsent) store.set('health', {...healthRecord(a), eating: prev && prev.eating});
     const o = store.get('onboarding', null) || {v:3, at:iso, answers:{}};
-    o.v = 3; o.answers = {...o.answers, track:'gym', goal:a.goal, level:a.level, dpw:+a.dpw, days:DPW_DAYS[+a.dpw], minutes:+a.minutes, time:a.time, sleepUsual:a.sleepUsual};
+    const track = a.kit === 'gym' ? 'gym' : 'home';
+    o.v = 3; o.answers = {...o.answers, track, sector:a.sector, kit:a.kit, wake:a.wake, goal:a.goal, level:a.level, dpw:+a.dpw, days:DPW_DAYS[+a.dpw], minutes:+a.minutes, time:a.time, sleepUsual:a.sleepUsual};
     store.set('onboarding', o);
-    const pa = {...a, kind:'training', track:'gym', days:o.answers.days, minutes:+a.minutes, equipment:GYM_KIT, injuries:a.healthConsent ? (a.injuries || []) : []};
+    if (a.wake && !alarmCfg().on) store.set('alarm', {...alarmCfg(), time:a.wake});
+    const pa = {...a, kind:'training', track, days:o.answers.days, minutes:+a.minutes, equipment:kitEquip(a), injuries:a.healthConsent ? (a.injuries || []) : []};
     const c = planContext(pa), res = validatePlan(localDraft(pa, c), c.L, c);
     const start = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     store.set('plan', {v:1, at:iso, start, status:'pending_review', source:'auto', kind:'training', note:'', issues:res.issues, plan:res.plan});
-    setTimeout(() => { ui.tab = 'sched'; ui.day = null; lastPct = null; setMode('train'); celebrate('Your plan is ready. Here’s your week!'); }, 60);
+    setTimeout(() => { ui.tab = 'sched'; ui.day = null; lastPct = null; setMode('train'); const q = gameEvent({kind:'questionnaire', quiet:true}); celebrate(q.xp ? `Your plan is ready! +${q.xp} XP` : 'Your plan is ready. Here’s your week!'); }, 60);
   }
 };
 
@@ -2281,7 +2381,7 @@ FLOWS.safety = {
     saveAge(a); const prev = store.get('health', null); store.set('health', {...healthRecord(a), eating: prev && prev.eating});
     const P = store.get('plan', null), o = store.get('onboarding', null), oa = o && o.answers;
     if (P && P.source === 'auto' && oa && oa.goal){
-      const pa = {...a, ...oa, kind:'training', track:oa.track || 'gym', equipment:GYM_KIT, injuries:(a.injuries || []).filter(x => x !== 'none')};
+      const pa = {...a, ...oa, kind:'training', track:oa.track || 'gym', equipment:oa.kit ? kitEquip(oa) : GYM_KIT, injuries:(a.injuries || []).filter(x => x !== 'none')};
       const c = planContext(pa), res = validatePlan(localDraft(pa, c), c.L, c);
       store.set('plan', {...P, issues:res.issues, plan:res.plan});
     }
@@ -2324,7 +2424,7 @@ FLOWS.plan = {
       }},
     {type:'custom', id:'aiConsent', consentKey:'aiConsent', q:'Ready?', render:a => `<dl class="sv-sum"><dt>Plan</dt><dd>${a.kind === 'both' ? 'Training and nutrition' : a.kind === 'training' ? 'Training' : 'Nutrition'}</dd>
       <dt>Goal</dt><dd>${esc(GOAL_LABEL[a.goal] || 'Stay in shape')}</dd>${trn(a) ? `<dt>Training</dt><dd>${(a.days || []).length} days, ${a.minutes} min</dd>` : ''}</dl>
-      <label class="consent"><input type="checkbox" id="ob-consent" ${a.aiConsent ? 'checked' : ''}><span>Draft it with AI (Claude)<small>We send your answers without your name or email. Leave it unticked to draft it on your device. Coach Dani reviews every plan.</small></span></label>`,
+      <label class="consent"><input type="checkbox" id="ob-consent" ${a.aiConsent ? 'checked' : ''}><span>Draft it with AI (Claude)<small>We send your answers without your name or email. Leave it unticked to draft it on your device. A coach reviews every plan.</small></span></label>`,
       valid:() => true, cta:() => 'Create my plan'},
     {type:'custom', id:'gen', q:'', render:() => `<div class="gen"><div class="spin" aria-hidden="true"></div><h2>Drafting your plan</h2><p class="muted" id="gen-s" aria-live="polite">Reading your answers…</p></div>`,
       valid:() => false, cta:() => 'Working…', after:(el, a) => { if (!a.goal) a.goal = 'tone'; syncDerived(a); saveAge(a); runGeneration(a); }}
@@ -2541,25 +2641,24 @@ async function runGeneration(a){
   if (nut(a)){ const hl = store.get('health', null); if (hl){ hl.eating = {scoff:a.scoff, weight:+a.weight, height:+a.height, goal:a.goal, refer:false, at:now}; store.set('health', hl); } }
   if (c.nut){ profile = {goal:GOAL_FOR_FOOD[a.goal] || 'tone', sex:a.sex, age:String(a.age), height:String(a.height), weight:String(a.weight), activity:a.activity, level:String(levelOf(a.level, a.track)), diet:a.diet || 'any', meals:String(a.meals || 4)}; store.set('profile', profile); fillForm(); }
   store.set('plan', {v:1, at:now, status:'pending_review', source, kind:a.kind, note, issues:res.issues, plan:res.plan});
-  const first = !store.get('points', []).some(x => x.r === 'plan_questionnaire');
-  if (first) addPoints(50, 'plan_questionnaire');
   closeFlow(); planSheet();
-  toast(first ? 'Plan drafted. +50 points for finishing the questionnaire.' : 'Plan drafted.');
+  const q = gameEvent({kind:'questionnaire'});
+  toast(q.xp ? `Plan drafted. +${q.xp} XP for finishing the questionnaire.` : 'Plan drafted.');
 }
 
 /* ---------- plan views ---------- */
 function planCard(){
   const P = store.get('plan', null), o = store.get('onboarding', null);
   if (!(o && o.answers && o.answers.goal)) return `<div class="cta-card"><span><b>Build your gym week</b><span class="small muted">3 taps, 30 seconds.</span></span><button class="btn sm primary" data-flow="gym">Start</button></div>`;
-  if (P && P.source === 'auto' && P.status !== 'approved') return `<div class="cta-card"><span><b>Your starter week</b><span class="small muted">Today follows it. Coach Dani will fine-tune it.</span></span><button class="btn sm" data-plan="view">View week</button></div>`;
-  if (!P) return `<div class="cta-card"><span><b>Get your personal plan</b><span class="small muted">Built from your goals and health check. Coach Dani reviews it.</span></span><button class="btn sm primary" data-flow="plan">Start</button></div>`;
-  if (P.status !== 'approved') return `<div class="cta-card"><span><b>Your plan is with Coach Dani</b><span class="small muted">Usually reviewed within 48 hours. Today’s suggestions below are safe to start with.</span></span><button class="btn sm" data-plan="view">View draft</button></div>`;
-  return `<div class="cta-card"><span><b>Your personal plan</b><span class="small muted">Approved by Coach Dani. Today follows it.</span></span><button class="btn sm" data-plan="view">View plan</button></div>`;
+  if (P && P.source === 'auto' && P.status !== 'approved') return `<div class="cta-card"><span><b>Your starter week</b><span class="small muted">Today follows it. A coach will fine-tune it.</span></span><button class="btn sm" data-plan="view">View week</button></div>`;
+  if (!P) return `<div class="cta-card"><span><b>Get your personal plan</b><span class="small muted">Built from your goals and health check. A coach reviews it.</span></span><button class="btn sm primary" data-flow="plan">Start</button></div>`;
+  if (P.status !== 'approved') return `<div class="cta-card"><span><b>Your plan is with a coach</b><span class="small muted">Usually reviewed within 48 hours. Today’s suggestions below are safe to start with.</span></span><button class="btn sm" data-plan="view">View draft</button></div>`;
+  return `<div class="cta-card"><span><b>Your personal plan</b><span class="small muted">Approved by your coach. Today follows it.</span></span><button class="btn sm" data-plan="view">View plan</button></div>`;
 }
 function planSheet(){
   const P = store.get('plan', null); if (!P) return;
   const pl = P.plan, ok = P.status === 'approved', n = pl.nutrition;
-  openSheet(`<div class="row" style="justify-content:space-between"><span class="badge ${ok ? 'ok' : ''}">${ok ? 'Approved by Coach Dani' : 'Waiting for Coach Dani’s review'}</span><span class="small muted">${P.source === 'ai' ? 'Drafted by AI (Claude)' : 'Drafted on your device'}</span></div>
+  openSheet(`<div class="row" style="justify-content:space-between"><span class="badge ${ok ? 'ok' : ''}">${ok ? 'Approved by your coach' : 'Waiting for the coach’s review'}</span><span class="small muted">${P.source === 'ai' ? 'Drafted by AI (Claude)' : 'Drafted on your device'}</span></div>
     <h2>Your personal plan</h2>
     ${P.note ? `<p class="small muted">${esc(P.note)}</p>` : ''}
     ${pl.summary ? `<p>${esc(pl.summary)}</p>` : ''}
@@ -2568,10 +2667,10 @@ function planSheet(){
     ${n ? `<div class="plan-day"><b>Nutrition: about ${n.kcal} kcal a day</b><p class="small muted">Protein ${n.protein} g · Carbs ${n.carbs} g · Fat ${n.fat} g</p>
       ${n.meals.length ? `<ol>${n.meals.map(m => `<li><b>${m.slot[0].toUpperCase() + m.slot.slice(1)}:</b> ${esc(m.idea)}${m.note ? ` <span class="muted">(${esc(m.note)})</span>` : ''}</li>`).join('')}</ol>` : ''}
       ${n.tips.length ? `<ul style="margin:0;padding-left:18px">${n.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}</div>` : ''}
-    ${pl.questionsForCoach.length ? `<div class="plan-day"><b>Questions for Coach Dani</b><ul style="margin:0;padding-left:18px">${pl.questionsForCoach.map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>` : ''}
+    ${pl.questionsForCoach.length ? `<div class="plan-day"><b>Questions for the coach</b><ul style="margin:0;padding-left:18px">${pl.questionsForCoach.map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>` : ''}
     ${P.issues.length ? `<p class="small muted">Our safety check adjusted the draft: ${P.issues.map(esc).join('; ')}.</p>` : ''}
     <p class="small muted">A general fitness guide, not medical advice.</p>
-    <div class="row">${ok ? '' : '<button class="btn primary" data-plan="approve">Prototype: approve as Coach Dani</button>'}<button class="btn" data-flow="plan">Redo questionnaire</button><button class="btn ghost" data-plan="discard">Delete plan</button></div>`);
+    <div class="row">${ok ? '' : '<button class="btn primary" data-plan="approve">Prototype: approve as coach</button>'}<button class="btn" data-flow="plan">Redo questionnaire</button><button class="btn ghost" data-plan="discard">Delete plan</button></div>`);
 }
 
 
@@ -2688,7 +2787,8 @@ async function startCamCounter(box, move, onUpdate, extStream){
     video.srcObject = stream; await video.play();
     cueEl.textContent = 'Loading body tracking…';
     const lm = await loadPose(); if (stopped) return stop;
-    const counter = makeRepCounter(move); let lastT = 0;
+    const counter = makeRepCounter(move); let lastT = 0, nf = 0, dark = false;
+    const probe = document.createElement('canvas'); probe.width = 32; probe.height = 24; const pctx = probe.getContext('2d', {willReadFrequently:true});
     (function frame(){
       if (stopped) return;
       const t = performance.now();
@@ -2698,7 +2798,9 @@ async function startCamCounter(box, move, onUpdate, extStream){
         const r = lm.detectForVideo(video, t), pts = r.landmarks && r.landmarks[0];
         drawSkeleton(ctx, canvas.width, canvas.height, pts);
         const st = counter.update(t, poseFeatures(move, pts));
-        cueEl.textContent = st.cue || (st.phase === 'down' ? 'Up!' : '');
+        if (++nf % 30 === 1){ try { pctx.drawImage(video, 0, 0, 32, 24); dark = lumaOf(pctx.getImageData(0, 0, 32, 24).data) < DARK_LUMA; } catch (e){ dark = false; } }
+        const cue = st.cue || (dark ? CUES.dark : '');
+        cueEl.textContent = cue || (st.phase === 'down' ? 'Up!' : ''); cueEl.classList.toggle('warn', !!cue && cue !== CUES[move].start);
         onUpdate(st);
       }
       raf = requestAnimationFrame(frame);
@@ -2743,23 +2845,25 @@ function closeAlarm(){
 function drawAlarm(){
   const el = document.getElementById('alarm'), cfg = alarmCfg(), task = alarmTask(cfg, currentLimits().mode === 'gentle');
   const o = store.get('onboarding', null), why = o && o.answers && o.answers.why, now = new Date();
-  const taskTxt = task.move === 'pushup' ? `${task.reps} push-ups` : '1 minute of easy movement';
+  const reps = task.move === 'pushup' || task.move === 'squat';
+  const taskTxt = task.move === 'pushup' ? `${task.reps} push-ups` : task.move === 'squat' ? `${task.reps} squats` : '1 minute of easy movement';
   if (alarmRun.phase === 'ring'){
     el.innerHTML = `<div class="ar-in al-in"><span class="al-time">${pad2(now.getHours())}:${pad2(now.getMinutes())}</span>
       <h2 class="ar-name">Good morning</h2>${why ? `<p class="ar-blurb">“${esc(why)}”</p>` : ''}
-      <div class="al-task${task.move === 'pushup' ? ' has-th' : ''}"><span><span class="small" style="opacity:.7;display:block">To switch it off</span><b>${taskTxt}</b></span>${task.move === 'pushup' ? `<span class="mv-th">${animSvg('pushup', '', 'data-ar="1.33"')}</span>` : ''}</div>
+      <div class="al-task${reps ? ' has-th' : ''}"><span><span class="small" style="opacity:.7;display:block">To switch it off</span><b>${taskTxt}</b></span>${reps ? `<span class="mv-th">${animSvg(task.move, '', 'data-ar="1.33"')}</span>` : ''}</div>
       <button class="ar-go" data-al="start">Let’s do it</button>
       <button class="al-hold" data-al="hold"><span class="al-fill"></span><span class="al-lbl">Emergency stop: hold 3 seconds</span></button>
       ${cfg.mode === 'commit' ? `<p class="ar-note">Commitment mode: if you leave the task, it rings again in ${cfg.rearm} minutes.</p>` : ''}</div>`;
   } else if (alarmRun.phase === 'task'){
-    const useCam = task.move === 'pushup' && camSupported();
+    const useCam = reps && camSupported(), noun = task.move === 'squat' ? 'squat' : 'push-up';
+    if (!alarmRun.t0){ alarmRun.t0 = performance.now(); alarmRun.startedAt = new Date().toISOString(); alarmRun.repTimes = []; alarmRun.conf = []; }
     el.innerHTML = `<div class="ar-in al-in"><div class="ar-top"><button class="ar-x" data-al="leave">Later</button><b class="ar-title">${taskTxt}</b></div>
-      ${task.move === 'pushup' ? `<div class="al-count"><b id="al-n">${alarmRun.reps}</b><span>of ${task.reps}</span></div>
+      ${reps ? `<div class="al-count"><b id="al-n">${alarmRun.reps}</b><span>of ${task.reps}</span></div>
         ${useCam ? '<div class="ar-cam" id="al-cam"></div><p class="ar-note">Phone on the floor, side-on, whole body in the picture. Nothing is recorded or sent.</p>' : ''}
-        <button class="ar-tap" data-al="tap">${useCam ? 'Camera not working? Tap each one' : 'Tap each push-up'}</button>`
+        <button class="ar-tap" data-al="tap">${useCam ? 'Camera not working? Tap each one' : `Tap each ${noun}`}</button>`
       : `<div class="al-count"><b id="al-n">60</b><span>seconds</span></div><p class="ar-blurb">March on the spot and roll your shoulders. Stop if anything hurts.</p><button class="ar-tap" data-al="mob">Start the minute</button>`}</div>`;
     if (useCam){
-      startCamCounter(document.getElementById('al-cam'), 'pushup', st => { if (st.counted && alarmRun) alarmRep('camera'); })
+      startCamCounter(document.getElementById('al-cam'), task.move, st => { if (st.counted && alarmRun) alarmRep('camera', st); })
         .then(stop => { if (alarmRun) alarmRun.stop = stop; else stop(); })
         .catch(e => { const b = document.getElementById('al-cam'); if (b) b.outerHTML = `<p class="ar-note">${camError(e)}</p>`; });
     }
@@ -2769,17 +2873,22 @@ function drawAlarm(){
       <div class="ar-row"><button data-al="back">Back to the task</button><button class="primary" data-al="stop">Stop the alarm</button></div></div>`;
   }
 }
-function alarmRep(how){
-  const task = alarmTask(alarmCfg(), false); if (!alarmRun || alarmRun.phase !== 'task') return;
-  alarmRun.reps++; if (how === 'camera') alarmRun.cam = (alarmRun.cam || 0) + 1;
-  const n = document.getElementById('al-n'); if (n){ n.textContent = alarmRun.reps; bump(n); } buzz(10);
-  if (alarmRun.reps >= task.reps) alarmDone(alarmRun.cam >= task.reps * 0.6 ? 'camera' : 'tap');
+function alarmRep(how, st){
+  const task = alarmTask(alarmCfg(), currentLimits().mode === 'gentle'); if (!alarmRun || alarmRun.phase !== 'task') return;
+  alarmRun.reps++;
+  if (how === 'camera'){ alarmRun.cam = (alarmRun.cam || 0) + 1; alarmRun.repTimes.push(Math.round(performance.now() - alarmRun.t0)); if (st && st.conf != null) alarmRun.conf.push(st.conf);
+    if (st && masterUnlocks(task, alarmRun.reps, st.heldMs)) alarmRun.master = true; }
+  const n = document.getElementById('al-n'); if (n){ n.textContent = alarmRun.reps; bump(n); } buzz(10); tone(how === 'camera' ? 988 : 784, .08);
+  if (alarmRun.reps >= task.reps) alarmDone(alarmRun.cam === alarmRun.reps ? 'camera' : 'tap');
 }
 function alarmDone(how){
-  const pts = alarmPoints(how);
-  if (pts) addPoints(pts, how === 'camera' ? 'wake_task_verified' : 'wake_task');
+  const task = alarmTask(alarmCfg(), currentLimits().mode === 'gentle'), r = alarmRun || {}, cam = how === 'camera';
+  const conf = r.conf && r.conf.length ? r.conf.reduce((a, b) => a + b, 0) / r.conf.length : null;
+  const res = gameEvent({kind:'alarm', id:'al-' + localDay(new Date()), verified:cam, move:task.move, reps:cam ? r.reps : 0, repTimes:cam ? r.repTimes : [], startedAt:r.startedAt || new Date().toISOString(), endedAt:new Date().toISOString(), conf, quiet:true});
   store.set('alarmState', {...(store.get('alarmState', {}) || {}), day:localDay(new Date()), status:'done', how});
-  closeAlarm(); celebrate(`Morning won! +${pts} points`);
+  const master = r.master; closeAlarm();
+  celebrate(res.xp ? `Morning won! +${res.xp} XP` : res.why === 'rejected' ? 'Morning done. That session looked off, so no XP this time.' : 'Morning won!');
+  if (master) setTimeout(masterReveal, 1400);
 }
 (function holdToStop(){
   let t0 = 0, timer = 0;
@@ -2818,7 +2927,8 @@ function alarmSettingsHtml(){
   let h = `<h3>Wake-up alarm</h3><div class="panel stack">
     <label class="consent" style="padding:0;border:0;background:none"><input type="checkbox" id="al-on" ${c.on ? 'checked' : ''}><span>Ring every morning until I do my task<small>${c.on && next ? `Next: ${DAY_FULL[WEEKDAY(next)]} at ${c.time}` : 'Off'}${c.pausedUntil ? ` · paused until ${c.pausedUntil}` : ''}</small></span></label>`;
   if (c.on) h += `<div class="ob-grid"><label class="ob-field">Time<input type="time" id="al-time" value="${esc(c.time)}"></label>
-      ${block('Push-ups to stop it', chip('reps', [['5','5'],['10','10'],['15','15']]))}</div>
+      ${block('Reps to stop it', chip('reps', [['5','5'],['10','10'],['15','15']]))}</div>
+    ${block('Exercise', chip('move', [['pushup','Push-ups'],['squat','Squats']]))}
     ${block('Mode', chip('mode', [['commit','Commitment'],['gentle','Gentle']]))}
     ${c.mode === 'commit' ? block('If I leave the task, ring again in', chip('rearm', [['3','3 min'],['5','5 min'],['10','10 min']])) : ''}
     ${block('Sick or travelling?', chip('pause', [['1','Pause 1 day'],['3','3 days'],['7','1 week'],['0','Resume']]))}
@@ -2833,7 +2943,7 @@ document.getElementById('v-sched').addEventListener('click', ev => {
   if (t.id === 'al-test') return openAlarm(new Date());
   const k = t.dataset.alcfg, v = t.dataset.v;
   if (k === 'pause'){ if (v === '0') return setAlarmCfg({pausedUntil:null}); const d = new Date(); d.setDate(d.getDate() + (+v) - 1); toast('Alarm paused. Get well soon, or have a good trip.'); return setAlarmCfg({pausedUntil:localDay(d)}); }
-  setAlarmCfg({[k]: k === 'mode' ? v : +v});
+  setAlarmCfg({[k]: k === 'mode' || k === 'move' ? v : +v});
 });
 document.getElementById('v-sched').addEventListener('change', ev => {
   if (ev.target.id === 'al-on') setAlarmCfg({on:ev.target.checked});
@@ -2865,8 +2975,7 @@ function logMeal(rec){
   store.set('meals', all);
   const good = list.filter(m => m.protein && m.veg).length;
   setHabit('food', good >= 2 ? 'yes' : list.some(m => m.protein || m.veg) ? 'mostly' : 'no');
-  const pts = list.length <= 3 ? 3 : 0; if (pts) addPoints(pts, 'meal_photo');
-  return pts;
+  return gameEvent({kind:'meal', id:rec.at, quiet:true}).xp;
 }
 document.getElementById('sheet-root').addEventListener('change', async ev => {
   if (!mealDraft) return;
@@ -2899,7 +3008,7 @@ document.addEventListener('click', async ev => {
     if (d.url) URL.revokeObjectURL(d.url);
     const pts = logMeal({slot:d.slot, protein:d.protein, veg:d.veg, photo:!!d.file, checked:d.checked || 'self', at:new Date().toISOString()});
     mealDraft = null; closeSheet();
-    toast((d.note ? d.note + ' ' : '') + (pts ? `+${pts} points.` : 'Logged.'));
+    toast((d.note ? d.note + ' ' : '') + (pts ? `+${pts} XP.` : 'Logged.'));
     if (ui.tab === 'food') drawFood(); if (ui.tab === 'today'){ todayAnim = false; drawToday(); }
   }
 });
@@ -2973,6 +3082,7 @@ async function duelsInit(){
   if (!db || !user) return;
   duel.me = await user.id(); if (!duel.me) return;
   Object.assign(duel, {db, assets, user, canWrite: await user.can('data.write')});
+  rankInit();
   db.collection('duels').orderBy('createdAt', 'desc').limit(60).onSnapshot(s => {
     duel.list = s.docs.map(d => ({id:d.id, ...d.data()})); duel.ready = true;
     if (ui.mode === 'challenge' && !arena) drawChallenges(false);
@@ -2982,7 +3092,7 @@ const duelOn = () => !!(duel.db && duel.me && duel.canWrite !== false);
 async function fillNames(root){
   const els = [...root.querySelectorAll('[data-uid]')]; if (!els.length || !duel.user) return;
   const ps = await duel.user.profiles([...new Set(els.map(e => e.dataset.uid))]);
-  els.forEach(e => { const p = ps[e.dataset.uid]; e.textContent = p && p.isMe ? 'You' : (p && p.name) || 'Someone'; });
+  els.forEach(e => { const p = ps[e.dataset.uid], pl = net.players.find(x => x.uid === e.dataset.uid); e.textContent = p && p.isMe ? 'You' : (pl && pl.nick) || (p && p.name) || 'Someone'; });
 }
 function duelWinner(d){
   const ch = CH[d.challengeId]; if (!ch || !d.to) return null;
@@ -3178,8 +3288,7 @@ function finishSession(){
   const key = dateStr(end), dl = new Set(doneLog[key] || []);
   s.exercises.forEach(x => { if (x.sets.some(y => y.done)) dl.add((x.src || 'r') + ':' + x.id); });
   doneLog[key] = [...dl]; store.set('done', doneLog); store.del('session');
-  const today = tcDay(end), pts = store.get('points', []) || [];
-  if (!pts.some(p => p.r === 'workout' && String(p.at).slice(0, 10) === today)) addPoints(15, 'workout');
+  const wxp = gameEvent({kind:'workout', id:s.id, quiet:true}).xp;
   const st = streakNow();
   clearInterval(ssClock); stopTimer();
   const mins = Math.max(1, Math.round((end - new Date(s.startedAt)) / 60000));
@@ -3191,7 +3300,7 @@ function finishSession(){
     <div class="streak-big">${ICON_FLAME}<span><b>${st.current}-day streak</b><span class="small muted">${st.freezesLeft} streak freeze${st.freezesLeft === 1 ? '' : 's'} left this month</span></span></div>
     <button class="btn primary wide" data-ss="close">Done</button></div>`;
   document.getElementById('session').scrollTop = 0;
-  celebrate(prs.length ? `${prs.length} new record${prs.length > 1 ? 's' : ''}!` : 'Workout logged. +15 points');
+  celebrate(prs.length ? `${prs.length} new record${prs.length > 1 ? 's' : ''}!` : wxp ? `Workout logged. +${wxp} XP` : 'Workout logged.');
 }
 document.getElementById('session').addEventListener('input', ev => {
   const t = ev.target; if (!t.dataset.ssf) return; saveSessionField(+t.dataset.i, +t.dataset.j, t.dataset.ssf, t.value);
@@ -3289,8 +3398,7 @@ function drawProgress(){
     <div class="heat" role="img" aria-label="Activity over the last 12 weeks">${cells}</div>
     <div class="legend"><span><i class="hm on"></i>Trained</span><span><i class="hm rest"></i>Rest day</span><span><i class="hm frz"></i>Freeze</span><span><i class="hm miss"></i>Missed</span></div>
     <p class="small" style="opacity:.75">Rest days keep your streak. Two missed training days a month are forgiven automatically.</p></div>`;
-  const pts = (store.get('points', []) || []).reduce((n, x) => n + (+x.d || 0), 0);
-  h += `<div class="cta-card"><span><b>${pts} points</b><span class="small muted">From workouts, morning tasks and meals. Soon you can spend them on sessions with Coach Dani.</span></span></div>`;
+  h += `<div class="panel stack">${profileHtml(false)}<div class="row"><button class="btn sm primary" data-open="ranks">Rankings</button><button class="btn sm" data-open="learn">Tips and A/B</button><button class="btn sm ghost" data-open="profile">Profile</button></div></div>`;
   if (!log.length){
     h += `<div class="empty"><p><b>Your progress starts with your first workout.</b></p><p class="small" style="margin-top:4px">Log your sets in Today and you’ll see your strength, volume and records here.</p>
       <div class="row" style="justify-content:center;margin-top:12px"><button class="btn primary" data-goto="today">Go to Today</button></div></div>`;
@@ -3461,6 +3569,12 @@ const ANIMS = {
   burpee: A([ST, squatK({hip:[-.12, .3], tr:35, a:[{h:[.24, 0]}, {h:[.22, 0]}]}), plankK([-.55, .03], [.21, .31], [.21, 0]), plankK([-.55, .03], [.23, .11], [.21, 0]), plankK([-.55, .03], [.21, .31], [.21, 0]), squatK({hip:[-.12, .3], tr:35, a:[{h:[.24, 0]}, {h:[.22, 0]}]}), mergeP(ST, {hip:[0, .63], a:[{h:[.05, 1.08]}, {h:[.03, 1.08]}], l:[{h:[.03, .13], ft:-45}, {h:[-.03, .13], ft:-45}]})], {move:330, hold:60}),
   jacks: two(FR, {hip:[0, .52], a:[{h:[.24, 1.1], b:-1}, {h:[-.24, 1.1], b:1}], l:[{h:[.26, .01]}, {h:[-.26, .01]}]}, {move:300, hold:60}),
 };
+// Bend a straight body at the hips while the shoulders stay put: dy > 0 sags the hips, dy < 0 lifts them (for A/B form checks).
+function sagK(k, dy){ const S = addv(k.hip, dirv(k.tr), RIG.shoulder), h = [k.hip[0], k.hip[1] - dy]; return mergeP(k, {hip:h, tr:deg(S[1] - h[1], S[0] - h[0])}); }
+// Wrong-form versions, used by the A/B challenges.
+ANIMS['pushup-sag'] = A(pushupA().map(k => sagK(k, .09)));
+ANIMS['plank-pike'] = (() => { const k = sagK(ANIMS.plank.keys[0], -.13); return two(k, {hip:[k.hip[0], k.hip[1] + .012]}, {move:1600, hold:600}); })();
+ANIMS['squat-half'] = two(ST, squatK({hip:[-.09, .41], tr:76, a:[{h:[.3, .66]}, {h:[.28, .66]}]}));
 // Exercises that share a movement.
 const ANIM_ALIAS = {};
 
@@ -3607,11 +3721,361 @@ if (typeof window !== 'undefined' && window.MutationObserver){
   new MutationObserver(() => { animScan(); animKick(); }).observe(document.documentElement, {childList:true, subtree:true});
 }
 
+/* ---------- XP, levels and points: the app side of game-core ---------- */
+const LEGACY_KIND = {plan_questionnaire:'questionnaire', wake_task:'alarm', wake_task_verified:'alarm', workout:'workout', meal_photo:'meal'};
+// One record for the game: XP ledger, points ledger (append-only), answered A/B ids, camera sessions for replay checks.
+function gameS(){
+  const g = store.get('game', null);
+  if (g && g.v === 1) return g;
+  // First open after this update: earlier points and challenge XP turn into XP, so nobody starts from zero.
+  const now = new Date().toISOString(), C = chState();
+  const old = (store.get('points', []) || []).map(p => ({kind:LEGACY_KIND[p.r] || 'legacy', xp:+p.d || 0, at:p.at || now, ref:'legacy'}));
+  const hist = (C.history || []).map(h => ({kind:'challenge', xp:+h.xp || 0, at:h.at || now, ref:'legacy'}));
+  const rest = Math.max(0, (+C.xp || 0) - hist.reduce((n, h) => n + h.xp, 0));
+  const ledger = [...old, ...hist, ...(rest ? [{kind:'challenge', xp:rest, at:now, ref:'legacy'}] : [])].filter(r => r.xp > 0).sort((a, b) => String(a.at).localeCompare(String(b.at)));
+  const fresh = {v:1, ledger, wallet:levelUps(0, sumXp(ledger), now), answered:[], read:[], sessions:[], times:[], flags:[], nick:'', since:now};
+  store.set('game', fresh); return fresh;
+}
+const gTotal = () => sumXp(gameS().ledger);
+const gLevel = () => levelInfo(gTotal());
+const gPoints = () => gameS().wallet.reduce((n, r) => n + (+r.pts || 0), 0);
+const gFlagged = () => gameS().flags.some(f => isSuspicious(f.flags));
+const restWeekdays = () => { const o = store.get('onboarding', null), d = o && o.answers && o.answers.days;
+  return d && d.length ? [0, 1, 2, 3, 4, 5, 6].filter(i => !d.includes(['sun','mon','tue','wed','thu','fri','sat'][i])) : []; };
+// Every reward goes through here: caps, checks and level-ups come from game-core.
+function gameEvent(ev){
+  const g = gameS(), now = Date.now(); ev = {at:new Date(now).toISOString(), ...ev};
+  if (!rateOk(g.times, now)) return {rows:[], why:'rate', flags:[], xp:0, ups:[]};
+  g.times = [...g.times.filter(t => now - t < 60000), now];
+  const before = sumXp(g.ledger);
+  const r = awardFor(ev, {ledger:g.ledger, sessions:g.sessions, answered:g.answered, restDays:restWeekdays()});
+  if (ev.kind === 'ab' && !g.answered.includes(ev.id)) g.answered.push(ev.id);
+  if (ev.kind === 'tip' && !g.read.includes(ev.id)) g.read.push(ev.id);
+  if (ev.kind === 'alarm' && ev.verified) g.sessions = [...g.sessions, {move:ev.move, reps:ev.reps, endedAt:ev.endedAt, gaps:checkSession(ev, []).gaps}].slice(-60);
+  if (r.flags.length) g.flags = [...g.flags, {at:ev.at, kind:ev.kind, flags:r.flags}].slice(-30);
+  g.ledger = g.ledger.concat(r.rows);
+  const after = sumXp(g.ledger), ups = levelUps(before, after, ev.at);
+  g.wallet = g.wallet.concat(ups);
+  store.set('game', g);
+  const xp = after - before;
+  if (xp && !ev.quiet) xpPop(xp);
+  if (ups.length) setTimeout(() => levelUpShow(ups[ups.length - 1].level, ups.reduce((n, u) => n + u.pts, 0)), ev.quiet ? 1100 : 650);
+  if (xp || r.flags.length) syncPlayer();
+  drawLvlChip();
+  return {...r, xp, before, after, ups};
+}
+function xpPop(n){
+  const el = document.createElement('div'); el.className = 'xp-pop'; el.setAttribute('role', 'status'); el.textContent = `+${n} XP`;
+  document.body.appendChild(el); setTimeout(() => el.remove(), RM() ? 1600 : 1500);
+}
+function levelUpShow(level, pts){
+  document.getElementById('lvlup')?.remove();
+  const el = document.createElement('div'); el.id = 'lvlup'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', `Level ${level}`);
+  el.innerHTML = `<div class="lu-card"><span class="lu-k">Level up</span><b class="lu-n">${level}</b><span class="lu-r">${esc(rankFor(level))}</span>
+    <span class="lu-p">+${pts} points</span><button class="btn primary wide" data-lu="ok">Let’s go</button></div>`;
+  document.body.appendChild(el); buzz([40, 60, 40, 60, 120]); [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .16), i * 120));
+  if (!RM()) celebrate(`Level ${level}!`);
+  el.addEventListener('click', ev => { if (ev.target === el || ev.target.closest('[data-lu]')) el.remove(); });
+  el.querySelector('[data-lu]').focus();
+  const onKey = ev => { if (ev.key === 'Escape'){ el.remove(); document.removeEventListener('keydown', onKey); } }; document.addEventListener('keydown', onKey);
+}
+function drawLvlChip(){
+  const el = document.getElementById('lvl-chip'); if (!el) return;
+  const L = gLevel(), m = !!store.get('master', null);
+  el.innerHTML = `<svg viewBox="0 0 36 36" aria-hidden="true"><circle class="trk" cx="18" cy="18" r="15"/><circle class="arc" cx="18" cy="18" r="15" style="stroke-dasharray:${(L.pct * 94.25).toFixed(1)} 94.25"/></svg><b>${L.level}</b>`;
+  el.setAttribute('aria-label', `Level ${L.level}, ${L.into} of ${L.need} XP. Open your profile`);
+  const mc = document.getElementById('master-chip'); if (mc) mc.hidden = !m;
+}
+const gSector = () => { const o = store.get('onboarding', null), a = (o && o.answers) || {}; return a.sector || (a.track === 'gym' ? 'gym' : a.track ? 'home' : ''); };
+const sectorName = k => (SECTORS.find(x => x[0] === k) || [k, 'No sector'])[1];
+function profileHtml(compact){
+  const g = gameS(), L = gLevel(), st = streakNow(), pts = gPoints();
+  return `<div class="prof">
+    <div class="prof-top"><div class="prof-lvl"><span>Level</span><b>${L.level}</b></div>
+      <div class="prof-id"><b>${g.nick ? esc(g.nick) : 'No nickname yet'}</b><span class="small muted">${esc(rankFor(L.level))}${gSector() ? ' · ' + esc(sectorName(gSector())) : ''}</span>
+        <div class="xpbar prof-bar"><span style="width:${Math.round(L.pct * 100)}%"></span></div><span class="small muted">${L.into} / ${L.need} XP to level ${L.level + 1}</span></div></div>
+    <div class="prof-stats"><span>${ICON_FLAME}<b>${st.current}</b><small>day streak</small></span><span><b>${gTotal()}</b><small>total XP</small></span><span><b>${pts}</b><small>points</small></span></div>
+    ${compact ? '' : `<p class="small muted">Points come with every new level. What you can do with them is coming soon.</p>`}
+  </div>`;
+}
+function profileSheet(){
+  const g = gameS(), m = store.get('master', null);
+  const rows = [...g.ledger].reverse().slice(0, 6).map(r => `<li><span>${esc(XP_LABEL[r.kind] || 'Activity')}</span><b>+${r.xp} XP</b></li>`).join('');
+  openSheet(`<h2>Your profile</h2>${profileHtml(false)}
+    <div class="row"><button class="btn primary" data-open="ranks">Rankings</button><button class="btn" data-open="learn">Tips and A/B</button><button class="btn" data-open="nick">${g.nick ? 'Edit nickname and sector' : 'Pick a nickname'}</button>${m ? '<button class="btn master-btn" data-open="master">MÁSTER</button>' : ''}</div>
+    ${rows ? `<h3>Latest XP</h3><ul class="xp-list">${rows}</ul>` : ''}
+    ${gFlagged() ? '<p class="banner">Some of your sessions looked unusual, so you’re out of the rankings until we check them. Your XP is safe.</p>' : ''}
+    <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
+}
+const XP_LABEL = {alarm:'Morning alarm', streak:'Streak bonus', tip:'Tip read', ab:'A/B challenge', questionnaire:'Questionnaire', workout:'Workout', meal:'Meal logged', challenge:'Challenge', legacy:'Earlier activity'};
+
+/* ---------- tips and A/B challenges (content comes from the shared store when there is one) ---------- */
+const LEARN_DEFAULT = [
+  {id:'tip-breathe', type:'tip', order:1, title:'Breathe out on the effort', text:'Exhale as you push up or stand up, inhale on the way down. Your core stays tight and every rep feels steadier.', anim:'squat'},
+  {id:'tip-sleep', type:'tip', order:2, title:'Sleep is part of training', text:'Most muscle repair happens while you sleep. Seven to nine hours does more for your progress than any supplement.'},
+  {id:'tip-protein', type:'tip', order:3, title:'Protein at every meal', text:'A palm-sized portion of protein at each of 3 or 4 meals builds more muscle than one huge serving at dinner.'},
+  {id:'ab-pushup', type:'ab', order:1, title:'Which push-up is right?', a:{label:'Body in one line', anim:'pushup'}, b:{label:'Hips dropping', anim:'pushup-sag'}, correct:'a',
+    why:'A straight line from head to heels protects your lower back and makes your chest and core do the work.'},
+  {id:'ab-squat', type:'ab', order:2, title:'Which squat counts?', a:{label:'Half way down', anim:'squat-half'}, b:{label:'Hips below the knees', anim:'squat'}, correct:'b',
+    why:'Going down until the hips pass the knees works your glutes and quads through the full range. Half reps build half the strength.'},
+  {id:'ab-plank', type:'ab', order:3, title:'Which plank works your core?', a:{label:'Hips up high', anim:'plank-pike'}, b:{label:'Flat like a board', anim:'plank'}, correct:'b',
+    why:'With the hips high your shoulders take the load and your abs switch off. Flat, your whole core has to hold you.'}
+];
+const learn = {items:LEARN_DEFAULT, live:false};
+const learnList = type => learn.items.filter(x => x.type === type).sort((a, b) => (a.order || 0) - (b.order || 0));
+const todayCount = kind => { const d = gDay(new Date()); return gameS().ledger.filter(e => e.kind === kind && gDay(e.at) === d).length; };
+function learnCardHtml(){
+  const g = gameS(), tip = learnList('tip').find(t => !g.read.includes(t.id)), ab = learnList('ab').find(x => !g.answered.includes(x.id));
+  if (!tip && !ab) return '';
+  return `<div class="learn-card">
+    ${ab ? `<button class="lc-ab" data-ab="${esc(ab.id)}"><span class="lc-k">A or B?</span><span class="lc-pair">${animSvg(ab.a.anim, 'th', 'data-ar="1"')}${animSvg(ab.b.anim, 'th', 'data-ar="1"')}</span><b>${esc(ab.title)}</b><span class="small">+${GAME.xp.ab} XP · ${Math.max(0, GAME.perDay.ab - todayCount('ab'))} left today</span></button>` : ''}
+    ${tip ? `<button class="lc-tip" data-tip="${esc(tip.id)}"><span class="lc-k">Tip</span><b>${esc(tip.title)}</b><span class="small">+${GAME.xp.tip} XP · ${Math.max(0, GAME.perDay.tip - todayCount('tip'))} left today</span></button>` : ''}
+  </div>`;
+}
+const learnMedia = it => it.video ? `<video class="learn-vid" src="${esc(it.video)}" controls playsinline preload="metadata"></video>` : it.image ? `<img class="learn-img" src="${esc(it.image)}" alt="">` : it.anim && animFor(it.anim) ? `<div class="anim-stage">${animSvg(it.anim, 'big', 'data-ar="1.5"')}</div>` : '';
+function tipSheet(id){
+  const t = learn.items.find(x => x.id === id); if (!t) return;
+  const first = !gameS().read.includes(id), r = first ? gameEvent({kind:'tip', id}) : null;
+  showSheet(`${learnMedia(t)}<span class="lc-k">Tip</span><h2>${esc(t.title)}</h2><p>${esc(t.text)}</p>
+    ${r && !r.xp ? `<p class="small muted">${r.why === 'daily_cap' ? `You’ve had your ${GAME.perDay.tip} tips with XP today. Keep reading, the XP comes back tomorrow.` : ''}</p>` : ''}
+    <div class="row">${learnNext('tip', id)}<button class="btn ghost" data-close="1">Close</button></div>`);
+}
+function abSheet(id, pick){
+  const x = learn.items.find(y => y.id === id); if (!x) return;
+  const g = gameS(), done = g.answered.includes(id), mine = pick || (done ? (g.abPick || {})[id] : null);
+  let res = '';
+  if (pick && !done){
+    const r = gameEvent({kind:'ab', id, choice:pick, correct:pick === x.correct});
+    const gg = gameS(); gg.abPick = {...(gg.abPick || {}), [id]:pick}; store.set('game', gg);
+    buzz(pick === x.correct ? [20, 40, 20] : 60); tone(pick === x.correct ? 1046 : 330, .2);
+    res = r.why === 'daily_cap' ? `<p class="small muted">No XP: you’ve done ${GAME.perDay.ab} today. It still counts as answered.</p>` : '';
+  }
+  const show = done || pick, side = k => { const o = x[k], cls = show ? (k === x.correct ? ' right' : mine === k ? ' wrong' : ' dim') : '';
+    return `<button class="ab-opt${cls}" data-abpick="${k}" data-ab="${esc(id)}" ${show ? 'disabled' : ''} aria-label="Option ${k.toUpperCase()}: ${esc(o.label)}">
+      <span class="ab-k">${k.toUpperCase()}</span>${o.video ? `<video src="${esc(o.video)}" muted loop autoplay playsinline></video>` : animSvg(o.anim, 'ab-anim', 'data-ar="1"')}<span class="ab-l">${esc(o.label)}</span></button>`; };
+  showSheet(`<span class="lc-k">A or B?</span><h2>${esc(x.title)}</h2>${x.video ? `<video class="learn-vid" src="${esc(x.video)}" controls playsinline></video>` : ''}
+    <div class="ab-pair">${side('a')}${side('b')}</div>
+    ${show ? `<div class="ab-why ${mine === x.correct ? 'ok' : mine ? 'no' : ''}"><b>${mine ? (mine === x.correct ? 'Correct!' : 'Not quite.') : 'Answer'} It’s ${x.correct.toUpperCase()}.</b><span>${esc(x.why)}</span></div>${res}` : `<p class="small muted">Tap A or B. You get one try.</p>`}
+    <div class="row">${show ? learnNext('ab', id) : ''}<button class="btn ghost" data-close="1">Close</button></div>`);
+}
+function learnNext(type, id){
+  const g = gameS(), nextAb = learnList('ab').find(y => y.id !== id && !g.answered.includes(y.id)), nextTip = learnList('tip').find(y => y.id !== id && !g.read.includes(y.id));
+  const n = type === 'ab' ? (nextAb || nextTip) : (nextTip || nextAb);
+  return n ? `<button class="btn primary" data-${n.type === 'ab' ? 'ab' : 'tip'}="${esc(n.id)}">Next</button>` : '';
+}
+function learnSheet(){
+  const g = gameS();
+  openSheet(`<h2>Tips and A/B</h2><p class="small muted">${GAME.perDay.tip} tips and ${GAME.perDay.ab} A/B challenges a day give XP.</p>
+    <div class="list">${learnList('ab').map(x => `<button class="learn-row" data-ab="${esc(x.id)}"><span class="lr-k">A/B</span><b>${esc(x.title)}</b><span class="small muted">${g.answered.includes(x.id) ? 'Answered' : '+' + GAME.xp.ab + ' XP'}</span></button>`).join('')}
+    ${learnList('tip').map(x => `<button class="learn-row" data-tip="${esc(x.id)}"><span class="lr-k">Tip</span><b>${esc(x.title)}</b><span class="small muted">${g.read.includes(x.id) ? 'Read' : '+' + GAME.xp.tip + ' XP'}</span></button>`).join('')}</div>
+    <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
+}
+
+/* ---------- rankings and leagues (shared store in the prototype; Supabase in the app) ---------- */
+const net = {players:[], ready:false, err:false, saving:null, savedJson:''};
+function rankInit(){
+  if (!duel.db || !duel.me) return;
+  duel.db.collection('players').orderBy('xp', 'desc').limit(500).onSnapshot(s => {
+    net.players = s.docs.map(d => ({uid:d.id, ...d.data()})); net.ready = true; net.err = false;
+    checkOvertakes(); refreshRanks();
+  }, () => { net.err = true; refreshRanks(); });
+  duel.db.collection('content').onSnapshot(s => {
+    const rows = s.docs.map(d => ({id:d.id, ...d.data()})).filter(x => x.type === 'tip' || x.type === 'ab');
+    if (rows.length){ const ids = new Set(rows.map(r => r.id)); learn.items = [...LEARN_DEFAULT.filter(x => !ids.has(x.id)), ...rows.filter(r => !r.hidden)]; learn.live = true; if (ui.tab === 'today' && ui.mode === 'train') render(); }
+  }, () => {});
+  syncPlayer();
+}
+const netOn = () => duelOn();
+const myPlayer = () => net.players.find(p => p.uid === duel.me);
+// My row in the shared rankings. Only the nickname is shared, never the account name.
+function playerDoc(){
+  const g = gameS(), me = myPlayer() || {}, L = gLevel();
+  return {nick:g.nick, nickKey:nickKey(g.nick), sector:gSector() || 'home', xp:gTotal(), wk:weekKey(new Date()), wxp:weekXp(g.ledger, new Date()), level:L.level,
+    leagues:g.leagues || me.leagues || [], flagged:gFlagged(), since:g.since};
+}
+function syncPlayer(){
+  if (!netOn() || !gameS().nick) return;
+  clearTimeout(net.saving); net.saving = setTimeout(async () => {
+    const d = playerDoc(), j = JSON.stringify(d); if (j === net.savedJson) return;
+    try { await duel.db.doc('players/' + duel.me).set({...d, at:new Date().toISOString()}); net.savedJson = j; } catch (e){}
+  }, 800);
+}
+// Someone in one of my leagues went from behind me to ahead of me: tell me, every single time.
+function checkOvertakes(){
+  const me = duel.me, g = gameS(), mine = new Set(g.leagues || []); if (!me || !mine.size) return;
+  const mates = net.players.filter(p => p.uid !== me && !p.flagged && (p.leagues || []).some(l => mine.has(l)));
+  const now = {[me]:gTotal()}; mates.forEach(p => { now[p.uid] = +p.xp || 0; });
+  const prev = store.get('rivals', null);
+  if (prev) whoPassed(prev, now, me).forEach((u, i) => { const p = mates.find(x => x.uid === u); if (p) setTimeout(() => notifyPassed(p.nick), i * 2600); });
+  store.set('rivals', now);
+}
+function notifyPassed(nick){
+  const line = overtakeLine(nick || 'Someone', Math.random());
+  toast(line); buzz([80, 60, 80]);
+  try { if (document.hidden && 'Notification' in window && Notification.permission === 'granted') new Notification('Home Reps', {body:line}); } catch (e){}
+}
+function askNotify(){ try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e){} }
+const ranksUi = {view:'sector', period:'week', sector:null, league:null};
+function refreshRanks(){ const el = document.getElementById('ranks-body'); if (el) el.innerHTML = ranksBody(); }
+function ranksSheet(view){
+  if (view) ranksUi.view = view;
+  if (netOn() && !gameS().nick) return nickSheet('ranks');
+  openSheet(`<h2>Rankings</h2><div id="ranks-body">${ranksBody()}</div><div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
+}
+function rankRows(list){
+  const me = duel.me, {top, near} = around(list, me, 2), seen = new Set(), rows = [];
+  [...top, ...near].forEach(p => { if (!seen.has(p.uid)){ seen.add(p.uid); rows.push(p); } });
+  if (!rows.length) return '<p class="small muted">Nobody here yet. Earn some XP and you’re first.</p>';
+  let last = 0;
+  return `<ol class="rank-list">${rows.map(p => { const gap = p.pos > last + 1 ? '<li class="gap">…</li>' : ''; last = p.pos;
+    return `${gap}<li class="${p.uid === me ? 'me' : ''}${p.pos <= 3 ? ' top' + p.pos : ''}"><span class="rp">${p.pos}</span><b>${esc(p.nick || 'Someone')}${p.uid === me ? ' (you)' : ''}</b><span class="rl">Lv ${+p.level || 1}</span><span class="rx">${p.score} XP</span></li>`; }).join('')}</ol>`;
+}
+function ranksBody(){
+  if (!netOn()) return `<p class="small muted">Rankings and leagues need the shared version of the app (open it from your Claude link). Your level and XP are saved on this phone.</p>${profileHtml(true)}`;
+  if (!net.ready) return net.err ? '<p class="small muted">Couldn’t load the rankings. Try again in a moment.</p>' : '<p class="small muted">Loading…</p>';
+  const g = gameS(), wk = weekKey(new Date()), seg = (k, v, l) => `<button data-rk="${k}" data-v="${v}" aria-pressed="${ranksUi[k] === v}">${l}</button>`;
+  const players = net.players.map(p => p.uid === duel.me ? {...p, ...playerDoc()} : p);
+  if (!players.some(p => p.uid === duel.me)) players.push({uid:duel.me, ...playerDoc()});
+  let h = `<div class="seg wide">${seg('view', 'sector', 'By sector')}${seg('view', 'league', 'My leagues')}</div>
+    <div class="seg wide">${seg('period', 'week', 'This week')}${seg('period', 'total', 'Total')}</div>`;
+  if (gFlagged()) h += '<p class="banner">You’re out of the rankings until we check some unusual sessions.</p>';
+  if (ranksUi.view === 'sector'){
+    const sec = ranksUi.sector || gSector() || 'home';
+    h += `<div class="chips">${SECTORS.map(([k, l]) => `<button class="chip" data-rk="sector" data-v="${k}" aria-pressed="${sec === k}">${l}</button>`).join('')}</div>`;
+    h += rankRows(rankPlayers(players, {sector:sec, period:ranksUi.period, week:wk}));
+  } else {
+    const mine = g.leagues || [], leagues = mine.map(code => ({code, name:(net.leagueNames || {})[code] || code}));
+    if (!mine.length) h += `<p class="small muted">Make a private league for you and your friends, or join one with a code.</p>`;
+    else {
+      const cur = mine.includes(ranksUi.league) ? ranksUi.league : mine[0]; ranksUi.league = cur; loadLeagueNames(mine);
+      h += `<div class="chips">${leagues.map(l => `<button class="chip" data-rk="league" data-v="${esc(l.code)}" aria-pressed="${cur === l.code}">${esc(l.name)}</button>`).join('')}</div>`;
+      h += rankRows(rankPlayers(players, {league:cur, period:ranksUi.period, week:wk}));
+      h += `<div class="row"><button class="btn sm" data-lg="invite" data-v="${esc(cur)}">Invite friends · code ${esc(cur)}</button><button class="btn sm ghost" data-lg="leave" data-v="${esc(cur)}">Leave</button></div>`;
+    }
+    h += `<div class="row"><button class="btn sm primary" data-lg="new">New league</button><button class="btn sm" data-lg="join">Join with a code</button></div>`;
+  }
+  return h;
+}
+async function loadLeagueNames(codes){
+  net.leagueNames = net.leagueNames || {}; const need = codes.filter(c => !(c in net.leagueNames)); if (!need.length) return;
+  need.forEach(c => { net.leagueNames[c] = c; });
+  for (const c of need){ try { const d = await duel.db.doc('leagues/' + c).get(); if (d.exists) net.leagueNames[c] = d.data().name || c; } catch (e){} }
+  refreshRanks();
+}
+const newCode = () => Array.from({length:6}, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
+function leagueForm(kind){
+  showSheet(`<h2>${kind === 'new' ? 'New league' : 'Join a league'}</h2>
+    <label class="ob-field">${kind === 'new' ? 'League name' : 'Invite code'}<input id="lg-in" maxlength="${kind === 'new' ? 30 : 6}" autocomplete="off" ${kind === 'join' ? 'style="text-transform:uppercase;letter-spacing:.2em"' : ''} placeholder="${kind === 'new' ? 'e.g. Office crew' : 'ABC123'}"></label>
+    <p class="small muted" id="lg-msg">${kind === 'new' ? 'You get a code to share. Everyone who joins sees each other’s nickname and XP.' : 'Ask your friend for their 6-letter code.'}</p>
+    <div class="row"><button class="btn primary" data-lg="${kind === 'new' ? 'create' : 'enter'}">${kind === 'new' ? 'Create' : 'Join'}</button><button class="btn ghost" data-lg="back">Back</button></div>`);
+  setTimeout(() => document.getElementById('lg-in')?.focus(), 50);
+}
+async function leagueAct(a, v){
+  const g = gameS(), msg = t => { const m = document.getElementById('lg-msg'); if (m) m.textContent = t; };
+  const setLeagues = list => { const gg = gameS(); gg.leagues = list; store.set('game', gg); syncPlayer(); checkOvertakes(); };
+  if (a === 'new' || a === 'join') return leagueForm(a);
+  if (a === 'back') return ranksSheet('league');
+  if (a === 'create'){
+    const name = (document.getElementById('lg-in').value || '').trim(); if (name.length < 2) return msg('Give it a name first.');
+    let code = newCode();
+    try { for (let i = 0; i < 4; i++){ const d = await duel.db.doc('leagues/' + code).get(); if (!d.exists) break; code = newCode(); }
+      await duel.db.doc('leagues/' + code).set({name, code, owner:duel.me, createdAt:new Date().toISOString()});
+    } catch (e){ return msg('Couldn’t create it. Check you can edit this app and try again.'); }
+    (net.leagueNames = net.leagueNames || {})[code] = name; setLeagues([...(g.leagues || []), code]); ranksUi.league = code; askNotify();
+    toast(`League created. Code: ${code}`); return ranksSheet('league');
+  }
+  if (a === 'enter'){
+    const code = (document.getElementById('lg-in').value || '').trim().toUpperCase(); if (!/^[A-Z0-9]{6}$/.test(code)) return msg('Codes have 6 letters and numbers.');
+    if ((g.leagues || []).includes(code)) return msg('You’re already in that league.');
+    try { const d = await duel.db.doc('leagues/' + code).get(); if (!d.exists) return msg('No league with that code.'); (net.leagueNames = net.leagueNames || {})[code] = d.data().name || code; }
+    catch (e){ return msg('Couldn’t check the code. Try again.'); }
+    setLeagues([...(g.leagues || []), code]); ranksUi.league = code; askNotify(); toast('You’re in! Go get them.'); return ranksSheet('league');
+  }
+  if (a === 'invite'){
+    const name = (net.leagueNames || {})[v] || 'my league', text = `Join "${name}" on Home Reps: open the app, Rankings, My leagues, Join with a code: ${v}`;
+    try { if (navigator.share){ await navigator.share({text}); return; } } catch (e){ return; }
+    try { await navigator.clipboard.writeText(text); toast('Invite copied. Paste it to your friends.'); } catch (e){ toast(`Your code: ${v}`); }
+    return;
+  }
+  if (a === 'leave'){ setLeagues((g.leagues || []).filter(c => c !== v)); ranksUi.league = null; toast('You left the league.'); return refreshRanks(); }
+}
+// Nickname (the only thing other people see) and sector.
+function nickSheet(next){
+  const g = gameS(), sec = gSector();
+  showSheet(`<h2>Your nickname</h2><p class="small muted">It’s the only thing other people see in rankings and leagues.</p>
+    <label class="ob-field">Nickname<input id="nick-in" maxlength="16" autocomplete="off" value="${esc(g.nick || '')}" placeholder="e.g. jorge_88"></label>
+    ${block('How do you train?', `<div class="chipset">${SECTORS.map(([k, l]) => `<button class="pick" data-sector="${k}" aria-pressed="${sec === k}">${l}</button>`).join('')}</div>`)}
+    <p class="small muted" id="nick-msg">3 to 16 letters, numbers, dots, dashes or underscores.</p>
+    <div class="row"><button class="btn primary" data-nick="save" data-next="${esc(next || '')}">Save</button><button class="btn ghost" data-close="1">Cancel</button></div>`);
+}
+function saveNick(next){
+  const v = (document.getElementById('nick-in').value || '').trim(), msg = t => { document.getElementById('nick-msg').textContent = t; };
+  const sel = document.querySelector('[data-sector][aria-pressed="true"]'), sector = sel ? sel.dataset.sector : gSector();
+  if (!nickOk(v)) return msg('3 to 16 letters, numbers, dots, dashes or underscores.');
+  if (!sector) return msg('Pick how you train.');
+  if (net.players.some(p => p.uid !== duel.me && p.nickKey === nickKey(v))) return msg('Someone already has that nickname. Try another.');
+  const g = gameS(); g.nick = v; store.set('game', g);
+  const o = store.get('onboarding', null) || {v:3, at:new Date().toISOString(), answers:{}}; o.answers = {...o.answers, sector}; store.set('onboarding', o);
+  net.savedJson = ''; syncPlayer(); drawLvlChip(); toast('Saved');
+  if (next === 'ranks') return ranksSheet(); if (next === 'master') return masterSheet(); closeSheet();
+}
+
+/* ---------- MÁSTER (hidden: nothing in the app points to it) ---------- */
+async function masterReveal(){
+  const first = !store.get('master', null);
+  store.set('master', {at:(store.get('master', null) || {}).at || new Date().toISOString()});
+  if (first && netOn()) duel.db.doc('masters/' + duel.me).set({at:new Date().toISOString()}).catch(() => {});
+  document.getElementById('master-in')?.remove();
+  const el = document.createElement('div'); el.id = 'master-in'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'MÁSTER');
+  el.innerHTML = `<div class="mi-rays" aria-hidden="true"></div><div class="mi-card"><svg class="mi-crown" viewBox="0 0 64 48" aria-hidden="true"><path d="M4 40 8 10l14 14L32 4l10 20 14-14 4 30z"/><rect x="4" y="41" width="56" height="5" rx="2"/></svg>
+    <span class="mi-k">You found it</span><b class="mi-t">MÁSTER</b><p class="mi-m">${esc(MASTER.message)}</p><button class="btn wide mi-go" data-mi="go">Enter</button></div>`;
+  document.body.appendChild(el); buzz([200, 100, 200, 100, 600]); [392, 523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .25), 200 + i * 180));
+  el.addEventListener('click', ev => { if (ev.target.closest('[data-mi]')){ el.remove(); masterSheet(); } });
+  drawLvlChip();
+}
+function masterSheet(pick){
+  if (!store.get('master', null)) return;
+  const sent = store.get('masterReq', null), o = MASTER.options.find(x => x.id === pick);
+  const html = o ? `<h2 class="master-h">MÁSTER</h2><p><b>${esc(o.name)}</b><br><span class="small muted">${esc(o.blurb)}</span></p>
+      <label class="ob-field">Anything Dani should know? (optional)<textarea id="mr-note" maxlength="500" rows="3" placeholder="Your goal, your schedule, an injury…"></textarea></label>
+      <p class="small muted">We send Dani your request with your questionnaire answers so Dani can tailor it. No payment now: Dani will contact you.</p>
+      <div class="row"><button class="btn primary" data-mr="send" data-v="${esc(o.id)}">Send request</button><button class="btn ghost" data-mr="back">Back</button></div>`
+    : `<h2 class="master-h">MÁSTER</h2><p class="small muted">Personal plans from Dani himself.</p>
+      ${sent ? `<p class="banner">Request sent (${esc((MASTER.options.find(x => x.id === sent.option) || {}).name || '')}). Dani will be in touch.</p>` : ''}
+      <div class="list">${MASTER.options.map(x => `<button class="master-opt" data-mr="pick" data-v="${x.id}"><b>${esc(x.name)}</b><span class="small muted">${esc(x.blurb)}</span></button>`).join('')}</div>
+      <a class="btn wide" href="${esc(MASTER.contact.url)}" target="_blank" rel="noopener">${esc(MASTER.contact.label)}</a>
+      <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`;
+  if (document.querySelector('#sheet-root .scrim:not(.closing)')) showSheet(html); else openSheet(html);
+}
+async function masterSend(option){
+  const note = (document.getElementById('mr-note') || {}).value || '', o = store.get('onboarding', null), hl = store.get('health', null);
+  const req = {option, note:note.slice(0, 500), answers:(o && o.answers) || {}, injuries:(hl && hl.injuries) || [], nick:gameS().nick || '', level:gLevel().level, at:new Date().toISOString()};
+  store.set('masterReq', req);
+  if (netOn()) try { await duel.db.collection('masterRequests/' + duel.me + '/items').add(req); } catch (e){}
+  buzz([30, 50, 30]); toast('Sent. Dani will contact you.'); masterSheet();
+}
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-open],[data-tip],[data-ab],[data-rk],[data-lg],[data-nick],[data-sector],[data-mr],#lvl-chip,#master-chip'); if (!t) return;
+  if (t.id === 'lvl-chip') return profileSheet();
+  if (t.id === 'master-chip') return masterSheet();
+  if (t.dataset.open){ const k = t.dataset.open; return k === 'ranks' ? ranksSheet() : k === 'learn' ? learnSheet() : k === 'nick' ? nickSheet() : k === 'master' ? masterSheet() : k === 'profile' ? profileSheet() : null; }
+  if (t.dataset.abpick) return abSheet(t.dataset.ab, t.dataset.abpick);
+  if (t.dataset.ab){ const s = document.querySelector('#sheet-root .scrim:not(.closing)'); if (!s) openSheet(''); return abSheet(t.dataset.ab); }
+  if (t.dataset.tip){ const s = document.querySelector('#sheet-root .scrim:not(.closing)'); if (!s) openSheet(''); return tipSheet(t.dataset.tip); }
+  if (t.dataset.rk){ ranksUi[t.dataset.rk] = t.dataset.v; return refreshRanks(); }
+  if (t.dataset.lg) return leagueAct(t.dataset.lg, t.dataset.v);
+  if (t.dataset.sector){ document.querySelectorAll('[data-sector]').forEach(b => b.setAttribute('aria-pressed', String(b === t))); return; }
+  if (t.dataset.nick) return saveNick(t.dataset.next);
+  if (t.dataset.mr === 'pick') return masterSheet(t.dataset.v);
+  if (t.dataset.mr === 'back') return masterSheet();
+  if (t.dataset.mr === 'send') return masterSend(t.dataset.v);
+});
+
 /* ---------- mode: Challenge or Training ---------- */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
 const ICON_DUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg>';
 function openModePicker(){
-  const el = document.getElementById('modepick'), S = chState(), lvl = levelFromXp(S.xp), hr = new Date().getHours();
+  const el = document.getElementById('modepick'), S = chState(), lvl = gLevel().level, hr = new Date().getHours();
   const hello = hr < 12 ? 'Morning' : hr < 19 ? 'Afternoon' : 'Evening', o = store.get('onboarding', null), setUp = !!(o && o.answers && o.answers.goal);
   const today = setUp && o.answers.time ? 'Today: ' + recommend(todayKey()).plan.title : 'Your plan in 5 taps';
   el.className = '';
@@ -3676,8 +4140,7 @@ function chAvailability(ch, S, L, open){
   return challengeAllowed(ch, L);
 }
 function drawChallenges(anim){
-  const S = chState(), L = currentLimits(), open = unlockedLevel(S.best, CHALLENGES), lvl = levelFromXp(S.xp);
-  const from = xpToReach(lvl), to = xpToReach(lvl + 1), pct = Math.round((S.xp - from) / (to - from) * 100);
+  const S = chState(), L = currentLimits(), open = unlockedLevel(S.best, CHALLENGES), GL = gLevel(), lvl = GL.level, pct = Math.round(GL.pct * 100);
   const tally = {bronze:0, silver:0, gold:0, legend:0};
   CHALLENGES.forEach(c => { const m = medalFor(c, S.best[c.id]); if (m) tally[m]++; });
   const avail = CHALLENGES.filter(c => chAvailability(c, S, L, open).ok);
@@ -3687,13 +4150,14 @@ function drawChallenges(anim){
       <div class="rank-badge">${lvl}</div>
       <div><span class="small" style="opacity:.7">Your rank</span><b class="rank-name">${rankFor(lvl)}</b>
         <div class="xpbar"><span id="rank-xp" style="width:${anim && !RM() ? 0 : pct}%"></span></div>
-        <span class="small" style="opacity:.75">${S.xp - from} / ${to - from} XP to level ${lvl + 1}</span></div>
+        <span class="small" style="opacity:.75">${GL.into} / ${GL.need} XP to level ${lvl + 1}</span></div>
       <div class="medal-row">${MEDALS.map(m => `<span><i class="mdot ${m}"></i>${tally[m]} ${MEDAL_NAME[m]}</span>`).join('')}</div>
     </div>`;
   if (feat){ const nt = nextTarget(feat, S.best[feat.id]);
     h += `<div class="feat"><span class="small" style="font-weight:700">Today’s challenge · ${esc(chFmtLabel(feat))}</span><h2>${esc(feat.name)}</h2><p class="small">${esc(feat.blurb)}</p>
       <p class="small"><b>Your target: ${chVal(feat, nt.value)}</b>${nt.medal ? ` for ${MEDAL_NAME[nt.medal]}` : ''}</p>
       <button class="btn" data-ch="${feat.id}">Let’s go</button></div>`; }
+  h += `<div class="row ch-links"><button class="btn sm" data-open="ranks">Rankings</button><button class="btn sm" data-open="learn">Tips and A/B</button><button class="btn sm ghost" data-open="profile">Profile</button></div>`;
   h += duelsHtml();
   if (L.mode === 'gentle') h += `<p class="banner">High-intensity challenges are locked for now. ${store.get('health', null) ? 'Your safety check suggests talking to a doctor before harder training.' : '<button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
   h += `<div class="chips" style="margin-top:16px">${CH_FILTERS.map(([k, l]) => `<button class="chip" data-chf="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>`;
@@ -3912,19 +4376,22 @@ function finishWork(score){
   arena.res = saveChallenge(ch, score, arena.scaled, arena.before);
   arena.phase = 'result'; drawArena();
 }
-function saveChallenge(ch, score, scaled, before){
+function saveChallenge(ch, score, scaled, before, prevAward){
   const S = JSON.parse(JSON.stringify(before)), key = scaled ? 'bestScaled' : 'best', prev = S[key][ch.id];
   const pb = isBetter(ch, score, prev), xp = xpFor(ch, score, pb, scaled), medal = medalFor(ch, score);
-  const lvlBefore = levelFromXp(S.xp);
   if (pb) S[key][ch.id] = score;
   S.xp += xp;
-  S.history.unshift({id:ch.id, at:new Date().toISOString(), score, scaled, medal, xp, pb});
+  const at = new Date().toISOString();
+  S.history.unshift({id:ch.id, at, score, scaled, medal, xp, pb});
   S.history = S.history.slice(0, 60);
   store.set('challenges', S);
-  return {score, medal, xp, pb, scaled, xpBefore:before.xp, xpAfter:S.xp, lvlBefore, lvlAfter:levelFromXp(S.xp)};
+  // XP for the whole app goes through game-core (daily caps, level-ups, points). A count fix keeps the XP of the first save.
+  const award = prevAward || gameEvent({kind:'challenge', xp, id:ch.id + '@' + at, quiet:true});
+  const L0 = levelInfo(award.before), L1 = levelInfo(award.after);
+  return {score, medal, xp:award.xp, pb, scaled, award, xpBefore:award.before, xpAfter:award.after, lvlBefore:L0.level, lvlAfter:L1.level};
 }
 function arenaResult(){
-  const {ch, res} = arena, lv = res.lvlAfter, from = xpToReach(lv), to = xpToReach(lv + 1);
+  const {ch, res} = arena, lv = res.lvlAfter, L1 = levelInfo(res.xpAfter), from = res.xpAfter - L1.into, to = from + L1.need;
   const nt = nextTarget(ch, (res.scaled ? chState().bestScaled : chState().best)[ch.id]);
   return `<div class="ar-top"><button class="ar-x" data-ar="close" aria-label="Close">✕</button><span class="ar-fmt">${chShort(ch)}</span></div>
     <div class="res m-${res.medal || 'none'}">
@@ -3941,13 +4408,13 @@ function arenaResult(){
     <div class="ar-row"><button data-ar="close">Done</button><button class="primary" data-ar="again">Go again</button></div>`;
 }
 function afterResult(){
-  const {ch, res} = arena, lv = res.lvlAfter, from = xpToReach(lv), to = xpToReach(lv + 1), pct = Math.round((res.xpAfter - from) / (to - from) * 100);
+  const {ch, res} = arena, pct = Math.round(levelInfo(res.xpAfter).pct * 100);
   if (arena.quiet){ arena.quiet = false; return; }
   requestAnimationFrame(() => requestAnimationFrame(() => { const x = $a('res-xp'); if (x) x.style.width = pct + '%'; }));
   if (ch.unit !== 'sec' && !RM()){ const e = $a('res-score'), t0 = performance.now();
     (function f(t){ const k = Math.min(1, (t - t0) / 700); e.textContent = Math.round(res.score * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f); })(t0); }
   [523, 659, 784].forEach((f, i) => setTimeout(() => tone(f, .18), 250 + i * 140));
-  if (res.lvlAfter > res.lvlBefore) setTimeout(() => celebrate(`Level up! You’re level ${res.lvlAfter}${rankFor(res.lvlAfter) !== rankFor(res.lvlBefore) ? ', rank ' + rankFor(res.lvlAfter) : ''}.`), 700);
+  if (res.lvlAfter > res.lvlBefore){}
   else if (res.pb || res.medal === 'gold' || res.medal === 'legend') setTimeout(() => celebrate(res.pb ? 'New personal best!' : MEDAL_NAME[res.medal] + ' medal!'), 700);
 }
 document.getElementById('arena').addEventListener('pointerdown', ev => {
@@ -3977,7 +4444,7 @@ document.getElementById('arena').addEventListener('click', ev => {
     const n = Math.max(1, arena.res.score + (+t.dataset.d));
     if (n === arena.res.score) return;
     store.set('challenges', arena.before);
-    arena.res = saveChallenge(arena.ch, n, arena.res.scaled, arena.before);
+    arena.res = saveChallenge(arena.ch, n, arena.res.scaled, arena.before, arena.res.award);
     arena.quiet = true; drawArena();
   }
 });
@@ -4127,6 +4594,7 @@ document.getElementById('today-date').textContent = new Date().toLocaleDateStrin
 fillForm();
 setTab(TABS.includes(ui.tab) ? ui.tab : 'today');
 duelsInit();
+drawLvlChip();
 setMode(store.get('mode', 'train'));
 if (/[?#&](survey|setup)\b/.test(location.search + location.hash)) openFlow('gym');
 else openModePicker();

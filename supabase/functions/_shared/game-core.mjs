@@ -10,8 +10,11 @@ const GAME = {
     eventsPerMin:20, maxSessionReps:200, replayTolMs:40, minConf:.5,
     rep:{pushup:{minMs:450, maxPerMin:60, perDay:600}, squat:{minMs:500, maxPerMin:60, perDay:800}}
   },
-  streakKinds:['alarm', 'workout', 'challenge']
+  streakKinds:['alarm', 'workout', 'challenge'],
+  // Flags that take an account out of the rankings until someone reviews it (others only cost that session's XP).
+  suspicious:['replay', 'pace_not_human', 'rep_times_outside_session', 'rep_times_mismatch', 'daily_volume']
 };
+const isSuspicious = flags => (flags || []).some(f => GAME.suspicious.includes(f));
 const SECTORS = [['gym', 'Gym'], ['calisthenics', 'Calisthenics'], ['home', 'Home bodyweight']];
 const OVERTAKE_LINES = [
   '{nick} just passed you in XP!! COME ON CHAMP, WAKE UP',
@@ -127,4 +130,4 @@ const overtakeLine = (nick, r) => OVERTAKE_LINES[Math.floor((r == null ? 0 : r) 
 const nickOk = n => /^[A-Za-z0-9._-]{3,16}$/.test(String(n || ''));
 const nickKey = n => String(n || '').toLowerCase();
 
-export { GAME, SECTORS, OVERTAKE_LINES, xpForLevel, levelInfo, pointsForLevel, levelUps, gDay, weekKey, sumXp, weekXp, activeStreak, checkSession, rateOk, awardFor, rankPlayers, around, whoPassed, overtakeLine, nickOk, nickKey };
+export { GAME, isSuspicious, SECTORS, OVERTAKE_LINES, xpForLevel, levelInfo, pointsForLevel, levelUps, gDay, weekKey, sumXp, weekXp, activeStreak, checkSession, rateOk, awardFor, rankPlayers, around, whoPassed, overtakeLine, nickOk, nickKey };

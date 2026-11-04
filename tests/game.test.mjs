@@ -155,6 +155,6 @@ test('MÁSTER: only the last push-up of the alarm held at the bottom for 10 s', 
 });
 
 test('the Supabase functions run the same rules as the app', () => {
-  const copy = readFileSync(new URL('../supabase/functions/_shared/game-core.js', import.meta.url), 'utf8');
+  const copy = readFileSync(new URL('../supabase/functions/_shared/game-core.mjs', import.meta.url), 'utf8');
   assert.ok(copy.includes(block('game-core').trim()), 'run: node scripts/sync-game-core.mjs');
 });
