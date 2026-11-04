@@ -2377,6 +2377,7 @@ function plannerHtml(){
   const now = new Date(), monday = new Date(now); monday.setDate(now.getDate() - DAYS.indexOf(todayKey()));
   let h = `<div class="phase-card"><span class="small" style="opacity:.75">Week ${week} of 4</span><b class="phase-name">${phase.name}</b><p class="small">${phase.tip}</p>
     <div class="pips">${[1,2,3,4].map(i => `<i class="${i < week ? 'past' : i === week ? 'now' : ''}"></i>`).join('')}</div></div>`;
+  h += `<button class="btn sm" data-flow="gym" style="align-self:flex-start;margin-top:10px">Change my answers (goal, days, hours)</button>`;
   if (currentLimits().mode === 'gentle') h += `<p class="banner" style="margin-top:10px">${store.get('health', null) ? 'Gentle mode: up to 3 easy sessions a week until a doctor clears harder training.' : 'Gentle mode: up to 3 easy sessions a week until you do the safety check.'}${store.get('health', null) ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do it now</button>'}</p>`;
   h += `<div class="planner">${rows.map((r, i) => {
     const dt = new Date(monday); dt.setDate(monday.getDate() + i);
