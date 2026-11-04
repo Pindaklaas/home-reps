@@ -1104,7 +1104,7 @@ function drawToday(){
     <div class="facts"><span>Goal: <b>${GOAL_TXT[p.goal]}</b></span>${rec.plan.focus.length?`<button class="rest-btn" type="button" data-timer="${REST_SEC[p.goal]}" data-tlabel="Rest between sets">⏱ Rest <b>${REST[p.goal]}</b> · start timer</button>`:''}${cardio?`<span>Cardio <b>${cardio} min</b></span>`:''}</div>
     ${all.length?`<div class="prog-row"><span>${nDone} of ${all.length} done</span><b>${pct}%</b></div><div class="progress" aria-label="${pct}% done"><span style="width:${lastPct===null?pct:lastPct}%"></span></div>`:''}
   </div>`;
-  h += batteryCard();
+  h = batteryCard() + h;
   h += planCard();
   if (ob && ob.answers && ob.answers.goal && !why && !store.get('whyAsked', false)) h += `<div class="cta-card stack" style="align-items:stretch"><span><b>What’s your why?</b><span class="small muted">One line. We’ll show it on the tough days.</span></span>
     <input id="why-in" class="why-in" maxlength="140" placeholder="e.g. feel strong again" aria-label="Your why"><span class="row"><button class="btn sm primary" id="why-save">Save</button><button class="btn sm ghost" id="why-skip">Not now</button></span></div>`;
@@ -2466,7 +2466,7 @@ const ICON_DUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M
 function openModePicker(){
   const el = document.getElementById('modepick'), S = chState(), lvl = levelFromXp(S.xp), hr = new Date().getHours();
   const hello = hr < 12 ? 'Morning' : hr < 19 ? 'Afternoon' : 'Evening', o = store.get('onboarding', null), setUp = !!(o && o.answers && o.answers.goal);
-  const today = setUp ? 'Today: ' + recommend(todayKey()).plan.title : 'Your plan in 5 taps';
+  const today = setUp && o.answers.time ? 'Today: ' + recommend(todayKey()).plan.title : 'Your plan in 5 taps';
   el.className = '';
   el.innerHTML = `<div class="mp-in"><p class="mp-hi">${hello}. What’s it today?</p>
     <button class="mp-card mp-ch" data-mode="challenge"><span class="mp-ico">${ICON_BOLT}</span><span class="mp-t">Challenge</span>
@@ -2477,7 +2477,10 @@ function openModePicker(){
 }
 function enterMode(m){
   const o = store.get('onboarding', null), a = (o && o.answers) || {};
-  if (m === 'train' && !(a.goal && a.age && a.age !== 'u18')){ setMode('train'); return openFlow('gym'); }
+  if (m === 'train'){
+    ui.tab = 'today'; ui.day = null;
+    if (!(a.goal && a.age && a.age !== 'u18' && a.time)){ setMode('train'); return openFlow('gym'); }
+  }
   setMode(m);
 }
 function pickMode(m, card){
