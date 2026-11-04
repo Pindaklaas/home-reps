@@ -932,6 +932,30 @@ h3.ih .itile .ico{width:18px;height:18px}
 .q-item.ok .qi-r b{color:var(--good)}
 .why-line{font-style:italic;color:var(--muted)}
 @media (max-width:380px){.home-menu{gap:6px}.mt-ico{width:40px;height:40px}.mtile b{font-size:11.5px}}
+/* clips and the daily tips calendar */
+.clip{flex:none;position:relative;border-radius:18px;overflow:hidden;background:radial-gradient(110% 80% at 50% 100%,var(--accent-soft),var(--bg) 72%);height:clamp(230px,62vw,290px)}
+.clip-stage{position:absolute;inset:18px 0 56px}
+.clip-stage svg{width:100%;height:100%}
+.clip-bars{position:absolute;left:10px;right:10px;top:8px;display:flex;gap:4px;z-index:2}
+.clip-bars i{flex:1;height:4px;border-radius:2px;background:color-mix(in srgb,var(--ink) 15%,transparent);overflow:hidden}
+.clip-bars b{display:block;height:100%;width:0;background:var(--accent)}
+.clip-cap{position:absolute;left:12px;right:52px;bottom:10px;margin:0;font-weight:700;font-size:15px;line-height:1.3;min-height:40px;display:flex;align-items:flex-end}
+.clip-cap.in{animation:rise .35s var(--out)}
+.clip-mark{position:absolute;top:20px;right:12px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:22px;font-weight:800;color:#fff;opacity:0;transform:scale(.6);transition:opacity .2s,transform .3s var(--spring)}
+.clip-mark.ok{background:var(--good);opacity:1;transform:none}.clip-mark.no{background:var(--bad);opacity:1;transform:none}
+.clip-btn{position:absolute;right:10px;bottom:10px;width:36px;height:36px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);display:grid;place-items:center;padding:0}
+.clip-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.tip-cal{flex:none;display:flex;gap:6px;overflow-x:auto;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none}
+.tip-cal::-webkit-scrollbar{display:none}
+.tc-day{flex:0 0 92px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;color:var(--ink)}
+.tc-day b{font-size:12.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tc-d{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tc-s{font-size:11px;color:var(--muted)}
+.tc-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--amber) 16%,var(--surface));color:var(--amber)}
+.tc-ico svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tc-day.today{border:2px solid var(--accent)}
+.tc-day.done .tc-ico{background:var(--good);color:var(--surface)}
+.tc-day.soon{opacity:.6;border-style:dashed}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -4029,9 +4053,30 @@ const XP_LABEL = {alarm:'Morning alarm', streak:'Streak bonus', tip:'Tip read', 
 
 /* ---------- tips and A/B challenges (content comes from the shared store when there is one) ---------- */
 const LEARN_DEFAULT = [
-  {id:'quiz-ergonomics', type:'ab', order:0, day:'2026-11-04', topic:'Ergonomics', title:'How do you pick up the weight?',
+  {id:'quiz-ergonomics', type:'ab', order:0, day:'2026-11-04', topic:'Ergonomics', title:'How do you pick up the weight?', clip:'ergonomics',
     a:{label:'Round your back, straight legs', anim:'lift-round'}, b:{label:'Close to you, hips back, flat back', anim:'lift-good'}, c:{label:'Reach out in front of you', anim:'lift-far'}, correct:'b',
     why:'Keep the weight close and push your hips back with a flat back: your legs and glutes do the work. Round-backed or far away, the load lands on your lower back.'},
+  {id:'tip-water', type:'tip', day:'2026-11-05', topic:'Water', title:'A glass of water first thing', text:'You wake up a little dehydrated. One glass of water before coffee helps your energy and your first workout.'},
+  {id:'quiz-glutes', type:'ab', day:'2026-11-06', topic:'Glutes', title:'Which one works your glutes most?', a:{label:'Crunch', anim:'crunch'}, b:{label:'Glute bridge', anim:'glute-bridge'}, c:{label:'Biceps curl', anim:'db-curl'}, correct:'b',
+    why:'Squeezing your hips up in a bridge is pure glute work. Crunches train your abs and curls your arms.'},
+  {id:'tip-warmup', type:'tip', day:'2026-11-07', topic:'Warm-up', title:'Two light sets first', text:'Before your first heavy exercise, do two easy sets with a light weight. Your joints warm up and your strong sets feel better.', anim:'jacks'},
+  {id:'quiz-hinge', type:'ab', day:'2026-11-08', topic:'Hip hinge', title:'Which one is a hip hinge?', a:{label:'Romanian deadlift', anim:'rdl'}, b:{label:'Squat', anim:'squat'}, c:{label:'Lunge', anim:'lunge'}, correct:'a',
+    why:'In a hinge your hips go back and your knees stay soft, so the back of your legs does the work. In a squat your knees bend a lot more.'},
+  {id:'tip-rest', type:'tip', day:'2026-11-09', topic:'Rest', title:'Rest long enough between sets', text:'For muscle, rest 60 to 90 seconds; for heavy strength work, 2 to 3 minutes. Too short and your next set gets weaker.'},
+  {id:'quiz-back', type:'ab', day:'2026-11-10', topic:'Back', title:'Which one trains your back?', a:{label:'Push-up', anim:'pushup'}, b:{label:'Squat', anim:'squat'}, c:{label:'Pull-up', anim:'pull-up'}, correct:'c',
+    why:'Pulling your body up works your back and biceps. Push-ups are chest and squats are legs.'},
+  {id:'tip-steps', type:'tip', day:'2026-11-11', topic:'Steps', title:'Walk between workouts', text:'Around 8,000 steps a day helps recovery, mood and fat loss, and it doesn’t tire your muscles for the next session.'},
+  {id:'quiz-core', type:'ab', day:'2026-11-12', topic:'Core', title:'Which keeps your lower back safest?', a:{label:'Dead bug', anim:'dead-bug'}, b:{label:'Sit-up', anim:'situp'}, c:{label:'Russian twist', anim:'russian-twist'}, correct:'a',
+    why:'In a dead bug your back stays still and flat while your abs hold it there. Great for beginners and sore backs.'},
+  {id:'tip-overload', type:'tip', day:'2026-11-13', topic:'Progress', title:'One more rep each week', text:'To keep getting stronger, add one rep or a little weight each week. Small steps add up fast.', anim:'db-bench'},
+  {id:'quiz-calves', type:'ab', day:'2026-11-14', topic:'Calves', title:'Which one works your calves?', a:{label:'Leg curl', anim:'leg-curl'}, b:{label:'Calf raise', anim:'calf-raise'}, c:{label:'Crunch', anim:'crunch'}, correct:'b',
+    why:'Rising up onto your toes works your calves. Leg curls train the back of your thighs.'},
+  {id:'tip-caffeine', type:'tip', day:'2026-11-15', topic:'Caffeine', title:'Stop coffee 8 hours before bed', text:'Caffeine stays in your body for hours. A late coffee costs you deep sleep, and sleep is when your muscles recover.'},
+  {id:'quiz-pull', type:'ab', day:'2026-11-16', topic:'Push or pull', title:'Which one is a pull exercise?', a:{label:'Dumbbell row', anim:'db-row'}, b:{label:'Overhead press', anim:'ohp'}, c:{label:'Bench press', anim:'db-bench'}, correct:'a',
+    why:'You pull the weight towards you in a row: back and biceps. Presses push it away: chest, shoulders and triceps.'},
+  {id:'tip-desk', type:'tip', day:'2026-11-17', topic:'Desk breaks', title:'Get up every 45 minutes', text:'Sitting all day stiffens your hips and back. Stand up every 45 minutes and do 10 squats: your body will thank you.', anim:'squat'},
+  {id:'quiz-shoulders', type:'ab', day:'2026-11-18', topic:'Shoulders', title:'Which one works your shoulders?', a:{label:'Leg press', anim:'leg-press'}, b:{label:'Bicycle crunch', anim:'bicycle'}, c:{label:'Lateral raise', anim:'lateral-raise'}, correct:'c',
+    why:'Lifting the weights out to your sides works the middle of your shoulders. Keep a slight bend in your elbows.'},
   {id:'tip-breathe', type:'tip', order:1, topic:'Breathing', title:'Breathe out on the effort', text:'Exhale as you push up or stand up, inhale on the way down. Your core stays tight and every rep feels steadier.', anim:'squat'},
   {id:'tip-sleep', type:'tip', order:2, topic:'Sleep', title:'Sleep is part of training', text:'Most muscle repair happens while you sleep. Seven to nine hours does more for your progress than any supplement.'},
   {id:'tip-protein', type:'tip', order:3, topic:'Protein', title:'Protein at every meal', text:'A palm-sized portion of protein at each of 3 or 4 meals builds more muscle than one huge serving at dinner.'},
@@ -4043,7 +4088,7 @@ const LEARN_DEFAULT = [
     why:'With the hips high your shoulders take the load and your abs switch off. Flat, your whole core has to hold you.'}
 ];
 const learn = {items:LEARN_DEFAULT, live:false};
-const learnList = type => learn.items.filter(x => x.type === type).sort((a, b) => (a.order || 0) - (b.order || 0));
+const learnList = type => learn.items.filter(x => x.type === type && (!x.day || x.day <= gDay(new Date()))).sort((a, b) => String(b.day || '').localeCompare(String(a.day || '')) || (a.order || 0) - (b.order || 0));
 function tipOfDay(at){
   const day = gDay(at || new Date()), pinned = learn.items.find(x => x.day === day); if (pinned) return pinned;
   const pool = learn.items.filter(x => !x.day).sort((a, b) => String(a.id).localeCompare(String(b.id)));
@@ -4051,7 +4096,7 @@ function tipOfDay(at){
 }
 const tipDone = x => { const g = gameS(); return x.type === 'ab' ? g.answered.includes(x.id) : g.read.includes(x.id); };
 const todayCount = kind => { const d = gDay(new Date()); return gameS().ledger.filter(e => e.kind === kind && gDay(e.at) === d).length; };
-const learnMedia = it => it.video ? `<video class="learn-vid" src="${esc(it.video)}" controls playsinline preload="metadata"></video>` : it.image ? `<img class="learn-img" src="${esc(it.image)}" alt="">` : it.anim && animFor(it.anim) ? `<div class="anim-stage">${animSvg(it.anim, 'big', 'data-ar="1.5"')}</div>` : '';
+const learnMedia = it => it.clip ? clipHtml(clipSteps(it)) : it.video ? `<video class="learn-vid" src="${esc(it.video)}" controls playsinline preload="metadata"></video>` : it.image ? `<img class="learn-img" src="${esc(it.image)}" alt="">` : it.anim && animFor(it.anim) ? `<div class="anim-stage">${animSvg(it.anim, 'big', 'data-ar="1.5"')}</div>` : '';
 // Redraw what's behind a sheet (Today or the Challenge hub) so tiles and dots stay current.
 function refreshHome(){ if (arena) return; if (ui.mode === 'challenge') drawChallenges(false); else if (ui.tab === 'today') drawToday(); }
 function tipSheet(id){
@@ -4076,7 +4121,7 @@ function abSheet(id, pick){
   const show = done || pick, side = k => { const o = x[k], cls = show ? (k === x.correct ? ' right' : mine === k ? ' wrong' : ' dim') : '';
     return `<button class="ab-opt${cls}" data-abpick="${k}" data-ab="${esc(id)}" ${show ? 'disabled' : ''} aria-label="Option ${k.toUpperCase()}: ${esc(o.label)}">
       <span class="ab-k">${k.toUpperCase()}</span>${o.video ? `<video src="${esc(o.video)}" muted loop autoplay playsinline></video>` : animSvg(o.anim, 'ab-anim', 'data-ar="1"')}<span class="ab-l">${esc(o.label)}</span></button>`; };
-  showSheet(`<span class="lc-k">${x.topic ? esc(x.topic) + ' · ' : ''}${kicker}</span><h2>${esc(x.title)}</h2>${x.video ? `<video class="learn-vid" src="${esc(x.video)}" ${x.poster ? `poster="${esc(x.poster)}"` : ''} controls playsinline></video>` : ''}
+  showSheet(`<span class="lc-k">${x.topic ? esc(x.topic) + ' · ' : ''}${kicker}</span><h2>${esc(x.title)}</h2>${x.video ? `<video class="learn-vid" src="${esc(x.video)}" ${x.poster ? `poster="${esc(x.poster)}"` : ''} controls playsinline></video>` : x.clip && show ? clipHtml(clipSteps(x)) : ''}
     <div class="ab-pair${keys.length > 2 ? ' three' : ''}">${keys.map(side).join('')}</div>
     ${show ? `<div class="ab-why ${mine === x.correct ? 'ok' : mine ? 'no' : ''}"><b>${mine ? (mine === x.correct ? 'Correct!' : 'Not quite.') : 'Answer'} It’s ${x.correct.toUpperCase()}.</b><span>${esc(x.why)}</span></div>${res}` : `<p class="small muted">Tap ${keys.length > 2 ? 'A, B or C' : 'A or B'}. You get one try.</p>`}
     <div class="row">${show ? learnNext('ab', id) : ''}<button class="btn" data-open="learn">All tips</button><button class="btn ghost" data-close="1">Close</button></div>`);
@@ -4088,10 +4133,84 @@ function learnNext(type, id){
 }
 function learnSheet(){
   const g = gameS();
-  openSheet(`<h2>Tips and A/B</h2><p class="small muted">${GAME.perDay.tip} tips and ${GAME.perDay.ab} A/B challenges a day give XP.</p>
-    <div class="list">${learnList('ab').map(x => `<button class="learn-row" data-ab="${esc(x.id)}"><span class="lr-k">A/B</span><b>${esc(x.title)}</b><span class="small muted">${g.answered.includes(x.id) ? 'Answered' : '+' + GAME.xp.ab + ' XP'}</span></button>`).join('')}
+  openSheet(`<div class="help-head">${tile('bulb', 'amber')}<span><h2>Daily tips</h2><span class="small muted">A new one every day. Up to ${GAME.perDay.tip} tips and ${GAME.perDay.ab} quizzes a day give XP.</span></span></div>
+    ${tipCalendarHtml()}<b>All tips</b>
+    <div class="list">${learnList('ab').map(x => `<button class="learn-row" data-ab="${esc(x.id)}"><span class="lr-k">Quiz</span><b>${esc(x.title)}</b><span class="small muted">${g.answered.includes(x.id) ? 'Answered' : '+' + GAME.xp.ab + ' XP'}</span></button>`).join('')}
     ${learnList('tip').map(x => `<button class="learn-row" data-tip="${esc(x.id)}"><span class="lr-k">Tip</span><b>${esc(x.title)}</b><span class="small muted">${g.read.includes(x.id) ? 'Read' : '+' + GAME.xp.tip + ' XP'}</span></button>`).join('')}</div>
     <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
+  setTimeout(() => { const t = document.querySelector('.tip-cal .today'); if (t) t.parentNode.scrollLeft = t.offsetLeft - t.parentNode.clientWidth / 2 + t.clientWidth / 2; }, 30);
+}
+
+/* ---------- clips: short animated "videos" made of exercise animations with captions ---------- */
+// A step: {anim, text, mark: 'ok' | 'no' | undefined, ms}. An item's `clip` is a CLIPS key or an inline list of steps.
+const CLIPS = {
+  ergonomics:[
+    {anim:'lift-good', text:'Stand close: the weight between your feet.', mark:'ok', ms:3200},
+    {anim:'lift-good', text:'Push your hips back. Back flat, chest up.', mark:'ok', ms:3200},
+    {anim:'lift-round', text:'Never round your back to reach it.', mark:'no', ms:3000},
+    {anim:'lift-far', text:'Never reach out far in front of you.', mark:'no', ms:3000},
+    {anim:'lift-good', text:'Stand up with it close. Your legs do the work.', mark:'ok', ms:3600}
+  ]
+};
+const clipSteps = it => Array.isArray(it.clip) ? it.clip.filter(s => s && animFor(s.anim)) : (CLIPS[it.clip] || []);
+let clipN = 0;
+function clipHtml(steps){
+  if (!steps.length) return '';
+  const id = 'clip' + (++clipN);
+  return `<div class="clip" id="${id}" data-clip="${esc(JSON.stringify(steps))}" role="region" aria-label="Animated video">
+    <div class="clip-bars">${steps.map(() => '<i><b></b></i>').join('')}</div>
+    <div class="clip-stage"></div><span class="clip-mark" aria-hidden="true"></span>
+    <p class="clip-cap" aria-live="polite"></p>
+    <button class="clip-btn" data-clipbtn="${id}" aria-label="Pause">${ICON_PAUSE}</button></div>`;
+}
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>';
+const ICON_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_REPLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v5h5"/></svg>';
+// Play a clip: one step at a time, bars fill like stories. Tap pauses; at the end, tap replays.
+function clipStart(el){
+  if (!el || el.dataset.on) return; el.dataset.on = '1';
+  const steps = JSON.parse(el.dataset.clip), bars = [...el.querySelectorAll('.clip-bars b')], stage = el.querySelector('.clip-stage');
+  const cap = el.querySelector('.clip-cap'), mark = el.querySelector('.clip-mark'), btn = el.querySelector('.clip-btn');
+  const st = {i:0, t:0, last:performance.now(), paused:false, done:false, anim:null};
+  const show = i => {
+    const s = steps[i];
+    if (st.anim !== s.anim){ stage.innerHTML = animSvg(s.anim, 'big', 'data-ar="1.6"'); st.anim = s.anim; }
+    cap.textContent = s.text || ''; cap.classList.remove('in'); void cap.offsetWidth; cap.classList.add('in');
+    mark.className = 'clip-mark' + (s.mark ? ' ' + s.mark : ''); mark.textContent = s.mark === 'ok' ? '✓' : s.mark === 'no' ? '✕' : '';
+    if (s.mark === 'no') buzz(30);
+    bars.forEach((b, k) => { b.style.width = k < i ? '100%' : '0%'; });
+  };
+  const setBtn = () => { btn.innerHTML = st.done ? ICON_REPLAY : st.paused ? ICON_PLAY : ICON_PAUSE; btn.setAttribute('aria-label', st.done ? 'Play again' : st.paused ? 'Play' : 'Pause'); };
+  el._clip = {toggle(){ if (st.done){ st.done = false; st.i = 0; st.t = 0; st.paused = false; show(0); } else st.paused = !st.paused; setBtn(); st.last = performance.now(); }};
+  show(0);
+  (function tick(now){
+    if (!el.isConnected) return;
+    const dt = now - st.last; st.last = now;
+    if (!st.paused && !st.done){
+      st.t += dt; const s = steps[st.i], ms = s.ms || 3000;
+      bars[st.i].style.width = Math.min(100, st.t / ms * 100) + '%';
+      if (st.t >= ms){ st.t = 0; st.i++; if (st.i >= steps.length){ st.i = steps.length - 1; st.done = true; setBtn(); } else show(st.i); }
+    }
+    requestAnimationFrame(tick);
+  })(performance.now());
+}
+function clipScan(root){ (root || document).querySelectorAll('.clip:not([data-on])').forEach(clipStart); }
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-clipbtn], .clip-stage'); if (!b) return;
+  const el = b.closest('.clip'); if (el && el._clip) el._clip.toggle();
+});
+if (window.MutationObserver) new MutationObserver(() => clipScan()).observe(document.documentElement, {childList:true, subtree:true});
+
+// The daily tips calendar: last few days, today, and what's coming (kept a surprise).
+function tipCalendarHtml(){
+  const today = new Date(), rows = [];
+  for (let k = -4; k <= 2; k++){
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + k), it = tipOfDay(d); if (!it) continue;
+    const done = tipDone(it), lbl = k === 0 ? 'Today' : k === -1 ? 'Yesterday' : k === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, {weekday:'short', day:'numeric'});
+    rows.push(k > 0 ? `<div class="tc-day soon"><span class="tc-d">${lbl}</span><span class="tc-ico">${ico('help')}</span><b>Surprise</b><span class="tc-s">Opens ${k === 1 ? 'tomorrow' : 'soon'}</span></div>`
+      : `<button class="tc-day${k === 0 ? ' today' : ''}${done ? ' done' : ''}" ${it.type === 'ab' ? `data-ab="${esc(it.id)}"` : `data-tip="${esc(it.id)}"`}><span class="tc-d">${lbl}</span><span class="tc-ico">${done ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>' : ico(it.type === 'ab' ? 'bulb' : 'help')}</span><b>${esc(it.topic || it.title)}</b><span class="tc-s">${done ? 'Done' : it.type === 'ab' ? 'Quiz' : 'Tip'}</span></button>`);
+  }
+  return `<div class="tip-cal">${rows.join('')}</div>`;
 }
 
 /* ---------- rankings and leagues (shared store in the prototype; Supabase in the app) ---------- */
