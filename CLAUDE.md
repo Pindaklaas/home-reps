@@ -13,3 +13,4 @@
 - Duels (challenge a friend) use the published page's shared `db` (`duels` collection: challengeId, scaled, createdAt, from/to {uid, score, medal, video asset id, at}, status) plus `assets` for attempt videos and `user` for ids and names. Store only user ids, never names. Nothing is shared without the tick box; videos are recorded with MediaRecorder or added from the gallery and shrunk on the device to under 20 MB. Without these capabilities (GitHub Pages, local file) the Duels section is hidden. See `docs/duelos.md`.
 - Motion uses the `--spring` / `--out` easing tokens; JS checks `RM()` and CSS has a reduced-motion rule, so keep both working when adding animation.
 - Test changes at phone width (about 400px) in light and dark mode.
+- After every update, republish the app and give the user the link: https://claude.ai/artifact/Mf29APFi1nqbfZ5QfDiLm5
