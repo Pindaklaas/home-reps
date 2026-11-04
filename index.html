@@ -2138,6 +2138,10 @@ function setHabit(k, v){
 }
 const BATT_MSG = {none:'Log last night’s sleep to charge it.', green:'Fully charged. Train as planned.',
   yellow:'Half charged. Train, but don’t chase records today.', red:'Low battery. We trimmed today’s session. Sleep is your best workout tonight.'};
+const BATT_MSG_CH = {none:'Log last night’s sleep to charge it.', green:'Fully charged. Go for a record.',
+  yellow:'Half charged. Pick a challenge, but don’t go all out.', red:'Low battery. Easier versions today. Sleep is your best workout tonight.'};
+const battMsg = col => (ui.mode === 'challenge' ? BATT_MSG_CH : BATT_MSG)[col];
+const batteryToday = () => batteryColor(batteryScore(habitLog(todayISO())));
 function battIcon(sc, big){
   const col = batteryColor(sc);
   return `<span class="batt b-${col}${big ? ' big' : ''}" aria-hidden="true"><span style="width:${sc || 0}%"></span></span>`;
@@ -2146,14 +2150,14 @@ function batteryCard(){
   const log = habitLog(todayISO()), sc = batteryScore(log), col = batteryColor(sc), f = factorScores(log);
   const dot = (k, l) => `<span class="hf ${f[k] == null ? '' : 'h-' + batteryColor(f[k])}">${l}</span>`;
   return `<button class="batt-card c-${col}" data-habits="1" type="button" aria-label="Daily battery ${sc == null ? 'not set' : sc + '%'}. Tap to check in">
-    ${battIcon(sc)}<span class="batt-txt"><b>${sc == null ? 'Your battery' : sc + '%'}</b><span>${BATT_MSG[col]}</span></span>
+    ${battIcon(sc)}<span class="batt-txt"><b>${sc == null ? 'Your battery' : sc + '%'}</b><span>${battMsg(col)}</span></span>
     <span class="hfs">${dot('sleep','Sleep')}${dot('food','Food')}${dot('water','Water')}${dot('move','Steps')}</span></button>`;
 }
 function habitsSheet(){
   const log = habitLog(todayISO()), sc = batteryScore(log), col = batteryColor(sc), o = store.get('onboarding', null), lvl = o && o.answers && o.answers.level;
   const row = (k, opts) => `<div class="chipset">${opts.map(([v, l]) => `<button class="pick" data-hab="${k}" data-v="${v}" aria-pressed="${log[k] === v}">${l}</button>`).join('')}</div>`;
   const w = log.water || 0;
-  showSheet(`<div class="batt-head">${battIcon(sc, true)}<div><h2>${sc == null ? 'Charge your battery' : sc + '%'}</h2><p class="small muted">${BATT_MSG[col]}</p></div></div>
+  showSheet(`<div class="batt-head">${battIcon(sc, true)}<div><h2>${sc == null ? 'Charge your battery' : sc + '%'}</h2><p class="small muted">${battMsg(col)}</p></div></div>
     ${lvl === 'start' ? '<p class="note">Your first weeks: these habits matter more than the weights.</p>' : ''}
     ${block('Sleep last night', row('sleep', SLEEP_OPTS))}
     ${block(`Water today · ${w} of ${WATER_GOAL} glasses`, `<div class="glasses">${Array.from({length:WATER_GOAL}, (_, i) => `<button class="glass${i < w ? ' full' : ''}" data-water="${i + 1 === w ? i : i + 1}" aria-label="${i + 1} glasses"></button>`).join('')}</div>`)}
@@ -2166,7 +2170,8 @@ document.getElementById('sheet-root').addEventListener('click', ev => {
   if (h.dataset.hab){ const k = h.dataset.hab, cur = habitLog(todayISO())[k]; setHabit(k, cur === h.dataset.v ? undefined : h.dataset.v); }
   else setHabit('water', +h.dataset.water);
   buzz(8); habitsSheet();
-  if (ui.tab === 'today' && ui.mode !== 'challenge'){ todayAnim = false; drawToday(); }
+  if (ui.mode === 'challenge') drawChallenges(false);
+  else if (ui.tab === 'today'){ todayAnim = false; drawToday(); }
 });
 
 /* ---------- the weekly planning ---------- */
@@ -2535,7 +2540,7 @@ function drawChallenges(anim){
   const avail = CHALLENGES.filter(c => chAvailability(c, S, L, open).ok);
   const dayNo = Math.floor(Date.now() / 86400000), feat = avail.length ? avail[dayNo % avail.length] : null;
   const f = ui.chFilter || 'all';
-  let h = `<div class="rank-card">
+  let h = batteryCard() + `<div class="rank-card">
       <div class="rank-badge">${lvl}</div>
       <div><span class="small" style="opacity:.7">Your rank</span><b class="rank-name">${rankFor(lvl)}</b>
         <div class="xpbar"><span id="rank-xp" style="width:${anim && !RM() ? 0 : pct}%"></span></div>
@@ -2597,7 +2602,7 @@ function tone(f, d){
 async function holdWake(){ try { if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen'); } catch (e){} }
 function releaseWake(){ try { if (wakeLock) wakeLock.release(); } catch (e){} wakeLock = null; }
 function openArena(id){
-  arena = {ch:CH[id], scaled:false, phase:'intro'};
+  arena = {ch:CH[id], scaled:batteryToday() === 'red', lowBatt:batteryToday() === 'red', phase:'intro'};
   document.getElementById('arena').hidden = false; document.body.style.overflow = 'hidden';
   drawArena();
 }
@@ -2623,6 +2628,7 @@ function arenaIntro(){
     <div class="ar-tiers">${ch.tiers.map((t, i) => `<div class="tier m-${MEDALS[i]}${reached(ch, best, t) ? ' got' : ''}"><span class="tier-m m-${MEDALS[i]}">${MEDAL_SVG}</span><b>${chVal(ch, t)}</b><span>${MEDAL_NAME[MEDALS[i]]}</span></div>`).join('')}</div>
     <div class="ar-stats"><span>Your best<b>${chVal(ch, best)}</b></span><span>Next target<b>${chVal(ch, nt.value)}</b></span></div>
     <ul class="ar-moves">${moves}</ul>
+    ${arena.lowBatt ? '<p class="ar-note">Low battery today, so we switched on the easier version. Switch it off if you feel good.</p>' : ''}
     <label class="ar-switch"><input type="checkbox" id="ar-scaled" ${arena.scaled ? 'checked' : ''}><span><b>Easier version</b><small>${esc(ch.easy)} Counts for XP, not for medals that unlock levels.</small></span></label>
     ${camMoveFor(ch) && camSupported() ? `<label class="ar-switch"><input type="checkbox" id="ar-cam-on" ${arena.cam ? 'checked' : ''}><span><b>Count with the camera</b><small>Phone on the floor, side-on, whole body in the picture. Nothing is recorded or sent.</small></span></label>` : ''}
     <p class="ar-note">Warm up first: a minute of marching, arm circles and a few easy squats. Stop if anything hurts.</p>
