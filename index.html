@@ -491,7 +491,7 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .heat{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(7,1fr);gap:3px}
 .hm{display:inline-block;aspect-ratio:1;border-radius:3px;background:color-mix(in srgb,currentColor 12%,transparent);min-width:10px}
 .legend .hm{width:11px;height:11px;margin-right:5px;vertical-align:-1px}
-.hm.on{background:var(--accent)}.hm.frz{background:transparent;outline:2px solid var(--amber);outline-offset:-2px}.hm.miss{background:color-mix(in srgb,currentColor 28%,transparent)}.hm.fut{background:transparent}
+.hm.on{background:var(--accent)}.hm.frz{background:transparent;outline:2px solid var(--amber);outline-offset:-2px}.hm.miss{background:color-mix(in srgb,currentColor 28%,transparent)}.hm.fut{background:transparent}.hm.pre{background:color-mix(in srgb,currentColor 7%,transparent)}
 .streak-card .legend{color:inherit;opacity:.85}
 .kpi .v small{font-size:.5em;opacity:.6}
 .chart-panel{padding:12px 10px 10px}
@@ -539,6 +539,8 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .mode-pill{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px 5px 8px;font-weight:700;font-size:13px}
 .mode-pill svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 body.mode-challenge .mode-pill svg{fill:var(--accent);stroke:none}
+@media (max-width:400px){.top-r{gap:6px}.brand{font-size:26px}}
+@media (max-width:380px){.mode-pill{padding:6px 8px}.mode-pill span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
 body.mode-challenge nav.tabs{display:none}
 body.mode-challenge .app{padding-bottom:40px}
 
@@ -791,6 +793,49 @@ details.steps ol{margin-top:8px}
 @keyframes mifade{from{opacity:0}to{opacity:1}}
 @keyframes micrown{from{transform:translateY(-60px) scale(.3) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
 @keyframes mitit{from{transform:scale(2.4);opacity:0;filter:blur(8px)}to{transform:none;opacity:1;filter:none}}
+/* visual help: icons, shortcuts, hints, help center */
+.ico{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.itile{--t:var(--accent);width:40px;height:40px;border-radius:13px;display:grid;place-items:center;flex:none;color:var(--t);background:color-mix(in srgb,var(--t) 15%,var(--surface))}
+.t-accent{--t:var(--accent)}.t-blue{--t:var(--blue)}.t-good{--t:var(--good)}.t-amber{--t:var(--amber)}.t-gold{--t:var(--gold)}.t-legend{--t:var(--legend)}.t-ink{--t:var(--ink)}
+.help-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0;color:var(--ink);flex:none}
+.help-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.qtiles{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:2px -16px 12px;padding:2px 16px 4px;scroll-snap-type:x proximity}
+.qtiles::-webkit-scrollbar{display:none}
+.qtile{flex:1 0 64px;max-width:84px;border:0;background:none;padding:4px 0;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ink);scroll-snap-align:start}
+.qtile .itile{width:52px;height:52px;border-radius:17px;transition:transform .25s var(--spring)}
+.qtile .itile .ico{width:26px;height:26px}
+.qtile:active .itile{transform:scale(.9)}
+.hint{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1.5px solid var(--accent);border-radius:16px;padding:10px 10px 10px 12px;margin:0 0 12px;animation:rise .35s var(--out)}
+.hint p{font-size:14px;line-height:1.35;margin:0}
+.hint .itile{width:34px;height:34px;border-radius:11px}
+.hint-x{border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:12.5px;border-radius:999px;padding:7px 10px;white-space:nowrap}
+.hint.out{opacity:0;transform:translateY(-6px) scale(.98);transition:opacity .25s,transform .25s var(--out)}
+.flash{animation:flash 1.2s var(--out)}
+@keyframes flash{0%,60%{box-shadow:0 0 0 3px var(--accent);border-radius:14px}100%{box-shadow:0 0 0 0 transparent}}
+h3.ih{display:flex;align-items:center;gap:10px}
+h3.ih .itile{width:30px;height:30px;border-radius:10px}
+h3.ih .itile .ico{width:18px;height:18px}
+.cta-card>.itile+span{flex:1;min-width:0}
+.help-head{display:flex;gap:12px;align-items:center}
+.help-head .itile{width:48px;height:48px;border-radius:15px}
+.help-head .itile .ico{width:26px;height:26px}
+.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.help-card{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;min-width:0;transition:transform .2s var(--spring)}
+.help-card:active{transform:scale(.97)}
+.help-card b{font-size:14.5px;line-height:1.2}
+.help-card span:last-child{font-size:12.5px;color:var(--muted);line-height:1.3}
+.sheet .help-steps{padding-left:0}
+.help-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.help-steps li{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:center;background:var(--bg);border-radius:14px;padding:10px 12px;animation:rise .35s var(--out) both;animation-delay:calc(var(--i) * 70ms)}
+.help-steps b{width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--display);font-size:18px}
+.help-stage{height:clamp(150px,42vw,190px)}
+.hscroll{display:flex;gap:8px;overflow-x:auto;margin:0 -16px;padding:2px 16px 6px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
+.mcard{flex:0 0 min(78%,300px);scroll-snap-align:start}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;font-variant-numeric:tabular-nums}
+.p-k{background:color-mix(in srgb,var(--amber) 18%,transparent);color:var(--ink)}
+.p-p{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--ink)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -802,7 +847,7 @@ details.steps ol{margin-top:8px}
 <div class="app">
   <header class="top">
     <div class="brand">Home<span>Reps</span></div>
-    <div class="top-r"><span class="date" id="today-date"></span><span class="streak-chip" id="streak-chip" hidden></span><button class="master-chip" id="master-chip" type="button" hidden>MÁSTER</button><button class="lvl-chip" id="lvl-chip" type="button"></button><button class="mode-pill" id="mode-pill" type="button" aria-label="Switch between Challenge and Training"></button></div>
+    <div class="top-r"><span class="date" id="today-date"></span><span class="streak-chip" id="streak-chip" hidden></span><button class="master-chip" id="master-chip" type="button" hidden>MÁSTER</button><button class="help-btn" id="help-btn" type="button" aria-label="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4M12 17.2v.1"/></svg></button><button class="lvl-chip" id="lvl-chip" type="button"></button><button class="mode-pill" id="mode-pill" type="button" aria-label="Switch between Challenge and Training"></button></div>
   </header>
 
   <!-- BODY -->
@@ -1342,7 +1387,7 @@ function drawToday(){
     ${isToday && (rec.items.length || mine.length) ? (() => { const ss = store.get('session', null); return `<button class="btn primary hero-go" data-startwo="${day}">${ss ? 'Resume workout · ' + fmtClock((Date.now() - new Date(ss.startedAt)) / 1000) : 'Start workout'}</button>`; })() : ''}
     ${all.length?`<div class="prog-row"><span>${nDone} of ${all.length} done</span><b>${pct}%</b></div><div class="progress" aria-label="${pct}% done"><span style="width:${lastPct===null?pct:lastPct}%"></span></div>`:''}
   </div>`;
-  h = batteryCard() + h;
+  h = quickTiles('train') + batteryCard() + h;
   h += planCard();
   h += learnCardHtml();
   if (ob && ob.answers && ob.answers.goal && !why && !store.get('whyAsked', false)) h += `<div class="cta-card stack" style="align-items:stretch"><span><b>What’s your why?</b><span class="small muted">One line. We’ll show it on the tough days.</span></span>
@@ -1522,10 +1567,11 @@ function drawFood(){
     <p class="small muted" style="margin-top:10px">Per meal: about ${Math.round(t.kcal/per/10)*10} kcal and ${Math.round(t.protein/per)} g protein over ${per} eating moments.</p>
   </div>`;
   h += `<div class="panel small"><b>Tips for ${GOAL_TXT[p.goal].toLowerCase()}</b><ul style="margin:6px 0 0;padding-left:18px">${GOAL_TIPS[p.goal].map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
-  h += `<button class="cta-card" data-goto="recipes" style="text-align:left;width:100%"><span><b>Recipe videos</b><span class="small muted">Quick meals with lots of protein.</span></span><span class="btn sm">Open</span></button>`;
+  h += `<button class="cta-card" data-goto="recipes" style="text-align:left;width:100%">${tile('recipe', 'accent')}<span><b>Recipe videos</b><span class="small muted">Quick meals with lots of protein.</span></span><span class="btn sm">Open</span></button>`;
+  const SLOT_ICON = {breakfast:['sunrise','amber'], lunch:['sun','accent'], dinner:['moon','blue'], snack:['apple','good']};
   slots.forEach(s => {
     const list = MEALS.filter(m => m[0]===s && ok(m)).sort(sorter).slice(0,3);
-    h += `<h3>${s[0].toUpperCase()+s.slice(1)} ideas</h3><div class="list">${list.map(m=>`<div class="meal"><span class="t">${m[1]}</span><span class="n">≈ ${m[3]} kcal · ${m[4]} g protein</span><span class="small muted">${m[5]}</span></div>`).join('')}</div>`;
+    h += `<h3 class="ih">${tile(SLOT_ICON[s][0], SLOT_ICON[s][1])}${s[0].toUpperCase()+s.slice(1)} ideas</h3><div class="hscroll">${list.map(m=>`<div class="meal mcard"><span class="t">${m[1]}</span><span class="pills"><span class="pill p-k">${m[3]} kcal</span><span class="pill p-p">${m[4]} g protein</span></span><span class="small muted">${m[5]}</span></div>`).join('')}</div>`;
   });
   h += `<p class="small muted">Estimates from the Mifflin-St Jeor formula. A general guide, not medical advice; check with a doctor or dietitian if you have a health condition.</p>`;
   document.getElementById('food-results').innerHTML = h;
@@ -2924,7 +2970,7 @@ document.getElementById('alarm').addEventListener('click', ev => {
 function alarmSettingsHtml(){
   const c = alarmCfg(), next = nextAlarmAt(c, new Date()), gentle = currentLimits().mode === 'gentle';
   const chip = (k, opts) => `<div class="chipset">${opts.map(([v, l]) => `<button class="pick" data-alcfg="${k}" data-v="${v}" aria-pressed="${String(c[k]) === String(v)}">${l}</button>`).join('')}</div>`;
-  let h = `<h3>Wake-up alarm</h3><div class="panel stack">
+  let h = `<h3 id="alarm-set" class="ih">${tile('alarm', 'blue')}Wake-up alarm</h3><div class="panel stack">
     <label class="consent" style="padding:0;border:0;background:none"><input type="checkbox" id="al-on" ${c.on ? 'checked' : ''}><span>Ring every morning until I do my task<small>${c.on && next ? `Next: ${DAY_FULL[WEEKDAY(next)]} at ${c.time}` : 'Off'}${c.pausedUntil ? ` · paused until ${c.pausedUntil}` : ''}</small></span></label>`;
   if (c.on) h += `<div class="ob-grid"><label class="ob-field">Time<input type="time" id="al-time" value="${esc(c.time)}"></label>
       ${block('Reps to stop it', chip('reps', [['5','5'],['10','10'],['15','15']]))}</div>
@@ -2956,7 +3002,7 @@ let mealDraft = null;
 function mealsToday(){ return ((store.get('meals', {}) || {})[todayISO()]) || []; }
 function mealCard(){
   const n = mealsToday().length;
-  return `<div class="cta-card"><span><b>Log a meal</b><span class="small muted">${n ? `${n} logged today. ` : ''}A photo and two taps. Feeds your battery.</span></span><button class="btn sm primary" data-meal="open">Log meal</button></div>`;
+  return `<div class="cta-card">${tile('photo', 'good')}<span><b>Log a meal</b><span class="small muted">${n ? `${n} logged today. ` : ''}A photo and two taps. Feeds your battery.</span></span><button class="btn sm primary" data-meal="open">Log meal</button></div>`;
 }
 function mealSheet(){
   const d = mealDraft, can = d.aiReady;
@@ -3104,7 +3150,7 @@ function duelsHtml(){
   const mine = duel.list.filter(d => d.from && (d.from.uid === duel.me || (d.to && d.to.uid === duel.me)));
   const open = duel.list.filter(d => d.status === 'open' && d.from && d.from.uid !== duel.me && CH[d.challengeId]);
   const watch = (id, label) => id ? `<button class="btn sm ghost" data-watch="${esc(id)}">${label}</button>` : '';
-  let h = `<div class="lvl-head"><h3>Duels</h3>${duel.ready ? '' : '<span class="lock">Loading…</span>'}</div>`;
+  let h = `<div class="lvl-head"><h3 id="duels" class="ih">${tile('duel', 'legend')}Duels</h3>${duel.ready ? '' : '<span class="lock">Loading…</span>'}</div>`;
   if (!open.length && !mine.length) h += `<p class="small muted">Finish any challenge and tap <b>Challenge a friend</b>. Your friend sees it here and tries to beat you.</p>`;
   if (open.length) h += `<div class="list">${open.slice(0, 8).map(d => { const ch = CH[d.challengeId];
     return `<div class="duel-row"><span><b><span data-uid="${esc(d.from.uid)}">Someone</span> challenged you</b><span class="small muted">${esc(ch.name)}${d.scaled ? ' (easier)' : ''}: ${chVal(ch, d.from.score)} ${chUnit(ch)}</span></span>
@@ -3391,8 +3437,8 @@ function drawProgress(){
   let cells = '';
   for (let wk = 0; wk < 12; wk++) for (let dd = 0; dd < 7; dd++){
     const d = new Date(ws); d.setDate(ws.getDate() + wk * 7 + dd); const k = tcDay(d), future = d > now;
-    const cls = future || k < first ? 'fut' : act.has(k) ? 'on' : frozen.has(k) ? 'frz' : trainDays.includes(tcWeekday(d)) ? 'miss' : 'rest';
-    cells += `<i class="hm ${cls}" style="grid-column:${wk + 1};grid-row:${dd + 1}" title="${d.toLocaleDateString(undefined, {day:'numeric', month:'short'})}: ${({on:'trained', frz:'streak freeze', miss:'missed', rest:'rest day', fut:''})[cls]}"></i>`;
+    const cls = future ? 'fut' : k < first ? 'pre' : act.has(k) ? 'on' : frozen.has(k) ? 'frz' : trainDays.includes(tcWeekday(d)) ? 'miss' : 'rest';
+    cells += `<i class="hm ${cls}" style="grid-column:${wk + 1};grid-row:${dd + 1}" title="${d.toLocaleDateString(undefined, {day:'numeric', month:'short'})}: ${({on:'trained', frz:'streak freeze', miss:'missed', rest:'rest day', fut:'', pre:'before you started'})[cls]}"></i>`;
   }
   let h = `<div class="streak-card"><div class="streak-top">${ICON_FLAME}<span><b>${st.current}</b><span>day streak</span></span><span class="streak-meta">Best ${st.best}<br>${st.freezesLeft} freeze${st.freezesLeft === 1 ? '' : 's'} left</span></div>
     <div class="heat" role="img" aria-label="Activity over the last 12 weeks">${cells}</div>
@@ -3802,7 +3848,7 @@ function profileSheet(){
   const g = gameS(), m = store.get('master', null);
   const rows = [...g.ledger].reverse().slice(0, 6).map(r => `<li><span>${esc(XP_LABEL[r.kind] || 'Activity')}</span><b>+${r.xp} XP</b></li>`).join('');
   openSheet(`<h2>Your profile</h2>${profileHtml(false)}
-    <div class="row"><button class="btn primary" data-open="ranks">Rankings</button><button class="btn" data-open="learn">Tips and A/B</button><button class="btn" data-open="nick">${g.nick ? 'Edit nickname and sector' : 'Pick a nickname'}</button>${m ? '<button class="btn master-btn" data-open="master">MÁSTER</button>' : ''}</div>
+    <div class="row"><button class="btn primary" data-open="ranks">Rankings</button><button class="btn" data-open="learn">Tips and A/B</button><button class="btn" data-open="nick">${g.nick ? 'Edit nickname and sector' : 'Pick a nickname'}</button><button class="btn" data-open="help">Help</button>${m ? '<button class="btn master-btn" data-open="master">MÁSTER</button>' : ''}</div>
     ${rows ? `<h3>Latest XP</h3><ul class="xp-list">${rows}</ul>` : ''}
     ${gFlagged() ? '<p class="banner">Some of your sessions looked unusual, so you’re out of the rankings until we check them. Your XP is safe.</p>' : ''}
     <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
@@ -4058,7 +4104,7 @@ document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-open],[data-tip],[data-ab],[data-rk],[data-lg],[data-nick],[data-sector],[data-mr],#lvl-chip,#master-chip'); if (!t) return;
   if (t.id === 'lvl-chip') return profileSheet();
   if (t.id === 'master-chip') return masterSheet();
-  if (t.dataset.open){ const k = t.dataset.open; return k === 'ranks' ? ranksSheet() : k === 'learn' ? learnSheet() : k === 'nick' ? nickSheet() : k === 'master' ? masterSheet() : k === 'profile' ? profileSheet() : null; }
+  if (t.dataset.open){ const k = t.dataset.open; return k === 'ranks' ? ranksSheet() : k === 'learn' ? learnSheet() : k === 'nick' ? nickSheet() : k === 'master' ? masterSheet() : k === 'profile' ? profileSheet() : k === 'help' ? helpSheet() : null; }
   if (t.dataset.abpick) return abSheet(t.dataset.ab, t.dataset.abpick);
   if (t.dataset.ab){ const s = document.querySelector('#sheet-root .scrim:not(.closing)'); if (!s) openSheet(''); return abSheet(t.dataset.ab); }
   if (t.dataset.tip){ const s = document.querySelector('#sheet-root .scrim:not(.closing)'); if (!s) openSheet(''); return tipSheet(t.dataset.tip); }
@@ -4070,6 +4116,146 @@ document.addEventListener('click', ev => {
   if (t.dataset.mr === 'back') return masterSheet();
   if (t.dataset.mr === 'send') return masterSend(t.dataset.v);
 });
+
+/* ---------- visual help: icons, quick tiles, per-screen hints and the Help center ---------- */
+const ICONS = {
+  today:'<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/>',
+  plan:'<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',
+  body:'<circle cx="12" cy="4.5" r="2.2"/><path d="M5 8.5h14M12 8.5v6M12 14.5l-3.5 7M12 14.5l3.5 7"/>',
+  progress:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  food:'<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2.5 1.5-3.5 4-3.5 8h3.5"/>',
+  workout:'<path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/>',
+  alarm:'<circle cx="12" cy="13" r="7"/><path d="M12 9.5V13l2.5 2M5 4 2.5 6.5M19 4l2.5 2.5"/>',
+  trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8M10 17h4"/>',
+  bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>',
+  camera:'<rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.5 7 10 4h4l1.5 3"/>',
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4M12 17.2v.1"/>',
+  league:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/>',
+  star:'<path d="m12 3 2.6 5.6 6 .7-4.4 4.1 1.2 6L12 16.4l-5.4 3 1.2-6-4.4-4.1 6-.7z"/>',
+  battery:'<rect x="2.5" y="7" width="17" height="10" rx="2.5"/><path d="M21.5 10.5v3M6 10v4M9.5 10v4"/>',
+  duel:'<path d="M14.5 4H20v5.5L9 20.5 3.5 15zM9.5 4H4v5.5l4 4M16 16l4 4M18 14l-4 4"/>',
+  bolt:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+  flame:'<path d="M12 3c1 3-2 4.5-2 7.5a2 2 0 0 0 4 0c0-.8-.3-1.5-.6-2 2.6 1.3 4.6 3.9 4.6 6.5a6 6 0 0 1-12 0c0-3.6 2.7-5.8 6-12z"/>',
+  shield:'<path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
+  medal:'<circle cx="12" cy="15" r="5"/><path d="M8.5 3h7l-2 6.5M8.5 3l2 6.5"/>',
+  photo:'<rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.5 7 10 4h4l1.5 3"/>',
+  recipe:'<path d="M6 13a5 5 0 1 1 3.5-8.6A5 5 0 1 1 18 13v7H6zM6 17h12"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  apple:'<path d="M12 7c-1.5-1.5-6-1.8-6 3.5 0 4.5 3 9.5 6 9.5s6-5 6-9.5C18 5.2 13.5 5.5 12 7zM12 7c0-2 1-3.5 3-4"/>',
+  sunrise:'<path d="M4 18h16M7 18a5 5 0 0 1 10 0M12 4v4M5.6 10.6 7 12M18.4 10.6 17 12M2 22h20"/>'
+};
+const ico = (name, cls) => `<svg class="ico${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+const tile = (name, tone) => `<span class="itile t-${tone || 'accent'}">${ico(name)}</span>`;
+
+// Shortcuts to everything, one tap away.
+function quickTiles(mode){
+  const items = mode === 'challenge'
+    ? [['trophy', 'gold', 'Rankings', 'data-open="ranks"'], ['bulb', 'amber', 'A or B?', 'data-open="learn"'], ['star', 'accent', 'My level', 'data-open="profile"'],
+       ['duel', 'legend', 'Duels', 'data-jump="duels"'], ['help', 'ink', 'Help', 'data-open="help"']]
+    : [['workout', 'accent', 'Workout', 'data-jump="workout"'], ['alarm', 'blue', 'Alarm', 'data-jump="alarm"'], ['trophy', 'gold', 'Rankings', 'data-open="ranks"'],
+       ['bulb', 'amber', 'A or B?', 'data-open="learn"'], ['photo', 'good', 'Meal photo', 'data-jump="meal"']];
+  return `<nav class="qtiles" aria-label="Shortcuts">${items.map(([i, t, l, a]) => `<button class="qtile" ${a}>${tile(i, t)}<span>${l}</span></button>`).join('')}</nav>`;
+}
+function jumpTo(where){
+  closeSheet();
+  if (where === 'workout'){ if (ui.mode !== 'train') setMode('train'); setTab('today'); const b = document.querySelector('[data-startwo]'); if (b) return b.click(); return setTimeout(() => document.querySelector('#today-content .list')?.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'start'}), 80); }
+  if (where === 'alarm'){ if (ui.mode !== 'train') setMode('train'); setTab('sched'); return setTimeout(() => { const a = document.getElementById('alarm-set'); if (a){ a.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'start'}); flash(a); } }, 80); }
+  if (where === 'meal'){ if (ui.mode !== 'train') setMode('train'); setTab('food'); return setTimeout(() => document.querySelector('[data-meal="open"]')?.click(), 120); }
+  if (where === 'duels'){ if (ui.mode !== 'challenge') setMode('challenge'); return setTimeout(() => { const d = document.getElementById('duels'); if (d){ d.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'start'}); flash(d); } else toast('Duels need the shared version of the app.'); }, 120); }
+  if (where === 'challenge') return setMode('challenge');
+  if (['today', 'sched', 'body', 'progress', 'food', 'recipes'].includes(where)){ if (ui.mode !== 'train') setMode('train'); return setTab(where); }
+}
+function flash(el){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+
+// One short, personal hint per screen, the first time you see it.
+const hintsOn = () => store.get('hintsOff', false) !== true;
+const hintSeen = k => !!(store.get('hints', {}) || {})[k];
+function hintText(k){
+  const o = store.get('onboarding', null), a = (o && o.answers) || {}, novice = !a.level || a.level === 'start', gym = userTrack() === 'gym';
+  const plan = !!store.get('plan', null);
+  return ({
+    today: !plan ? ['today', 'This is your day. Pick an exercise, tick it when it’s done, and tap any picture to see how it’s done.']
+      : novice ? ['workout', 'Tap Start workout and follow the cards one by one. Tap a moving picture to see the exercise.']
+      : ['workout', gym ? 'Start workout logs every set, shows last time and suggests your next weight.' : 'Start workout, follow the cards, tick each set. Rest timer starts by itself.'],
+    sched: ['plan', 'Your week at a glance. Tap a day to see it. The wake-up alarm is at the top.'],
+    body: ['body', 'Tap a muscle to see exercises for it. Recovery map: red means you worked it in the last 3 days.'],
+    progress: ['progress', 'Every workout adds a square and keeps your streak alive. Your level and records live here too.'],
+    food: ['food', novice ? 'Start easy: snap your meals with Meal photo. Two taps, no calorie counting.' : 'Your daily targets are at the top. Meal photo logs a meal in two taps.'],
+    recipes: ['recipe', 'Short videos of quick, high-protein meals. Tap one to play.'],
+    challenge: ['bolt', novice ? 'Start with a Level 1 card. Beat the target to win a medal; 2 medals open the next level.' : 'Pick a card, beat your best, win medals. Rankings and duels are in the shortcuts.']
+  })[k];
+}
+function hintHtml(k){
+  if (!hintsOn() || hintSeen(k)) return '';
+  const h = hintText(k); if (!h) return '';
+  return `<div class="hint" data-hint="${k}" role="note">${tile(h[0], 'accent')}<p>${esc(h[1])}</p><button class="hint-x" data-hintx="${k}" aria-label="Got it">Got it</button></div>`;
+}
+function dismissHint(k, el){
+  store.set('hints', {...(store.get('hints', {}) || {}), [k]:1});
+  if (!el) return; if (RM()) return el.remove();
+  el.classList.add('out'); setTimeout(() => el.remove(), 260);
+}
+
+// Help center: every section in pictures and one line each, with a button that takes you there.
+const HELP = [
+  {id:'modes', icon:'bolt', tone:'accent', title:'Training or Challenge', line:'Two ways to use the app. You choose every time you open it.',
+    steps:['Training: your week, workouts, food and progress.', 'Challenge: short battles against the clock for medals.', 'Switch any time with the pill at the top right.'], go:'challenge', goLabel:'Try a challenge'},
+  {id:'today', icon:'today', tone:'accent', title:'Today', line:'What to do today, in order.', anim:'squat',
+    steps:['Tap a moving picture to see how the exercise is done.', 'Tick each exercise when it’s done.', 'Pick another day at the top to look ahead.'], go:'today'},
+  {id:'workout', icon:'workout', tone:'accent', title:'Live workout', line:'Log every set while you train.', anim:'db-bench',
+    steps:['Tap Start workout on Today.', 'Each card shows last time and a suggested weight or reps.', 'Tick a set: the rest timer starts and records light up.'], go:'workout', goLabel:'Start a workout'},
+  {id:'plan', icon:'plan', tone:'blue', title:'Plan', line:'Your week and your 4-week block.',
+    steps:['Each day shows its session, time and exercises.', 'The block goes Base, Build, Push and an easy week.', 'Change your answers any time from this screen.'], go:'sched'},
+  {id:'alarm', icon:'alarm', tone:'blue', title:'Wake-up alarm', line:'Rings until you do your push-ups or squats.', anim:'pushup',
+    steps:['Turn it on in Plan and pick the time and reps.', 'Phone on the floor, side-on: the camera counts each rep.', 'Emergency stop: hold the button 3 seconds. Sick or travelling? Pause it.'], go:'alarm', goLabel:'Set my alarm'},
+  {id:'camera', icon:'camera', tone:'ink', title:'Camera counting', line:'Counts reps for you. Nothing is recorded or sent.',
+    steps:['Put the phone on the floor, side-on, with your whole body in the picture.', 'Go all the way down and up; half reps don’t count.', 'Too dark? Turn on a light. You can always tap instead.']},
+  {id:'battery', icon:'battery', tone:'good', title:'Your battery', line:'How charged you are today. Sleep counts most.',
+    steps:['Log sleep, food, water and steps with one tap each.', 'Green with 8 hours of sleep.', 'Red battery: the app makes today’s training easier.'], go:'today'},
+  {id:'body', icon:'body', tone:'blue', title:'Body', line:'Pick a muscle, see exercises for it.',
+    steps:['Tap a muscle on the figure, or swipe to turn it around.', 'Recovery map: red is worked in the last 3 days.', 'Add any exercise to your week with + Schedule.'], go:'body'},
+  {id:'progress', icon:'progress', tone:'good', title:'Progress', line:'Streak, level, strength and records.',
+    steps:['Every workout adds a square to your streak.', 'Rest days never break it, and 2 misses a month are forgiven.', 'Charts show your strength, volume and battery.'], go:'progress'},
+  {id:'food', icon:'food', tone:'good', title:'Food', line:'Daily targets, meal ideas and recipe videos.',
+    steps:['Meal photo: a picture and two taps.', 'Your calories and protein come from your answers.', 'Recipes: short videos of quick meals.'], go:'meal', goLabel:'Log a meal'},
+  {id:'challenges', icon:'medal', tone:'gold', title:'Challenges and medals', line:'Beat the target, win a medal, open new levels.', anim:'burpee',
+    steps:['Pick a card: 3 minutes, 5 minutes, a race or a hold.', 'Bronze, silver, gold, legend.', 'Two medals open the next level.'], go:'challenge', goLabel:'Open challenges'},
+  {id:'duels', icon:'duel', tone:'legend', title:'Duels', line:'Challenge a friend to beat your score.',
+    steps:['Finish a challenge and tap Challenge a friend.', 'Add a video of your attempt if you want.', 'Your friend sees it under Duels and tries to beat you.'], go:'duels'},
+  {id:'xp', icon:'star', tone:'accent', title:'XP, levels and points', line:'Everything you do gives XP. XP gives levels.',
+    steps:['Alarm, workouts, challenges, tips and A/B all give XP.', 'Each new level gives you points.', 'Tap the circle at the top to see your profile.'], open:'profile', goLabel:'My profile'},
+  {id:'ranks', icon:'trophy', tone:'gold', title:'Rankings and leagues', line:'Compete by sector or in a private league with friends.',
+    steps:['Pick a nickname: it’s the only thing others see.', 'Rankings by gym, calisthenics or home, this week or all time.', 'Make a league and share the code. You’ll hear every time someone passes you.'], open:'ranks', goLabel:'Open rankings'},
+  {id:'learn', icon:'bulb', tone:'amber', title:'Tips and A or B', line:'Short tips and quick form quizzes.', anim:'pushup-sag',
+    steps:['A or B? Pick the right form; you get one try.', 'Tips take ten seconds to read.', 'Up to 3 of each a day give XP.'], open:'learn', goLabel:'Play one'},
+  {id:'privacy', icon:'shield', tone:'ink', title:'Your data', line:'What stays on your phone and what doesn’t.',
+    steps:['Camera video never leaves your phone.', 'Others only see your nickname, level and XP.', 'Delete your answers or everything from Food → Your setup and data.']}
+];
+function helpSheet(){
+  const on = hintsOn();
+  openSheet(`<div class="help-head">${tile('help', 'ink')}<span><h2>Help</h2><span class="small muted">Tap a topic. Every one has a shortcut.</span></span></div>
+    <div class="help-grid">${HELP.map(t => `<button class="help-card" data-help="${t.id}">${tile(t.icon, t.tone)}<b>${esc(t.title)}</b><span>${esc(t.line)}</span></button>`).join('')}</div>
+    <label class="consent"><input type="checkbox" id="hints-on" ${on ? 'checked' : ''}><span>Show a short hint on each screen<small>One line the first time you open a screen.</small></span></label>
+    <div class="row"><button class="btn" data-hintreset="1">Show all hints again</button><button class="btn ghost" data-close="1">Close</button></div>`);
+}
+function helpTopic(id){
+  const t = HELP.find(x => x.id === id); if (!t) return;
+  const go = t.open ? `data-open="${t.open}"` : t.go ? `data-jump="${t.go}"` : '';
+  showSheet(`<div class="help-head">${tile(t.icon, t.tone)}<span><h2>${esc(t.title)}</h2><span class="small muted">${esc(t.line)}</span></span></div>
+    ${t.anim && animFor(t.anim) ? `<div class="anim-stage help-stage">${animSvg(t.anim, 'big', 'data-ar="1.8"')}</div>` : ''}
+    <ol class="help-steps">${t.steps.map((s, i) => `<li style="--i:${i}"><b>${i + 1}</b><span>${esc(s)}</span></li>`).join('')}</ol>
+    <div class="row">${go ? `<button class="btn primary" ${go}>${esc(t.goLabel || 'Take me there')}</button>` : ''}<button class="btn" data-open="help">All topics</button></div>`);
+}
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-jump],[data-help],[data-hintx],[data-hintreset],#help-btn'); if (!t) return;
+  if (t.id === 'help-btn') return helpSheet();
+  if (t.dataset.jump) return jumpTo(t.dataset.jump);
+  if (t.dataset.help) return helpTopic(t.dataset.help);
+  if (t.dataset.hintx) return dismissHint(t.dataset.hintx, t.closest('.hint'));
+  if (t.dataset.hintreset){ store.set('hints', {}); store.set('hintsOff', false); closeSheet(); render(); return toast('Hints are back on every screen.'); }
+});
+document.addEventListener('change', ev => { if (ev.target.id === 'hints-on'){ store.set('hintsOff', !ev.target.checked); render(); } });
 
 /* ---------- mode: Challenge or Training ---------- */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
@@ -4112,7 +4298,7 @@ function setMode(m){
   if (ui.mode === 'challenge'){
     TABS.forEach(k => { document.getElementById('v-' + k).hidden = true; });
     v.hidden = false; v.classList.remove('enter'); v.style.setProperty('--dx', '0px'); void v.offsetWidth; v.classList.add('enter');
-    drawChallenges(true); window.scrollTo({top:0});
+    drawChallenges(true); placeHint(); window.scrollTo({top:0});
   } else { v.hidden = true; setTab(ui.tab); }
 }
 document.getElementById('modepick').addEventListener('click', ev => {
@@ -4157,7 +4343,7 @@ function drawChallenges(anim){
     h += `<div class="feat"><span class="small" style="font-weight:700">Today’s challenge · ${esc(chFmtLabel(feat))}</span><h2>${esc(feat.name)}</h2><p class="small">${esc(feat.blurb)}</p>
       <p class="small"><b>Your target: ${chVal(feat, nt.value)}</b>${nt.medal ? ` for ${MEDAL_NAME[nt.medal]}` : ''}</p>
       <button class="btn" data-ch="${feat.id}">Let’s go</button></div>`; }
-  h += `<div class="row ch-links"><button class="btn sm" data-open="ranks">Rankings</button><button class="btn sm" data-open="learn">Tips and A/B</button><button class="btn sm ghost" data-open="profile">Profile</button></div>`;
+  h = h.replace('<div class="rank-card">', quickTiles('challenge') + '<div class="rank-card">');
   h += duelsHtml();
   if (L.mode === 'gentle') h += `<p class="banner">High-intensity challenges are locked for now. ${store.get('health', null) ? 'Your safety check suggests talking to a doctor before harder training.' : '<button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
   h += `<div class="chips" style="margin-top:16px">${CH_FILTERS.map(([k, l]) => `<button class="chip" data-chf="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>`;
@@ -4470,15 +4656,20 @@ function setTab(t){
   if (changed){ v.style.setProperty('--dx', (to>from?18:-18)+'px'); void v.offsetWidth; v.classList.add('enter'); }
   todayAnim = true; render(); placePill(); window.scrollTo({top:0});
 }
+function placeHint(){
+  const key = ui.mode === 'challenge' ? 'challenge' : ui.tab, view = document.getElementById('v-' + key); if (!view) return;
+  document.querySelectorAll('.view > .hint').forEach(x => { if (x.parentNode !== view || hintSeen(x.dataset.hint)) x.remove(); });
+  if (!view.querySelector(':scope > .hint')){ const h = hintHtml(key); if (h) view.insertAdjacentHTML('afterbegin', h); }
+}
 function render(){
-  if (ui.mode === 'challenge') return drawChallenges(false);
+  if (ui.mode === 'challenge'){ drawChallenges(false); return placeHint(); }
   if (ui.tab==='body'){ drawFigure(); drawGroupDetail(); }
   if (ui.tab==='today') drawToday();
   if (ui.tab==='food') drawFood();
   if (ui.tab==='recipes') drawRecipes();
   if (ui.tab==='sched') drawSchedule();
   if (ui.tab==='progress') drawProgress();
-  drawStreakChip();
+  drawStreakChip(); placeHint();
 }
 
 document.addEventListener('click', ev => {
