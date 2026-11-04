@@ -836,6 +836,90 @@ h3.ih .itile .ico{width:18px;height:18px}
 .pill{font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;font-variant-numeric:tabular-nums}
 .p-k{background:color-mix(in srgb,var(--amber) 18%,transparent);color:var(--ink)}
 .p-p{background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--ink)}
+/* RPG hero and daily quests */
+.body-mode{margin-bottom:12px}
+.hero-card{position:relative;overflow:hidden;background:var(--ink);color:var(--bg);border-radius:22px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px}
+.hero-aura{position:absolute;left:50%;top:38%;width:130%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--gold) calc(var(--lv) * 55%),transparent) 0,transparent 62%);pointer-events:none;animation:aura 4s ease-in-out infinite}
+.cls-str .hero-aura{background:radial-gradient(circle,color-mix(in srgb,var(--accent) calc(var(--lv) * 55%),transparent) 0,transparent 62%)}
+.cls-end .hero-aura,.cls-pwr .hero-aura{background:radial-gradient(circle,color-mix(in srgb,var(--amber) calc(var(--lv) * 55%),transparent) 0,transparent 62%)}
+.cls-core .hero-aura{background:radial-gradient(circle,color-mix(in srgb,var(--blue) calc(var(--lv) * 55%),transparent) 0,transparent 62%)}
+.cls-dis .hero-aura{background:radial-gradient(circle,color-mix(in srgb,var(--good) calc(var(--lv) * 55%),transparent) 0,transparent 62%)}
+.cls-bal .hero-aura{background:radial-gradient(circle,color-mix(in srgb,var(--legend) calc(var(--lv) * 55%),transparent) 0,transparent 62%)}
+@keyframes aura{50%{transform:translate(-50%,-50%) scale(1.08);opacity:.8}}
+.hero-figs{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:4px;height:clamp(230px,62vw,300px)}
+.hero-fig{width:100%;height:100%}
+.hero-fig .skin{fill:var(--skin)}
+.hm2{fill:var(--muscle);stroke:var(--ink);stroke-width:1.2;cursor:pointer;transform-box:fill-box;transform-origin:center;transform:scale(var(--s));transition:transform .6s var(--spring),fill .3s;animation:musc .7s var(--spring) both}
+.hm2:hover,.hm2:focus-visible{outline:none;filter:brightness(1.15)}
+@keyframes musc{from{transform:scale(.85);opacity:.3}}
+.tier-bronze{--tc:var(--bronze)}.tier-silver{--tc:var(--silver)}.tier-gold{--tc:var(--gold)}.tier-legend{--tc:var(--legend)}.tier-none{--tc:var(--muscle)}
+.hm2[class*="tier-"]{fill:var(--tc)}
+.hm2.tier-gold,.hm2.tier-legend{filter:drop-shadow(0 0 4px var(--tc))}
+.hero-id{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px}
+.hero-lv{font-family:var(--display);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;background:var(--gold);color:var(--arena);border-radius:999px;padding:2px 10px}
+.hero-cls{font-family:var(--display);font-size:38px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.hero-line{font-size:13.5px;opacity:.8}
+.hero-meta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:13px;margin-top:4px;opacity:.9}
+.hero-meta span{display:inline-flex;align-items:center;gap:4px}
+.hero-meta .ico{width:16px;height:16px}
+.tier-key{position:relative;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:11.5px;opacity:.85}
+.tk{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--tc);margin-right:4px;vertical-align:-1px}
+.hero-stats{display:flex;flex-direction:column;gap:6px}
+.radar{width:100%;max-width:300px;align-self:center}
+.radar .rg{fill:none;stroke:var(--line);stroke-width:1}
+.radar .rv{fill:color-mix(in srgb,var(--accent) 28%,transparent);stroke:var(--accent);stroke-width:2.2;stroke-linejoin:round;transform-origin:120px 104px;animation:radar .9s var(--spring) both}
+.radar text{font-family:var(--display);font-weight:700;font-size:12px;fill:var(--muted);letter-spacing:.06em}
+.radar tspan{fill:var(--ink)}
+@keyframes radar{from{transform:scale(0)}}
+.stat-list{display:flex;flex-direction:column;gap:6px}
+.stat-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.stat-row .itile{width:34px;height:34px;border-radius:11px}
+.stat-row .itile .ico{width:19px;height:19px}
+.stat-row .sn{display:flex;flex-direction:column;min-width:0}
+.stat-row .sn b{font-size:14px}
+.stat-row .xpbar{margin:4px 0 0;height:6px}
+.stat-row .sl{font-family:var(--display);font-size:24px;min-width:32px;text-align:right}
+.m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.m-card{border:1.5px solid color-mix(in srgb,var(--tc) 70%,var(--line));background:color-mix(in srgb,var(--tc) 14%,var(--surface));border-radius:14px;padding:8px 10px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;text-align:left}
+.m-card.tier-none{border-color:var(--line);background:var(--surface)}
+.m-card .mn{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.m-card b{font-family:var(--display);font-size:26px;line-height:1}
+.mbar{width:100%;height:4px;border-radius:2px;background:var(--line);overflow:hidden}
+.mbar span{display:block;height:100%;background:var(--tc);min-width:2px}
+.m-card.tier-none .mbar span{background:var(--accent)}
+.weak-row{border:0;background:var(--bg);border-radius:12px;padding:8px 10px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;text-align:left}
+.weak-row .itile{width:34px;height:34px;border-radius:11px}
+.weak-row>span:not(.btn){display:flex;flex-direction:column;min-width:0}
+.m-badge{width:52px;height:52px;border-radius:16px;background:var(--tc);display:grid;place-items:center;color:var(--arena);flex:none}
+.m-badge.tier-none{background:var(--muscle);color:var(--ink)}
+.m-badge b{font-family:var(--display);font-size:28px}
+.hero-pop{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:125;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:var(--arena);color:var(--arena-ink);border:1.5px solid var(--gold);border-radius:18px;padding:8px 14px 8px 8px;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:hpop 3s var(--out) forwards;pointer-events:none;white-space:nowrap}
+.hero-pop small{display:block;font-family:var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-size:11px}
+.hero-pop b{font-family:var(--display);font-size:22px;text-transform:uppercase}
+.hero-pop i{font-style:normal;opacity:.6}
+@keyframes hpop{0%{opacity:0;transform:translate(-50%,30px) scale(.8)}12%{opacity:1;transform:translate(-50%,0) scale(1.05)}20%{transform:translate(-50%,0) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,10px)}}
+.quests{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 10px 10px;margin-bottom:12px}
+.q-head{display:flex;align-items:center;gap:8px;padding:0 4px 8px}
+.q-head b{font-family:var(--display);font-size:17px;text-transform:uppercase;letter-spacing:.05em}
+.q-count{font-weight:700;font-size:13px;color:var(--muted)}
+.q-bar{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.q-bar span{display:block;height:100%;background:var(--good);transition:width .5s var(--out)}
+.q-row{display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
+.quest{--t:var(--accent);border:0;background:none;padding:2px 0;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;color:var(--ink)}
+.q-ring{position:relative;width:52px;height:52px;display:grid;place-items:center;color:var(--t);transition:transform .25s var(--spring)}
+.quest:active .q-ring{transform:scale(.9)}
+.q-ring svg:first-child{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.q-trk{fill:color-mix(in srgb,var(--t) 12%,var(--surface));stroke:color-mix(in srgb,var(--t) 22%,transparent);stroke-width:4}
+.q-arc{fill:none;stroke:var(--t);stroke-width:4;stroke-linecap:round;transition:stroke-dasharray .6s var(--out)}
+.q-ring .ico{position:relative;width:22px;height:22px}
+.quest.ok .q-trk{fill:var(--good);stroke:var(--good)}
+.quest.ok .q-arc{stroke:var(--good)}
+.q-ok{position:relative;width:24px;height:24px;stroke:var(--surface);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;animation:pop .45s var(--spring)}
+.q-n{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.q-x{font-size:11px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.quest.ok .q-x{color:var(--good)}
+.qtile{flex:1 1 0;min-width:0}
+@media (max-width:380px){.qtile .itile{width:46px;height:46px;border-radius:15px}.qtile{font-size:11px}.q-ring{width:46px;height:46px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -852,6 +936,9 @@ h3.ih .itile .ico{width:18px;height:18px}
 
   <!-- BODY -->
   <section class="view" id="v-body" aria-labelledby="t-body">
+    <div class="seg wide body-mode" role="group" aria-label="Body view"><button data-bmode="train" aria-pressed="true">Train</button><button data-bmode="hero" aria-pressed="false">My hero</button></div>
+    <div id="body-hero" hidden></div>
+    <div id="body-train">
     <div class="row" style="justify-content:space-between">
       <h2>Pick a muscle</h2>
       <div class="seg" role="group" aria-label="Body side">
@@ -868,6 +955,7 @@ h3.ih .itile .ico{width:18px;height:18px}
     <div id="rec-legend"></div>
     <div class="chips" id="group-chips" aria-label="Muscle groups"></div>
     <div id="group-detail"></div>
+    </div>
   </section>
 
   <!-- TODAY -->
@@ -1138,7 +1226,7 @@ const EXAMPLE_PROFILE = {goal:'tone',sex:'f',age:30,height:170,weight:68,activit
 let profile = store.get('profile', null);
 let schedule = store.get('schedule', null) || Object.fromEntries(DAYS.map(d => [d, []]));
 let doneLog = store.get('done', {});
-let ui = {tab: store.get('tab','body'), side:'front', group:null, day: null};
+let ui = {tab: store.get('tab','body'), side:'front', group:null, day: null, bodyMode: store.get('bodyMode', 'train') === 'hero' ? 'hero' : 'train'};
 
 const todayKey = () => DAYS[(new Date().getDay()+6)%7];
 const dateStr = (d=new Date()) => d.toISOString().slice(0,10);
@@ -1387,9 +1475,9 @@ function drawToday(){
     ${isToday && (rec.items.length || mine.length) ? (() => { const ss = store.get('session', null); return `<button class="btn primary hero-go" data-startwo="${day}">${ss ? 'Resume workout · ' + fmtClock((Date.now() - new Date(ss.startedAt)) / 1000) : 'Start workout'}</button>`; })() : ''}
     ${all.length?`<div class="prog-row"><span>${nDone} of ${all.length} done</span><b>${pct}%</b></div><div class="progress" aria-label="${pct}% done"><span style="width:${lastPct===null?pct:lastPct}%"></span></div>`:''}
   </div>`;
-  h = quickTiles('train') + batteryCard() + h;
-  h += planCard();
+  h = quickTiles('train') + questsHtml() + batteryCard() + h;
   h += learnCardHtml();
+  h += planCard();
   if (ob && ob.answers && ob.answers.goal && !why && !store.get('whyAsked', false)) h += `<div class="cta-card stack" style="align-items:stretch"><span><b>What’s your why?</b><span class="small muted">One line. We’ll show it on the tough days.</span></span>
     <input id="why-in" class="why-in" maxlength="140" placeholder="e.g. feel strong again" aria-label="Your why"><span class="row"><button class="btn sm primary" id="why-save">Save</button><button class="btn sm ghost" id="why-skip">Not now</button></span></div>`;
   if (Lt.mode==='gentle') h += `<p class="banner">${hl ? 'Gentle mode: based on your health check we keep things easy. Check with your doctor before harder training.' : 'Gentle mode until you do the quick health check.'}${hl ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
@@ -1406,7 +1494,7 @@ function drawToday(){
   const bar = document.querySelector('#today-content .progress span');
   if (bar && lastPct!==null && lastPct!==pct) requestAnimationFrame(()=>requestAnimationFrame(()=>{ bar.style.width = pct+'%'; }));
   if (justKey && pct===100 && lastPct!==null && lastPct<100) celebrate();
-  lastPct = pct; justKey = null; todayAnim = true;
+  lastPct = pct; justKey = null; todayAnim = true; heroCheck();
 }
 function celebrate(msg){
   toast(msg || 'Workout complete! Great job.'); buzz([30,60,30]);
@@ -2279,6 +2367,68 @@ const MASTER = {
 // The last rep of the alarm held at the bottom long enough unlocks it.
 const masterUnlocks = (task, repNo, heldMs) => !!task && task.move === MASTER.move && heldMs >= MASTER.holdMs && (!MASTER.lastRepOnly || repNo >= task.reps);
 /* master-core:end */
+
+/* hero-core:start — the RPG hero built from training history: muscle levels, six stats and a class, pure (no DOM). Tested in tests/hero.test.mjs */
+const HERO = {
+  maxLevel:99,
+  muscleScale:15,                                            // muscle level = 1 + floor(sqrt(points / muscleScale))
+  statScale:{str:20, end:80, core:15, pwr:12, dis:6},
+  power:['jump-squat', 'burpee', 'jacks', 'skip', 'mountain', 'step-up', 'bridge-walk', 'split-squat'],
+  strGroups:['chest', 'upperback', 'shoulders', 'quads', 'hamstrings', 'glutes', 'biceps', 'triceps', 'traps', 'lowerback'],
+  coreGroups:['abs', 'obliques', 'lowerback'],
+  moveGroups:{squat:['quads', 'glutes'], pushup:['chest', 'triceps', 'shoulders'], jacks:['calves', 'shoulders'], plank:['abs', 'shoulders'], mountain:['abs', 'quads', 'shoulders'],
+    situp:['abs'], burpee:['chest', 'quads', 'shoulders'], lunge:['quads', 'glutes'], 'wall-sit':['quads', 'glutes']},
+  tiers:[[15, 'legend'], [10, 'gold'], [6, 'silver'], [3, 'bronze'], [1, 'none']],
+  classes:{str:['The Tank', 'Heavy lifting is your thing.'], end:['The Marathoner', 'You never stop moving.'], core:['The Monk', 'A core made of steel.'],
+    pwr:['The Striker', 'Explosive and fast.'], dis:['The Spartan', 'You show up every single day.'], bal:['The All-rounder', 'Strong everywhere, weak nowhere.'], none:['The Rookie', 'Every hero starts here.']}
+};
+const STAT_NAMES = [['str', 'Strength'], ['end', 'Endurance'], ['core', 'Core'], ['pwr', 'Power'], ['dis', 'Discipline'], ['bal', 'Balance']];
+const heroLevel = (x, scale) => Math.min(HERO.maxLevel, 1 + Math.floor(Math.sqrt(Math.max(0, x) / scale)));
+const heroNeed = (level, scale) => level * level * scale;     // points where the next level starts
+const heroTier = level => HERO.tiers.find(([l]) => level >= l)[1];
+// One activity: reps count once, seconds count a third, weight multiplies (up to 200 kg).
+const actPoints = a => ((+a.reps || 0) + (+a.sec || 0) / 3) * (a.w > 0 ? 1 + Math.min(+a.w, 200) / 60 : 1);
+// acts: [{id, groups, reps, sec, w}] (first group is the main one). extra: {days, alarms, streak}. groups: every muscle group.
+function heroFrom(acts, extra, groups){
+  const pts = {}, raw = {str:0, end:0, core:0, pwr:0, dis:0};
+  (acts || []).forEach(a => {
+    const p = actPoints(a), gs = a.groups || [], plain = (+a.reps || 0) + (+a.sec || 0) / 3;
+    gs.forEach((g, i) => { pts[g] = (pts[g] || 0) + p * (i === 0 ? 1 : .5); });
+    raw.end += plain;
+    if (gs.some(g => HERO.strGroups.includes(g))) raw.str += a.w > 0 ? p : plain * .35;
+    if (gs.some(g => HERO.coreGroups.includes(g))) raw.core += plain;
+    if (HERO.power.includes(a.id)) raw.pwr += plain * 1.5;
+  });
+  const e = extra || {};
+  raw.dis = (e.days || 0) * 10 + (e.alarms || 0) * 15 + (e.streak || 0) * 5;
+  const muscles = {};
+  (groups || Object.keys(pts)).forEach(g => { const x = Math.round(pts[g] || 0), level = heroLevel(x, HERO.muscleScale);
+    muscles[g] = {xp:x, level, tier:heroTier(level), from:heroNeed(level - 1, HERO.muscleScale), next:heroNeed(level, HERO.muscleScale)}; });
+  const stats = {};
+  Object.keys(HERO.statScale).forEach(k => { const x = Math.round(raw[k]), level = heroLevel(x, HERO.statScale[k]);
+    stats[k] = {xp:x, level, from:heroNeed(level - 1, HERO.statScale[k]), next:heroNeed(level, HERO.statScale[k])}; });
+  // Balance: how strong your five weakest muscles are.
+  const lv = Object.values(muscles).map(m => m.level).sort((a, b) => a - b), low = lv.slice(0, 5);
+  const bal = low.length ? Math.max(1, Math.round(low.reduce((n, x) => n + x, 0) / low.length)) : 1;
+  stats.bal = {xp:bal, level:bal, from:0, next:0};
+  return {muscles, stats, cls:heroClass(stats), power:Object.values(stats).reduce((n, s) => n + s.level, 0) * 10};
+}
+function heroClass(stats){
+  const keys = ['str', 'end', 'core', 'pwr', 'dis'], top = keys.reduce((a, b) => stats[b].level > stats[a].level ? b : a, keys[0]), max = stats[top].level;
+  if (max < 3) return {key:'none', name:HERO.classes.none[0], line:HERO.classes.none[1]};
+  const k = stats.bal.level >= 3 && stats.bal.level >= max * .7 ? 'bal' : top;
+  return {key:k, name:HERO.classes[k][0], line:HERO.classes[k][1]};
+}
+// What went up since the last look: [{kind:'muscle'|'stat', key, from, to}].
+function heroUps(prev, now){
+  if (!prev) return [];
+  const out = [];
+  Object.keys(now.muscles).forEach(k => { const a = (prev.m || {})[k] || 1, b = now.muscles[k].level; if (b > a) out.push({kind:'muscle', key:k, from:a, to:b}); });
+  Object.keys(now.stats).forEach(k => { const a = (prev.s || {})[k] || 1, b = now.stats[k].level; if (b > a) out.push({kind:'stat', key:k, from:a, to:b}); });
+  return out;
+}
+const heroSnap = h => ({m:Object.fromEntries(Object.entries(h.muscles).map(([k, v]) => [k, v.level])), s:Object.fromEntries(Object.entries(h.stats).map(([k, v]) => [k, v.level]))});
+/* hero-core:end */
 
 
 
@@ -3807,7 +3957,7 @@ function gameEvent(ev){
   if (xp && !ev.quiet) xpPop(xp);
   if (ups.length) setTimeout(() => levelUpShow(ups[ups.length - 1].level, ups.reduce((n, u) => n + u.pts, 0)), ev.quiet ? 1100 : 650);
   if (xp || r.flags.length) syncPlayer();
-  drawLvlChip();
+  drawLvlChip(); heroCheck();
   return {...r, xp, before, after, ups};
 }
 function xpPop(n){
@@ -3848,7 +3998,7 @@ function profileSheet(){
   const g = gameS(), m = store.get('master', null);
   const rows = [...g.ledger].reverse().slice(0, 6).map(r => `<li><span>${esc(XP_LABEL[r.kind] || 'Activity')}</span><b>+${r.xp} XP</b></li>`).join('');
   openSheet(`<h2>Your profile</h2>${profileHtml(false)}
-    <div class="row"><button class="btn primary" data-open="ranks">Rankings</button><button class="btn" data-open="learn">Tips and A/B</button><button class="btn" data-open="nick">${g.nick ? 'Edit nickname and sector' : 'Pick a nickname'}</button><button class="btn" data-open="help">Help</button>${m ? '<button class="btn master-btn" data-open="master">MÁSTER</button>' : ''}</div>
+    <div class="row"><button class="btn primary" data-open="ranks">Rankings</button><button class="btn" data-open="learn">Tips and A/B</button><button class="btn" data-open="nick">${g.nick ? 'Edit nickname and sector' : 'Pick a nickname'}</button><button class="btn" data-jump="hero">My hero</button><button class="btn" data-open="help">Help</button>${m ? '<button class="btn master-btn" data-open="master">MÁSTER</button>' : ''}</div>
     ${rows ? `<h3>Latest XP</h3><ul class="xp-list">${rows}</ul>` : ''}
     ${gFlagged() ? '<p class="banner">Some of your sessions looked unusual, so you’re out of the rankings until we check them. Your XP is safe.</p>' : ''}
     <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
@@ -4151,10 +4301,10 @@ const tile = (name, tone) => `<span class="itile t-${tone || 'accent'}">${ico(na
 // Shortcuts to everything, one tap away.
 function quickTiles(mode){
   const items = mode === 'challenge'
-    ? [['trophy', 'gold', 'Rankings', 'data-open="ranks"'], ['bulb', 'amber', 'A or B?', 'data-open="learn"'], ['star', 'accent', 'My level', 'data-open="profile"'],
+    ? [['trophy', 'gold', 'Rankings', 'data-open="ranks"'], ['bulb', 'amber', 'A or B?', 'data-open="learn"'], ['star', 'accent', 'My hero', 'data-jump="hero"'],
        ['duel', 'legend', 'Duels', 'data-jump="duels"'], ['help', 'ink', 'Help', 'data-open="help"']]
-    : [['workout', 'accent', 'Workout', 'data-jump="workout"'], ['alarm', 'blue', 'Alarm', 'data-jump="alarm"'], ['trophy', 'gold', 'Rankings', 'data-open="ranks"'],
-       ['bulb', 'amber', 'A or B?', 'data-open="learn"'], ['photo', 'good', 'Meal photo', 'data-jump="meal"']];
+    : [['workout', 'accent', 'Workout', 'data-jump="workout"'], ['star', 'gold', 'My hero', 'data-jump="hero"'], ['alarm', 'blue', 'Alarm', 'data-jump="alarm"'], ['trophy', 'gold', 'Rankings', 'data-open="ranks"'],
+       ['bulb', 'amber', 'A or B?', 'data-open="learn"'], ['photo', 'good', 'Meal', 'data-jump="meal"']];
   return `<nav class="qtiles" aria-label="Shortcuts">${items.map(([i, t, l, a]) => `<button class="qtile" ${a}>${tile(i, t)}<span>${l}</span></button>`).join('')}</nav>`;
 }
 function jumpTo(where){
@@ -4164,6 +4314,7 @@ function jumpTo(where){
   if (where === 'meal'){ if (ui.mode !== 'train') setMode('train'); setTab('food'); return setTimeout(() => document.querySelector('[data-meal="open"]')?.click(), 120); }
   if (where === 'duels'){ if (ui.mode !== 'challenge') setMode('challenge'); return setTimeout(() => { const d = document.getElementById('duels'); if (d){ d.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'start'}); flash(d); } else toast('Duels need the shared version of the app.'); }, 120); }
   if (where === 'challenge') return setMode('challenge');
+  if (where === 'hero'){ if (ui.mode !== 'train') setMode('train'); ui.bodyMode = 'hero'; store.set('bodyMode', 'hero'); setTab('body'); return window.scrollTo({top:0}); }
   if (['today', 'sched', 'body', 'progress', 'food', 'recipes'].includes(where)){ if (ui.mode !== 'train') setMode('train'); return setTab(where); }
 }
 function flash(el){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
@@ -4183,6 +4334,7 @@ function hintText(k){
     progress: ['progress', 'Every workout adds a square and keeps your streak alive. Your level and records live here too.'],
     food: ['food', novice ? 'Start easy: snap your meals with Meal photo. Two taps, no calorie counting.' : 'Your daily targets are at the top. Meal photo logs a meal in two taps.'],
     recipes: ['recipe', 'Short videos of quick, high-protein meals. Tap one to play.'],
+    hero: ['star', 'This is you as a game character. Every rep levels up the muscles it works. Tap one to see how to level it up.'],
     challenge: ['bolt', novice ? 'Start with a Level 1 card. Beat the target to win a medal; 2 medals open the next level.' : 'Pick a card, beat your best, win medals. Rankings and duels are in the shortcuts.']
   })[k];
 }
@@ -4215,6 +4367,10 @@ const HELP = [
     steps:['Log sleep, food, water and steps with one tap each.', 'Green with 8 hours of sleep.', 'Red battery: the app makes today’s training easier.'], go:'today'},
   {id:'body', icon:'body', tone:'blue', title:'Body', line:'Pick a muscle, see exercises for it.',
     steps:['Tap a muscle on the figure, or swipe to turn it around.', 'Recovery map: red is worked in the last 3 days.', 'Add any exercise to your week with + Schedule.'], go:'body'},
+  {id:'hero', icon:'star', tone:'gold', title:'Your hero', line:'You as a game character that levels up with every rep.',
+    steps:['Body → My hero.', 'Each muscle has a level and a colour: bronze, silver, gold, then purple.', 'Six stats give you a class: Tank, Marathoner, Monk, Striker, Spartan or All-rounder.'], go:'hero', goLabel:'See my hero'},
+  {id:'quests', icon:'today', tone:'good', title:'Daily quests', line:'Five small wins every day, with XP for each.',
+    steps:['Alarm, train, an A or B, a tip and a meal photo.', 'The ring fills as you go; a tick means done.', 'Tap a quest to do it straight away.'], go:'today'},
   {id:'progress', icon:'progress', tone:'good', title:'Progress', line:'Streak, level, strength and records.',
     steps:['Every workout adds a square to your streak.', 'Rest days never break it, and 2 misses a month are forgiven.', 'Charts show your strength, volume and battery.'], go:'progress'},
   {id:'food', icon:'food', tone:'good', title:'Food', line:'Daily targets, meal ideas and recipe videos.',
@@ -4256,6 +4412,127 @@ document.addEventListener('click', ev => {
   if (t.dataset.hintreset){ store.set('hints', {}); store.set('hintsOff', false); closeSheet(); render(); return toast('Hints are back on every screen.'); }
 });
 document.addEventListener('change', ev => { if (ev.target.id === 'hints-on'){ store.set('hintsOff', !ev.target.checked); render(); } });
+
+/* ---------- the RPG hero (Body → My hero) and daily quests ---------- */
+const STAT_ICON = {str:['workout', 'accent'], end:['flame', 'amber'], core:['shield', 'blue'], pwr:['bolt', 'gold'], dis:['alarm', 'good'], bal:['body', 'legend']};
+const TIER_NAME = {none:'Untrained', bronze:'Bronze', silver:'Silver', gold:'Gold', legend:'Legend'};
+// Everything you've done, as reps on muscles: logged sets, ticks on Today, challenges and camera alarms.
+function heroActs(){
+  const acts = [], logged = new Set();
+  workoutLog().forEach(h => { const d = tcDay(new Date(h.endedAt || h.startedAt));
+    (h.exercises || []).forEach(x => { const e = EX[x.id]; if (!e) return; logged.add(d + '|' + x.id);
+      (x.sets || []).forEach(st => acts.push({id:x.id, groups:e.groups, reps:e.unit === 'sec' ? 0 : +st.r || 0, sec:e.unit === 'sec' ? +st.r || 0 : 0, w:+st.w || 0})); }); });
+  Object.entries(doneLog || {}).forEach(([d, keys]) => (keys || []).forEach(k => { const id = String(k).slice(2), e = EX[id]; if (!e || logged.has(d + '|' + id)) return;
+    for (let i = 0; i < 3; i++) acts.push({id, groups:e.groups, reps:e.unit === 'sec' ? 0 : e.dose, sec:e.unit === 'sec' ? e.dose : 0, w:0}); }));
+  (chState().history || []).forEach(h => { const ch = CH[h.id]; if (!ch) return; const sc = +h.score || 0;
+    const total = ch.fmt === 'hold' ? 0 : ch.fmt === 'fortime' ? (ch.parts || []).reduce((n, p) => n + p[1], 0) : ch.fmt === 'emom' ? sc * (ch.per || 10) : ch.round ? sc * ch.round.reduce((n, r) => n + r[1], 0) : sc;
+    ch.moves.forEach(m => acts.push({id:m, groups:HERO.moveGroups[m] || ['quads'], reps:ch.fmt === 'hold' ? 0 : Math.round(total / ch.moves.length), sec:ch.fmt === 'hold' ? sc : 0, w:0})); });
+  (gameS().sessions || []).forEach(s => acts.push({id:s.move, groups:HERO.moveGroups[s.move] || ['chest'], reps:+s.reps || 0, w:0}));
+  return acts;
+}
+const heroNow = () => heroFrom(heroActs(), {days:activeDays().size, alarms:gameS().ledger.filter(e => e.kind === 'alarm').length, streak:streakInfo(activeDays(), (store.get('onboarding', null) || {answers:{}}).answers.days || ['mon','wed','fri'], new Date(), 2).current}, Object.keys(GROUPS));
+const heroName = u => u.kind === 'muscle' ? GROUPS[u.key].label : (STAT_NAMES.find(s => s[0] === u.key) || [0, u.key])[1];
+// After anything that counts, show what levelled up (muscles and stats), like a game.
+let heroT = 0;
+function heroCheck(){
+  clearTimeout(heroT);
+  heroT = setTimeout(() => {
+    const h = heroNow(), prev = store.get('hero', null), ups = heroUps(prev, h);
+    store.set('hero', heroSnap(h));
+    ups.sort((a, b) => (a.kind === 'stat') - (b.kind === 'stat')).slice(0, 3).forEach((u, i) => setTimeout(() => heroPop(u), 500 + i * 1100));
+    if (ui.tab === 'body' && ui.bodyMode === 'hero' && ui.mode === 'train') drawHero();
+  }, 1200);
+}
+function heroPop(u){
+  document.querySelectorAll('.hero-pop').forEach(x => x.remove());
+  const el = document.createElement('div'); el.className = 'hero-pop'; el.setAttribute('role', 'status');
+  const ic = u.kind === 'stat' ? STAT_ICON[u.key] : ['body', 'gold'];
+  el.innerHTML = `${tile(ic[0], ic[1])}<span><small>Level up</small><b>${esc(heroName(u))} <i>${u.from}</i> → ${u.to}</b></span>`;
+  document.body.appendChild(el); buzz([20, 40, 60]); tone(880, .1); setTimeout(() => tone(1318, .14), 120);
+  setTimeout(() => el.remove(), 3000);
+}
+function heroFig(h, side){
+  const paths = side === 'front' ? FRONT_PATHS : BACK_PATHS; let m = '';
+  paths.forEach(([g, d, mir]) => { const M = h.muscles[g], s = (1 + Math.min(M.level - 1, 20) * .007).toFixed(3);
+    const a = `class="hm2 tier-${M.tier}" data-hero="${g}" style="--s:${s}" role="button" aria-label="${GROUPS[g].label}, level ${M.level}"`;
+    m += `<path ${a} tabindex="0" d="${d}"/>`; if (mir) m += `<g transform="${MIRROR}"><path ${a} tabindex="-1" d="${d}"/></g>`; });
+  return `<svg class="hero-fig" viewBox="0 0 200 430" role="group" aria-label="${side} of your hero"><ellipse class="skin" cx="100" cy="34" rx="16" ry="21"/><path class="skin" d="${SIL}"/><path class="skin" d="${SIL}" transform="${MIRROR}"/>${m}</svg>`;
+}
+function radarSvg(stats){
+  const ks = STAT_NAMES.map(s => s[0]), max = Math.max(10, ...ks.map(k => stats[k].level)), cx = 120, cy = 104, R = 74;
+  const pt = (i, r) => { const a = (-90 + i * 60) * Math.PI / 180; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+  const poly = f => ks.map((k, i) => pt(i, R * f(k)).map(v => v.toFixed(1)).join(',')).join(' ');
+  return `<svg class="radar" viewBox="0 0 240 208" role="img" aria-label="${ks.map(k => (STAT_NAMES.find(s => s[0] === k)[1]) + ' ' + stats[k].level).join(', ')}">
+    ${[1, 2 / 3, 1 / 3].map(f => `<polygon class="rg" points="${poly(() => f)}"/>`).join('')}
+    ${ks.map((k, i) => { const [x, y] = pt(i, R); return `<line class="rg" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`; }).join('')}
+    <polygon class="rv" points="${poly(k => Math.max(.06, stats[k].level / max))}"/>
+    ${ks.map((k, i) => { const [x, y] = pt(i, R + 18); return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle">${k.toUpperCase()} <tspan>${stats[k].level}</tspan></text>`; }).join('')}
+  </svg>`;
+}
+function drawHero(){
+  const el = document.getElementById('body-hero'); if (!el) return;
+  const h = heroNow(), L = gLevel(), g = gameS();
+  const list = Object.keys(GROUPS).map(k => [k, h.muscles[k]]), weak = [...list].sort((a, b) => a[1].xp - b[1].xp).slice(0, 3);
+  const bar = (x, from, next) => next > from ? Math.round((x - from) / (next - from) * 100) : 100;
+  el.innerHTML = `<div class="hero-card cls-${h.cls.key}">
+      <div class="hero-aura" style="--lv:${Math.min(1, .25 + L.level / 20).toFixed(2)}" aria-hidden="true"></div>
+      <div class="hero-figs">${heroFig(h, 'front')}${heroFig(h, 'back')}</div>
+      <div class="hero-id"><span class="hero-lv">Level ${L.level}</span><b class="hero-cls">${esc(h.cls.name)}</b><span class="hero-line">${esc(h.cls.line)}</span>
+        <div class="hero-meta"><span>${ico('star')}<b>${h.power}</b> power</span><span>${ico('flame')}<b>${streakNow().current}</b> day streak</span>${g.nick ? `<span>${esc(g.nick)}</span>` : ''}</div></div>
+      <div class="tier-key" aria-label="Muscle colours">${['none', 'bronze', 'silver', 'gold', 'legend'].map(t => `<span><i class="tk tier-${t}"></i>${TIER_NAME[t]}</span>`).join('')}</div>
+    </div>
+    <h3 class="ih">${tile('progress', 'accent')}Stats</h3>
+    <div class="panel hero-stats">${radarSvg(h.stats)}
+      <div class="stat-list">${STAT_NAMES.map(([k, n]) => { const S = h.stats[k], ic = STAT_ICON[k];
+        return `<div class="stat-row">${tile(ic[0], ic[1])}<span class="sn"><b>${n}</b><span class="xpbar"><span style="width:${k === 'bal' ? Math.min(100, S.level * 5) : bar(S.xp, S.from, S.next)}%"></span></span></span><b class="sl">${S.level}</b></div>`; }).join('')}</div></div>
+    <h3 class="ih">${tile('body', 'blue')}Muscles</h3>
+    <div class="m-grid">${list.map(([k, M]) => `<button class="m-card tier-${M.tier}" data-hero="${k}"><span class="mn">${GROUPS[k].label}</span><b>${M.level}</b><span class="mbar"><span style="width:${bar(M.xp, M.from, M.next)}%"></span></span></button>`).join('')}</div>
+    <div class="panel stack"><b>Level up next</b>${weak.map(([k, M]) => `<button class="weak-row" data-herotrain="${k}">${tile('body', 'accent')}<span><b>${GROUPS[k].label}</b><span class="small muted">Level ${M.level} · ${M.next - M.xp} reps to level ${M.level + 1}</span></span><span class="btn sm primary">Train it</span></button>`).join('')}</div>
+    <p class="small muted">Your hero grows with every rep: logged workouts, ticks on Today, challenges and the morning alarm.</p>`;
+}
+function heroMuscleSheet(g){
+  const h = heroNow(), M = h.muscles[g], pct = M.next > M.from ? Math.round((M.xp - M.from) / (M.next - M.from) * 100) : 100, exs = exFor(g).slice(0, 3);
+  openSheet(`<div class="help-head"><span class="m-badge tier-${M.tier}"><b>${M.level}</b></span><span><h2>${GROUPS[g].label}</h2><span class="small muted">${TIER_NAME[M.tier]} · level ${M.level}</span></span></div>
+    <div><div class="xpbar"><span style="width:${pct}%"></span></div><span class="small muted">${M.xp} / ${M.next} reps to level ${M.level + 1}</span></div>
+    <b>Moves that build it</b>
+    <div class="list">${exs.map(e => `<button class="learn-row" data-info="${e.id}">${animSvg(e.id, 'th', 'data-ar="1"') ? `<span class="th-btn" style="width:48px;height:48px">${animSvg(e.id, 'th', 'data-ar="1"')}</span>` : ''}<b>${esc(e.name)}</b><span class="small muted">${doseText(e.dose, e.unit)}</span></button>`).join('')}</div>
+    <div class="row"><button class="btn primary" data-herotrain="${g}">Train it</button><button class="btn ghost" data-close="1">Close</button></div>`);
+}
+function setBodyMode(m){
+  ui.bodyMode = m === 'hero' ? 'hero' : 'train'; store.set('bodyMode', ui.bodyMode);
+  document.getElementById('body-train').hidden = ui.bodyMode === 'hero';
+  document.getElementById('body-hero').hidden = ui.bodyMode !== 'hero';
+  document.querySelectorAll('[data-bmode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.bmode === ui.bodyMode)));
+  if (ui.bodyMode === 'hero') drawHero(); else { drawFigure(); drawGroupDetail(); }
+  placeHint();
+}
+
+// Daily quests: today's small wins, each one tap away.
+function questsHtml(){
+  const g = gameS(), day = gDay(new Date()), L = g.ledger.filter(e => gDay(e.at) === day), n = k => L.filter(e => e.kind === k).length;
+  const ab = learnList('ab').find(x => !g.answered.includes(x.id)), tip = learnList('tip').find(x => !g.read.includes(x.id)), al = alarmCfg();
+  const trained = n('workout') + n('challenge') > 0 || ((doneLog || {})[dateStr(new Date())] || []).length > 0;
+  const Q = [
+    {icon:'alarm', tone:'blue', name:'Alarm', xp:30, have:n('alarm'), need:1, go:'data-jump="alarm"', sub:n('alarm') ? 'Done' : al.on ? al.time : 'Set it'},
+    {icon:'workout', tone:'accent', name:'Train', xp:15, have:trained ? 1 : 0, need:1, go:ui.mode === 'challenge' ? 'data-jump="challenge"' : 'data-jump="workout"', sub:trained ? 'Done' : 'Go'},
+    {icon:'bulb', tone:'amber', name:'A or B?', xp:5, have:n('ab'), need:GAME.perDay.ab, go:ab ? `data-ab="${esc(ab.id)}"` : 'data-open="learn"'},
+    {icon:'help', tone:'amber', name:'Tip', xp:2, have:n('tip'), need:GAME.perDay.tip, go:tip ? `data-tip="${esc(tip.id)}"` : 'data-open="learn"'},
+    {icon:'photo', tone:'good', name:'Meal', xp:3, have:n('meal'), need:GAME.perDay.meal, go:'data-jump="meal"'}
+  ];
+  const done = Q.filter(q => q.have >= q.need).length, C = 2 * Math.PI * 22;
+  return `<section class="quests" aria-label="Daily quests"><div class="q-head"><b>Daily quests</b><span class="q-count">${done}/${Q.length}</span><span class="q-bar"><span style="width:${done / Q.length * 100}%"></span></span></div>
+    <div class="q-row">${Q.map(q => { const k = Math.min(1, q.have / q.need), ok = k >= 1;
+      return `<button class="quest t-${q.tone}${ok ? ' ok' : ''}" ${q.go} aria-label="${q.name}: ${Math.min(q.have, q.need)} of ${q.need}, +${q.xp} XP">
+        <span class="q-ring"><svg viewBox="0 0 52 52" aria-hidden="true"><circle class="q-trk" cx="26" cy="26" r="22"/><circle class="q-arc" cx="26" cy="26" r="22" style="stroke-dasharray:${(k * C).toFixed(1)} ${C.toFixed(1)}"/></svg>${ok ? '<svg class="q-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>' : ico(q.icon)}</span>
+        <span class="q-n">${q.name}</span><span class="q-x">${ok ? '✓' : q.need > 1 ? `${q.have}/${q.need}` : '+' + q.xp + ' XP'}</span></button>`; }).join('')}</div></section>`;
+}
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-bmode],[data-hero],[data-herotrain]'); if (!t) return;
+  if (t.dataset.bmode) return setBodyMode(t.dataset.bmode);
+  if (t.dataset.herotrain){ closeSheet(); setBodyMode('train'); return selectGroup(t.dataset.herotrain, true); }
+  if (t.dataset.hero) return heroMuscleSheet(t.dataset.hero);
+});
+document.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('path[data-hero]')){ ev.preventDefault(); heroMuscleSheet(ev.target.dataset.hero); } });
 
 /* ---------- mode: Challenge or Training ---------- */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
@@ -4343,7 +4620,7 @@ function drawChallenges(anim){
     h += `<div class="feat"><span class="small" style="font-weight:700">Today’s challenge · ${esc(chFmtLabel(feat))}</span><h2>${esc(feat.name)}</h2><p class="small">${esc(feat.blurb)}</p>
       <p class="small"><b>Your target: ${chVal(feat, nt.value)}</b>${nt.medal ? ` for ${MEDAL_NAME[nt.medal]}` : ''}</p>
       <button class="btn" data-ch="${feat.id}">Let’s go</button></div>`; }
-  h = h.replace('<div class="rank-card">', quickTiles('challenge') + '<div class="rank-card">');
+  h = h.replace('<div class="rank-card">', quickTiles('challenge') + questsHtml() + '<div class="rank-card">');
   h += duelsHtml();
   if (L.mode === 'gentle') h += `<p class="banner">High-intensity challenges are locked for now. ${store.get('health', null) ? 'Your safety check suggests talking to a doctor before harder training.' : '<button class="btn sm" data-flow="safety" style="margin-left:4px">Do the 20-second safety check</button>'}</p>`;
   h += `<div class="chips" style="margin-top:16px">${CH_FILTERS.map(([k, l]) => `<button class="chip" data-chf="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>`;
@@ -4657,19 +4934,22 @@ function setTab(t){
   todayAnim = true; render(); placePill(); window.scrollTo({top:0});
 }
 function placeHint(){
-  const key = ui.mode === 'challenge' ? 'challenge' : ui.tab, view = document.getElementById('v-' + key); if (!view) return;
+  const key = ui.mode === 'challenge' ? 'challenge' : ui.tab === 'body' && ui.bodyMode === 'hero' ? 'hero' : ui.tab, view = document.getElementById('v-' + (key === 'hero' ? 'body' : key)); if (!view) return;
   document.querySelectorAll('.view > .hint').forEach(x => { if (x.parentNode !== view || hintSeen(x.dataset.hint)) x.remove(); });
+  view.querySelectorAll(':scope > .hint').forEach(x => { if (x.dataset.hint !== key) x.remove(); });
   if (!view.querySelector(':scope > .hint')){ const h = hintHtml(key); if (h) view.insertAdjacentHTML('afterbegin', h); }
 }
 function render(){
   if (ui.mode === 'challenge'){ drawChallenges(false); return placeHint(); }
-  if (ui.tab==='body'){ drawFigure(); drawGroupDetail(); }
+  if (ui.tab==='body'){ const hm = ui.bodyMode === 'hero'; document.getElementById('body-train').hidden = hm; document.getElementById('body-hero').hidden = !hm;
+    document.querySelectorAll('[data-bmode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.bmode === ui.bodyMode)));
+    if (hm) drawHero(); else { drawFigure(); drawGroupDetail(); } }
   if (ui.tab==='today') drawToday();
   if (ui.tab==='food') drawFood();
   if (ui.tab==='recipes') drawRecipes();
   if (ui.tab==='sched') drawSchedule();
   if (ui.tab==='progress') drawProgress();
-  drawStreakChip(); placeHint();
+  drawStreakChip(); placeHint(); heroCheck();
 }
 
 document.addEventListener('click', ev => {
