@@ -18,16 +18,17 @@
   --amber:#D99A1E; --blue:#4A7BD0;
   --spring:cubic-bezier(.3,1.45,.5,1); --out:cubic-bezier(.2,.8,.2,1);
   --bad:#D63A2F; --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
+  --fig:#2B333E; --fig-hl:rgba(255,255,255,.2); --prop:#8D97A4; --prop-soft:#DCE1E7;
   --r:14px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#101318; --surface:#191E25; --ink:#EDF0F3; --muted:#9AA3AE; --line:#2B323C;
   --skin:#2A313A; --muscle:#46505D; --muscle-hover:#5A6574;
-  --accent:#FF6448; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; color-scheme:dark}}
+  --accent:#FF6448; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#101318; --surface:#191E25; --ink:#EDF0F3; --muted:#9AA3AE; --line:#2B323C;
   --skin:#2A313A; --muscle:#46505D; --muscle-hover:#5A6574;
-  --accent:#FF6448; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; color-scheme:dark}
+  --accent:#FF6448; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--text);font-size:15px;line-height:1.45}
 *{box-sizing:border-box}
@@ -650,8 +651,62 @@ body.mode-challenge .app{padding-bottom:40px}
 .res-xp{width:100%;max-width:320px;display:flex;flex-direction:column;gap:2px;margin-top:8px}
 .res-xp b{font-family:var(--display);font-size:24px;color:var(--accent)}
 
+/* exercise animations */
+svg.anim{display:block;overflow:hidden;--g:0}
+svg.anim .bd{stroke:var(--fig);stroke-linecap:round;fill:none}
+svg.anim .hl{stroke:var(--fig-hl);stroke-linecap:round;fill:none}
+svg.anim .on{stroke:var(--accent)}
+svg.anim .halo{stroke:var(--accent);fill:none;stroke-linecap:round;opacity:calc(.1 + var(--g) * .26)}
+svg.anim .haloc{fill:var(--accent);opacity:calc(.1 + var(--g) * .26)}
+svg.anim .dot{fill:var(--accent);stroke:none}
+svg.anim .tor{fill:var(--fig);stroke:var(--fig);stroke-width:.05;stroke-linejoin:round}
+svg.anim .tor.on{fill:var(--accent);stroke:var(--accent);stroke-width:.035}
+svg.anim .hd{fill:var(--fig)}
+svg.anim .hhl{fill:var(--fig-hl)}
+svg.anim .far{opacity:.4}
+svg.anim .sh{fill:var(--ink);opacity:.1}
+svg.anim .pr{fill:var(--prop-soft);stroke:var(--prop);stroke-width:.012}
+svg.anim .wl{opacity:.6}
+svg.anim .pl{fill:var(--prop)}
+svg.anim .pll{stroke:var(--prop);stroke-linecap:round;fill:none}
+svg.anim .rim{fill:none;stroke:var(--prop-soft);stroke-width:.01}
+svg.anim .hub{fill:var(--prop-soft)}
+svg.anim .cb{stroke:var(--prop);fill:none}
+svg.anim .bag{fill:var(--blue);stroke:none}
+svg.anim .bagp{fill:none;stroke:var(--surface);stroke-width:.01;opacity:.5}
+svg.anim .jug{fill:var(--blue);opacity:.85}
+svg.anim .tw{stroke:var(--amber);fill:none;stroke-linecap:round}
+svg.anim .rp{stroke:var(--prop);fill:none}
+.anim-stage{position:relative;height:clamp(200px,56vw,250px);border-radius:18px;overflow:hidden;background:radial-gradient(110% 80% at 50% 100%,var(--accent-soft),var(--bg) 72%)}
+.anim-stage svg{width:100%;height:100%}
+.th-btn{border:0;padding:0;background:var(--bg);border-radius:12px;overflow:hidden;flex:none}
+.th-btn svg{width:100%;height:100%}
+.ex.has-th{grid-template-columns:64px minmax(0,1fr) auto;padding-left:10px}
+.ex.has-th .name{overflow-wrap:anywhere;line-height:1.2}
+.ex.has-th .th-btn{grid-row:1/span 2;grid-column:1;width:64px;height:64px}
+.ex.has-th .name{grid-column:2;grid-row:1}.ex.has-th .meta{grid-column:2;grid-row:2}.ex.has-th .actions{grid-column:3}
+.check.has-th{grid-template-columns:auto 52px 1fr auto;gap:10px}
+.check .th-btn{width:52px;height:52px}
+.ss-h .th-btn{width:56px;height:56px}
+.ss-h .ss-n2{flex:1;min-width:0}
+.ex-head{display:flex;flex-direction:column;gap:6px}
+details.steps summary{cursor:pointer;font-weight:600;color:var(--muted);font-size:13.5px;list-style:none;display:flex;align-items:center;gap:8px;min-height:32px}
+details.steps summary::-webkit-details-marker{display:none}
+details.steps summary::after{content:'';width:7px;height:7px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-2px);transition:transform .2s var(--out)}
+details.steps[open] summary::after{transform:rotate(-135deg) translateY(-1px)}
+details.steps ol{margin-top:8px}
+#arena svg.anim,#alarm svg.anim{--fig:var(--arena-ink);--fig-hl:rgba(255,255,255,.45);--prop:#6B7684;--prop-soft:#2E3640;--ink:#fff}
+.ar-moves li{display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:center}
+.ar-moves .mv-th{width:76px;height:76px;border-radius:16px;background:color-mix(in srgb,var(--arena-ink) 7%,transparent);overflow:hidden}
+.ar-moves .mv-th svg{width:100%;height:100%}
+.ar-moves.one li{grid-template-columns:1fr}
+.ar-moves.one .mv-th{width:100%;height:170px;border-radius:20px;background:radial-gradient(110% 80% at 50% 100%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 72%)}
+.al-task.has-th{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+.al-task .mv-th{width:96px;height:72px;flex:none}
+.al-task .mv-th svg{width:100%;height:100%}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
+@media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
@@ -1024,7 +1079,9 @@ function selectGroup(g, scroll){
   if (ui.group && scroll !== false) document.getElementById('group-detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function exCard(e){
-  return `<div class="ex">
+  const th = animSvg(e.id, 'th', 'data-ar="1"');
+  return `<div class="ex${th ? ' has-th' : ''}">
+    ${th ? `<button class="th-btn" data-info="${e.id}" aria-label="How to do ${esc(e.name)}">${th}</button>` : ''}
     <div class="name">${esc(e.name)}</div>
     <div class="meta"><b>${doseText(e.dose,e.unit)}</b><span class="tag">${esc(e.equip)}</span>${lvlBars(e.level)}</div>
     <div class="actions">
@@ -1081,10 +1138,11 @@ function closeSheet(){
 })();
 function infoSheet(id){
   const e = EX[id];
-  openSheet(`<h2>${esc(e.name)}</h2>
+  const big = animSvg(e.id, 'big', 'data-ar="1.5"');
+  openSheet(`${big ? `<div class="anim-stage">${big}</div>` : ''}<div class="ex-head"><h2>${esc(e.name)}</h2>
     <div class="row small muted"><b style="color:var(--ink)">${doseText(e.dose,e.unit)}</b> per set · ${esc(e.equip)} · ${lvlBars(e.level)}</div>
-    <div class="row">${e.groups.map(g=>`<span class="tag small">${GROUPS[g].label}</span>`).join('')}</div>
-    <ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+    <div class="row">${e.groups.map((g,i)=>`<span class="tag small"${i<2&&big?' style="border-color:var(--accent);color:var(--accent)"':''}>${GROUPS[g].label}</span>`).join('')}</div></div>
+    ${big ? `<details class="steps"><summary>Steps</summary><ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></details>` : `<ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`}
     <div class="row" style="margin-top:4px"><button class="btn primary" data-add="${e.id}">+ Add to schedule</button><button class="btn" data-stretch="${e.id}">Stretch</button><button class="btn ghost" data-close="1">Close</button></div>`);
 }
 function stretchSheet(id){
@@ -1181,9 +1239,10 @@ function drawToday(){
   const nDone = all.filter(k=>done.has(k)).length;
   let ri = 0;
   const row = (x, pre) => { const e = EX[x.id], k = pre+x.id, d = done.has(k);
-    return `<label class="check ${d?'done':''}${k===justKey?' just':''}" style="--i:${ri++}"><input type="checkbox" data-done="${k}" data-date="${key}" ${d?'checked':''}>
-      <span><span class="name">${esc(e.name)}</span><br><span class="sub">${x.sets} × ${doseText(x.dose,e.unit)} · ${esc(e.equip)}</span></span>
-      <span class="acts">${e.unit==='sec'?`<button class="btn sm primary" type="button" data-timer="${x.dose}" data-tlabel="${esc(e.name)}" aria-label="Start ${doseText(x.dose,e.unit)} timer">▶ ${doseText(x.dose,e.unit)}</button>`:''}<button class="btn sm ghost" data-info="${e.id}" type="button">How to</button></span></label>`; };
+    const th = animSvg(e.id, 'th', `data-ar="1" data-ph="${ri * 370}"`);
+    return `<label class="check ${d?'done':''}${k===justKey?' just':''}${th?' has-th':''}" style="--i:${ri++}"><input type="checkbox" data-done="${k}" data-date="${key}" ${d?'checked':''}>
+      ${th ? `<button class="th-btn" type="button" data-info="${e.id}" aria-label="How to do ${esc(e.name)}">${th}</button>` : ''}<span><span class="name">${esc(e.name)}</span><br><span class="sub">${x.sets} × ${doseText(x.dose,e.unit)} · ${esc(e.equip)}</span></span>
+      <span class="acts">${e.unit==='sec'?`<button class="btn sm primary" type="button" data-timer="${x.dose}" data-tlabel="${esc(e.name)}" aria-label="Start ${doseText(x.dose,e.unit)} timer">▶ ${doseText(x.dose,e.unit)}</button>`:''}${th ? '' : `<button class="btn sm ghost" data-info="${e.id}" type="button">How to</button>`}</span></label>`; };
   const L = todayAnim ? 'list in' : 'list';
   const ob = store.get('onboarding', null), why = ob && ob.answers && ob.answers.why, hl = store.get('health', null), Lt = currentLimits();
   let h = `<div class="day-hero">
@@ -1883,6 +1942,58 @@ function restFor(equip, goal){
 }
 /* training-core:end */
 
+/* anim-core:start — exercise animation rig: pose solving (2-bone IK) and interpolation, pure (no DOM). Tested in tests/anim.test.mjs */
+// Units: a standing person is 1.0 tall, feet on y = 0, x grows forward (the figure faces right in side view).
+const RIG = {shin:.25, thigh:.25, torso:.30, shoulder:.27, neck:.035, head:.065, upper:.16, fore:.15, foot:.075, shW:.1, hipW:.065};
+const rad = d => d * Math.PI / 180;
+const dirv = d => [Math.cos(rad(d)), Math.sin(rad(d))];
+const addv = (a, b, k) => [a[0] + b[0] * (k == null ? 1 : k), a[1] + b[1] * (k == null ? 1 : k)];
+// Two-bone IK from root A towards target T. s = +1 bends the middle joint counter-clockwise of A→T, -1 clockwise.
+function ik2(A, T, l1, l2, s){
+  const dx = T[0] - A[0], dy = T[1] - A[1];
+  const d = Math.max(Math.abs(l1 - l2) + 1e-4, Math.min(l1 + l2 - 1e-4, Math.hypot(dx, dy)));
+  const a = Math.atan2(dy, dx), c = Math.max(-1, Math.min(1, (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d)));
+  const ang = a + (s >= 0 ? 1 : -1) * Math.acos(c);
+  return [[A[0] + l1 * Math.cos(ang), A[1] + l1 * Math.sin(ang)], [A[0] + d * Math.cos(a), A[1] + d * Math.sin(a)]];
+}
+function limb(root, spec, l1, l2, sDef){
+  if (spec.u != null) { const m = addv(root, dirv(spec.u), l1); return [m, addv(m, dirv(spec.f != null ? spec.f : spec.u), l2)]; }
+  return ik2(root, spec.h || spec.p, l1, l2, spec.b != null ? spec.b : sDef);
+}
+// Solve every joint of a pose. side view: limb 0 is the near side, 1 the far side; front view: 0 is screen-right, 1 screen-left.
+function solvePose(p){
+  const front = p.v === 'front', tr = p.tr != null ? p.tr : 90, d = dirv(tr), perp = dirv(tr - 90);
+  const hip = p.hip, base = addv(hip, d, RIG.shoulder), neck = addv(hip, d, RIG.torso);
+  const lift = p.sl || 0;
+  const sh = front ? [addv(addv(base, perp, RIG.shW), d, lift), addv(addv(base, perp, -RIG.shW), d, lift)] : [addv(base, d, lift), addv(addv(base, [-.012, .006]), d, lift)];
+  const hp = front ? [addv(hip, perp, RIG.hipW), addv(hip, perp, -RIG.hipW)] : [hip, addv(hip, [-.012, .006])];
+  const head = addv(neck, dirv(tr + (p.hd || 0)), RIG.neck + RIG.head);
+  const arms = [0, 1].map(i => limb(sh[i], (p.a && p.a[i]) || (p.a && p.a[0]) || {u:-90, f:-90}, RIG.upper, RIG.fore, -1));
+  const legs = [0, 1].map(i => limb(hp[i], (p.l && p.l[i]) || (p.l && p.l[0]) || {u:-90, f:-90}, RIG.thigh, RIG.shin, 1));
+  const toes = [0, 1].map(i => { const sp = (p.l && (p.l[i] || p.l[0])) || {}; return addv(legs[i][1], dirv(sp.ft != null ? sp.ft : 0), RIG.foot); });
+  return {front, hip, neck, head, sh, hp, el:arms.map(a => a[0]), hand:arms.map(a => a[1]), knee:legs.map(l => l[0]), ankle:legs.map(l => l[1]), toe:toes};
+}
+// Interpolate two poses of the same shape: numbers blend, anything else switches half way.
+function lerpPose(a, b, t){
+  if (typeof a === 'number' && typeof b === 'number') return a + (b - a) * t;
+  if (Array.isArray(a) && Array.isArray(b)) return a.map((x, i) => b[i] === undefined ? x : lerpPose(x, b[i], t));
+  if (a && b && typeof a === 'object' && typeof b === 'object'){
+    const o = {}; new Set([...Object.keys(a), ...Object.keys(b)]).forEach(k => { o[k] = a[k] === undefined ? b[k] : b[k] === undefined ? a[k] : lerpPose(a[k], b[k], t); });
+    return o;
+  }
+  return t < .5 ? a : b;
+}
+const ease = t => .5 - Math.cos(Math.PI * t) / 2;
+// Where in the loop we are: keys play in order and return to the first. Each key holds, then moves to the next.
+function poseAt(anim, ms){
+  const ks = anim.keys, n = ks.length, hold = anim.hold != null ? anim.hold : 260, move = anim.move || 850;
+  if (n === 1) return {pose:ks[0], k:0, t:0};
+  const legs = n === 2 ? 2 : n, seg = hold + move, tt = ms % (legs * seg), i = Math.floor(tt / seg), r = tt - i * seg;
+  const from = ks[i % n], to = ks[(i + 1) % n];
+  return r < hold ? {pose:from, k:i % n, t:0} : {pose:lerpPose(from, to, ease((r - hold) / move)), k:i % n, t:(r - hold) / move};
+}
+/* anim-core:end */
+
 
 
 
@@ -2487,7 +2598,7 @@ function drawAlarm(){
   if (alarmRun.phase === 'ring'){
     el.innerHTML = `<div class="ar-in al-in"><span class="al-time">${pad2(now.getHours())}:${pad2(now.getMinutes())}</span>
       <h2 class="ar-name">Good morning</h2>${why ? `<p class="ar-blurb">“${esc(why)}”</p>` : ''}
-      <div class="al-task"><span class="small" style="opacity:.7">To switch it off</span><b>${taskTxt}</b></div>
+      <div class="al-task${task.move === 'pushup' ? ' has-th' : ''}"><span><span class="small" style="opacity:.7;display:block">To switch it off</span><b>${taskTxt}</b></span>${task.move === 'pushup' ? `<span class="mv-th">${animSvg('pushup', '', 'data-ar="1.33"')}</span>` : ''}</div>
       <button class="ar-go" data-al="start">Let’s do it</button>
       <button class="al-hold" data-al="hold"><span class="al-fill"></span><span class="al-lbl">Emergency stop: hold 3 seconds</span></button>
       ${cfg.mode === 'commit' ? `<p class="ar-note">Commitment mode: if you leave the task, it rings again in ${cfg.rearm} minutes.</p>` : ''}</div>`;
@@ -2869,7 +2980,7 @@ function drawSession(){
       const bar = /barbell/i.test(e.equip), work = x.sug ? x.sug.w : (x.last ? Math.max(...x.last.map(y => y.w || 0)) : 0);
       const plates = bar && work ? platesFor(work) : null, warm = bar && !x.sets.some(y => y.done) ? warmupSets(work) : [];
       return `<section class="ss-ex">
-        <div class="ss-h"><b>${esc(e.name)}</b><button class="btn sm ghost" data-info="${e.id}">How to</button></div>
+        <div class="ss-h">${animFor(e.id) ? `<button class="th-btn" data-info="${e.id}" aria-label="How to do ${esc(e.name)}">${animSvg(e.id, 'th', 'data-ar="1"')}</button><b class="ss-n2">${esc(e.name)}</b>` : `<b>${esc(e.name)}</b><button class="btn sm ghost" data-info="${e.id}">How to</button>`}</div>
         <p class="small muted">${target}${x.last ? ` · Last: ${x.last.map(y => fmtSet(e, y)).join(', ')}` : ''}</p>
         ${sug ? `<p class="ss-sug">${sug}</p>` : ''}
         ${warm.length ? `<p class="small muted">Warm up: ${warm.map(y => `${y.w} kg × ${y.r}`).join(' · ')}</p>` : ''}
@@ -3070,6 +3181,283 @@ document.getElementById('v-progress').addEventListener('click', ev => {
   const t = ev.target.closest('[data-lift]'); if (t){ ui.lift = t.dataset.lift; drawProgress(); }
 });
 
+/* ---------- exercise animations: one looping figure per exercise ---------- */
+const mergeP = (a, b) => {
+  if (b === undefined) return a === undefined ? a : JSON.parse(JSON.stringify(a));
+  if (Array.isArray(b)){ if (b.length && typeof b[0] === 'number') return b.slice(); const n = Math.max(b.length, (a || []).length); return Array.from({length:n}, (_, i) => mergeP(a && a[i], b[i])); }
+  if (b && typeof b === 'object'){ const o = a && typeof a === 'object' && !Array.isArray(a) ? JSON.parse(JSON.stringify(a)) : {};
+    // A limb is either aimed at a point (h) or set by angles (u, f): the newer one wins. Props are replaced as a list.
+    if (b.h) { delete o.u; delete o.f; } if (b.u != null) delete o.h;
+    Object.keys(b).forEach(k => { o[k] = k === 'pr' ? JSON.parse(JSON.stringify(b[k])) : mergeP(o[k], b[k]); }); return o; }
+  return b;
+};
+const deg = (y, x) => Math.atan2(y, x) * 180 / Math.PI;
+// A straight body from the ankles to the shoulders (plank, push-up, row under a table…).
+function lineBody(ank, sh){ const vx = sh[0] - ank[0], vy = sh[1] - ank[1], L = Math.hypot(vx, vy); return {hip:[ank[0] + vx / L * .5, ank[1] + vy / L * .5], tr:deg(vy, vx)}; }
+const ST = {v:'side', hip:[0, .5], tr:90, a:[{h:[.03, .46], b:-1}, {h:[0, .46], b:-1}], l:[{h:[.03, 0], ft:0}, {h:[-.03, 0], ft:0}], pr:[]};
+const STA = {v:'side', hip:[0, .5], tr:90, a:[{u:-91, f:-90}, {u:-88, f:-88}], l:[{h:[.03, 0], ft:0}, {h:[-.03, 0], ft:0}], pr:[]};
+const FR = {v:'front', hip:[0, .5], tr:90, a:[{h:[.17, .46], b:1}, {h:[-.17, .46], b:-1}], l:[{h:[.07, 0], ft:0}, {h:[-.07, 0], ft:-180}], pr:[]};
+const plankK = (ank, sh, hand, ft, extra) => mergeP({v:'side', ...lineBody(ank, sh), a:[{h:hand, b:-1}, {h:[hand[0] - .02, hand[1]], b:-1}], l:[{h:ank, ft:ft == null ? -70 : ft}, {h:[ank[0] - .02, ank[1]], ft:ft == null ? -70 : ft}], pr:[]}, extra || {});
+const pushupA = (o) => { o = o || {}; const hx = o.hx || .19, hy = o.hy || 0, ank = o.ank || [-.55, .03];
+  return [plankK(ank, [hx, hy + .31], [hx, hy], o.ft, o.x), plankK(ank, [hx + .02, hy + (o.low || .1)], [hx, hy], o.ft, o.x)]; };
+const SUP = (o) => mergeP({v:'side', hip:[0, .07], tr:2, a:[{u:182, f:182}, {u:178, f:178}], l:[{h:[-.3, 0], b:-1, ft:-10}, {h:[-.32, 0], b:-1, ft:-10}], pr:[]}, o || {});
+const QUAD = (o) => mergeP({v:'side', hip:[-.17, .31], tr:2, a:[{h:[.1, 0], b:-1}, {h:[.08, 0], b:-1}], l:[{h:[-.42, .02], b:1, ft:180}, {h:[-.44, .02], b:1, ft:180}], pr:[]}, o || {});
+const benchLie = (o) => mergeP({v:'side', hip:[-.12, .37], tr:0, a:[{h:[.15, .68], b:-1}, {h:[.13, .68], b:-1}], l:[{h:[-.42, 0], b:-1, ft:0}, {h:[-.46, 0], b:-1, ft:0}], pr:[{k:'bench', x:-.45, y:.32, w:.78}]}, o || {});
+const seat = (o) => mergeP({v:'side', hip:[-.06, .33], tr:91, a:[{h:[.06, .62], b:-1}, {h:[.04, .62], b:-1}], l:[{h:[.24, 0], b:1, ft:0}, {h:[.2, 0], b:1, ft:0}], pr:[{k:'bench', x:-.28, y:.28, w:.4}]}, o || {});
+const A = (keys, x) => ({keys, ...(x || {})});
+// Second key = first key changed by b. A full pose given as b with no props keeps the props of the first key.
+const two = (a, b, x) => { const m = mergeP(a, b); if (b && Array.isArray(b.pr) && !b.pr.length) m.pr = mergeP(undefined, a.pr); return A([a, m], x); };
+const squatK = (x) => mergeP({v:'side', hip:[-.17, .28], tr:58, a:[{h:[.33, .55], b:-1}, {h:[.31, .55], b:-1}], l:[{h:[.03, 0], ft:0}, {h:[-.03, 0], ft:0}], pr:[]}, x || {});
+const bridgeK = (lift, x) => { const tr = lift ? -38 : 3, S = [.3, .05], d = [Math.cos(tr * Math.PI / 180), Math.sin(tr * Math.PI / 180)];
+  return mergeP({v:'side', hip:[S[0] - d[0] * .27, S[1] - d[1] * .27], tr, a:[{h:[.02, .02], b:1}, {h:[0, .02], b:1}], l:[{h:[-.27, 0], b:-1, ft:-5}, {h:[-.3, 0], b:-1, ft:-5}], pr:[]}, x || {}); };
+const thrustK = (lift, x) => { const tr = lift ? -2 : 42, S = [.32, .37], d = [Math.cos(tr * Math.PI / 180), Math.sin(tr * Math.PI / 180)];
+  return mergeP({v:'side', hip:[S[0] - d[0] * .27, S[1] - d[1] * .27], tr, a:[{h:[.38, .42], b:1}, {h:[.36, .42], b:1}], l:[{h:[-.32, 0], b:-1, ft:0}, {h:[-.35, 0], b:-1, ft:0}], pr:[{k:'bench', x:.2, y:.32, w:.5}]}, x || {}); };
+const hinge = (x) => mergeP({v:'side', hip:[-.13, .46], tr:22, a:[{u:-92, f:-90}, {u:-89, f:-89}], l:[{h:[.03, 0], ft:0}, {h:[-.02, 0], ft:0}], pr:[]}, x || {});
+const hang = (x) => mergeP({v:'side', hip:[0, .66], tr:92, a:[{h:[.04, 1.25], b:-1}, {h:[.02, 1.25], b:-1}], l:[{h:[-.06, .18], b:1, ft:-60}, {h:[-.09, .2], b:1, ft:-60}], pr:[{k:'bar', x:.03, y:1.27, w:.5}]}, x || {});
+const walk = (props) => A([mergeP(STA, {l:[{h:[.15, 0], ft:10}, {h:[-.14, .02], ft:-25}], pr:props}), mergeP(STA, {hip:[0, .51], l:[{h:[.02, .05], ft:-10}, {h:[0, 0], ft:0}], pr:props}),
+  mergeP(STA, {l:[{h:[-.14, .02], ft:-25}, {h:[.15, 0], ft:10}], pr:props}), mergeP(STA, {hip:[0, .51], l:[{h:[0, 0], ft:0}, {h:[.02, .05], ft:-10}], pr:props})], {move:420, hold:0});
+const curl = (props, x) => A([mergeP(STA, mergeP({a:[{u:-92, f:-90}, {u:-88, f:-88}], pr:props}, x || {})), mergeP(STA, mergeP({a:[{u:-94, f:75}, {u:-90, f:78}], pr:props}, x || {}))]);
+const DB = [{k:'db', at:'hand0'}, {k:'db', at:'hand1', far:1}];
+const press = (props, lowH, highH) => two(mergeP(STA, {a:[{h:lowH, b:-1}, {h:[lowH[0] - .02, lowH[1]], b:-1}], pr:props}), {a:[{h:highH}, {h:[highH[0] - .02, highH[1]]}]});
+const LIE_PRONE = (o) => mergeP({v:'side', hip:[0, .07], tr:0, a:[{u:2, f:2}, {u:1, f:1}], l:[{u:181, f:181, ft:-92}, {u:180, f:180, ft:-92}], pr:[]}, o || {});
+const sidePlank = (hipY, x) => mergeP({v:'front', hip:[-.06, hipY], tr:hipY > .15 ? 17 : 8, a:[{u:-92, f:-70}, {u:96, f:96}], l:[{h:[-.56, .03], b:1, ft:-90}, {h:[-.56, .1], b:1, ft:-90}], pr:[]}, x || {});
+const ANIMS = {
+  pushup: A(pushupA()),
+  'incline-pushup': A(pushupA({hx:.27, hy:.36, ank:[-.42, .02], low:.13, x:{pr:[{k:'box', x:.18, y:.36, w:.3}]}})),
+  'wide-pushup': A(pushupA({hx:.24, low:.08})),
+  'decline-pushup': A(pushupA({ank:[-.55, .4], ft:-40, low:.11, x:{pr:[{k:'box', x:-.7, y:.38, w:.25}]}})),
+  'diamond-pushup': A(pushupA({hx:.15, low:.11})),
+  'pike-pushup': two({v:'side', hip:[-.12, .6], tr:-55, a:[{h:[.24, 0], b:-1}, {h:[.22, 0], b:-1}], l:[{h:[-.42, .02], ft:-60}, {h:[-.44, .02], ft:-60}], pr:[]}, {hip:[-.07, .5], tr:-72}),
+  'chair-dip': two({v:'side', hip:[.04, .31], tr:88, a:[{h:[-.1, .44], b:1}, {h:[-.12, .44], b:1}], l:[{h:[.46, 0], ft:80}, {h:[.43, 0], ft:80}], pr:[{k:'box', x:-.38, y:.42, w:.3}]}, {hip:[.04, .14]}),
+  'shoulder-taps': A([plankK([-.55, .03], [.19, .31], [.19, 0]), plankK([-.55, .03], [.19, .31], [.19, 0], null, {a:[{h:[.16, .33], b:1}]}), plankK([-.55, .03], [.19, .31], [.19, 0]), plankK([-.55, .03], [.19, .31], [.19, 0], null, {a:[undefined, {h:[.17, .34], b:1}]})], {move:450, hold:150}),
+  mountain: A([plankK([-.55, .03], [.19, .31], [.19, 0], null, {l:[{h:[-.08, .1], b:1, ft:-60}]}), plankK([-.55, .03], [.19, .31], [.19, 0], null, {l:[undefined, {h:[-.08, .1], b:1, ft:-60}]})], {move:330, hold:40}),
+  plank: two(plankK([-.62, .03], [.13, .17], [.13, .01], null, {a:[{u:-90, f:0}, {u:-90, f:-2}]}), {hip:[-.13, .1]}, {move:1600, hold:600}),
+  'side-plank': two(sidePlank(.2), {hip:[-.06, .21]}, {move:1600, hold:600}),
+  'hip-dips': two(sidePlank(.2), sidePlank(.1)),
+  crunch: two(SUP({a:[{h:[.37, .16], b:1}, {h:[.35, .16], b:1}]}), {tr:28, a:[{h:[.33, .33]}, {h:[.31, .33]}]}),
+  situp: two(SUP({a:[{h:[.2, .14], b:1}, {h:[.18, .14], b:1}]}), {tr:72, a:[{h:[.13, .38]}, {h:[.11, .38]}]}),
+  'leg-raise': two(SUP({a:[{u:183, f:183}, {u:181, f:181}], l:[{u:182, f:182, ft:180}, {u:180, f:180, ft:180}]}), {l:[{u:92, f:92, ft:90}, {u:90, f:90, ft:90}]}),
+  hollow: two(SUP({tr:16, a:[{u:22, f:18}, {u:20, f:16}], l:[{u:165, f:165, ft:165}, {u:163, f:163, ft:163}]}), {tr:20, l:[{u:160, f:160}, {u:158, f:158}]}, {move:1300, hold:400}),
+  'dead-bug': two(SUP({a:[{u:90, f:90}, {u:88, f:88}], l:[{u:90, f:180, ft:180}, {u:88, f:178, ft:178}]}), {a:[{u:178, f:178}], l:[undefined, {u:168, f:168}]}),
+  bicycle: A([SUP({tr:24, a:[{h:[.3, .33], b:1}, {h:[.28, .33], b:1}], l:[{u:72, f:182, ft:180}, {u:166, f:166, ft:166}]}), SUP({tr:24, a:[{h:[.3, .33], b:1}, {h:[.28, .33], b:1}], l:[{u:166, f:166, ft:166}, {u:72, f:182, ft:180}]})], {move:500, hold:120}),
+  'russian-twist': two({v:'side', hip:[0, .1], tr:122, a:[{h:[.24, .3], b:-1}, {h:[.22, .3], b:-1}], l:[{u:48, f:-8, ft:0}, {u:46, f:-10, ft:-2}], pr:[{k:'db', at:'hand0', big:1}]}, {tr:116, a:[{h:[.06, .05]}, {h:[.04, .05]}]}, {move:650, hold:200}),
+  'bird-dog': two(QUAD(), {a:[{h:[.42, .33]}], l:[undefined, {h:[-.67, .31], ft:180}]}, {move:1000, hold:500}),
+  superman: two(LIE_PRONE(), {tr:9, a:[{u:16, f:16}, {u:15, f:15}], l:[{u:170, f:170}, {u:169, f:169}]}, {move:1100, hold:600}),
+  'donkey-kick': two(QUAD({l:[{h:[-.42, .02], b:1, ft:180}]}), {l:[{h:[-.42, .56], ft:90}]}),
+  'fire-hydrant': two(QUAD(), {l:[{h:[-.34, .3], ft:150}]}),
+  'glute-bridge': two(bridgeK(0), bridgeK(1)),
+  'sl-bridge': two(bridgeK(0, {l:[{h:[-.47, .1], ft:180}]}), bridgeK(1, {l:[{h:[-.3, .52], ft:142}]})),
+  'bridge-walk': A([bridgeK(1), bridgeK(1, {l:[{h:[-.36, 0]}]}), bridgeK(1, {l:[{h:[-.38, 0]}, {h:[-.4, 0]}]}), bridgeK(1, {l:[{h:[-.3, 0]}, {h:[-.4, 0]}]})], {move:500, hold:150}),
+  'towel-curl-leg': two(bridgeK(1, {pr:[{k:'towel', from:'ankle0', to:'toe0'}]}), bridgeK(1, {hip:[.1, .13], tr:-18, l:[{h:[-.42, 0]}, {h:[-.44, 0]}]})),
+  'couch-thrust': two(thrustK(0), thrustK(1)),
+  'hip-thrust': two(thrustK(0, {pr:[{k:'bench', x:.2, y:.32, w:.5}, {k:'barbell', at:'hip', off:[0, .07]}]}), thrustK(1, {pr:[{k:'bench', x:.2, y:.32, w:.5}, {k:'barbell', at:'hip', off:[0, .07]}]})),
+  squat: two(ST, squatK()),
+  'goblet-squat': two(mergeP(ST, {a:[{h:[.12, .64], b:-1}, {h:[.1, .64], b:-1}], pr:[{k:'db', at:'hand0', big:1}]}), squatK({a:[{h:[.13, .43]}, {h:[.11, .43]}]})),
+  'back-squat': two(mergeP(ST, {a:[{h:[-.07, .81], b:1}, {h:[-.09, .81], b:1}], pr:[{k:'barbell', at:'sh0', off:[-.05, .03]}]}), squatK({tr:48, hip:[-.21, .27], a:[{h:[-.11, .5]}, {h:[-.13, .5]}]})),
+  'jump-squat': two(squatK(), {hip:[0, .66], tr:90, a:[{h:[.06, 1.07]}, {h:[.04, 1.07]}], l:[{h:[.03, .15], ft:-45}, {h:[-.03, .15], ft:-45}]}, {move:420, hold:180}),
+  'wall-sit': two({v:'side', hip:[-.22, .26], tr:90, a:[{h:[.04, .3], b:-1}, {h:[.02, .3], b:-1}], l:[{h:[.05, 0], ft:0}, {h:[.02, 0], ft:0}], pr:[{k:'wall', x:-.285}]}, {hip:[-.22, .25]}, {move:1500, hold:400}),
+  lunge: two(ST, {hip:[-.13, .29], tr:88, l:[{h:[.13, 0], ft:0}, {h:[-.44, .02], ft:-60}]}),
+  'split-squat': two({v:'side', hip:[-.02, .49], tr:90, a:[{h:[0, .45], b:-1}, {h:[-.02, .45], b:-1}], l:[{h:[.17, 0], ft:0}, {h:[-.5, .43], ft:175}], pr:[{k:'bench', x:-.72, y:.4, w:.35}]}, {hip:[-.08, .26], tr:86}),
+  'step-up': two({v:'side', hip:[-.1, .47], tr:88, a:[{h:[-.06, .44], b:-1}, {h:[-.1, .44], b:-1}], l:[{h:[.17, .29], b:1, ft:0}, {h:[-.12, 0], b:1, ft:0}], pr:[{k:'box', x:.07, y:.28, w:.38}]}, {hip:[.13, .77], tr:90, l:[{h:[.17, .29]}, {h:[.03, .42], ft:-30}]}),
+  'sl-rdl': two(mergeP(STA, {l:[{h:[.02, 0], ft:0}, {h:[-.05, .03], ft:-10}]}), {hip:[-.08, .48], tr:10, l:[undefined, {h:[-.57, .55], ft:-90}]}, {move:1100, hold:400}),
+  'good-morning': two(mergeP(ST, {a:[{h:[.02, .92], b:1}, {h:[0, .92], b:1}]}), {hip:[-.12, .47], tr:16, a:[{h:[.2, .63]}, {h:[.18, .63]}]}),
+  rdl: two(mergeP(STA, {pr:[{k:'barbell', at:'hand0'}]}), {hip:[-.15, .47], tr:24}),
+  deadlift: two(mergeP(STA, {hip:[-.2, .26], tr:42, pr:[{k:'barbell', at:'hand0'}]}), {hip:[0, .5], tr:90}),
+  'barbell-row': two(hinge({pr:[{k:'barbell', at:'hand0'}]}), {a:[{u:-125, f:-60}, {u:-122, f:-57}]}),
+  'backpack-row': two(hinge({pr:[{k:'pack', at:'hand0'}]}), {a:[{u:-125, f:-60}, {u:-122, f:-57}]}),
+  'db-row': two(hinge({hip:[-.16, .44], tr:12, a:[undefined, {h:[.32, .33], b:-1}], pr:[{k:'bench', x:.05, y:.3, w:.5}, {k:'db', at:'hand0'}]}), {a:[{u:-130, f:-60}]}),
+  'cable-row': two({v:'side', hip:[-.18, .22], tr:88, a:[{h:[.37, .46], b:-1}, {h:[.35, .46], b:-1}], l:[{h:[.38, .2], b:1, ft:80}, {h:[.36, .2], b:1, ft:80}], pr:[{k:'bench', x:-.4, y:.18, w:.45}, {k:'cable', from:[.62, .44], to:'hand0'}, {k:'plate', x:.45, y:.2}]}, {tr:96, a:[{h:[.06, .46]}, {h:[.04, .46]}]}),
+  'lat-pulldown': two({v:'side', hip:[-.06, .33], tr:92, a:[{h:[.04, .9], b:-1}, {h:[.02, .9], b:-1}], l:[{h:[.25, 0], b:1, ft:0}, {h:[.21, 0], b:1, ft:0}], pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'cable', from:[.04, 1.2], to:'hand0'}, {k:'handle', at:'hand0'}]}, {tr:98, a:[{h:[.1, .64]}, {h:[.08, .64]}]}),
+  'pull-up': two(hang(), {hip:[0, .88], a:[{h:[.04, 1.25]}, {h:[.02, 1.25]}], l:[{h:[-.06, .4]}, {h:[-.09, .42]}]}),
+  'knee-raise': two(hang({l:[{h:[-.03, .17], ft:-80}, {h:[-.06, .18], ft:-80}]}), {l:[{h:[.25, .42], ft:-80}, {h:[.23, .43], ft:-80}]}),
+  'towel-pulldown': two(LIE_PRONE({tr:8, a:[{h:[.62, .16], b:1}, {h:[.6, .16], b:1}], pr:[{k:'towel', from:'hand0', to:'hand1', wide:1}]}), {a:[{h:[.33, .2]}, {h:[.31, .2]}]}),
+  'table-row': two(plankK([-.58, 0], [.12, .15], [.12, .46], 85, {a:[{b:1}, {b:1}], pr:[{k:'table', x:-.05, y:.47, w:.5}]}), plankK([-.58, 0], [.11, .34], [.12, .46], 85, {a:[{b:1}, {b:1}]})),
+  'table-row-under': two(plankK([-.58, 0], [.12, .15], [.12, .46], 85, {a:[{b:1}, {b:1}], pr:[{k:'table', x:-.05, y:.47, w:.5}]}), plankK([-.58, 0], [.11, .34], [.12, .46], 85, {a:[{b:1}, {b:1}]})),
+  'door-row': two(mergeP(plankK([.17, 0], [-.07, .73], [.25, .7], 75, {a:[{b:-1}, {b:-1}], pr:[{k:'door', x:.27}]}), {l:[{ft:75}, {ft:75}]}), plankK([.17, 0], [.07, .76], [.25, .7], 75, {a:[{b:-1}, {b:-1}]})),
+  'db-curl': curl(DB), 'jug-hammer': curl([{k:'jug', at:'hand0'}, {k:'jug', at:'hand1', far:1}]), 'backpack-curl': curl([{k:'pack', at:'hand0'}]),
+  'cable-curl': curl([{k:'cable', from:[.3, .05], to:'hand0'}, {k:'handle', at:'hand0'}]),
+  'towel-curl': two(mergeP(STA, {a:[{u:-92, f:-5}, {u:-90, f:-3}], pr:[{k:'towel', from:'hand0', to:'toe0'}]}), {a:[{u:-93, f:0}, {u:-91, f:2}]}, {move:900, hold:700}),
+  pushdown: two(mergeP(STA, {tr:86, a:[{u:-96, f:8}, {u:-93, f:10}], pr:[{k:'cable', from:[.3, 1.15], to:'hand0'}, {k:'handle', at:'hand0'}]}), {a:[{u:-96, f:-86}, {u:-93, f:-84}]}),
+  'skull-crusher': two(benchLie({a:[{u:94, f:94}, {u:92, f:92}], pr:[{k:'bench', x:-.45, y:.32, w:.78}, {k:'barbell', at:'hand0', small:1}]}), {a:[{u:96, f:-2}, {u:94, f:-4}]}),
+  'backpack-ext': two(mergeP(STA, {a:[{u:98, f:98}, {u:96, f:96}], pr:[{k:'pack', at:'hand0'}]}), {a:[{u:100, f:-70}, {u:98, f:-72}]}),
+  'db-bench': two(benchLie({pr:[{k:'bench', x:-.45, y:.32, w:.78}, ...DB]}), {a:[{h:[.15, .43]}, {h:[.13, .43]}]}),
+  'bench-press': two(benchLie({pr:[{k:'bench', x:-.45, y:.32, w:.78}, {k:'barbell', at:'hand0'}]}), {a:[{h:[.14, .46]}, {h:[.12, .46]}]}),
+  'incline-db': two(benchLie({hip:[-.08, .36], tr:32, a:[{h:[.22, .84]}, {h:[.2, .84]}], pr:[{k:'bench', x:-.45, y:.32, w:.55}, {k:'incline', x:-.08, y:.34, a:32}, ...DB]}), {a:[{h:[.21, .57]}, {h:[.19, .57]}]}),
+  'machine-press': two(seat({a:[{h:[.13, .65], b:-1}, {h:[.11, .65], b:-1}], pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'back', x:-.15, y:.3}, {k:'handle', at:'hand0'}, {k:'stack', x:.6}]}), {a:[{h:[.43, .67]}, {h:[.41, .67]}]}),
+  'cable-fly': two(mergeP(FR, {a:[{h:[.46, .82], b:-1}, {h:[-.46, .82], b:1}], pr:[{k:'cable', from:[.66, .98], to:'hand0'}, {k:'cable', from:[-.66, .98], to:'hand1'}]}), {a:[{h:[.06, .66]}, {h:[-.06, .66]}]}),
+  'lateral-raise': two(mergeP(FR, {pr:[{k:'db', at:'hand0', front:1}, {k:'db', at:'hand1', front:1}]}), {a:[{h:[.46, .78]}, {h:[-.46, .78]}]}),
+  'bottle-raise': two(mergeP(FR, {pr:[{k:'bottle', at:'hand0'}, {k:'bottle', at:'hand1'}]}), {a:[{h:[.46, .78]}, {h:[-.46, .78]}]}),
+  'db-press': two(seat({a:[{h:[.07, .66], b:-1}, {h:[.05, .66], b:-1}], pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'back', x:-.15, y:.3}, ...DB]}), {a:[{h:[0, .93]}, {h:[-.02, .93]}]}),
+  ohp: press([{k:'barbell', at:'hand0'}], [.09, .8], [.02, 1.1]),
+  'backpack-press': press([{k:'pack', at:'hand0'}], [.09, .8], [.02, 1.1]),
+  'face-pull': two(mergeP(STA, {a:[{h:[.44, .86], b:1}, {h:[.42, .86], b:1}], pr:[{k:'cable', from:[.66, .88], to:'hand0'}, {k:'handle', at:'hand0'}]}), {a:[{h:[.13, .9]}, {h:[.11, .9]}]}),
+  shrug: two(mergeP(FR, {a:[{u:-90, f:-90}, {u:-90, f:-90}], pr:[{k:'pack', at:'hand0'}]}), {sl:.05}, {move:600, hold:400}),
+  'db-shrug': two(mergeP(FR, {a:[{u:-90, f:-90}, {u:-90, f:-90}], pr:[{k:'db', at:'hand0', front:1}, {k:'db', at:'hand1', front:1}]}), {sl:.05}, {move:600, hold:400}),
+  'farmer-walk': walk([{k:'db', at:'hand0'}]),
+  'bag-carry': walk([{k:'bag', at:'hand0'}]),
+  'bottle-wrist': two(seat({a:[{u:-60, f:-8}, {u:-62, f:-10}], pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'bottle', at:'hand0', off:[.02, -.03]}]}), {pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'bottle', at:'hand0', off:[.02, .05]}]}),
+  'towel-wring': two(mergeP(FR, {a:[{h:[.07, .62], b:1}, {h:[-.07, .66], b:-1}], pr:[{k:'towel', from:'hand0', to:'hand1', wide:1}]}), {a:[{h:[.07, .67]}, {h:[-.07, .61]}]}, {move:500, hold:150}),
+  'yt-raise': two(LIE_PRONE(), {tr:5, a:[{u:22, f:22}, {u:21, f:21}]}),
+  'snow-angel': two(LIE_PRONE({tr:5, a:[{u:186, f:186}, {u:185, f:185}]}), {a:[{u:20, f:20}, {u:19, f:19}]}, {move:1200, hold:300}),
+  'leg-press': two({v:'side', hip:[0, .25], tr:128, a:[{h:[-.02, .36], b:-1}, {h:[-.04, .36], b:-1}], l:[{h:[.14, .5], b:1, ft:45}, {h:[.12, .5], b:1, ft:45}], pr:[{k:'box', x:-.2, y:.2, w:.3}, {k:'sled', at:'ankle0'}, {k:'incline', x:-.05, y:.22, a:128}]}, {l:[{h:[.38, .7]}, {h:[.36, .7]}]}),
+  'leg-extension': two({v:'side', hip:[-.05, .43], tr:94, a:[{h:[-.05, .44], b:-1}, {h:[-.07, .44], b:-1}], l:[{u:0, f:-90, ft:0}, {u:-2, f:-92, ft:-2}], pr:[{k:'bench', x:-.3, y:.38, w:.48}, {k:'back', x:-.15, y:.4}, {k:'pad', at:'ankle0'}]}, {l:[{f:-6}, {f:-8}]}),
+  'leg-curl': two({v:'side', hip:[0, .4], tr:0, a:[{u:-80, f:-40}, {u:-82, f:-42}], l:[{u:180, f:180, ft:-90}, {u:178, f:178, ft:-90}], pr:[{k:'bench', x:-.55, y:.35, w:.95}, {k:'pad', at:'ankle0'}]}, {l:[{f:85}, {f:83}]}),
+  'calf-raise': two(mergeP(STA, {hip:[0, .62], l:[{h:[0, .12], ft:24}, {h:[-.03, .12], ft:24}], pr:[{k:'box', x:.03, y:.15, w:.35}]}), {hip:[0, .71], l:[{h:[0, .21], ft:-42}, {h:[-.03, .21], ft:-42}]}),
+  'sl-calf': two(mergeP(STA, {hip:[0, .62], a:[{h:[.3, .85], b:-1}], l:[{h:[0, .12], ft:24}, {h:[-.12, .35], ft:-60}], pr:[{k:'box', x:.03, y:.15, w:.35}, {k:'wall', x:.36}]}), {hip:[0, .71], a:[{h:[.3, .92]}], l:[{h:[0, .21], ft:-42}, {h:[-.12, .44]}]}),
+  'machine-calf': two(mergeP(STA, {hip:[0, .62], a:[{h:[.05, .85], b:1}, {h:[.03, .85], b:1}], l:[{h:[0, .12], ft:24}, {h:[-.03, .12], ft:24}], pr:[{k:'box', x:.03, y:.15, w:.35}, {k:'pad', at:'sh0', off:[0, .03]}]}), {hip:[0, .71], a:[{h:[.05, .94]}, {h:[.03, .94]}], l:[{h:[0, .21], ft:-42}, {h:[-.03, .21], ft:-42}]}),
+  'tib-raise': two({v:'side', hip:[-.12, .54], tr:95, a:[{u:-95, f:-92}, {u:-93, f:-90}], l:[{h:[.16, 0], ft:0}, {h:[.13, 0], ft:0}], pr:[{k:'wall', x:-.24}]}, {l:[{ft:38}, {ft:38}]}),
+  skip: A([mergeP(FR, {a:[{h:[.22, .55], b:1}, {h:[-.22, .55], b:-1}], pr:[{k:'rope', y:1.2}]}), mergeP(FR, {hip:[0, .56], a:[{h:[.22, .6], b:1}, {h:[-.22, .6], b:-1}], l:[{h:[.06, .06], ft:-50}, {h:[-.06, .06], ft:-130}], pr:[{k:'rope', y:-.06}]})], {move:260, hold:30}),
+  'cable-crunch': two({v:'side', hip:[0, .27], tr:84, a:[{h:[.12, .62], b:1}, {h:[.1, .62], b:1}], l:[{h:[-.25, .02], b:1, ft:180}, {h:[-.27, .02], b:1, ft:180}], pr:[{k:'cable', from:[.2, 1.18], to:'hand0'}]}, {tr:28, a:[{h:[.32, .4]}, {h:[.3, .4]}]}),
+  'wall-hs': two({v:'side', hip:[.01, .58], tr:-90, a:[{h:[.04, 0], b:1}, {h:[.02, 0], b:1}], l:[{h:[-.07, 1.06], ft:90}, {h:[-.09, 1.06], ft:90}], pr:[{k:'wall', x:-.14}]}, {hip:[.015, .585]}, {move:1500, hold:500}),
+  burpee: A([ST, squatK({hip:[-.12, .3], tr:35, a:[{h:[.24, 0]}, {h:[.22, 0]}]}), plankK([-.55, .03], [.21, .31], [.21, 0]), plankK([-.55, .03], [.23, .11], [.21, 0]), plankK([-.55, .03], [.21, .31], [.21, 0]), squatK({hip:[-.12, .3], tr:35, a:[{h:[.24, 0]}, {h:[.22, 0]}]}), mergeP(ST, {hip:[0, .63], a:[{h:[.05, 1.08]}, {h:[.03, 1.08]}], l:[{h:[.03, .13], ft:-45}, {h:[-.03, .13], ft:-45}]})], {move:330, hold:60}),
+  jacks: two(FR, {hip:[0, .52], a:[{h:[.24, 1.1], b:-1}, {h:[-.24, 1.1], b:1}], l:[{h:[.26, .01]}, {h:[-.26, .01]}]}, {move:300, hold:60}),
+};
+// Exercises that share a movement.
+const ANIM_ALIAS = {};
+
+/* ---------- exercise animation renderer: an SVG mannequin that loops each exercise ---------- */
+const ANIM_GLOW = {chest:'chest', upperback:'chest', traps:'chest', abs:'core', obliques:'core', lowerback:'core', shoulders:'delt', biceps:'upper', triceps:'upper', forearms:'fore', quads:'thigh', hamstrings:'thigh', glutes:'glute', calves:'shin'};
+const ANIM_MOVE_GROUPS = {burpee:['chest','quads'], jacks:['shoulders','calves'], situp:['abs']};
+const animFor = id => ANIMS[id] || ANIMS[ANIM_ALIAS[id]] || null;
+function animGlow(id){ const g = (typeof EX !== 'undefined' && EX[id] && EX[id].groups) || ANIM_MOVE_GROUPS[id] || []; return new Set(g.slice(0, 2).map(x => ANIM_GLOW[x]).filter(Boolean)); }
+const jointAt = (P, r) => { if (Array.isArray(r)) return r; const m = /^([a-z]+)(\d)?$/.exec(r || '') || []; const v = P[m[1]]; return v && m[2] != null ? v[+m[2]] : v; };
+const LIMB_W = {thigh:.09, shin:.072, foot:.044, upper:.066, fore:.056};
+const STATIC_PROPS = new Set(['bench', 'box', 'wall', 'bar', 'table', 'door', 'stack', 'back', 'incline', 'sled', 'plate', 'cable']);
+// Build the drawing for one pose: a list of [tag, attributes]. Rig y grows up; SVG y grows down.
+function animScene(pose, glow){
+  const P = solvePose(pose), out = [], f = n => Math.round(n * 1e4) / 1e4, front = P.front;
+  const L = (a, b, w, c) => out.push(['line', {x1:f(a[0]), y1:f(-a[1]), x2:f(b[0]), y2:f(-b[1]), 'stroke-width':w, class:c}]);
+  const C = (c, r, k) => out.push(['circle', {cx:f(c[0]), cy:f(-c[1]), r, class:k}]);
+  const E = (c, rx, ry, k) => out.push(['ellipse', {cx:f(c[0]), cy:f(-c[1]), rx, ry, class:k}]);
+  const R = (x, y, w, h, k, rx) => out.push(['rect', {x:f(x), y:f(-(y + h)), width:f(w), height:f(h), rx:rx == null ? .014 : rx, class:k}]);
+  const PG = (pts, k) => out.push(['polygon', {points:pts.map(p => f(p[0]) + ',' + f(-p[1])).join(' '), class:k}]);
+  const Q = (a, c, b, w, k) => out.push(['path', {d:`M${f(a[0])} ${f(-a[1])}Q${f(c[0])} ${f(-c[1])} ${f(b[0])} ${f(-b[1])}`, 'stroke-width':w, class:k}]);
+  const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  const seg = (a, b, part, far) => { const on = glow.has(part), w = LIMB_W[part], fc = far ? ' far' : '';
+    if (on) L(a, b, w + .075, 'halo' + fc);
+    L(a, b, w, 'bd' + (on ? ' on' : '') + fc);
+    L([a[0] - .009, a[1] + .011], [b[0] - .009, b[1] + .011], f(w * .28), 'hl' + fc); };
+  const leg = (i, far) => { seg(P.hp[i], P.knee[i], 'thigh', far); seg(P.knee[i], P.ankle[i], 'shin', far); seg(P.ankle[i], P.toe[i], 'foot', far); };
+  const arm = (i, far) => { seg(P.sh[i], P.el[i], 'upper', far); seg(P.el[i], P.hand[i], 'fore', far);
+    if (glow.has('delt')) { C(P.sh[i], .085, 'haloc' + (far ? ' far' : '')); C(P.sh[i], .043, 'dot on' + (far ? ' far' : '')); } };
+  // props
+  const prop = (p, layer) => {
+    const k = p.k, isStatic = STATIC_PROPS.has(k), far = p.far ? 'far' : 'near';
+    const want = k === 'towel' || k === 'rope' ? 'top' : isStatic ? 'back' : far;
+    if (want !== layer) return;
+    const at = p.at ? jointAt(P, p.at) : null, o = p.off || [0, 0], c = at ? [at[0] + o[0], at[1] + o[1]] : null, fc = p.far ? ' far' : '';
+    if (k === 'bench'){ R(p.x, p.y - .045, p.w, .045, 'pr'); [p.x + .05, p.x + p.w - .08].forEach(x => R(x, 0, .03, p.y - .045, 'pr leg', .006)); }
+    else if (k === 'box') R(p.x, 0, p.w, p.y, 'pr', .02);
+    else if (k === 'wall') R(p.x - .05, 0, .05, 1.32, 'pr wl', 0);
+    else if (k === 'bar'){ L([p.x - p.w / 2, p.y], [p.x + p.w / 2, p.y], .024, 'pll'); [p.x - p.w / 2, p.x + p.w / 2].forEach(x => L([x, p.y], [x, p.y + .06], .03, 'pll')); }
+    else if (k === 'table'){ R(p.x, p.y - .04, p.w, .04, 'pr'); [p.x + .02, p.x + p.w - .05].forEach(x => R(x, 0, .03, p.y - .04, 'pr leg', .006)); }
+    else if (k === 'door'){ R(p.x, 0, .045, 1.26, 'pr wl', .006); C([p.x, .7], .018, 'pl'); }
+    else if (k === 'stack'){ R(p.x, 0, .13, 1.12, 'pr wl', .01); for (let i = 0; i < 6; i++) R(p.x + .015, .05 + i * .055, .1, .045, 'pl', .006); }
+    else if (k === 'back') R(p.x - .055, p.y, .055, .46, 'pr', .025);
+    else if (k === 'incline'){ const d = dirv(p.a); L([p.x, p.y], [p.x + d[0] * .55, p.y + d[1] * .55], .055, 'pll'); }
+    else if (k === 'sled'){ const a = jointAt(P, p.at), d = dirv(135); L([a[0] - d[0] * .15, a[1] - d[1] * .15], [a[0] + d[0] * .15, a[1] + d[1] * .15], .045, 'pll'); }
+    else if (k === 'plate'){ C([p.x, p.y], .075, 'pl'); C([p.x, p.y], .022, 'hub'); }
+    else if (k === 'cable'){ const to = jointAt(P, p.to); L(p.from, to, .009, 'cb'); C(p.from, .026, 'pl'); }
+    else if (k === 'barbell'){ if (front){ L([c[0] - .4, c[1]], [c[0] + .4, c[1]], .02, 'pll'); [-.36, .36].forEach(x => R(c[0] + x - .02, c[1] - .1, .04, .2, 'pl', .01)); }
+      else { const r = p.small ? .06 : .112; C(c, r, 'pl' + fc); C(c, r * .55, 'rim' + fc); C(c, .018, 'hub' + fc); } }
+    else if (k === 'db'){ if (p.front) { R(c[0] - .055, c[1] - .02, .11, .04, 'pl' + fc, .01); R(c[0] - .065, c[1] - .03, .028, .06, 'pl' + fc, .008); R(c[0] + .037, c[1] - .03, .028, .06, 'pl' + fc, .008); }
+      else { const r = p.big ? .055 : .038; C(c, r, 'pl' + fc); C(c, .012, 'hub' + fc); } }
+    else if (k === 'pack'){ R(c[0] - .065, c[1] - .13, .13, .15, 'bag' + fc, .035); R(c[0] - .04, c[1] - .1, .08, .05, 'bagp' + fc, .015); }
+    else if (k === 'bag'){ L(c, [c[0], c[1] - .04], .012, 'cb'); R(c[0] - .07, c[1] - .22, .14, .18, 'bag' + fc, .03); }
+    else if (k === 'jug'){ R(c[0] - .04, c[1] - .13, .08, .12, 'jug' + fc, .02); L([c[0] - .02, c[1] - .01], [c[0] + .02, c[1] - .01], .014, 'pll' + fc); }
+    else if (k === 'bottle'){ R(c[0] - .018, c[1] - .05, .036, .1, 'jug' + fc, .012); R(c[0] - .01, c[1] + .05, .02, .02, 'pl' + fc, .004); }
+    else if (k === 'handle') L([c[0] - .04, c[1] + .005], [c[0] + .04, c[1] - .005], .022, 'pll');
+    else if (k === 'pad'){ C(c, .042, 'pl'); C(c, .014, 'hub'); }
+    else if (k === 'towel'){ const a = jointAt(P, p.from), b = jointAt(P, p.to), m = mix(a, b, .5); Q(a, [m[0], m[1] - (p.wide ? .03 : .07)], b, .026, 'tw'); }
+    else if (k === 'rope'){ const a = P.hand[0], b = P.hand[1], my = (a[1] + b[1]) / 2; Q(a, [(a[0] + b[0]) / 2, 2 * p.y - my], b, .012, 'rp'); }
+  };
+  const props = pose.pr || [], layer = l => props.forEach(p => prop(p, l));
+  E([P.hip[0], 0], .3, .022, 'sh');
+  layer('back');
+  // torso: a rounded polygon, deeper at the chest
+  const d = dirv(pose.tr != null ? pose.tr : 90), fw = dirv((pose.tr != null ? pose.tr : 90) - 90), bk = [-fw[0], -fw[1]];
+  const base = addv(P.hip, d, RIG.shoulder - .01);
+  const T = front ? [addv(P.hp[0], fw, .03), addv(P.sh[0], fw, .02), addv(P.sh[1], fw, -.02), addv(P.hp[1], fw, -.03)]
+    : [addv(P.hip, fw, .045), addv(base, fw, .062), addv(base, bk, .05), addv(P.hip, bk, .058)];
+  const torso = () => {
+    PG(T, 'tor');
+    const top = [mix(T[0], T[1], .48), T[1], T[2], mix(T[3], T[2], .48)], low = [T[0], mix(T[0], T[1], .52), mix(T[3], T[2], .52), T[3]];
+    if (glow.has('chest')) PG(top, 'tor on');
+    if (glow.has('core')) PG(low, 'tor on');
+    if (glow.has('glute')) { const g = front ? P.hip : addv(P.hip, bk, .03); C(g, .1, 'haloc'); C(g, .055, 'dot on'); }
+    L(P.neck, addv(P.neck, dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0)), .05), .05, 'bd');
+    C(P.head, .07, 'hd'); C([P.head[0] - .02, P.head[1] + .022], .02, 'hhl');
+  };
+  if (front && pose.lf){ layer('far'); torso(); leg(0); leg(1); arm(0); arm(1); layer('near'); }
+  else if (front){ leg(0); leg(1); layer('far'); torso(); arm(0); arm(1); layer('near'); }
+  else { leg(1, 1); arm(1, 1); layer('far'); torso(); leg(0); arm(0); layer('near'); }
+  layer('top');
+  return out;
+}
+function sceneBounds(items, bb){
+  const add = (x, y, r) => { r = r || 0; bb[0] = Math.min(bb[0], x - r); bb[1] = Math.min(bb[1], y - r); bb[2] = Math.max(bb[2], x + r); bb[3] = Math.max(bb[3], y + r); };
+  items.forEach(([t, a]) => {
+    if (a.class === 'sh' || / (wl|leg)\b/.test(' ' + a.class)) return;
+    if (t === 'line'){ const w = a['stroke-width'] / 2; add(a.x1, a.y1, w); add(a.x2, a.y2, w); }
+    else if (t === 'circle') add(a.cx, a.cy, a.r);
+    else if (t === 'ellipse'){ add(a.cx - a.rx, a.cy); add(a.cx + a.rx, a.cy); }
+    else if (t === 'rect'){ add(a.x, a.y); add(a.x + a.width, a.y + a.height); }
+    else { const n = String(a.points || a.d).match(/-?[\d.]+/g).map(Number);
+      if (t === 'path'){ add(n[0], n[1], .02); add(n[4], n[5], .02); add(.25 * n[0] + .5 * n[2] + .25 * n[4], .25 * n[1] + .5 * n[3] + .25 * n[5], .02); }
+      else for (let i = 0; i + 1 < n.length; i += 2) add(n[i], n[i + 1], .03); }
+  });
+  return bb;
+}
+// Fit every frame of the loop into a box of the given aspect (width / height), feet near the bottom.
+function animViewBox(anim, glow, ar){
+  const bb = [Infinity, Infinity, -Infinity, -Infinity], ks = anim.keys, n = ks.length === 2 ? 2 : ks.length, cyc = n * ((anim.hold != null ? anim.hold : 260) + (anim.move || 850));
+  for (let i = 0; i < 20; i++) sceneBounds(animScene(poseAt(anim, cyc * i / 20).pose, glow), bb);
+  bb[3] = Math.max(bb[3], .02);
+  const pad = .07; let x = bb[0] - pad, y = bb[1] - pad, w = bb[2] - bb[0] + pad * 2, h = bb[3] - bb[1] + pad * 2;
+  if (w / h > ar){ const nh = w / ar; y -= (nh - h) * .62; h = nh; } else { const nw = h * ar; x -= (nw - w) / 2; w = nw; }
+  return [x, y, w, h].map(v => Math.round(v * 1e3) / 1e3).join(' ');
+}
+// The pose that shows the work best (the end of the first move).
+const animStill = anim => anim.keys[anim.keys.length > 1 ? 1 : 0];
+function animEffort(anim, k, t, ms){ return anim.keys.length === 2 ? (k === 0 ? ease(t) : 1 - ease(t)) : .5 + .5 * Math.sin(ms / 300); }
+const animReg = new Set(); let animRaf = 0, animIO = null;
+function animApply(st, items){
+  const same = st.els && st.els.length === items.length && items.every((it, i) => st.els[i].tagName === it[0]);
+  if (!same){
+    st.g.innerHTML = items.map(([t, a]) => `<${t} ${Object.keys(a).map(k => `${k}="${a[k]}"`).join(' ')}/>`).join('');
+    st.els = [...st.g.children]; st.prev = items.map(it => it[1]); return;
+  }
+  items.forEach(([, a], i) => { const p = st.prev[i], el = st.els[i]; for (const k in a) if (p[k] !== a[k]) el.setAttribute(k, a[k]); st.prev[i] = a; });
+}
+function animDraw(st, now){
+  if (st.small && now - (st.last || 0) < 30) return; st.last = now;
+  const ms = (now - st.t0) + st.ph, r = poseAt(st.anim, ms);
+  animApply(st, animScene(r.pose, st.glow));
+  st.svg.style.setProperty('--g', animEffort(st.anim, r.k, r.t, ms).toFixed(2));
+}
+function animTick(now){
+  animRaf = 0; let any = false;
+  animReg.forEach(st => { if (!st.svg.isConnected){ animReg.delete(st); if (animIO) animIO.unobserve(st.svg); return; } if (st.vis){ animDraw(st, now); any = true; } });
+  if (any) animRaf = requestAnimationFrame(animTick);
+}
+const animKick = () => { if (!animRaf && !RM()) animRaf = requestAnimationFrame(animTick); };
+function animMount(svg){
+  const id = svg.dataset.anim, anim = animFor(id); svg.dataset.m = '1'; if (!anim) return;
+  const glow = animGlow(id), ar = +svg.dataset.ar || 4 / 3;
+  svg.setAttribute('viewBox', animViewBox(anim, glow, ar));
+  svg.innerHTML = '<g></g>';
+  const st = {svg, anim, glow, g:svg.firstChild, t0:performance.now(), ph:+svg.dataset.ph || 0, small:svg.classList.contains('th'), vis:!animIO};
+  if (RM()){ animApply(st, animScene(animStill(anim), glow)); svg.style.setProperty('--g', '1'); return; }
+  animDraw(st, st.t0); animReg.add(st);
+  if (animIO) animIO.observe(svg); else animKick();
+}
+function animScan(root){ (root || document).querySelectorAll('svg[data-anim]:not([data-m])').forEach(animMount); }
+function animSvg(id, cls, extra){ return animFor(id) ? `<svg class="anim ${cls || ''}" data-anim="${esc(id)}" ${extra || ''} aria-hidden="true" focusable="false"></svg>` : ''; }
+if (typeof window !== 'undefined' && window.MutationObserver){
+  if (window.IntersectionObserver) animIO = new IntersectionObserver(es => { es.forEach(e => animReg.forEach(st => { if (st.svg === e.target) st.vis = e.isIntersecting; })); animKick(); }, {rootMargin:'60px'});
+  new MutationObserver(() => { animScan(); animKick(); }).observe(document.documentElement, {childList:true, subtree:true});
+}
+
 /* ---------- mode: Challenge or Training ---------- */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
 const ICON_DUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg>';
@@ -3228,7 +3616,7 @@ function drawArena(){
 }
 function arenaIntro(){
   const ch = arena.ch, S = chState(), best = S.best[ch.id], nt = nextTarget(ch, best);
-  const moves = ch.moves.map(m => `<li><b>${MOVES[m].name}</b> ${esc(MOVES[m].how)}</li>`).join('');
+  const one = ch.moves.length === 1, moves = ch.moves.map(m => `<li>${animFor(m) ? `<span class="mv-th">${animSvg(m, '', one ? 'data-ar="2"' : 'data-ar="1"')}</span>` : ''}<span><b>${MOVES[m].name}</b> ${esc(MOVES[m].how)}</span></li>`).join('');
   return `<div class="ar-top"><button class="ar-x" data-ar="close" aria-label="Close">✕</button><span class="ar-fmt">${esc(chFmtLabel(ch))}</span></div>
     ${arena.duel ? `<p class="duel-banner">Duel: beat <span data-uid="${esc(arena.duel.from.uid)}">their</span> ${chVal(ch, arena.duel.from.score)} ${chUnit(ch)}${arena.duel.scaled ? ' (easier version)' : ''}</p>` : ''}
     <span class="ar-lvl">Level ${ch.level} · ${LEVEL_NAMES[ch.level]}</span>
@@ -3236,7 +3624,7 @@ function arenaIntro(){
     <p class="ar-blurb">${esc(ch.scheme || ch.blurb)}</p>
     <div class="ar-tiers">${ch.tiers.map((t, i) => `<div class="tier m-${MEDALS[i]}${reached(ch, best, t) ? ' got' : ''}"><span class="tier-m m-${MEDALS[i]}">${MEDAL_SVG}</span><b>${chVal(ch, t)}</b><span>${MEDAL_NAME[MEDALS[i]]}</span></div>`).join('')}</div>
     <div class="ar-stats"><span>Your best<b>${chVal(ch, best)}</b></span><span>Next target<b>${chVal(ch, nt.value)}</b></span></div>
-    <ul class="ar-moves">${moves}</ul>
+    <ul class="ar-moves${one ? ' one' : ''}">${moves}</ul>
     ${arena.lowBatt ? '<p class="ar-note">Low battery today, so we switched on the easier version. Switch it off if you feel good.</p>' : ''}
     <label class="ar-switch"><input type="checkbox" id="ar-scaled" ${arena.scaled ? 'checked' : ''}><span><b>Easier version</b><small>${esc(ch.easy)} Counts for XP, not for medals that unlock levels.</small></span></label>
     ${camMoveFor(ch) && camSupported() ? `<label class="ar-switch"><input type="checkbox" id="ar-cam-on" ${arena.cam ? 'checked' : ''}><span><b>Count with the camera</b><small>Phone on the floor, side-on, whole body in the picture. Nothing is recorded or sent.</small></span></label>` : ''}
