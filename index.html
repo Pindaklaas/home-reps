@@ -397,6 +397,36 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .pl-state{font-size:12.5px;font-weight:700;color:var(--accent)}
 .pl-row.done .pl-state{color:var(--good);font-size:18px}
 .habit-line{margin-top:10px;text-align:center}
+/* ---------- camera counting ---------- */
+.ar-cam{position:relative;height:min(30vh,230px);border-radius:20px;overflow:hidden;background:#000;flex:none}
+.ar-cam video,.ar-cam canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.cam-cue{position:absolute;left:10px;right:10px;bottom:10px;text-align:center;font-weight:700;font-size:15px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.ar-work.has-cam .ar-ring{width:min(46vw,190px,26vh)}
+.ar-work.has-cam .ar-count{font-size:clamp(56px,16vw,84px)}
+.ar-work.has-cam .ar-tap{min-height:70px;font-size:20px}
+/* ---------- wake-up alarm ---------- */
+#alarm{position:fixed;inset:0;z-index:75;background:var(--arena);color:var(--arena-ink);overflow:auto;color-scheme:dark}
+#alarm .ar-in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+#alarm .ar-row{display:flex;gap:8px}
+#alarm .ar-row button{flex:1;height:52px;border-radius:16px;border:0;background:color-mix(in srgb,var(--arena-ink) 12%,transparent);color:inherit;font-weight:700;font-size:15px}
+#alarm .ar-row button.primary{background:var(--accent);color:var(--accent-ink)}
+.al-in{justify-content:center}
+.al-time{font-family:var(--display);font-size:96px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+.al-task{display:flex;flex-direction:column;gap:2px;background:color-mix(in srgb,var(--arena-ink) 8%,transparent);border-radius:18px;padding:16px}
+.al-task b{font-family:var(--display);font-size:34px;text-transform:uppercase}
+.al-hold{position:relative;overflow:hidden;height:52px;border-radius:16px;border:1.5px solid color-mix(in srgb,var(--arena-ink) 30%,transparent);background:transparent;color:inherit;font-weight:700;font-size:14px;touch-action:none;user-select:none;-webkit-user-select:none}
+.al-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:color-mix(in srgb,var(--bad) 55%,transparent)}
+.al-hold.holding .al-fill{width:100%;transition:width 3s linear}
+.al-lbl{position:relative}
+.al-count{display:flex;align-items:baseline;justify-content:center;gap:10px}
+.al-count b{font-family:var(--display);font-size:clamp(90px,28vw,140px);line-height:.9;font-variant-numeric:tabular-nums}
+.al-count span{font-size:18px;opacity:.7}
+/* ---------- meal photo ---------- */
+.photo-drop{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px dashed var(--line);border-radius:var(--r);padding:22px 14px;text-align:center;cursor:pointer;font-weight:700}
+.photo-drop input{position:absolute;width:1px;height:1px;opacity:0}
+.photo-drop small{font-weight:500;color:var(--muted)}
+.meal-photo{width:100%;max-height:240px;object-fit:cover;border-radius:var(--r)}
 /* ---------- mode picker: Challenge or Training ---------- */
 #modepick{position:fixed;inset:0;z-index:65;background:var(--bg);overflow:auto}
 #modepick .mp-in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
@@ -674,6 +704,7 @@ body.mode-challenge .app{padding-bottom:40px}
 <div id="onboard" role="dialog" aria-modal="true" aria-label="Setup" hidden></div>
 <div id="modepick" role="dialog" aria-modal="true" aria-label="Choose Challenge or Training" hidden></div>
 <div id="arena" role="dialog" aria-modal="true" aria-label="Challenge" hidden></div>
+<div id="alarm" role="alertdialog" aria-modal="true" aria-label="Wake-up alarm" hidden></div>
 <div id="timer" hidden><div class="tm" role="timer">
   <svg class="ring" viewBox="0 0 44 44" aria-hidden="true"><circle class="trk" cx="22" cy="22" r="19"/><circle class="arc" cx="22" cy="22" r="19"/></svg>
   <div class="tm-txt"><span class="tm-l" id="tm-l">Rest</span><b class="tm-t" id="tm-t">1:00</b></div>
@@ -926,6 +957,11 @@ function openSheet(html){
   const root = document.getElementById('sheet-root'); clearTimeout(closeSheet.t);
   root.innerHTML = `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true"><div class="grab" title="Drag down to close"></div>${html}</div></div>`;
   const first = root.querySelector('.sheet button'); if (first) first.focus();
+}
+function showSheet(html){
+  const sh = document.querySelector('#sheet-root .scrim:not(.closing) .sheet');
+  if (!sh) return openSheet(html);
+  const top = sh.scrollTop; sh.innerHTML = '<div class="grab" title="Drag down to close"></div>' + html; sh.scrollTop = top;
 }
 function closeSheet(){
   const root = document.getElementById('sheet-root'), sc = root.querySelector('.scrim');
@@ -1229,7 +1265,7 @@ function drawFood(){
       <p class="small muted">You can still use workouts, stretching and recipes. If you answered by mistake, delete your health answers below and try again.</p></div>`;
     return;
   }
-  let h = profile ? '' : `<p class="banner">Showing an <b>example profile</b> (30-year-old woman, 68 kg). Fill in your answers below to get your own numbers.</p>`;
+  let h = mealCard() + (profile ? '' : `<p class="banner">Showing an <b>example profile</b> (30-year-old woman, 68 kg). Fill in your answers below to get your own numbers.</p>`);
   if (pl && pl.plan.nutrition){ const n = pl.plan.nutrition;
     h += `<div class="panel stack"><div class="row" style="justify-content:space-between"><b>Your plan’s nutrition</b><span class="badge ${pl.status==='approved'?'ok':''}">${pl.status==='approved'?'Approved by Coach Dani':'Waiting for review'}</span></div>
       <div class="kpis" style="margin-top:0"><div class="kpi"><span class="v">${n.kcal}</span><span class="l">kcal / day</span></div><div class="kpi"><span class="v">${n.protein}g</span><span class="l">Protein</span></div><div class="kpi"><span class="v">${n.carbs}g</span><span class="l">Carbs</span></div><div class="kpi"><span class="v">${n.fat}g</span><span class="l">Fat</span></div></div>
@@ -1269,7 +1305,7 @@ function fillForm(){
 /* ---------- schedule ---------- */
 function drawSchedule(){
   const total = DAYS.reduce((n,d)=>n+schedule[d].length,0), planned = !!planInfo();
-  let h = plannerHtml();
+  let h = plannerHtml() + alarmSettingsHtml();
   if (planned) h += `<h3>Extra exercises</h3>` + (total ? '' : `<p class="small muted">Add extras from the Body tab with <b>+ Schedule</b>. They show up on Today next to your plan.</p>`);
   if (!total && !planned){
     h += `<div class="empty"><p><b>Your week is empty.</b></p><p class="small" style="margin-top:4px">Tap a muscle on the body, then <b>+ Schedule</b> on any exercise. Or start from a sample week and edit it.</p>
@@ -1569,6 +1605,96 @@ function weekPlanning(planDays, time, minutes){
     return d ? {day, type:'train', title:d.title, time:time || null, minutes:+minutes || null, count:d.exercises.length} : {day, type:'rest'}; });
 }
 /* habits-core:end */
+
+/* pose-core:start — rep counting from body landmarks, pure (no DOM). Same rules will run in the native app. Tested in tests/pose.test.mjs */
+// Landmark indices (MediaPipe / ML Kit 33-point body model).
+const LM = {ls:11, rs:12, le:13, re:14, lw:15, rw:16, lh:23, rh:24, lk:25, rk:26, la:27, ra:28};
+function angleAt(a, b, c){
+  const ux = a.x - b.x, uy = a.y - b.y, vx = c.x - b.x, vy = c.y - b.y, d = Math.hypot(ux, uy) * Math.hypot(vx, vy);
+  if (!d) return null;
+  return Math.acos(Math.max(-1, Math.min(1, (ux * vx + uy * vy) / d))) * 180 / Math.PI;
+}
+const vis = p => !p ? 0 : (p.visibility == null ? 1 : p.visibility);
+// Use the side of the body the camera sees best (the phone films from the side).
+function sideOf(lm){
+  const sum = s => ['s','e','w','h','k','a'].reduce((n, k) => n + vis(lm[LM[s + k]]), 0);
+  return sum('l') >= sum('r') ? 'l' : 'r';
+}
+function poseFeatures(move, lm){
+  if (!lm || lm.length < 29) return {ok:false, why:'nobody'};
+  const s = sideOf(lm), P = k => lm[LM[s + k]];
+  const sh = P('s'), el = P('e'), wr = P('w'), hip = P('h'), kn = P('k'), an = P('a');
+  const need = move === 'pushup' ? [sh, el, wr, hip, an] : [sh, hip, kn, an];
+  if (need.some(p => vis(p) < 0.5)) return {ok:false, why:'frame'};
+  if (move === 'pushup') return {ok:true, joint:angleAt(sh, el, wr), body:angleAt(sh, hip, an)};
+  return {ok:true, joint:angleAt(hip, kn, an), body:angleAt(sh, hip, kn)};
+}
+// A rep counts when the joint goes below `down` and back above `up`, with a straight body (push-ups) and not faster than minMs.
+const REP_RULES = {pushup:{down:95, up:150, body:150, minMs:450, partial:25}, squat:{down:105, up:160, body:0, minMs:500, partial:25}};
+const CUES = {
+  pushup:{start:'Start at the top with straight arms', lower:'Go a little lower', body:'Keep your body in a straight line'},
+  squat:{start:'Stand tall to start', lower:'Squat a little deeper', body:''},
+  nobody:'Step into the picture', frame:'Get your whole body in the picture', fast:'Slow down a little'
+};
+function makeRepCounter(move, rules){
+  const R = rules || REP_RULES[move], C = CUES[move];
+  let phase = 'up', reps = 0, last = -1e9, primed = false, bad = false, minUp = 180;
+  return {
+    get reps(){ return reps; },
+    update(t, f){
+      if (!f || !f.ok) return {reps, phase, counted:false, cue: CUES[(f && f.why) || 'nobody']};
+      let cue = '', counted = false;
+      if (!primed){ if (f.joint >= R.up) primed = true; else return {reps, phase, counted, cue:C.start}; }
+      if (R.body && f.body != null && f.body < R.body) bad = true;
+      if (phase === 'up'){
+        minUp = Math.min(minUp, f.joint);
+        if (f.joint <= R.down){ phase = 'down'; }
+        else if (f.joint >= R.up && minUp < R.up - R.partial){ cue = C.lower; minUp = 180; bad = false; }
+        else if (f.joint >= R.up){ minUp = 180; bad = false; }
+      } else if (f.joint >= R.up){
+        phase = 'up'; minUp = 180;
+        if (bad) cue = C.body;
+        else if (t - last < R.minMs) cue = CUES.fast;
+        else { reps++; last = t; counted = true; }
+        bad = false;
+      }
+      return {reps, phase, counted, cue};
+    }
+  };
+}
+/* pose-core:end */
+
+/* alarm-core:start — wake-up alarm rules, pure (no DOM). Tested in tests/alarm.test.mjs */
+const ALARM_DEFAULT = {on:false, time:'07:00', days:['mon','tue','wed','thu','fri','sat','sun'], mode:'commit', rearm:5, reps:10, maxMin:60, pausedUntil:null};
+const pad2 = n => String(n).padStart(2, '0');
+const localDay = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const WEEKDAY = d => ['sun','mon','tue','wed','thu','fri','sat'][d.getDay()];
+// Next time the alarm should ring, or null when it is off. Paused days (sick or travelling) are skipped.
+function nextAlarmAt(cfg, now){
+  if (!cfg || !cfg.on) return null;
+  const [h, m] = String(cfg.time).split(':').map(Number);
+  for (let i = 0; i < 15; i++){
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i, h, m, 0, 0);
+    if (d <= now) continue;
+    if (!(cfg.days || []).includes(WEEKDAY(d))) continue;
+    if (cfg.pausedUntil && localDay(d) <= cfg.pausedUntil) continue;
+    return d;
+  }
+  return null;
+}
+// The task that stops the alarm. Gentle health mode always gets an easy minute of movement.
+function alarmTask(cfg, gentle){ return gentle ? {move:'mobility', sec:60} : {move:'pushup', reps:Math.max(1, Math.min(30, +cfg.reps || 10))}; }
+// Leaving the task: commitment mode rings again after `rearm` minutes, but never beyond maxMin from the first ring.
+function afterAbandon(cfg, firstRing, now){
+  if (cfg.mode !== 'commit') return {status:'stopped'};
+  const next = new Date(now.getTime() + (cfg.rearm || 5) * 60000);
+  if (next - firstRing > (cfg.maxMin || 60) * 60000) return {status:'expired'};
+  return {status:'rearmed', nextRing:next};
+}
+// Points: verified by camera earns full points, tapping earns less, an emergency stop earns none (and never takes any away).
+const alarmPoints = how => how === 'camera' ? 10 : how === 'tap' ? 4 : 0;
+/* alarm-core:end */
+
 
 
 
@@ -2027,21 +2153,19 @@ function habitsSheet(){
   const log = habitLog(todayISO()), sc = batteryScore(log), col = batteryColor(sc), o = store.get('onboarding', null), lvl = o && o.answers && o.answers.level;
   const row = (k, opts) => `<div class="chipset">${opts.map(([v, l]) => `<button class="pick" data-hab="${k}" data-v="${v}" aria-pressed="${log[k] === v}">${l}</button>`).join('')}</div>`;
   const w = log.water || 0;
-  openSheet(`<div class="batt-head">${battIcon(sc, true)}<div><h2>${sc == null ? 'Charge your battery' : sc + '%'}</h2><p class="small muted">${BATT_MSG[col]}</p></div></div>
+  showSheet(`<div class="batt-head">${battIcon(sc, true)}<div><h2>${sc == null ? 'Charge your battery' : sc + '%'}</h2><p class="small muted">${BATT_MSG[col]}</p></div></div>
     ${lvl === 'start' ? '<p class="note">Your first weeks: these habits matter more than the weights.</p>' : ''}
     ${block('Sleep last night', row('sleep', SLEEP_OPTS))}
     ${block(`Water today · ${w} of ${WATER_GOAL} glasses`, `<div class="glasses">${Array.from({length:WATER_GOAL}, (_, i) => `<button class="glass${i < w ? ' full' : ''}" data-water="${i + 1 === w ? i : i + 1}" aria-label="${i + 1} glasses"></button>`).join('')}</div>`)}
     ${block('Protein and veg at most meals?', row('food', FOOD_OPTS))}
     ${block('Steps today', row('move', MOVE_OPTS))}
-    <div class="row"><button class="btn primary" data-close="1">Done</button></div>`);
+    <div class="row"><button class="btn primary" data-close="1">Done</button><button class="btn" data-meal="open">Log a meal</button></div>`);
 }
 document.getElementById('sheet-root').addEventListener('click', ev => {
   const h = ev.target.closest('[data-hab],[data-water]'); if (!h) return;
   if (h.dataset.hab){ const k = h.dataset.hab, cur = habitLog(todayISO())[k]; setHabit(k, cur === h.dataset.v ? undefined : h.dataset.v); }
   else setHabit('water', +h.dataset.water);
-  buzz(8);
-  const sc = document.querySelector('.sheet').scrollTop;
-  habitsSheet(); document.querySelector('.sheet').scrollTop = sc; document.querySelector('.scrim').style.animation = 'none'; document.querySelector('.sheet').style.animation = 'none';
+  buzz(8); habitsSheet();
   if (ui.tab === 'today' && ui.mode !== 'challenge'){ todayAnim = false; drawToday(); }
 });
 
@@ -2072,6 +2196,269 @@ function plannerHtml(){
   h += `<p class="small muted habit-line">Every day: 8 h sleep · ${WATER_GOAL} glasses of water · protein at every meal · 8k steps</p>`;
   return h;
 }
+
+
+/* ---------- camera rep counting (on this device only: frames are never stored or sent) ---------- */
+const MP_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+const POSE_MODEL = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
+let poseLandmarker = null;
+const camSupported = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+async function loadPose(){
+  if (poseLandmarker) return poseLandmarker;
+  const v = await import(MP_BASE + '/vision_bundle.mjs');
+  const files = await v.FilesetResolver.forVisionTasks(MP_BASE + '/wasm');
+  const opts = d => ({baseOptions:{modelAssetPath:POSE_MODEL, delegate:d}, runningMode:'VIDEO', numPoses:1});
+  try { poseLandmarker = await v.PoseLandmarker.createFromOptions(files, opts('GPU')); }
+  catch (e){ poseLandmarker = await v.PoseLandmarker.createFromOptions(files, opts('CPU')); }
+  return poseLandmarker;
+}
+const camError = e => e && e.name === 'NotAllowedError' ? 'Camera permission was declined. Count by tapping instead.'
+  : e && e.name === 'NotFoundError' ? 'No camera found. Count by tapping instead.'
+  : 'The camera isn’t available here (it is in the mobile app). Count by tapping instead.';
+const SKEL = [[11,13],[13,15],[12,14],[14,16],[11,12],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]];
+function drawSkeleton(ctx, w, h, pts){
+  ctx.clearRect(0, 0, w, h); if (!pts) return;
+  ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.strokeStyle = 'rgba(255,255,255,.85)';
+  SKEL.forEach(([a, b]) => { const p = pts[a], q = pts[b]; if (vis(p) < .5 || vis(q) < .5) return; ctx.beginPath(); ctx.moveTo(p.x * w, p.y * h); ctx.lineTo(q.x * w, q.y * h); ctx.stroke(); });
+}
+// Starts the camera in `box` and calls onUpdate({reps, cue, counted}) for every frame. Resolves with a stop() function.
+async function startCamCounter(box, move, onUpdate){
+  box.innerHTML = '<video playsinline muted autoplay></video><canvas></canvas><span class="cam-cue">Starting camera…</span>';
+  const video = box.querySelector('video'), canvas = box.querySelector('canvas'), cueEl = box.querySelector('.cam-cue'), ctx = canvas.getContext('2d');
+  let stream = null, stopped = false, raf = 0;
+  const stop = () => { stopped = true; cancelAnimationFrame(raf); if (stream) stream.getTracks().forEach(t => t.stop()); box.innerHTML = ''; };
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width:{ideal:640}, height:{ideal:480}}, audio:false});
+    if (stopped){ stop(); return stop; }
+    video.srcObject = stream; await video.play();
+    cueEl.textContent = 'Loading body tracking…';
+    const lm = await loadPose(); if (stopped) return stop;
+    const counter = makeRepCounter(move); let lastT = 0;
+    (function frame(){
+      if (stopped) return;
+      const t = performance.now();
+      if (video.readyState >= 2 && t > lastT){
+        lastT = t;
+        if (canvas.width !== video.videoWidth){ canvas.width = video.videoWidth; canvas.height = video.videoHeight; }
+        const r = lm.detectForVideo(video, t), pts = r.landmarks && r.landmarks[0];
+        drawSkeleton(ctx, canvas.width, canvas.height, pts);
+        const st = counter.update(t, poseFeatures(move, pts));
+        cueEl.textContent = st.cue || (st.phase === 'down' ? 'Up!' : '');
+        onUpdate(st);
+      }
+      raf = requestAnimationFrame(frame);
+    })();
+  } catch (e){ stop(); throw e; }
+  return stop;
+}
+
+/* ---------- arena: camera option for push-up and squat challenges ---------- */
+const camMoveFor = ch => ch.moves.length === 1 && (ch.moves[0] === 'pushup' || ch.moves[0] === 'squat') && (ch.fmt === 'amrap' || ch.fmt === 'fortime') ? ch.moves[0] : null;
+async function arenaCamStart(){
+  const box = document.getElementById('ar-cam'); if (!box || !arena) return;
+  try {
+    arena.camStop = await startCamCounter(box, camMoveFor(arena.ch), st => {
+      if (!arena || arena.phase !== 'work' || !st.counted) return;
+      arena.camReps = (arena.camReps || 0) + 1;
+      if (arena.ch.fmt === 'fortime') repDone(1); else setCount(arena.count + 1);
+    });
+  } catch (e){ box.outerHTML = `<p class="ar-ghost">${camError(e)}</p>`; arena.cam = false; }
+}
+function arenaCamStop(){ if (arena && arena.camStop){ arena.camStop(); arena.camStop = null; } }
+
+/* ---------- wake-up alarm (in the prototype it only rings while the app is open) ---------- */
+const alarmCfg = () => ({...ALARM_DEFAULT, ...(store.get('alarm', {}) || {})});
+let alarmRun = null;      // {firstRing, how, stop, reps, phase}
+let alarmAudio = null;
+function ringStart(){
+  ringStop();
+  buzz([400, 200, 400, 200, 400]);
+  alarmAudio = setInterval(() => { tone(880, .18); setTimeout(() => tone(1175, .18), 220); buzz([300, 150, 300]); }, 1200);
+}
+function ringStop(){ clearInterval(alarmAudio); alarmAudio = null; }
+function checkAlarm(){
+  const cfg = alarmCfg(); if (!cfg.on || alarmRun) return;
+  const st = store.get('alarmState', null), now = new Date();
+  if (st && st.status === 'rearmed' && new Date(st.nextRing) <= now) return openAlarm(new Date(st.firstRing));
+  const due = nextAlarmAt(cfg, new Date(now.getTime() - 60000));
+  if (due && due <= now && now - due < 60000 && !(st && st.day === localDay(now))) openAlarm(now);
+}
+setInterval(checkAlarm, 15000);
+function openAlarm(firstRing){
+  const cfg = alarmCfg(), now = new Date();
+  alarmRun = {firstRing: firstRing || now, phase:'ring', how:null, reps:0};
+  store.set('alarmState', {day:localDay(now), status:'ringing', firstRing:alarmRun.firstRing.toISOString()});
+  document.getElementById('alarm').hidden = false; document.body.style.overflow = 'hidden';
+  drawAlarm(); ringStart(); holdWake();
+}
+function closeAlarm(){
+  ringStop(); if (alarmRun && alarmRun.stop) alarmRun.stop(); alarmRun = null; releaseWake();
+  const el = document.getElementById('alarm'); el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
+  if (ui.mode !== 'challenge') render();
+}
+function drawAlarm(){
+  const el = document.getElementById('alarm'), cfg = alarmCfg(), task = alarmTask(cfg, currentLimits().mode === 'gentle');
+  const o = store.get('onboarding', null), why = o && o.answers && o.answers.why, now = new Date();
+  const taskTxt = task.move === 'pushup' ? `${task.reps} push-ups` : '1 minute of easy movement';
+  if (alarmRun.phase === 'ring'){
+    el.innerHTML = `<div class="ar-in al-in"><span class="al-time">${pad2(now.getHours())}:${pad2(now.getMinutes())}</span>
+      <h2 class="ar-name">Good morning</h2>${why ? `<p class="ar-blurb">“${esc(why)}”</p>` : ''}
+      <div class="al-task"><span class="small" style="opacity:.7">To switch it off</span><b>${taskTxt}</b></div>
+      <button class="ar-go" data-al="start">Let’s do it</button>
+      <button class="al-hold" data-al="hold"><span class="al-fill"></span><span class="al-lbl">Emergency stop: hold 3 seconds</span></button>
+      ${cfg.mode === 'commit' ? `<p class="ar-note">Commitment mode: if you leave the task, it rings again in ${cfg.rearm} minutes.</p>` : ''}</div>`;
+  } else if (alarmRun.phase === 'task'){
+    const useCam = task.move === 'pushup' && camSupported();
+    el.innerHTML = `<div class="ar-in al-in"><div class="ar-top"><button class="ar-x" data-al="leave">Later</button><b class="ar-title">${taskTxt}</b></div>
+      ${task.move === 'pushup' ? `<div class="al-count"><b id="al-n">${alarmRun.reps}</b><span>of ${task.reps}</span></div>
+        ${useCam ? '<div class="ar-cam" id="al-cam"></div><p class="ar-note">Phone on the floor, side-on, whole body in the picture. Nothing is recorded or sent.</p>' : ''}
+        <button class="ar-tap" data-al="tap">${useCam ? 'Camera not working? Tap each one' : 'Tap each push-up'}</button>`
+      : `<div class="al-count"><b id="al-n">60</b><span>seconds</span></div><p class="ar-blurb">March on the spot and roll your shoulders. Stop if anything hurts.</p><button class="ar-tap" data-al="mob">Start the minute</button>`}</div>`;
+    if (useCam){
+      startCamCounter(document.getElementById('al-cam'), 'pushup', st => { if (st.counted && alarmRun) alarmRep('camera'); })
+        .then(stop => { if (alarmRun) alarmRun.stop = stop; else stop(); })
+        .catch(e => { const b = document.getElementById('al-cam'); if (b) b.outerHTML = `<p class="ar-note">${camError(e)}</p>`; });
+    }
+  } else if (alarmRun.phase === 'confirm'){
+    el.innerHTML = `<div class="ar-in al-in"><h2 class="ar-name">Stop today’s alarm?</h2>
+      <p class="ar-blurb">No points today. Nothing is taken away, and tomorrow is a fresh start.</p>
+      <div class="ar-row"><button data-al="back">Back to the task</button><button class="primary" data-al="stop">Stop the alarm</button></div></div>`;
+  }
+}
+function alarmRep(how){
+  const task = alarmTask(alarmCfg(), false); if (!alarmRun || alarmRun.phase !== 'task') return;
+  alarmRun.reps++; if (how === 'camera') alarmRun.cam = (alarmRun.cam || 0) + 1;
+  const n = document.getElementById('al-n'); if (n){ n.textContent = alarmRun.reps; bump(n); } buzz(10);
+  if (alarmRun.reps >= task.reps) alarmDone(alarmRun.cam >= task.reps * 0.6 ? 'camera' : 'tap');
+}
+function alarmDone(how){
+  const pts = alarmPoints(how);
+  if (pts) addPoints(pts, how === 'camera' ? 'wake_task_verified' : 'wake_task');
+  store.set('alarmState', {...(store.get('alarmState', {}) || {}), day:localDay(new Date()), status:'done', how});
+  closeAlarm(); celebrate(`Morning won! +${pts} points`);
+}
+(function holdToStop(){
+  let t0 = 0, timer = 0;
+  const el = () => document.querySelector('#alarm [data-al="hold"]');
+  document.getElementById('alarm').addEventListener('pointerdown', ev => {
+    if (!ev.target.closest('[data-al="hold"]')) return;
+    t0 = performance.now(); const b = el(); b.classList.add('holding');
+    timer = setTimeout(() => { if (alarmRun){ ringStop(); alarmRun.phase = 'confirm'; drawAlarm(); } }, 3000);
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(n => document.getElementById('alarm').addEventListener(n, () => { clearTimeout(timer); const b = el(); if (b) b.classList.remove('holding'); }));
+})();
+document.getElementById('alarm').addEventListener('click', ev => {
+  const t = ev.target.closest('[data-al]'); if (!t || !alarmRun) return;
+  const a = t.dataset.al, cfg = alarmCfg();
+  if (a === 'start'){ ringStop(); alarmRun.phase = 'task'; return drawAlarm(); }
+  if (a === 'tap') return alarmRep('tap');
+  if (a === 'mob' && !alarmRun.mobT){
+    const end = Date.now() + 60000; t.disabled = true;
+    alarmRun.mobT = setInterval(() => { const left = Math.ceil((end - Date.now()) / 1000), n = document.getElementById('al-n');
+      if (n) n.textContent = Math.max(0, left); if (left <= 0){ clearInterval(alarmRun.mobT); alarmDone('tap'); } }, 250);
+    return;
+  }
+  if (a === 'leave'){
+    if (alarmRun.stop) alarmRun.stop();
+    const r = afterAbandon(cfg, alarmRun.firstRing, new Date());
+    store.set('alarmState', {day:localDay(new Date()), firstRing:alarmRun.firstRing.toISOString(), status:r.status, nextRing:r.nextRing ? r.nextRing.toISOString() : null});
+    closeAlarm();
+    return toast(r.status === 'rearmed' ? `It rings again at ${pad2(r.nextRing.getHours())}:${pad2(r.nextRing.getMinutes())}.` : r.status === 'expired' ? 'Alarm finished for today. Tomorrow is a fresh start.' : 'Alarm off. See you tomorrow.');
+  }
+  if (a === 'back'){ alarmRun.phase = 'task'; return drawAlarm(); }
+  if (a === 'stop'){ store.set('alarmState', {day:localDay(new Date()), status:'stopped'}); closeAlarm(); return toast('Alarm stopped. Tomorrow is a fresh start.'); }
+});
+function alarmSettingsHtml(){
+  const c = alarmCfg(), next = nextAlarmAt(c, new Date()), gentle = currentLimits().mode === 'gentle';
+  const chip = (k, opts) => `<div class="chipset">${opts.map(([v, l]) => `<button class="pick" data-alcfg="${k}" data-v="${v}" aria-pressed="${String(c[k]) === String(v)}">${l}</button>`).join('')}</div>`;
+  let h = `<h3>Wake-up alarm</h3><div class="panel stack">
+    <label class="consent" style="padding:0;border:0;background:none"><input type="checkbox" id="al-on" ${c.on ? 'checked' : ''}><span>Ring every morning until I do my task<small>${c.on && next ? `Next: ${DAY_FULL[WEEKDAY(next)]} at ${c.time}` : 'Off'}${c.pausedUntil ? ` · paused until ${c.pausedUntil}` : ''}</small></span></label>`;
+  if (c.on) h += `<div class="ob-grid"><label class="ob-field">Time<input type="time" id="al-time" value="${esc(c.time)}"></label>
+      ${block('Push-ups to stop it', chip('reps', [['5','5'],['10','10'],['15','15']]))}</div>
+    ${block('Mode', chip('mode', [['commit','Commitment'],['gentle','Gentle']]))}
+    ${c.mode === 'commit' ? block('If I leave the task, ring again in', chip('rearm', [['3','3 min'],['5','5 min'],['10','10 min']])) : ''}
+    ${block('Sick or travelling?', chip('pause', [['1','Pause 1 day'],['3','3 days'],['7','1 week'],['0','Resume']]))}
+    ${gentle ? '<p class="small muted">Gentle health mode: the task is one easy minute of movement.</p>' : ''}
+    <button class="btn sm" id="al-test" style="align-self:flex-start">Try it now</button>`;
+  h += `<p class="small muted">Prototype: it only rings while the app is open. The mobile app will ring even when your phone is locked, and you can always stop it in an emergency.</p></div>`;
+  return h;
+}
+function setAlarmCfg(patch){ store.set('alarm', {...alarmCfg(), ...patch}); drawSchedule(); }
+document.getElementById('v-sched').addEventListener('click', ev => {
+  const t = ev.target.closest('[data-alcfg],#al-test'); if (!t) return;
+  if (t.id === 'al-test') return openAlarm(new Date());
+  const k = t.dataset.alcfg, v = t.dataset.v;
+  if (k === 'pause'){ if (v === '0') return setAlarmCfg({pausedUntil:null}); const d = new Date(); d.setDate(d.getDate() + (+v) - 1); toast('Alarm paused. Get well soon, or have a good trip.'); return setAlarmCfg({pausedUntil:localDay(d)}); }
+  setAlarmCfg({[k]: k === 'mode' ? v : +v});
+});
+document.getElementById('v-sched').addEventListener('change', ev => {
+  if (ev.target.id === 'al-on') setAlarmCfg({on:ev.target.checked});
+  if (ev.target.id === 'al-time' && ev.target.value) setAlarmCfg({time:ev.target.value});
+});
+
+/* ---------- meal photo check ---------- */
+const MEAL_SLOTS = [['breakfast','Breakfast'],['lunch','Lunch'],['dinner','Dinner'],['snack','Snack']];
+let mealDraft = null;
+function mealsToday(){ return ((store.get('meals', {}) || {})[todayISO()]) || []; }
+function mealCard(){
+  const n = mealsToday().length;
+  return `<div class="cta-card"><span><b>Log a meal</b><span class="small muted">${n ? `${n} logged today. ` : ''}A photo and two taps. Feeds your battery.</span></span><button class="btn sm primary" data-meal="open">Log meal</button></div>`;
+}
+function mealSheet(){
+  const d = mealDraft, can = d.aiReady;
+  showSheet(`<h2>Log a meal</h2>
+    ${d.url ? `<img class="meal-photo" src="${d.url}" alt="Your meal">` : `<label class="photo-drop"><input type="file" accept="image/*" capture="environment" id="meal-file"><span>Take or choose a photo</span><small>Optional. It stays on your phone unless you ask the AI to check it.</small></label>`}
+    ${block('Which meal?', `<div class="chipset">${MEAL_SLOTS.map(([v, l]) => `<button class="pick" data-mealk="slot" data-v="${v}" aria-pressed="${d.slot === v}">${l}</button>`).join('')}</div>`)}
+    ${block('What’s on the plate?', `<div class="chipset"><button class="pick" data-mealt="protein" aria-pressed="${!!d.protein}">Protein</button><button class="pick" data-mealt="veg" aria-pressed="${!!d.veg}">Veg or fruit</button></div>`)}
+    ${d.url && can ? `<label class="consent"><input type="checkbox" id="meal-ai" ${d.ai ? 'checked' : ''}><span>Check this photo with AI (Claude)<small>Sends only this photo, once. Nothing is saved.</small></span></label>` : ''}
+    ${d.msg ? `<p class="note">${esc(d.msg)}</p>` : ''}
+    <div class="row"><button class="btn primary" data-meal="save" ${d.slot ? '' : 'disabled'}>${d.busy ? 'Checking…' : 'Log meal'}</button><button class="btn ghost" data-close="1">Cancel</button></div>`);
+}
+function logMeal(rec){
+  const all = store.get('meals', {}) || {}, day = todayISO(), list = all[day] || [];
+  list.push(rec); all[day] = list;
+  const keys = Object.keys(all).sort(); while (keys.length > 60) delete all[keys.shift()];
+  store.set('meals', all);
+  const good = list.filter(m => m.protein && m.veg).length;
+  setHabit('food', good >= 2 ? 'yes' : list.some(m => m.protein || m.veg) ? 'mostly' : 'no');
+  const pts = list.length <= 3 ? 3 : 0; if (pts) addPoints(pts, 'meal_photo');
+  return pts;
+}
+document.getElementById('sheet-root').addEventListener('change', async ev => {
+  if (!mealDraft) return;
+  if (ev.target.id === 'meal-file' && ev.target.files[0]){
+    mealDraft.file = ev.target.files[0]; mealDraft.url = URL.createObjectURL(mealDraft.file); mealSheet();
+  }
+  if (ev.target.id === 'meal-ai') mealDraft.ai = ev.target.checked;
+});
+document.addEventListener('click', async ev => {
+  const t = ev.target.closest('[data-meal],[data-mealk],[data-mealt]'); if (!t) return;
+  if (t.dataset.meal === 'open'){
+    mealDraft = {slot:null, protein:false, veg:false, ai:false, aiReady:false};
+    if (window.claude && typeof window.claude.use === 'function') window.claude.use('sample').then(async s => { if (!s || !mealDraft) return; const l = await s.limits().catch(() => null); if (l && l.images){ mealDraft.sample = s; mealDraft.aiReady = true; if (document.querySelector('.sheet')) mealSheet(); } });
+    return mealSheet();
+  }
+  if (!mealDraft) return;
+  if (t.dataset.mealk){ mealDraft.slot = t.dataset.v; return mealSheet(); }
+  if (t.dataset.mealt){ mealDraft[t.dataset.mealt] = !mealDraft[t.dataset.mealt]; return mealSheet(); }
+  if (t.dataset.meal === 'save' && !mealDraft.busy){
+    const d = mealDraft;
+    if (d.ai && d.file && d.sample){
+      d.busy = true; d.msg = ''; mealSheet();
+      try {
+        const r = await d.sample.json('You check meal photos for a fitness app. Look at the photo and reply with only JSON: {"isFood": boolean, "protein": boolean, "veg": boolean, "note": "one short, kind sentence"}. protein is true if there is a clear protein source (meat, fish, eggs, dairy, tofu, beans or lentils). veg is true if there are vegetables or fruit. Do not comment on portion size, body or weight.', {images:[d.file], modelTier:'quick'});
+        d.busy = false;
+        if (!r || r.isFood !== true){ d.msg = 'That doesn’t look like a meal. Try another photo, or log it without one.'; URL.revokeObjectURL(d.url); d.url = null; d.file = null; return mealSheet(); }
+        d.protein = !!r.protein; d.veg = !!r.veg; d.checked = 'ai'; d.note = String(r.note || '').slice(0, 140);
+      } catch (e){ d.busy = false; d.msg = 'The AI check didn’t work this time. Your own answers are used instead.'; }
+    }
+    if (d.url) URL.revokeObjectURL(d.url);
+    const pts = logMeal({slot:d.slot, protein:d.protein, veg:d.veg, photo:!!d.file, checked:d.checked || 'self', at:new Date().toISOString()});
+    mealDraft = null; closeSheet();
+    toast((d.note ? d.note + ' ' : '') + (pts ? `+${pts} points.` : 'Logged.'));
+    if (ui.tab === 'food') drawFood(); if (ui.tab === 'today'){ todayAnim = false; drawToday(); }
+  }
+});
 
 /* ---------- mode: Challenge or Training ---------- */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
@@ -2213,7 +2600,7 @@ function openArena(id){
 }
 function closeArena(){
   if (!arena) return;
-  cancelAnimationFrame(arena.raf); clearTimeout(arena.cdT); releaseWake(); arena = null;
+  cancelAnimationFrame(arena.raf); clearTimeout(arena.cdT); releaseWake(); arenaCamStop(); arena = null;
   const el = document.getElementById('arena'); el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   if (ui.mode === 'challenge') drawChallenges(false);
 }
@@ -2234,11 +2621,13 @@ function arenaIntro(){
     <div class="ar-stats"><span>Your best<b>${chVal(ch, best)}</b></span><span>Next target<b>${chVal(ch, nt.value)}</b></span></div>
     <ul class="ar-moves">${moves}</ul>
     <label class="ar-switch"><input type="checkbox" id="ar-scaled" ${arena.scaled ? 'checked' : ''}><span><b>Easier version</b><small>${esc(ch.easy)} Counts for XP, not for medals that unlock levels.</small></span></label>
+    ${camMoveFor(ch) && camSupported() ? `<label class="ar-switch"><input type="checkbox" id="ar-cam-on" ${arena.cam ? 'checked' : ''}><span><b>Count with the camera</b><small>Phone on the floor, side-on, whole body in the picture. Nothing is recorded or sent.</small></span></label>` : ''}
     <p class="ar-note">Warm up first: a minute of marching, arm circles and a few easy squats. Stop if anything hurts.</p>
     <button class="ar-go" data-ar="go">Start</button>`;
 }
 function startCountdown(){
   arena.scaled = !!(document.getElementById('ar-scaled') || {}).checked;
+  arena.cam = !!(document.getElementById('ar-cam-on') || {}).checked; arena.camReps = 0;
   arena.phase = 'countdown'; holdWake();
   const el = document.getElementById('arena'), seq = ['3','2','1','GO'];
   el.innerHTML = `<div class="ar-in"><div class="ar-top"><button class="ar-x" data-ar="close" aria-label="Close">✕</button><b class="ar-title">${esc(arena.ch.name)}</b></div></div><div class="ar-cd" aria-live="assertive"></div>`;
@@ -2262,14 +2651,16 @@ function startWork(){
   const btns = ch.fmt === 'amrap' && !ch.round ? '<button data-ar="minus">−1</button><button data-ar="plus5">+5</button><button data-ar="end">Finish</button>'
     : ch.fmt === 'amrap' ? '<button data-ar="minus">−1 round</button><button data-ar="end">Finish</button>'
     : ch.fmt === 'fortime' ? '<button data-ar="undo">Undo</button><button data-ar="setdone">Set done</button>' : '';
-  document.getElementById('arena').innerHTML = `<div class="ar-in ar-work">
+  document.getElementById('arena').innerHTML = `<div class="ar-in ar-work${arena.cam ? ' has-cam' : ''}">
     <div class="ar-top"><button class="ar-x" data-ar="quit" aria-label="Quit">✕</button><b class="ar-title">${esc(ch.name)}${arena.scaled ? ' · easier' : ''}</b><span class="ar-fmt">${chShort(ch)}</span></div>
     <div class="ar-ring"><svg viewBox="0 0 120 120"><circle class="trk" cx="60" cy="60" r="54"/><circle class="arc" id="ar-arc" cx="60" cy="60" r="54"/></svg>
       <div class="ar-mid"><b class="ar-count" id="ar-count">${ch.fmt === 'fortime' ? arena.left : ch.fmt === 'hold' ? '0:00' : 0}</b><span class="ar-unit" id="ar-unit">${unit}</span><span class="ar-time" id="ar-time">${ch.dur ? fmtClock(ch.dur) : '0:00'}</span></div></div>
     <div class="ar-track" aria-hidden="true"><div class="bar"><span id="ar-fill"></span></div>${ch.tiers.map((t, i) => `<i class="mk m-${MEDALS[i]}" id="mk-${i}" style="left:${trackPos(ch, t)}%"></i>`).join('')}</div>
     <p class="ar-ghost" id="ar-ghost" aria-live="polite">${sub}</p>
-    <button class="ar-tap" id="ar-tap" data-ar="tap">${tap}</button>
+    ${arena.cam ? '<div class="ar-cam" id="ar-cam"></div>' : ''}
+    <button class="ar-tap" id="ar-tap" data-ar="tap">${arena.cam ? 'Tap if the camera misses one' : tap}</button>
     ${btns ? `<div class="ar-row">${btns}</div>` : ''}</div>`;
+  if (arena.cam) arenaCamStart();
   loop();
 }
 const $a = id => document.getElementById(id);
@@ -2354,7 +2745,7 @@ function arTap(ev){
   setCount(arena.count + 1); buzz(8);
 }
 function finishWork(score){
-  cancelAnimationFrame(arena.raf); releaseWake();
+  cancelAnimationFrame(arena.raf); releaseWake(); arenaCamStop();
   const ch = arena.ch;
   if (!(score > 0)){ arena.phase = 'intro'; drawArena(); return toast(ch.fmt === 'emom' ? 'The first minute slipped by. Go again!' : 'Nothing counted. Go again when you’re ready.'); }
   arena.before = JSON.parse(JSON.stringify(chState()));
