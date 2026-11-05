@@ -971,6 +971,9 @@ h3.ih .itile .ico{width:18px;height:18px}
 .demo-note{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12.5px;text-align:center;color:var(--ink)}
 .demo-note b{line-height:1.2}
 [data-demoring] .ico{width:18px;height:18px;vertical-align:-3px;margin-right:4px}
+.mp-demo{align-self:center;display:inline-flex;align-items:center;gap:8px;border:1.5px dashed var(--line);background:var(--surface);border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;color:var(--ink);margin-top:2px}
+.mp-demo .ico{width:18px;height:18px;color:var(--accent)}
+.demo-btn{border-color:var(--accent);color:var(--accent)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -982,7 +985,7 @@ h3.ih .itile .ico{width:18px;height:18px}
 <div class="app">
   <header class="top">
     <div class="brand">Home<span>Reps</span></div>
-    <div class="top-r"><span class="date" id="today-date"></span><span class="streak-chip" id="streak-chip" hidden></span><button class="master-chip" id="master-chip" type="button" hidden>MÁSTER</button><button class="help-btn" id="help-btn" type="button" aria-label="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4M12 17.2v.1"/></svg></button><button class="lvl-chip" id="lvl-chip" type="button"></button><button class="mode-pill" id="mode-pill" type="button" aria-label="Switch between Challenge and Training"></button></div>
+    <div class="top-r"><span class="date" id="today-date"></span><span class="streak-chip" id="streak-chip" hidden></span><button class="master-chip" id="master-chip" type="button" hidden>MÁSTER</button><button class="help-btn demo-btn" id="demo-btn" type="button" aria-label="Demo controls" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.5 7 10 4h4l1.5 3"/></svg></button><button class="help-btn" id="help-btn" type="button" aria-label="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4M12 17.2v.1"/></svg></button><button class="lvl-chip" id="lvl-chip" type="button"></button><button class="mode-pill" id="mode-pill" type="button" aria-label="Switch between Challenge and Training"></button></div>
   </header>
 
   <!-- BODY -->
@@ -4542,9 +4545,10 @@ const HELP = [
 function helpSheet(){
   const on = hintsOn();
   openSheet(`<div class="help-head">${tile('help', 'ink')}<span><h2>Help</h2><span class="small muted">Tap a topic. Every one has a shortcut.</span></span></div>
+    <button class="cta-card" data-open="demo" style="text-align:left;width:100%">${tile('photo', 'accent')}<span><b>${demoOn() ? 'Demo controls' : 'Demo for videos'}</b><span class="small muted">${demoOn() ? 'Send notifications for your video.' : 'Example account and notifications, on this phone only.'}</span></span><span class="btn sm primary">Open</span></button>
     <div class="help-grid">${HELP.map(t => `<button class="help-card" data-help="${t.id}">${tile(t.icon, t.tone)}<b>${esc(t.title)}</b><span>${esc(t.line)}</span></button>`).join('')}</div>
     <label class="consent"><input type="checkbox" id="hints-on" ${on ? 'checked' : ''}><span>Show a short hint on each screen<small>One line the first time you open a screen.</small></span></label>
-    <div class="row"><button class="btn" data-hintreset="1">Show all hints again</button><button class="btn" data-open="demo">${demoOn() ? 'Demo controls' : 'Demo for videos'}</button><button class="btn ghost" data-close="1">Close</button></div>`);
+    <div class="row"><button class="btn" data-hintreset="1">Show all hints again</button><button class="btn ghost" data-close="1">Close</button></div>`);
 }
 function helpTopic(id){
   const t = HELP.find(x => x.id === id); if (!t) return;
@@ -4839,17 +4843,22 @@ function demoSheet(){
     : `<button class="btn primary wide" data-demoenter="1">Load the demo account</button>`}
     <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
 }
+// The demo button stays out of the shot while a timed notification is on its way.
+let demoBtnT = 0;
+function demoBtnShow(){ const b = document.getElementById('demo-btn'); if (b) b.hidden = !demoOn(); }
+function demoBtnHide(ms){ const b = document.getElementById('demo-btn'); if (b) b.hidden = true; clearTimeout(demoBtnT); demoBtnT = setTimeout(demoBtnShow, ms); }
 const showOrOpen = html => document.querySelector('#sheet-root .scrim:not(.closing)') ? showSheet(html) : openSheet(html);
 document.addEventListener('click', ev => {
+  if (ev.target.closest('#demo-btn')) return demoSheet();
   const t = ev.target.closest('[data-demonote],[data-demodelay],[data-demoring],[data-demoperm],[data-demoenter],[data-demoleave],[data-demoreset]'); if (!t) return;
   if (t.dataset.demoreset){ store.set('demoBump', {}); net.players = demoPlayers(); store.del('rivals'); return toast('Ranking reset. Jorge is behind you again.'); }
   if (t.dataset.demoenter) return demoEnter();
   if (t.dataset.demoleave) return demoLeave();
   if (t.dataset.demodelay != null){ demoDelay = +t.dataset.demodelay; return demoSheet(); }
   if (t.dataset.demoperm){ try { Notification.requestPermission().then(() => demoSheet()); } catch (e){} return; }
-  if (t.dataset.demoring){ closeSheet(); toast(`Alarm in ${demoDelay || 5} s`); return setTimeout(() => { if (!alarmRun) openAlarm(new Date()); }, (demoDelay || 5) * 1000); }
+  if (t.dataset.demoring){ closeSheet(); demoBtnHide(((demoDelay || 5) + 8) * 1000); return setTimeout(() => { if (!alarmRun) openAlarm(new Date()); }, (demoDelay || 5) * 1000); }
   if (t.dataset.demonote){ const n = DEMO_NOTES.find(x => x.id === t.dataset.demonote); if (!n) return;
-    closeSheet(); if (demoDelay) toast(`Notification in ${demoDelay} s`);
+    closeSheet(); demoBtnHide((demoDelay + 8) * 1000);
     setTimeout(() => { pushBanner(n.make()); refreshRanks(); }, demoDelay * 1000); }
 });
 
@@ -4865,7 +4874,8 @@ function openModePicker(){
     <button class="mp-card mp-ch" data-mode="challenge"><span class="mp-ico">${ICON_BOLT}</span><span class="mp-t">Challenge</span>
       <span class="mp-s">3 and 5 minute battles. Beat your best, win medals.</span><span class="mp-tag">${rankFor(lvl)} · Level ${lvl}</span></button>
     <button class="mp-card mp-tr" data-mode="train"><span class="mp-ico">${ICON_DUMB}</span><span class="mp-t">Training</span>
-      <span class="mp-s">Your gym week, built around you.</span><span class="mp-tag">${esc(today)}</span></button></div>`;
+      <span class="mp-s">Your gym week, built around you.</span><span class="mp-tag">${esc(today)}</span></button>
+    <button class="mp-demo" type="button" data-mpdemo="1">${ico('photo')}<span>${demoOn() ? 'Demo on · open controls' : 'Load the demo for videos'}</span></button></div>`;
   el.hidden = false; document.body.style.overflow = 'hidden';
 }
 function enterMode(m){
@@ -4898,6 +4908,7 @@ function setMode(m){
   } else { v.hidden = true; setTab(ui.tab); }
 }
 document.getElementById('modepick').addEventListener('click', ev => {
+  if (ev.target.closest('[data-mpdemo]')){ if (!demoOn()) return demoEnter(); pickMode('train', document.querySelector('.mp-tr')); return setTimeout(demoSheet, 800); }
   const b = ev.target.closest('[data-mode]'); if (b) pickMode(b.dataset.mode, b);
 });
 
@@ -5386,6 +5397,7 @@ document.getElementById('today-date').textContent = new Date().toLocaleDateStrin
 fillForm();
 setTab(TABS.includes(ui.tab) ? ui.tab : 'today');
 duelsInit();
+demoBtnShow();
 if (demoOn()){ duel.me = duel.me || 'me'; net.players = demoPlayers(); net.ready = true; net.leagueNames = {[DEMO_LEAGUE]:'Office crew'}; }
 drawLvlChip();
 setMode(store.get('mode', 'train'));
