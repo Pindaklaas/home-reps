@@ -914,8 +914,8 @@ h3.ih .itile .ico{width:18px;height:18px}
 .dh-chips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px}
 .dh-chips span{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;background:color-mix(in srgb,var(--bg) 14%,transparent);border-radius:999px;padding:4px 10px}
 .dh-chips .ico{width:15px;height:15px}
-.ex-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
-.ex-head h3{margin:12px 0 8px}
+.exs-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+.exs-head h3{margin:12px 0 8px}
 .rest-chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;min-height:34px;font-variant-numeric:tabular-nums}
 .warm{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--muted);margin:0 0 8px}
 .warm .ico{width:18px;height:18px;color:var(--amber);margin-top:1px}
@@ -956,6 +956,21 @@ h3.ih .itile .ico{width:18px;height:18px}
 .tc-day.today{border:2px solid var(--accent)}
 .tc-day.done .tc-ico{background:var(--good);color:var(--surface)}
 .tc-day.soon{opacity:.6;border-style:dashed}
+/* push-style banners and demo controls */
+#banners{position:fixed;left:0;right:0;top:calc(8px + env(safe-area-inset-top,0px));z-index:150;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;padding:0 8px}
+.pbanner{pointer-events:auto;width:min(420px,100%);display:grid;grid-template-columns:38px 1fr;gap:10px;align-items:center;text-align:left;border:0;border-radius:20px;padding:10px 12px;color:var(--ink);background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 10px 30px rgba(0,0,0,.22),0 0 0 1px color-mix(in srgb,var(--ink) 8%,transparent);animation:pbin .5s var(--spring)}
+.pbanner.out{animation:pbout .28s var(--out) forwards}
+.pb-app{width:38px;height:38px;border-radius:10px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.02em}
+.pb-txt{display:flex;flex-direction:column;min-width:0}
+.pb-top{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}.pb-top b{font-weight:600;letter-spacing:.04em}
+.pb-t{font-size:15px;line-height:1.25}
+.pb-b{font-size:14px;line-height:1.3}
+@keyframes pbin{from{transform:translateY(-130%);opacity:0}to{transform:none;opacity:1}}
+@keyframes pbout{to{transform:translateY(-130%);opacity:0}}
+.demo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.demo-note{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12.5px;text-align:center;color:var(--ink)}
+.demo-note b{line-height:1.2}
+[data-demoring] .ico{width:18px;height:18px;vertical-align:-3px;margin-right:4px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -1514,7 +1529,7 @@ function drawToday(){
   if (!(ob && ob.answers && ob.answers.goal) || !P0) h += planCard();
   h += homeMenu('train');
   if (Lt.mode==='gentle') h += `<p class="banner">${hl ? 'Gentle mode: easy sessions only.' : 'Gentle mode until your safety check.'}${hl ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do it (20 sec)</button>'}</p>`;
-  const exHead = (title, rest) => `<div class="ex-head"><h3 class="ih">${tile('workout', 'accent')}${title}</h3>${rest && rec.plan.focus.length ? `<button class="rest-chip" type="button" data-timer="${REST_SEC[p.goal]}" data-tlabel="Rest between sets">⏱ ${REST[p.goal]}</button>` : ''}</div>`;
+  const exHead = (title, rest) => `<div class="exs-head"><h3 class="ih">${tile('workout', 'accent')}${title}</h3>${rest && rec.plan.focus.length ? `<button class="rest-chip" type="button" data-timer="${REST_SEC[p.goal]}" data-tlabel="Rest between sets">⏱ ${REST[p.goal]}</button>` : ''}</div>`;
   if (mine.length) h += `${exHead('From your schedule', !rec.items.length)}<div class="${L}">${mine.map(x=>row(x,'s:')).join('')}</div>`;
   if (rec.items.length){
     h += `${exHead(planForToday() ? 'Your exercises' : 'Recommended', true)}
@@ -4216,7 +4231,7 @@ function tipCalendarHtml(){
 /* ---------- rankings and leagues (shared store in the prototype; Supabase in the app) ---------- */
 const net = {players:[], ready:false, err:false, saving:null, savedJson:''};
 function rankInit(){
-  if (!duel.db || !duel.me) return;
+  if (demoOn() || !duel.db || !duel.me) return;
   duel.db.collection('players').orderBy('xp', 'desc').limit(500).onSnapshot(s => {
     net.players = s.docs.map(d => ({uid:d.id, ...d.data()})); net.ready = true; net.err = false;
     checkOvertakes(); refreshRanks();
@@ -4227,7 +4242,7 @@ function rankInit(){
   }, () => {});
   syncPlayer();
 }
-const netOn = () => duelOn();
+const netOn = () => demoOn() || duelOn();
 const myPlayer = () => net.players.find(p => p.uid === duel.me);
 // My row in the shared rankings. Only the nickname is shared, never the account name.
 function playerDoc(){
@@ -4236,7 +4251,7 @@ function playerDoc(){
     leagues:g.leagues || me.leagues || [], flagged:gFlagged(), since:g.since};
 }
 function syncPlayer(){
-  if (!netOn() || !gameS().nick) return;
+  if (demoOn() || !netOn() || !gameS().nick) return;
   clearTimeout(net.saving); net.saving = setTimeout(async () => {
     const d = playerDoc(), j = JSON.stringify(d); if (j === net.savedJson) return;
     try { await duel.db.doc('players/' + duel.me).set({...d, at:new Date().toISOString()}); net.savedJson = j; } catch (e){}
@@ -4252,9 +4267,7 @@ function checkOvertakes(){
   store.set('rivals', now);
 }
 function notifyPassed(nick){
-  const line = overtakeLine(nick || 'Someone', Math.random());
-  toast(line); buzz([80, 60, 80]);
-  try { if (document.hidden && 'Notification' in window && Notification.permission === 'granted') new Notification('Home Reps', {body:line}); } catch (e){}
+  pushBanner({title:nick || 'Someone', body:overtakeLine(nick || 'Someone', Math.random()), tag:'overtake', onTap:() => ranksSheet('league')});
 }
 function askNotify(){ try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e){} }
 const ranksUi = {view:'sector', period:'week', sector:null, league:null};
@@ -4315,6 +4328,7 @@ function leagueForm(kind){
 async function leagueAct(a, v){
   const g = gameS(), msg = t => { const m = document.getElementById('lg-msg'); if (m) m.textContent = t; };
   const setLeagues = list => { const gg = gameS(); gg.leagues = list; store.set('game', gg); syncPlayer(); checkOvertakes(); };
+  if (demoOn() && a !== 'invite' && a !== 'back') return toast('Leagues are read-only in the demo.');
   if (a === 'new' || a === 'join') return leagueForm(a);
   if (a === 'back') return ranksSheet('league');
   if (a === 'create'){
@@ -4400,7 +4414,7 @@ document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-open],[data-tip],[data-ab],[data-rk],[data-lg],[data-nick],[data-sector],[data-mr],#lvl-chip,#master-chip'); if (!t) return;
   if (t.id === 'lvl-chip') return profileSheet();
   if (t.id === 'master-chip') return masterSheet();
-  if (t.dataset.open){ const k = t.dataset.open; return k === 'ranks' ? ranksSheet() : k === 'learn' ? learnSheet() : k === 'nick' ? nickSheet() : k === 'master' ? masterSheet() : k === 'profile' ? profileSheet() : k === 'help' ? helpSheet() : k === 'quests' ? questsSheet() : k === 'duels' ? duelsSheet() : null; }
+  if (t.dataset.open){ const k = t.dataset.open; return k === 'ranks' ? ranksSheet() : k === 'learn' ? learnSheet() : k === 'nick' ? nickSheet() : k === 'master' ? masterSheet() : k === 'profile' ? profileSheet() : k === 'help' ? helpSheet() : k === 'demo' ? demoSheet() : k === 'quests' ? questsSheet() : k === 'duels' ? duelsSheet() : null; }
   if (t.dataset.abpick) return abSheet(t.dataset.ab, t.dataset.abpick);
   if (t.dataset.ab){ const s = document.querySelector('#sheet-root .scrim:not(.closing)'); if (!s) openSheet(''); return abSheet(t.dataset.ab); }
   if (t.dataset.tip){ const s = document.querySelector('#sheet-root .scrim:not(.closing)'); if (!s) openSheet(''); return tipSheet(t.dataset.tip); }
@@ -4530,7 +4544,7 @@ function helpSheet(){
   openSheet(`<div class="help-head">${tile('help', 'ink')}<span><h2>Help</h2><span class="small muted">Tap a topic. Every one has a shortcut.</span></span></div>
     <div class="help-grid">${HELP.map(t => `<button class="help-card" data-help="${t.id}">${tile(t.icon, t.tone)}<b>${esc(t.title)}</b><span>${esc(t.line)}</span></button>`).join('')}</div>
     <label class="consent"><input type="checkbox" id="hints-on" ${on ? 'checked' : ''}><span>Show a short hint on each screen<small>One line the first time you open a screen.</small></span></label>
-    <div class="row"><button class="btn" data-hintreset="1">Show all hints again</button><button class="btn ghost" data-close="1">Close</button></div>`);
+    <div class="row"><button class="btn" data-hintreset="1">Show all hints again</button><button class="btn" data-open="demo">${demoOn() ? 'Demo controls' : 'Demo for videos'}</button><button class="btn ghost" data-close="1">Close</button></div>`);
 }
 function helpTopic(id){
   const t = HELP.find(x => x.id === id); if (!t) return;
@@ -4727,6 +4741,116 @@ function homeMenu(mode){
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-subtab]'); if (!t) return;
   const [k, v] = t.dataset.subtab.split(':'); setSub(k, v);
+});
+
+/* ---------- push-style banners (used by real notices and by the demo) ---------- */
+// A banner that drops from the top like a phone notification. Also sent as a system notification when the phone allows it.
+function pushBanner(o){
+  const wrap = document.getElementById('banners') || (() => { const w = document.createElement('div'); w.id = 'banners'; w.setAttribute('aria-live', 'polite'); document.body.appendChild(w); return w; })();
+  const el = document.createElement('button'); el.type = 'button'; el.className = 'pbanner';
+  el.innerHTML = `<span class="pb-app" aria-hidden="true">HR</span><span class="pb-txt"><span class="pb-top"><b>HOME REPS</b><span>now</span></span><b class="pb-t">${esc(o.title)}</b><span class="pb-b">${esc(o.body)}</span></span>`;
+  wrap.prepend(el); [...wrap.children].slice(3).forEach(x => x.remove());
+  buzz([60, 40, 60]); tone(1175, .09); setTimeout(() => tone(1568, .12), 110);
+  const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), RM() ? 0 : 280); };
+  el.addEventListener('click', () => { close(); if (o.onTap) o.onTap(); });
+  let y0 = null; el.addEventListener('pointerdown', ev => { y0 = ev.clientY; });
+  el.addEventListener('pointerup', ev => { if (y0 != null && y0 - ev.clientY > 25) close(); y0 = null; });
+  setTimeout(close, o.ms || 6000);
+  try { if ('Notification' in window && Notification.permission === 'granted' && (document.hidden || o.system)) new Notification(o.title, {body:o.body, tag:o.tag || 'homereps'}); } catch (e){}
+}
+
+/* ---------- demo mode: a full, believable account for videos, without touching anyone else ---------- */
+const DEMO_KEY = 'homereps_demo_backup';
+const demoOn = () => store.get('demo', false) === true;
+const DEMO_LEAGUE = 'DEMO01';
+function demoPlayers(){
+  const wk = weekKey(new Date());
+  const bump = store.get('demoBump', {}) || {};
+  return [['d-lucia', 'Lucia', 3820, 410], ['d-sara', 'Sara_fit', 3110, 300], ['d-jorge', 'Jorge', 2790, 240], ['d-marc', 'Marc.lifts', 2640, 190], ['d-pau', 'Pau', 2210, 120], ['d-nora', 'Nora', 1890, 95]]
+    .map(([uid, nick, xp, wxp]) => { const b = bump[uid] || {}, x = b.xp || xp;
+      return {uid, nick, nickKey:nick.toLowerCase(), sector:'gym', xp:x, wk, wxp:b.wxp || wxp, level:levelInfo(x).level, leagues:[DEMO_LEAGUE], since:'2026-09-01'}; });
+}
+function demoEnter(){
+  try {
+    if (!localStorage.getItem(DEMO_KEY)){ const keep = {}; Object.keys(localStorage).filter(k => k.startsWith('homereps.')).forEach(k => { keep[k] = localStorage.getItem(k); }); localStorage.setItem(DEMO_KEY, JSON.stringify(keep)); }
+    Object.keys(localStorage).filter(k => k.startsWith('homereps.')).forEach(k => localStorage.removeItem(k));
+  } catch (e){ return toast('This browser blocks saving, so the demo can’t start.'); }
+  const now = new Date(), day = n => { const d = new Date(now); d.setDate(d.getDate() - n); d.setHours(18, 40, 0, 0); return d; };
+  const ans = {age:'25-34', track:'gym', sector:'gym', kit:'gym', goal:'gain', level:'some', dpw:4, days:DPW_DAYS[4], minutes:60, time:'18:30', wake:'07:00', sleepUsual:'7-8', why:'Feel strong every single day'};
+  store.set('onboarding', {v:3, at:day(30).toISOString(), answers:ans});
+  store.set('health', {v:1, at:day(30).toISOString(), consent:{granted:true, at:day(30).toISOString(), version:CONSENT_V}, parq:{heart:false, chest:false, dizzy:false, chronic:false, meds:false, joint:false, supervised:false, pregnant:false}, injuries:[]});
+  try {
+    const pa = {...ans, kind:'training', days:DPW_DAYS[4], minutes:60, equipment:GYM_KIT, injuries:[], healthConsent:true, parq:{heart:false, chest:false, dizzy:false, chronic:false, meds:false, joint:false, supervised:false, pregnant:false}}, c = planContext(pa), res = validatePlan(localDraft(pa, c), c.L, c), st = day(9);
+    store.set('plan', {v:1, at:st.toISOString(), start:`${st.getFullYear()}-${pad2(st.getMonth() + 1)}-${pad2(st.getDate())}`, status:'approved', source:'auto', kind:'training', note:'', issues:res.issues, plan:res.plan});
+  } catch (e){}
+  // Twelve days in a row of training, getting a little stronger each time.
+  const log = [];
+  for (let n = 12; n >= 1; n--){ const d = day(n), k = 12 - n;
+    log.push({id:'demo' + n, title:'Upper body', startedAt:new Date(d - 50 * 60000).toISOString(), endedAt:d.toISOString(), exercises:[
+      {id:'bench-press', sets:[{w:50 + k * 1.25, r:8, done:true}, {w:50 + k * 1.25, r:8, done:true}, {w:50 + k * 1.25, r:7, done:true}]},
+      {id:'back-squat', sets:[{w:70 + k * 2.5, r:6, done:true}, {w:70 + k * 2.5, r:6, done:true}]},
+      {id:'pull-up', sets:[{w:0, r:6 + (k >> 2), done:true}, {w:0, r:6 + (k >> 2), done:true}]},
+      {id:'crunch', sets:[{w:0, r:20, done:true}]}, {id:'lateral-raise', sets:[{w:8, r:12, done:true}, {w:8, r:12, done:true}]}]}); }
+  store.set('log', log);
+  const ledger = [{kind:'legacy', xp:1700, at:day(20).toISOString(), ref:'legacy'}];
+  for (let n = 12; n >= 1; n--){ const d = day(n).toISOString(); ledger.push({kind:'alarm', xp:40, at:d, ref:'demo'}, {kind:'workout', xp:15, at:d, ref:'demo'}, {kind:'streak', xp:Math.min(50, 10 * (13 - n)), at:d, ref:13 - n}); }
+  const total = sumXp(ledger);
+  store.set('game', {v:1, ledger, wallet:levelUps(0, total, day(20).toISOString()), answered:[], read:[], sessions:[], times:[], flags:[], nick:'alex_fit', since:'2026-09-01', leagues:[DEMO_LEAGUE]});
+  store.set('challenges', {v:1, xp:0, best:{'squat-sprint':72, 'plank-clock':95, 'pushup-pressure':28, 'jack-attack':104}, bestScaled:{},
+    history:[{id:'squat-sprint', at:day(3).toISOString(), score:72, scaled:false, medal:'silver', xp:60, pb:true}, {id:'plank-clock', at:day(6).toISOString(), score:95, scaled:false, medal:'silver', xp:50, pb:true}]});
+  const hab = {}; for (let n = 0; n < 14; n++){ const d = day(n); hab[`${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`] = {sleep:n % 5 === 3 ? '7-8' : '8+', food:'yes', water:n ? 7 : 6}; }
+  store.set('habits', hab);
+  store.set('alarm', {...ALARM_DEFAULT, on:true, time:'07:00', move:'pushup', reps:10});
+  store.set('bestStreak', 12);
+  store.set('hints', {today:1, sched:1, body:1, progress:1, food:1, recipes:1, challenge:1, hero:1});
+  store.set('demo', true); store.set('mode', 'train'); store.set('tab', 'today');
+  location.reload();
+}
+function demoLeave(){
+  try {
+    const keep = JSON.parse(localStorage.getItem(DEMO_KEY) || '{}');
+    Object.keys(localStorage).filter(k => k.startsWith('homereps.')).forEach(k => localStorage.removeItem(k));
+    Object.entries(keep).forEach(([k, v]) => localStorage.setItem(k, v));
+    localStorage.removeItem(DEMO_KEY);
+  } catch (e){}
+  location.reload();
+}
+// The notices you can fire for a video, now or after a few seconds (time to start recording).
+const DEMO_NOTES = [
+  {id:'pass', icon:'trophy', tone:'gold', label:'Jorge passed you', make:() => { const b = store.get('demoBump', {}) || {}; b['d-jorge'] = {xp:gTotal() + 35, wxp:weekXp(gameS().ledger, new Date()) + 20}; store.set('demoBump', b); net.players = demoPlayers();
+    return {title:'Jorge', body:overtakeLine('Jorge', 0), onTap:() => ranksSheet('league')}; }},
+  {id:'alarm', icon:'alarm', tone:'blue', label:'Wake-up alarm', make:() => ({title:'Good morning ⏰', body:'10 push-ups to switch it off. You’ve got this.', onTap:() => openAlarm(new Date())})},
+  {id:'level', icon:'star', tone:'accent', label:'Level up', make:() => ({title:'Level up! 🔥', body:`You’re level ${gLevel().level + 1}. Your chest just hit gold.`, onTap:() => jumpTo('hero')})},
+  {id:'tip', icon:'bulb', tone:'amber', label:'Daily tip', make:() => { const t = tipOfDay(); return {title:'Today’s tip: ' + (t && t.topic || 'Ergonomics'), body:t ? t.title : 'How do you pick up the weight?', onTap:() => { if (t){ openSheet(''); t.type === 'ab' ? abSheet(t.id) : tipSheet(t.id); } }}; }},
+  {id:'duel', icon:'duel', tone:'legend', label:'Duel received', make:() => ({title:'Lucia challenged you ⚔️', body:'Squat Sprint: 78 reps. Can you beat it?', onTap:() => setMode('challenge')})},
+  {id:'streak', icon:'flame', tone:'accent', label:'Streak', make:() => ({title:'12-day streak 🔥', body:'One more workout today and you hit a new record.', onTap:() => jumpTo('progress')})}
+];
+let demoDelay = 5;
+function demoSheet(){
+  const on = demoOn(), perm = 'Notification' in window ? Notification.permission : 'unsupported';
+  showOrOpen(`<div class="help-head">${tile('photo', 'accent')}<span><h2>Demo for videos</h2><span class="small muted">${on ? 'Demo account loaded. Your own data comes back when you leave.' : 'Loads a full example account on this phone only. Nothing is shared.'}</span></span></div>
+    ${on ? `<b>Send a notification</b>
+      <div class="chipset" role="radiogroup" aria-label="When">${[[0, 'Now'], [5, 'In 5 s'], [15, 'In 15 s']].map(([v, l]) => `<button class="pick" data-demodelay="${v}" aria-pressed="${demoDelay === v}">${l}</button>`).join('')}</div>
+      <div class="demo-grid">${DEMO_NOTES.map(n => `<button class="demo-note" data-demonote="${n.id}">${tile(n.icon, n.tone)}<b>${n.label}</b></button>`).join('')}</div>
+      <button class="btn wide" data-demoring="1">${ico('alarm')} Ring the alarm in ${demoDelay || 5} s</button>
+      ${perm === 'default' ? '<button class="btn wide" data-demoperm="1">Also show them as real phone notifications</button>' : perm === 'granted' ? '<p class="small muted">Real phone notifications are on.</p>' : '<p class="small muted">This screen shows them inside the app. Real lock-screen notifications come with the phone app.</p>'}
+      <button class="btn wide" data-demoreset="1">Put Jorge back below me (for another take)</button>
+      <button class="btn ghost wide" data-demoleave="1">Leave demo and get my data back</button>`
+    : `<button class="btn primary wide" data-demoenter="1">Load the demo account</button>`}
+    <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
+}
+const showOrOpen = html => document.querySelector('#sheet-root .scrim:not(.closing)') ? showSheet(html) : openSheet(html);
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-demonote],[data-demodelay],[data-demoring],[data-demoperm],[data-demoenter],[data-demoleave],[data-demoreset]'); if (!t) return;
+  if (t.dataset.demoreset){ store.set('demoBump', {}); net.players = demoPlayers(); store.del('rivals'); return toast('Ranking reset. Jorge is behind you again.'); }
+  if (t.dataset.demoenter) return demoEnter();
+  if (t.dataset.demoleave) return demoLeave();
+  if (t.dataset.demodelay != null){ demoDelay = +t.dataset.demodelay; return demoSheet(); }
+  if (t.dataset.demoperm){ try { Notification.requestPermission().then(() => demoSheet()); } catch (e){} return; }
+  if (t.dataset.demoring){ closeSheet(); toast(`Alarm in ${demoDelay || 5} s`); return setTimeout(() => { if (!alarmRun) openAlarm(new Date()); }, (demoDelay || 5) * 1000); }
+  if (t.dataset.demonote){ const n = DEMO_NOTES.find(x => x.id === t.dataset.demonote); if (!n) return;
+    closeSheet(); if (demoDelay) toast(`Notification in ${demoDelay} s`);
+    setTimeout(() => { pushBanner(n.make()); refreshRanks(); }, demoDelay * 1000); }
 });
 
 /* ---------- mode: Challenge or Training ---------- */
@@ -5262,6 +5386,7 @@ document.getElementById('today-date').textContent = new Date().toLocaleDateStrin
 fillForm();
 setTab(TABS.includes(ui.tab) ? ui.tab : 'today');
 duelsInit();
+if (demoOn()){ duel.me = duel.me || 'me'; net.players = demoPlayers(); net.ready = true; net.leagueNames = {[DEMO_LEAGUE]:'Office crew'}; }
 drawLvlChip();
 setMode(store.get('mode', 'train'));
 if (/[?#&](survey|setup)\b/.test(location.search + location.hash)) openFlow('gym');
