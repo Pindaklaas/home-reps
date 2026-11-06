@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#E2472B">
-<title>Home Reps</title>
+<title>Neutrón</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/favicon-64.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Home Reps">
+<meta name="apple-mobile-web-app-title" content="Neutrón">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Figtree:wght@400;500;600;700&display=swap">
@@ -967,7 +967,8 @@ h3.ih .itile .ico{width:18px;height:18px}
 #banners{position:fixed;left:0;right:0;top:calc(8px + env(safe-area-inset-top,0px));z-index:150;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;padding:0 8px}
 .pbanner{pointer-events:auto;width:min(420px,100%);display:grid;grid-template-columns:38px 1fr;gap:10px;align-items:center;text-align:left;border:0;border-radius:20px;padding:10px 12px;color:var(--ink);background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);box-shadow:0 10px 30px rgba(0,0,0,.22),0 0 0 1px color-mix(in srgb,var(--ink) 8%,transparent);animation:pbin .5s var(--spring)}
 .pbanner.out{animation:pbout .28s var(--out) forwards}
-.pb-app{width:38px;height:38px;border-radius:10px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.02em}
+.pb-app{width:38px;height:38px;border-radius:10px;overflow:hidden;display:block}
+.pb-app svg{width:100%;height:100%;display:block}
 .pb-txt{display:flex;flex-direction:column;min-width:0}
 .pb-top{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}.pb-top b{font-weight:600;letter-spacing:.04em}
 .pb-t{font-size:15px;line-height:1.25}
@@ -991,7 +992,7 @@ h3.ih .itile .ico{width:18px;height:18px}
 
 <div class="app">
   <header class="top">
-    <div class="brand">Home<span>Reps</span></div>
+    <div class="brand">Neutr<span>ó</span>n</div>
     <div class="top-r"><span class="date" id="today-date"></span><span class="streak-chip" id="streak-chip" hidden></span><button class="master-chip" id="master-chip" type="button" hidden>MÁSTER</button><button class="help-btn demo-btn" id="demo-btn" type="button" aria-label="Demo controls" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="3"/><circle cx="12" cy="13.5" r="3.5"/><path d="M8.5 7 10 4h4l1.5 3"/></svg></button><button class="help-btn" id="help-btn" type="button" aria-label="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.4M12 17.2v.1"/></svg></button><button class="lvl-chip" id="lvl-chip" type="button"></button><button class="mode-pill" id="mode-pill" type="button" aria-label="Switch between Challenge and Training"></button></div>
   </header>
 
@@ -2496,7 +2497,7 @@ const heroSnap = h => ({m:Object.fromEntries(Object.entries(h.muscles).map(([k, 
 
 
 // The generator's standing instructions. The page has no system prompt of its own, so this goes first in every request.
-const PLAN_SYSTEM_PROMPT = `You draft personal weekly plans for Home Reps, a home fitness and nutrition app. A coach, Coach Dani, reviews every draft before the user treats it as final.
+const PLAN_SYSTEM_PROMPT = `You draft personal weekly plans for Neutrón, a fitness and nutrition app. A coach, Coach Dani, reviews every draft before the user treats it as final.
 
 Hard rules:
 1. Safety first. Follow every value in SAFETY LIMITS exactly: never exceed the training days, sets per exercise or exercise level, never use an exercise listed in avoidExerciseIds, and keep every workout within maxMinutesPerWorkout.
@@ -2589,7 +2590,7 @@ function saveAge(a){
 }
 const ageSteps = hint => [
   {type:'custom', id:'age', auto:'age', when:a => !a._age, q:'How old are you?', hint, render:a => chips('age', AGE_OPTS, a, {label:'Age'}), valid:a => !!a.age},
-  {type:'info', block:true, when:a => !a._age && a.age === 'u18', title:'Home Reps is for adults for now', body:'You need to be 18 or older to use Home Reps. If you tapped this by mistake, go back and change it.'}
+  {type:'info', block:true, when:a => !a._age && a.age === 'u18', title:'Neutrón is for adults for now', body:'You need to be 18 or older to use Neutrón. If you tapped this by mistake, go back and change it.'}
 ];
 const adultOk = a => !!a._age || a.age !== 'u18';
 FLOWS.gym = {
@@ -2728,7 +2729,7 @@ function drawFlow(){
     <span class="count">${flow.i + 1} of ${n}</span>${flowClosable() ? `<button class="btn sm ghost" data-fx="close">Close</button>` : ''}</div>`;
   let body;
   if (st.type === 'info'){
-    body = `<div class="hero">${st.hero ? '<div class="brand">Home<span>Reps</span></div>' : ''}<h2>${esc(title)}</h2><p class="muted">${typeof st.body === 'function' ? st.body(a) : st.body}</p></div>`;
+    body = `<div class="hero">${st.hero ? '<div class="brand">Neutr<span>ó</span>n</div>' : ''}<h2>${esc(title)}</h2><p class="muted">${typeof st.body === 'function' ? st.body(a) : st.body}</p></div>`;
   } else {
     body = (title ? `<h2>${esc(title)}</h2>` : '') + (st.hint ? `<p class="muted small" style="margin-top:-6px">${esc(st.hint)}</p>` : '');
     if (st.type === 'single' || st.type === 'multi'){
@@ -4358,7 +4359,7 @@ async function leagueAct(a, v){
     setLeagues([...(g.leagues || []), code]); ranksUi.league = code; askNotify(); toast('You’re in! Go get them.'); return ranksSheet('league');
   }
   if (a === 'invite'){
-    const name = (net.leagueNames || {})[v] || 'my league', text = `Join "${name}" on Home Reps: open the app, Rankings, My leagues, Join with a code: ${v}`;
+    const name = (net.leagueNames || {})[v] || 'my league', text = `Join "${name}" on Neutrón: open the app, Rankings, My leagues, Join with a code: ${v}`;
     try { if (navigator.share){ await navigator.share({text}); return; } } catch (e){ return; }
     try { await navigator.clipboard.writeText(text); toast('Invite copied. Paste it to your friends.'); } catch (e){ toast(`Your code: ${v}`); }
     return;
@@ -4755,11 +4756,13 @@ document.addEventListener('click', ev => {
 });
 
 /* ---------- push-style banners (used by real notices and by the demo) ---------- */
+// The app logo (same drawing as icons/icon.svg): an N with an orbit and a particle.
+const LOGO_SVG = '<svg viewBox="0 0 1024 1024" aria-hidden="true"><rect width="1024" height="1024" fill="var(--accent)"/><g transform="rotate(-28 512 512)"><path d="M140 512A372 138 0 0 1 884 512" fill="none" stroke="#151A21" stroke-width="44" stroke-linecap="round"/></g><text x="512" y="745" text-anchor="middle" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="800" font-size="700" fill="#fff">N</text><g transform="rotate(-28 512 512)"><path d="M884 512A372 138 0 0 1 140 512" fill="none" stroke="#151A21" stroke-width="44" stroke-linecap="round"/><circle cx="278.3" cy="619.4" r="46" fill="#fff" stroke="#151A21" stroke-width="16"/></g></svg>';
 // A banner that drops from the top like a phone notification. Also sent as a system notification when the phone allows it.
 function pushBanner(o){
   const wrap = document.getElementById('banners') || (() => { const w = document.createElement('div'); w.id = 'banners'; w.setAttribute('aria-live', 'polite'); document.body.appendChild(w); return w; })();
   const el = document.createElement('button'); el.type = 'button'; el.className = 'pbanner';
-  el.innerHTML = `<span class="pb-app" aria-hidden="true">HR</span><span class="pb-txt"><span class="pb-top"><b>HOME REPS</b><span>now</span></span><b class="pb-t">${esc(o.title)}</b><span class="pb-b">${esc(o.body)}</span></span>`;
+  el.innerHTML = `<span class="pb-app" aria-hidden="true">${LOGO_SVG}</span><span class="pb-txt"><span class="pb-top"><b>NEUTRÓN</b><span>now</span></span><b class="pb-t">${esc(o.title)}</b><span class="pb-b">${esc(o.body)}</span></span>`;
   wrap.prepend(el); [...wrap.children].slice(3).forEach(x => x.remove());
   buzz([60, 40, 60]); tone(1175, .09); setTimeout(() => tone(1568, .12), 110);
   const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), RM() ? 0 : 280); };

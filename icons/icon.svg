@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="#E2472B"/>
+  <g transform="translate(512 512) scale(1) translate(-512 -512)">
+    <g transform="rotate(-28 512 512)"><path d="M140 512 A372 138 0 0 1 884 512" fill="none" stroke="#151A21" stroke-width="44" stroke-linecap="round"/></g>
+    <text x="512" y="745" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="700" fill="#FFFFFF">N</text>
+    <g transform="rotate(-28 512 512)"><path d="M884 512 A372 138 0 0 1 140 512" fill="none" stroke="#151A21" stroke-width="44" stroke-linecap="round"/>
+      <circle cx="278.3" cy="619.4" r="46" fill="#FFFFFF" stroke="#151A21" stroke-width="16"/></g>
+  </g></svg>

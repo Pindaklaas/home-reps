@@ -1,4 +1,6 @@
-# Home Reps: notes for Claude
+# Neutrón (formerly Home Reps): notes for Claude
+
+- The app is called **Neutrón** (written with the accent). Its logo is an N with one orbit and a particle (`icons/icon.svg`, `LOGO_SVG` in `index.html`; PNGs in `icons/`). The repository, file names and the `homereps.` storage prefix keep the old name on purpose: don't rename them.
 
 - This web app is the prototype of a native app (React Native + Expo, iOS and Android, English UI). Plans and decisions live in `docs/` (start with `docs/fase-1-arquitectura.md`); team docs are in Spanish.
 - Single-file app: `index.html` holds all CSS, HTML and JS. Keep it dependency-free with no build step, so it runs from GitHub Pages and by opening the file. The one exception: MediaPipe pose is lazy-loaded from jsDelivr only when camera counting starts, and the app falls back to tap counting without it.

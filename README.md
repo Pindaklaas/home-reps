@@ -1,4 +1,6 @@
-# Home Reps
+# Neutrón
+
+(Formerly Home Reps; the repository, file names and saved-data keys keep the old name.)
 
 A fitness and nutrition app that gets you to train every day. The alarm only stops after you do your push-ups or squats in front of the camera. You earn XP and levels, compete in rankings and private leagues, and learn from short tips and A/B challenges.
 
