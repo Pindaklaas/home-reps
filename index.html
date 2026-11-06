@@ -4792,7 +4792,7 @@ const DEMO_LEAGUE = 'DEMO01';
 function demoPlayers(){
   const wk = weekKey(new Date());
   const bump = store.get('demoBump', {}) || {};
-  return [['d-lucia', 'Lucia', 3820, 410], ['d-sara', 'Sara_fit', 3110, 300], ['d-jorge', 'Jorge', 2790, 240], ['d-marc', 'Marc.lifts', 2640, 190], ['d-pau', 'Pau', 2210, 120], ['d-nora', 'Nora', 1890, 95]]
+  return [['d-lucia', 'Lucia', 3820, 410], ['d-sara', 'Sara_fit', 3110, 300], ['d-ariete', 'Ariete', 2790, 240], ['d-marc', 'Marc.lifts', 2640, 190], ['d-pau', 'Pau', 2210, 120], ['d-nora', 'Nora', 1890, 95]]
     .map(([uid, nick, xp, wxp]) => { const b = bump[uid] || {}, x = b.xp || xp;
       return {uid, nick, nickKey:nick.toLowerCase(), sector:'gym', xp:x, wk, wxp:b.wxp || wxp, level:levelInfo(x).level, leagues:[DEMO_LEAGUE], since:'2026-09-01'}; });
 }
@@ -4843,8 +4843,8 @@ function demoLeave(){
 }
 // The notices you can fire for a video, now or after a few seconds (time to start recording).
 const DEMO_NOTES = [
-  {id:'pass', icon:'trophy', tone:'gold', label:'Jorge passed you', make:() => { const b = store.get('demoBump', {}) || {}; b['d-jorge'] = {xp:gTotal() + 35, wxp:weekXp(gameS().ledger, new Date()) + 20}; store.set('demoBump', b); net.players = demoPlayers();
-    return {title:'Jorge', body:overtakeLine('Jorge', 0), onTap:() => ranksSheet('league')}; }},
+  {id:'pass', icon:'trophy', tone:'gold', label:'Ariete passed you', make:() => { const b = store.get('demoBump', {}) || {}; b['d-ariete'] = {xp:gTotal() + 35, wxp:weekXp(gameS().ledger, new Date()) + 20}; store.set('demoBump', b); net.players = demoPlayers();
+    return {title:'Ariete', body:overtakeLine('Ariete', 0), onTap:() => ranksSheet('league')}; }},
   {id:'alarm', icon:'alarm', tone:'blue', label:'Wake-up alarm', make:() => ({title:'Good morning ⏰', body:'10 push-ups to switch it off. You’ve got this.', onTap:() => openAlarm(new Date())})},
   {id:'level', icon:'star', tone:'accent', label:'Level up', make:() => ({title:'Level up! 🔥', body:`You’re level ${gLevel().level + 1}. Your chest just hit gold.`, onTap:() => jumpTo('hero')})},
   {id:'tip', icon:'bulb', tone:'amber', label:'Daily tip', make:() => { const t = tipOfDay(); return {title:'Today’s tip: ' + (t && t.topic || 'Ergonomics'), body:t ? t.title : 'How do you pick up the weight?', onTap:() => { if (t){ openSheet(''); t.type === 'ab' ? abSheet(t.id) : tipSheet(t.id); } }}; }},
@@ -4861,7 +4861,7 @@ function demoSheet(){
       <button class="btn wide" data-demosound="1">${ico('bolt')} Play the notification sound</button>
       <button class="btn wide" data-demoring="1">${ico('alarm')} Ring the alarm in ${demoDelay || 5} s</button>
       ${perm === 'default' ? '<button class="btn wide" data-demoperm="1">Also show them as real phone notifications</button>' : perm === 'granted' ? '<p class="small muted">Real phone notifications are on.</p>' : '<p class="small muted">This screen shows them inside the app. Real lock-screen notifications come with the phone app.</p>'}
-      <button class="btn wide" data-demoreset="1">Put Jorge back below me (for another take)</button>
+      <button class="btn wide" data-demoreset="1">Put Ariete back below me (for another take)</button>
       <button class="btn ghost wide" data-demoleave="1">Leave demo and get my data back</button>`
     : `<button class="btn primary wide" data-demoenter="1">Load the demo account</button>`}
     <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
@@ -4875,7 +4875,7 @@ document.addEventListener('click', ev => {
   if (ev.target.closest('#demo-btn')) return demoSheet();
   if (ev.target.closest('[data-demosound]')){ buzz([250, 80, 400]); return neutronBurst(); }
   const t = ev.target.closest('[data-demonote],[data-demodelay],[data-demoring],[data-demoperm],[data-demoenter],[data-demoleave],[data-demoreset]'); if (!t) return;
-  if (t.dataset.demoreset){ store.set('demoBump', {}); net.players = demoPlayers(); store.del('rivals'); return toast('Ranking reset. Jorge is behind you again.'); }
+  if (t.dataset.demoreset){ store.set('demoBump', {}); net.players = demoPlayers(); store.del('rivals'); return toast('Ranking reset. Ariete is behind you again.'); }
   if (t.dataset.demoenter) return demoEnter();
   if (t.dataset.demoleave) return demoLeave();
   if (t.dataset.demodelay != null){ demoDelay = +t.dataset.demodelay; return demoSheet(); }
