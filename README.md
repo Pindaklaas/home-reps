@@ -12,6 +12,18 @@ This repository has two parts:
 - Open `index.html` in a browser, or run `python3 -m http.server` and visit http://localhost:8000.
 - Rankings, leagues and duels need shared storage. They work in the published version (the Claude link). On GitHub Pages or a local file, everything else works and your data stays on the phone.
 
+## Put it on your phone like an app (not in the stores)
+
+The app installs as a web app: icon on the home screen, full screen, works offline, and can show notifications.
+
+1. Turn on GitHub Pages once: repository **Settings → Pages → Build and deployment → Deploy from a branch**, pick the branch with the latest app (`add-stretch-action` until it's merged, then `main`) and the `/ (root)` folder, and save. After a minute the app is at `https://pindaklaas.github.io/home-reps/`.
+2. On the phone, open that address:
+   - **iPhone (Safari):** Share button → **Add to Home Screen** → Add. Open it from the new icon (notifications only work from the icon, iOS 16.4 or newer).
+   - **Android (Chrome):** menu ⋮ → **Install app** (or **Add to Home screen**).
+3. Open it from the icon, and if you want notifications: Help → Demo for videos → **Also show them as real phone notifications** → Allow.
+
+The address is public but not listed anywhere: only people who have it can open it. Your data stays on the phone. Rankings, leagues, duels and the AI features only work in the Claude link, because they use its shared storage; the demo works everywhere.
+
 ## Run the tests
 
 ```bash
