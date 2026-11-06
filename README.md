@@ -22,6 +22,7 @@ The app installs as a web app: icon on the home screen, full screen, works offli
 2. On the phone, open that address:
    - **iPhone (Safari):** Share button → **Add to Home Screen** → Add. Open it from the new icon (notifications only work from the icon, iOS 16.4 or newer).
    - **Android (Chrome):** menu ⋮ → **Install app** (or **Add to Home screen**).
+   - No access to the repository settings? Upload the app folder (`index.html`, `manifest.webmanifest`, `sw.js`, `icons/`, `media/`) to any static host, for example by dragging it onto app.netlify.com/drop, and open that address instead.
 3. Open it from the icon, and if you want notifications: Help → Demo for videos → **Also show them as real phone notifications** → Allow.
 
 The address is public but not listed anywhere: only people who have it can open it. Your data stays on the phone. Rankings, leagues, duels and the AI features only work in the Claude link, because they use its shared storage; the demo works everywhere.

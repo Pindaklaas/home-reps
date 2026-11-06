@@ -4776,7 +4776,7 @@ function pushBanner(o){
 function sysNotify(title, body, tag, force){
   try {
     if (!('Notification' in window) || Notification.permission !== 'granted' || !force) return;
-    const opts = {body, tag:tag || 'homereps', icon:'icons/icon-192.png', badge:'icons/icon-192.png'};
+    const opts = {body, tag:tag || 'homereps', renotify:true, icon:'icons/icon-192.png', badge:'icons/badge-96.png', vibrate:[120, 60, 120]};
     if (swReg) swReg.showNotification(title, opts); else new Notification(title, opts);
   } catch (e){}
 }
