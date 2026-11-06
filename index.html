@@ -4764,7 +4764,7 @@ function pushBanner(o){
   const el = document.createElement('button'); el.type = 'button'; el.className = 'pbanner';
   el.innerHTML = `<span class="pb-app" aria-hidden="true">${LOGO_SVG}</span><span class="pb-txt"><span class="pb-top"><b>NEUTRÓN</b><span>now</span></span><b class="pb-t">${esc(o.title)}</b><span class="pb-b">${esc(o.body)}</span></span>`;
   wrap.prepend(el); [...wrap.children].slice(3).forEach(x => x.remove());
-  buzz([60, 40, 60]); tone(1175, .09); setTimeout(() => tone(1568, .12), 110);
+  buzz([250, 80, 400]); neutronBurst();
   const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), RM() ? 0 : 280); };
   el.addEventListener('click', () => { close(); if (o.onTap) o.onTap(); });
   let y0 = null; el.addEventListener('pointerdown', ev => { y0 = ev.clientY; });
@@ -4858,6 +4858,7 @@ function demoSheet(){
     ${on ? `<b>Send a notification</b>
       <div class="chipset" role="radiogroup" aria-label="When">${[[0, 'Now'], [5, 'In 5 s'], [15, 'In 15 s']].map(([v, l]) => `<button class="pick" data-demodelay="${v}" aria-pressed="${demoDelay === v}">${l}</button>`).join('')}</div>
       <div class="demo-grid">${DEMO_NOTES.map(n => `<button class="demo-note" data-demonote="${n.id}">${tile(n.icon, n.tone)}<b>${n.label}</b></button>`).join('')}</div>
+      <button class="btn wide" data-demosound="1">${ico('bolt')} Play the notification sound</button>
       <button class="btn wide" data-demoring="1">${ico('alarm')} Ring the alarm in ${demoDelay || 5} s</button>
       ${perm === 'default' ? '<button class="btn wide" data-demoperm="1">Also show them as real phone notifications</button>' : perm === 'granted' ? '<p class="small muted">Real phone notifications are on.</p>' : '<p class="small muted">This screen shows them inside the app. Real lock-screen notifications come with the phone app.</p>'}
       <button class="btn wide" data-demoreset="1">Put Jorge back below me (for another take)</button>
@@ -4872,6 +4873,7 @@ function demoBtnHide(ms){ const b = document.getElementById('demo-btn'); if (b) 
 const showOrOpen = html => document.querySelector('#sheet-root .scrim:not(.closing)') ? showSheet(html) : openSheet(html);
 document.addEventListener('click', ev => {
   if (ev.target.closest('#demo-btn')) return demoSheet();
+  if (ev.target.closest('[data-demosound]')){ buzz([250, 80, 400]); return neutronBurst(); }
   const t = ev.target.closest('[data-demonote],[data-demodelay],[data-demoring],[data-demoperm],[data-demoenter],[data-demoleave],[data-demoreset]'); if (!t) return;
   if (t.dataset.demoreset){ store.set('demoBump', {}); net.players = demoPlayers(); store.del('rivals'); return toast('Ranking reset. Jorge is behind you again.'); }
   if (t.dataset.demoenter) return demoEnter();
@@ -5024,6 +5026,46 @@ function tone(f, d){
     o.start(t); o.stop(t + d + .02);
   } catch (e){}
 }
+// The Neutrón notification sound: a deep boom, a crash of noise and a rising energy zap with an echo.
+// Loud on purpose, through a limiter so it never distorts the speaker.
+function neutronBurst(){
+  try {
+    const A = window.AudioContext || window.webkitAudioContext; if (!A) return;
+    const ac = beep.ac || (beep.ac = new A()); if (ac.state === 'suspended' && ac.resume) ac.resume().catch(() => {});
+    const t = ac.currentTime + .02, lim = ac.createDynamicsCompressor(), master = ac.createGain();
+    lim.threshold.value = -4; lim.knee.value = 4; lim.ratio.value = 12; lim.attack.value = .002; lim.release.value = .25;
+    master.gain.value = 1.3; lim.connect(master); master.connect(ac.destination);
+    const env = (g, peak, a, d) => { g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(.0001, t + d); };
+    // 1. sub-bass boom that drops in pitch
+    const o1 = ac.createOscillator(), g1 = ac.createGain(); o1.type = 'sine';
+    o1.frequency.setValueAtTime(150, t); o1.frequency.exponentialRampToValueAtTime(36, t + .55); env(g1, 1, .008, 1.1);
+    o1.connect(g1); g1.connect(lim); o1.start(t); o1.stop(t + 1.15);
+    // 2. growl: a saturated low saw for punch on small phone speakers
+    const o2 = ac.createOscillator(), ws = ac.createWaveShaper(), g2 = ac.createGain(), curve = new Float32Array(1024);
+    for (let i = 0; i < 1024; i++){ const x = i / 512 - 1; curve[i] = Math.tanh(x * 6); }
+    ws.curve = curve; o2.type = 'sawtooth'; o2.frequency.setValueAtTime(110, t); o2.frequency.exponentialRampToValueAtTime(48, t + .4); env(g2, .55, .006, .55);
+    o2.connect(ws); ws.connect(g2); g2.connect(lim); o2.start(t); o2.stop(t + .6);
+    // 3. crash: noise through a closing low-pass filter
+    const len = Math.floor(ac.sampleRate * 1.6), buf = ac.createBuffer(1, len, ac.sampleRate), ch = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+    const nz = ac.createBufferSource(), lp = ac.createBiquadFilter(), g3 = ac.createGain(); nz.buffer = buf; lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(9000, t); lp.frequency.exponentialRampToValueAtTime(300, t + 1.3); env(g3, .75, .004, 1.5);
+    nz.connect(lp); lp.connect(g3); g3.connect(lim); nz.start(t); nz.stop(t + 1.6);
+    // 4. energy zap rising, then two bright pings, with an echo
+    const dl = ac.createDelay(1), fb = ac.createGain(), wet = ac.createGain(); dl.delayTime.value = .19; fb.gain.value = .38; wet.gain.value = .5;
+    dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(lim);
+    const o4 = ac.createOscillator(), g4 = ac.createGain(); o4.type = 'square';
+    o4.frequency.setValueAtTime(320, t + .05); o4.frequency.exponentialRampToValueAtTime(2400, t + .28);
+    g4.gain.setValueAtTime(.0001, t + .05); g4.gain.exponentialRampToValueAtTime(.22, t + .1); g4.gain.exponentialRampToValueAtTime(.0001, t + .34);
+    o4.connect(g4); g4.connect(lim); g4.connect(dl); o4.start(t + .05); o4.stop(t + .36);
+    [[1568, .3], [2093, .42]].forEach(([f, s]) => { const o = ac.createOscillator(), g = ac.createGain(); o.type = 'triangle'; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, t + s); g.gain.exponentialRampToValueAtTime(.5, t + s + .01); g.gain.exponentialRampToValueAtTime(.0001, t + s + .45);
+      o.connect(g); g.connect(lim); g.connect(dl); o.start(t + s); o.stop(t + s + .5); });
+  } catch (e){}
+}
+// Phones only allow sound after a tap: every tap keeps the audio unlocked, so a notification that arrives later can still play.
+document.addEventListener('pointerdown', () => { try { const A = window.AudioContext || window.webkitAudioContext; if (!A) return;
+  const ac = beep.ac || (beep.ac = new A()); if (ac.state === 'suspended') ac.resume().catch(() => {}); } catch (e){} }, {passive:true});
 async function holdWake(){ try { if (navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen'); } catch (e){} }
 function releaseWake(){ try { if (wakeLock) wakeLock.release(); } catch (e){} wakeLock = null; }
 function openArena(id, duelDoc){
