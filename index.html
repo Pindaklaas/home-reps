@@ -472,6 +472,12 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .al-place{display:flex;gap:12px;align-items:center}
 .al-place svg{width:64px;height:48px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
 .al-place b{display:block;font-size:15px}.al-place small{display:block;font-size:12.5px;opacity:.7}
+.cam-check{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.cam-check.ok{border-color:color-mix(in srgb,var(--good) 45%,var(--line))}.cam-check.bad{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.cam-check b{display:block;font-size:14.5px}.cam-check small{display:block;font-size:12.5px;color:var(--muted);line-height:1.3}
+.al-camerr{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px;border-radius:16px;background:color-mix(in srgb,var(--arena-ink) 8%,transparent);font-size:14px;line-height:1.35}
+.al-camerr .ico{width:22px;height:22px;color:var(--accent)}
+.al-camerr .btn{background:var(--accent);color:var(--accent-ink);border:0;min-height:40px}
 .al-tapfb{background:none;border:0;color:inherit;text-decoration:underline;opacity:.75;font-size:14px;padding:8px}
 .al-moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .al-mv{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px 10px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);text-align:center;transition:transform .14s var(--out),background-color .2s,border-color .2s}
@@ -3261,22 +3267,42 @@ function plannerHtml(){
 
 
 /* ---------- camera rep counting (on this device only: frames are never stored or sent) ---------- */
-const MP_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
-const POSE_MODEL = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
-let poseLandmarker = null;
+// Body tracking: the copy shipped with the app first (vendor/mediapipe), then the CDNs. Same for the model.
+const MP_SOURCES = ['vendor/mediapipe', 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14', 'https://unpkg.com/@mediapipe/tasks-vision@0.10.14'];
+const POSE_MODELS = ['vendor/mediapipe/pose_landmarker_lite.task', 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task'];
+let poseLandmarker = null, poseLoading = null;
 const camSupported = () => !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-async function loadPose(){
-  if (poseLandmarker) return poseLandmarker;
-  const v = await import(MP_BASE + '/vision_bundle.mjs');
-  const files = await v.FilesetResolver.forVisionTasks(MP_BASE + '/wasm');
-  const opts = d => ({baseOptions:{modelAssetPath:POSE_MODEL, delegate:d}, runningMode:'VIDEO', numPoses:1});
-  try { poseLandmarker = await v.PoseLandmarker.createFromOptions(files, opts('GPU')); }
-  catch (e){ poseLandmarker = await v.PoseLandmarker.createFromOptions(files, opts('CPU')); }
-  return poseLandmarker;
+const absUrl = u => new URL(u, document.baseURI).href;
+function loadPose(){
+  if (poseLandmarker) return Promise.resolve(poseLandmarker);
+  return poseLoading || (poseLoading = (async () => {
+    let last = null;
+    // Opened as a file, the browser won't load the local copy: go straight to the CDNs.
+    for (const base of MP_SOURCES.filter(b => location.protocol !== 'file:' || /^https:/.test(b))){
+      let v, files;
+      try { v = await import(absUrl(base + '/vision_bundle.mjs')); files = await v.FilesetResolver.forVisionTasks(absUrl(base + '/wasm')); } catch (e){ last = e; continue; }
+      for (const model of POSE_MODELS.filter(m => location.protocol !== 'file:' || /^https:/.test(m))) for (const d of ['GPU', 'CPU']){
+        try { poseLandmarker = await v.PoseLandmarker.createFromOptions(files, {baseOptions:{modelAssetPath:absUrl(model), delegate:d}, runningMode:'VIDEO', numPoses:1}); return poseLandmarker; }
+        catch (e){ last = e; }
+      }
+    }
+    const err = new Error('Body tracking could not load'); err.name = 'ModelError'; err.cause = last; throw err;
+  })().finally(() => { poseLoading = null; }));
 }
-const camError = e => e && e.name === 'NotAllowedError' ? 'Camera permission was declined. Count by tapping instead.'
-  : e && e.name === 'NotFoundError' ? 'No camera found. Count by tapping instead.'
-  : 'The camera isn’t available here (it is in the mobile app). Count by tapping instead.';
+// Why the camera can't count, in plain words, so the fix is obvious.
+const inFrame = () => { try { return window.self !== window.top; } catch (e){ return true; } };
+const framePolicyBlocks = () => { try { const fp = document.permissionsPolicy || document.featurePolicy; return !!(fp && fp.allowsFeature && !fp.allowsFeature('camera')); } catch (e){ return false; } };
+function camError(e){
+  const n = e && e.name;
+  if (!window.isSecureContext) return 'The camera only works on a secure (https) page. Open the installed app.';
+  if (n === 'ModelError') return 'Body tracking couldn’t load. Check your internet and try again.';
+  if (n === 'NotAllowedError' || n === 'SecurityError') return inFrame() && (framePolicyBlocks() || n === 'SecurityError')
+    ? 'This view can’t use the camera. Open Neutrón from your home screen (the installed app) and it counts every rep.'
+    : 'The camera is blocked. Allow it for this site in your browser settings, then try again.';
+  if (n === 'NotFoundError' || n === 'OverconstrainedError') return 'No camera found on this device.';
+  if (n === 'NotReadableError' || n === 'AbortError') return 'Another app is using the camera. Close it and try again.';
+  return camSupported() ? 'The camera didn’t start. Try again.' : 'This browser can’t use the camera. Open the installed app.';
+}
 const SKEL = [[11,13],[13,15],[12,14],[14,16],[11,12],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]];
 function drawSkeleton(ctx, w, h, pts, color){
   ctx.clearRect(0, 0, w, h); if (!pts) return;
@@ -3293,7 +3319,7 @@ async function startCamCounter(box, move, onUpdate, extStream){
     stream = extStream || await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width:{ideal:640}, height:{ideal:480}}, audio:false});
     if (stopped){ stop(); return stop; }
     video.srcObject = stream; await video.play();
-    cueEl.textContent = 'Loading body tracking…';
+    cueEl.textContent = poseLandmarker ? 'Starting…' : 'Loading body tracking…';
     const lm = await loadPose(); if (stopped) return stop;
     const counter = makeRepCounter(move); let lastT = 0, nf = 0, dark = false;
     const probe = document.createElement('canvas'); probe.width = 32; probe.height = 24; const pctx = probe.getContext('2d', {willReadFrequently:true});
@@ -3344,7 +3370,8 @@ const alarmGentle = () => { const hl = store.get('health', null); return !!hl &&
 function curAlarmTask(){
   const c = alarmCfg(), bl = alarmBlocked();
   if (bl[c.move]) c.move = Object.keys(ALARM_MOVES).find(k => !bl[k]) || c.move;
-  return alarmTask(c, alarmGentle() || !!bl[c.move]);
+  const t = alarmTask(c, alarmGentle() || !!bl[c.move]);
+  return alarmRun && alarmRun.practice === 'cam' && t.reps ? {...t, reps:Math.min(3, t.reps)} : t;
 }
 let alarmRun = null;      // {firstRing, how, stop, reps, phase}
 let alarmAudio = null;
@@ -3362,12 +3389,13 @@ function checkAlarm(){
   if (due && due <= now && now - due < 60000 && !(st && st.day === localDay(now))) openAlarm(now);
 }
 setInterval(checkAlarm, 15000);
-function openAlarm(firstRing){
+// practice: 'ring' tries the whole alarm, 'cam' goes straight to a 3-rep camera test. Practice never gives XP or touches the real alarm.
+function openAlarm(firstRing, practice){
   const cfg = alarmCfg(), now = new Date();
-  alarmRun = {firstRing: firstRing || now, phase:'ring', how:null, reps:0};
-  store.set('alarmState', {day:localDay(now), status:'ringing', firstRing:alarmRun.firstRing.toISOString()});
+  alarmRun = {firstRing: firstRing || now, phase:practice === 'cam' ? 'task' : 'ring', how:null, reps:0, practice:practice || null};
+  if (!practice) store.set('alarmState', {day:localDay(now), status:'ringing', firstRing:alarmRun.firstRing.toISOString()});
   document.getElementById('alarm').hidden = false; document.body.style.overflow = 'hidden';
-  drawAlarm(); ringStart(); holdWake();
+  drawAlarm(); if (practice !== 'cam') ringStart(); holdWake();
 }
 function closeAlarm(){
   ringStop(); if (alarmRun){ clearTimeout(alarmRun.fbT); if (alarmRun.stop) alarmRun.stop(); } alarmRun = null; releaseWake();
@@ -3378,7 +3406,7 @@ function drawAlarm(){
   const el = document.getElementById('alarm'), cfg = alarmCfg(), task = curAlarmTask();
   const o = store.get('onboarding', null), why = o && o.answers && o.answers.why, now = new Date();
   const reps = !!ALARM_MOVES[task.move], M = ALARM_MOVES[task.move];
-  const taskTxt = reps ? `${task.reps} ${M.name.toLowerCase()}` : '1 minute of easy movement';
+  const taskTxt = alarmRun.practice === 'cam' && reps ? `Camera test · ${task.reps} ${M.name.toLowerCase()}` : reps ? `${task.reps} ${M.name.toLowerCase()}` : '1 minute of easy movement';
   if (alarmRun.phase === 'ring'){
     el.innerHTML = `<div class="ar-in al-in"><span class="al-time">${pad2(now.getHours())}:${pad2(now.getMinutes())}</span>
       <h2 class="ar-name">Good morning</h2>${why ? `<p class="ar-blurb">“${esc(why)}”</p>` : ''}
@@ -3390,20 +3418,21 @@ function drawAlarm(){
     const useCam = reps && camSupported() && !alarmRun.noCam, pct = reps ? Math.round(alarmRun.reps / task.reps * 100) : 0, view = reps && POSE_VIEW[task.move];
     if (!alarmRun.t0){ alarmRun.t0 = performance.now(); alarmRun.startedAt = new Date().toISOString(); alarmRun.repTimes = []; alarmRun.conf = []; }
     // Camera first: the phone has to see you do it. Tapping only shows up if the camera fails or can't see you for a while.
-    el.innerHTML = `<div class="ar-in al-in${useCam ? ' al-camscr' : ''}"><div class="ar-top"><button class="ar-x" data-al="leave">Later</button><b class="ar-title">${taskTxt}</b></div>
+    el.innerHTML = `<div class="ar-in al-in${useCam ? ' al-camscr' : ''}"><div class="ar-top"><button class="ar-x" data-al="leave">${alarmRun.practice ? 'Close' : 'Later'}</button><b class="ar-title">${taskTxt}</b></div>
       ${reps && useCam ? `<div class="al-camwrap"><div class="ar-cam al-cam" id="al-cam"></div>
           <div class="al-hud"><b id="al-n">${alarmRun.reps}</b><span>/ ${task.reps}</span></div>
           <span class="al-seen" id="al-seen">Looking for you…</span>
           <span class="al-bar"><i id="al-bar" style="width:${pct}%"></i></span></div>
         <div class="al-place">${placeSvg(view)}<span><b>${view === 'front' ? 'Phone in front of you' : 'Phone side-on'}</b><small>${camPlaceText(task.move)} Nothing is recorded or sent.</small></span></div>
         <button class="al-tapfb" data-al="tapmode" id="al-tapfb" hidden>Camera can’t see you? Count by tapping</button>`
-      : reps ? `<div class="al-count"><b id="al-n">${alarmRun.reps}</b><span>of ${task.reps}</span></div>${alarmRun.camErr ? `<p class="ar-note">${alarmRun.camErr}</p>` : ''}
-        <button class="ar-tap" data-al="tap">Tap each one</button>`
+      : reps ? `<div class="al-count"><b id="al-n">${alarmRun.reps}</b><span>of ${task.reps}</span></div>
+        ${alarmRun.camErr ? `<div class="al-camerr">${ico('camera')}<span>${esc(alarmRun.camErr)}</span>${camSupported() ? '<button class="btn sm" data-al="camretry">Try again</button>' : ''}</div>` : ''}
+        ${alarmRun.practice === 'cam' ? '' : '<button class="ar-tap" data-al="tap">Tap each one</button>'}`
       : `<div class="al-count"><b id="al-n">60</b><span>seconds</span></div><p class="ar-blurb">March on the spot and roll your shoulders. Stop if anything hurts.</p><button class="ar-tap" data-al="mob">Start the minute</button>`}</div>`;
     if (useCam){
       let seenTxt = '';
       const showFb = () => { const b = document.getElementById('al-tapfb'); if (b) b.hidden = false; };
-      clearTimeout(alarmRun.fbT); alarmRun.fbT = setTimeout(() => { if (alarmRun && !alarmRun.cam) showFb(); }, 30000);
+      clearTimeout(alarmRun.fbT); alarmRun.fbT = setTimeout(() => { if (alarmRun && !alarmRun.cam && !alarmRun.practice) showFb(); }, 30000);
       startCamCounter(document.getElementById('al-cam'), task.move, st => {
         if (!alarmRun) return;
         const txt = st.tracked ? 'Got you ✓' : st.seen ? 'Almost: whole body in' : 'Looking for you…';
@@ -3411,7 +3440,7 @@ function drawAlarm(){
         if (st.counted) alarmRep('camera', st);
       })
         .then(stop => { if (alarmRun) alarmRun.stop = stop; else stop(); })
-        .catch(e => { if (!alarmRun) return; alarmRun.noCam = true; alarmRun.camErr = camError(e); drawAlarm(); });
+        .catch(e => { if (!alarmRun) return; alarmRun.noCam = true; alarmRun.camErr = camError(e); if (alarmRun.practice === 'cam') store.set('camTest', {ok:false, at:new Date().toISOString(), why:alarmRun.camErr}); drawAlarm(); });
     }
   } else if (alarmRun.phase === 'confirm'){
     el.innerHTML = `<div class="ar-in al-in"><h2 class="ar-name">Stop today’s alarm?</h2>
@@ -3430,6 +3459,10 @@ function alarmRep(how, st){
 }
 function alarmDone(how){
   const task = curAlarmTask(), r = alarmRun || {}, cam = how === 'camera';
+  if (r.practice){
+    if (cam) store.set('camTest', {ok:true, at:new Date().toISOString(), move:task.move});
+    closeAlarm(); return celebrate(cam ? 'The camera counted every rep. Tomorrow it just works.' : 'Alarm test done. Nothing was scored.');
+  }
   const conf = r.conf && r.conf.length ? r.conf.reduce((a, b) => a + b, 0) / r.conf.length : null;
   const res = gameEvent({kind:'alarm', id:'al-' + localDay(new Date()), verified:cam, move:task.move, reps:cam ? r.reps : 0, repTimes:cam ? r.repTimes : [], startedAt:r.startedAt || new Date().toISOString(), endedAt:new Date().toISOString(), conf, quiet:true});
   store.set('alarmState', {...(store.get('alarmState', {}) || {}), day:localDay(new Date()), status:'done', how});
@@ -3452,6 +3485,7 @@ document.getElementById('alarm').addEventListener('click', ev => {
   const a = t.dataset.al, cfg = alarmCfg();
   if (a === 'start'){ ringStop(); alarmRun.phase = 'task'; return drawAlarm(); }
   if (a === 'tap') return alarmRep('tap');
+  if (a === 'camretry'){ alarmRun.noCam = false; alarmRun.camErr = ''; return drawAlarm(); }
   if (a === 'tapmode'){ if (alarmRun.stop) alarmRun.stop(); alarmRun.stop = null; alarmRun.noCam = true; alarmRun.camErr = ''; return drawAlarm(); }
   if (a === 'mob' && !alarmRun.mobT){
     const end = Date.now() + 60000; t.disabled = true;
@@ -3459,6 +3493,8 @@ document.getElementById('alarm').addEventListener('click', ev => {
       if (n) n.textContent = Math.max(0, left); if (left <= 0){ clearInterval(alarmRun.mobT); alarmDone('tap'); } }, 250);
     return;
   }
+  if (a === 'leave' && alarmRun.practice){ closeAlarm(); return drawSchedule(); }
+  if (a === 'stop' && alarmRun.practice){ closeAlarm(); return; }
   if (a === 'leave'){
     if (alarmRun.stop) alarmRun.stop();
     const r = afterAbandon(cfg, alarmRun.firstRing, new Date());
@@ -3479,19 +3515,28 @@ function alarmSettingsHtml(){
     ${gentle ? '' : block('What stops it', `<div class="al-moves">${Object.entries(ALARM_MOVES).map(([k, m]) => `<button class="al-mv" data-alcfg="move" data-v="${k}" aria-pressed="${task.move === k}" ${bl[k] ? 'disabled' : ''}>
         <span class="mv-th">${animSvg(m.ex, '', 'data-ar="1.33"')}</span><b>${m.name}</b><small>${bl[k] || (m.bar ? 'Needs a bar' : POSE_VIEW[k] === 'front' ? 'Phone in front' : 'Phone side-on')}</small></button>`).join('')}</div>`)
     + block('Level', `<div class="al-lvls">${ALARM_LEVELS.map(([v, l], i) => `<button class="pick" data-alcfg="level" data-v="${v}" aria-pressed="${c.level === v}"><b>${M.reps[i]}</b>${l}</button>`).join('')}</div>
-      <div class="al-step"><button class="btn sm ghost" data-alcfg="step" data-v="-1" aria-label="One less">−</button><span><b>${task.reps}</b> ${esc(M.name.toLowerCase())} to stop it</span><button class="btn sm ghost" data-alcfg="step" data-v="1" aria-label="One more">+</button></div>`)}
+      <div class="al-step"><button class="btn sm ghost" data-alcfg="step" data-v="-1" aria-label="One less">−</button><span><b>${task.reps}</b> ${esc(M.name.toLowerCase())} to stop it</span><button class="btn sm ghost" data-alcfg="step" data-v="1" aria-label="One more">+</button></div>`) + camCheckHtml(task)}
     ${block('Mode', chip('mode', [['commit','Commitment'],['gentle','Gentle']]))}
     ${c.mode === 'commit' ? block('If I leave the task, ring again in', chip('rearm', [['3','3 min'],['5','5 min'],['10','10 min']])) : ''}
     ${block('Sick or travelling?', chip('pause', [['1','Pause 1 day'],['3','3 days'],['7','1 week'],['0','Resume']]))}
-    ${gentle ? '<p class="small muted">Gentle health mode: the task is one easy minute of movement.</p>' : '<p class="small muted">The camera checks each rep. Nothing is recorded or sent.</p>'}
-    <button class="btn sm" id="al-test" style="align-self:flex-start">Try it now</button>`;
+    ${gentle ? '<p class="small muted">Gentle health mode: the task is one easy minute of movement.</p>' : ''}
+    <button class="btn sm ghost" id="al-test" style="align-self:flex-start">Try the whole alarm</button>`;
   h += `<p class="small muted">Prototype: it only rings while the app is open. The mobile app will ring even when your phone is locked, and you can always stop it in an emergency.</p></div>`;
   return h;
 }
+// Camera check in the alarm settings: test it once (3 reps, no XP) so tomorrow morning it just works.
+function camCheckHtml(task){
+  const t = store.get('camTest', null), ok = t && t.ok, M = ALARM_MOVES[task.move] || ALARM_MOVES.pushup;
+  return `<div class="cam-check${ok ? ' ok' : t ? ' bad' : ''}">${tile('camera', ok ? 'good' : t ? 'accent' : 'blue')}
+    <span><b>${ok ? 'Camera ready' : t ? 'Camera not working here' : 'Count with the camera'}</b>
+    <small>${ok ? 'It counts every rep. Nothing is recorded or sent.' : t ? esc(t.why || '') : `Test it once: 3 ${esc(M.name.toLowerCase())}, no points.`}</small></span>
+    <button class="btn sm ${ok ? 'ghost' : 'primary'}" id="al-camtest">${ok ? 'Test again' : 'Test it'}</button></div>`;
+}
 function setAlarmCfg(patch){ store.set('alarm', {...alarmCfg(), ...patch}); drawSchedule(); }
 document.getElementById('v-sched').addEventListener('click', ev => {
-  const t = ev.target.closest('[data-alcfg],#al-test'); if (!t) return;
-  if (t.id === 'al-test') return openAlarm(new Date());
+  const t = ev.target.closest('[data-alcfg],#al-test,#al-camtest'); if (!t) return;
+  if (t.id === 'al-test') return openAlarm(new Date(), 'ring');
+  if (t.id === 'al-camtest') return openAlarm(new Date(), 'cam');
   const k = t.dataset.alcfg, v = t.dataset.v;
   if (k === 'step'){ const t = curAlarmTask(); return setAlarmCfg({level:null, reps:Math.max(1, Math.min((ALARM_MOVES[t.move] || ALARM_MOVES.pushup).max, t.reps + (+v)))}); }
   if (k === 'pause'){ if (v === '0') return setAlarmCfg({pausedUntil:null}); const d = new Date(); d.setDate(d.getDate() + (+v) - 1); toast('Alarm paused. Get well soon, or have a good trip.'); return setAlarmCfg({pausedUntil:localDay(d)}); }
