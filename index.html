@@ -982,6 +982,21 @@ h3.ih .itile .ico{width:18px;height:18px}
 .mp-demo{align-self:center;display:inline-flex;align-items:center;gap:8px;border:1.5px dashed var(--line);background:var(--surface);border-radius:999px;padding:9px 16px;font-weight:700;font-size:14px;color:var(--ink);margin-top:2px}
 .mp-demo .ico{width:18px;height:18px;color:var(--accent)}
 .demo-btn{border-color:var(--accent);color:var(--accent)}
+.ss-restctl{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.ss-restctl>span{display:inline-flex;align-items:center;gap:5px;flex:1}
+.ss-restctl .ico{width:16px;height:16px;color:var(--blue)}
+.ss-restctl button{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:18px;line-height:1}
+.ss-restctl b{min-width:44px;text-align:center;color:var(--ink);font-variant-numeric:tabular-nums}
+.ss-gap{--p:0;display:flex;align-items:center;gap:8px;margin:2px 0;font-size:12px;color:var(--muted)}
+.ss-gap i{flex:1;height:2px;border-radius:1px;background:var(--line)}
+.ss-gap span{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;padding:2px 9px;background:var(--surface);font-variant-numeric:tabular-nums}
+.ss-gap .ico{width:13px;height:13px}
+.ss-gap.live span{border-color:var(--blue);color:var(--ink);background:linear-gradient(90deg,color-mix(in srgb,var(--blue) 22%,var(--surface)) calc(var(--p) * 100%),var(--surface) 0)}
+.ss-gap.live b{color:var(--blue)}
+.ss-gap.live i{background:var(--blue)}
+.ss-gap.rested span{color:var(--good);border-color:color-mix(in srgb,var(--good) 40%,var(--line))}
+.rest-sub{display:flex;align-items:center;gap:4px}
+.rest-sub .ico{width:13px;height:13px;color:var(--blue)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -1525,7 +1540,7 @@ function drawToday(){
   const row = (x, pre) => { const e = EX[x.id], k = pre+x.id, d = done.has(k);
     const th = animSvg(e.id, 'th', `data-ar="1" data-ph="${ri * 370}"`);
     return `<label class="check ${d?'done':''}${k===justKey?' just':''}${th?' has-th':''}" style="--i:${ri++}"><input type="checkbox" data-done="${k}" data-date="${key}" ${d?'checked':''}>
-      ${th ? `<button class="th-btn" type="button" data-info="${e.id}" aria-label="How to do ${esc(e.name)}">${th}</button>` : ''}<span><span class="name">${esc(e.name)}</span><br><span class="sub">${x.sets} × ${doseText(x.dose,e.unit)} · ${esc(e.equip)}</span></span>
+      ${th ? `<button class="th-btn" type="button" data-info="${e.id}" aria-label="How to do ${esc(e.name)}">${th}</button>` : ''}<span><span class="name">${esc(e.name)}</span><br><span class="sub">${x.sets} × ${doseText(x.dose,e.unit)} · ${esc(e.equip)}</span>${x.sets > 1 ? `<span class="sub rest-sub">${ico('alarm')}${fmtRest(restOf(e.id, p.goal, x.restSec))} rest between sets</span>` : ''}</span>
       <span class="acts">${e.unit==='sec'?`<button class="btn sm primary" type="button" data-timer="${x.dose}" data-tlabel="${esc(e.name)}" aria-label="Start ${doseText(x.dose,e.unit)} timer">▶ ${doseText(x.dose,e.unit)}</button>`:''}${th ? '' : `<button class="btn sm ghost" data-info="${e.id}" type="button">How to</button>`}</span></label>`; };
   const L = todayAnim ? 'list in' : 'list';
   const ob = store.get('onboarding', null), why = ob && ob.answers && ob.answers.why, hl = store.get('health', null), Lt = currentLimits();
@@ -1586,8 +1601,9 @@ function beep(){
       o.start(t); o.stop(t+.2); });
   }catch(e){}
 }
-function startTimer(sec, label){
-  clearTimeout(tm.hideT); cancelAnimationFrame(tm.raf);
+function startTimer(sec, gap, label){
+  if (label === undefined){ label = gap; gap = null; }
+  clearTimeout(tm.hideT); cancelAnimationFrame(tm.raf); gapDone(); tm.gap = gap || null;
   const box = document.getElementById('timer'), card = box.querySelector('.tm');
   card.classList.remove('finish'); box.hidden = false; document.body.classList.add('has-timer');
   card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
@@ -1600,18 +1616,22 @@ function tickTimer(){
   if (!tm.paused) tm.left = (tm.end - performance.now())/1000;
   document.getElementById('tm-t').textContent = fmt(tm.left);
   document.querySelector('#timer .arc').style.strokeDashoffset = 119.4 * (1 - Math.max(0,tm.left)/tm.total);
+  const g = tm.gap && document.querySelector(`[data-gap="${tm.gap}"]`);
+  if (g){ g.classList.add('live'); g.style.setProperty('--p', (1 - Math.max(0, tm.left) / tm.total).toFixed(3)); const b = g.querySelector('b'); if (b) b.textContent = fmt(Math.max(0, tm.left)); }
   if (tm.left <= 0) return finishTimer();
   tm.raf = requestAnimationFrame(tickTimer);
 }
+// The rest between two sets is over (or skipped): the gap shows it was rested.
+function gapDone(){ const g = tm.gap && document.querySelector(`[data-gap="${tm.gap}"]`); if (g){ g.classList.remove('live'); g.classList.add('rested'); } tm.gap = null; }
 function finishTimer(){
   const card = document.querySelector('#timer .tm');
-  document.getElementById('tm-t').textContent = 'Done'; card.classList.add('finish');
+  document.getElementById('tm-t').textContent = 'Done'; card.classList.add('finish'); gapDone();
   document.querySelector('#timer .arc').style.strokeDashoffset = 0;
   beep(); buzz([200,100,200]);
   toast(document.getElementById('tm-l').textContent.startsWith('Rest') ? 'Rest is over. Next set!' : 'Time! Nice hold.');
   tm.hideT = setTimeout(stopTimer, 2600);
 }
-function stopTimer(){ cancelAnimationFrame(tm.raf); clearTimeout(tm.hideT); document.getElementById('timer').hidden = true; document.body.classList.remove('has-timer'); }
+function stopTimer(){ cancelAnimationFrame(tm.raf); clearTimeout(tm.hideT); gapDone(); document.getElementById('timer').hidden = true; document.body.classList.remove('has-timer'); }
 document.getElementById('timer').addEventListener('click', ev => {
   const b = ev.target.closest('[data-tm]'); if (!b) return;
   if (b.dataset.tm==='stop') return stopTimer();
@@ -2863,7 +2883,7 @@ function localDraft(a, c){
         if (gym && pool.some(isGymEx)) pool = pool.filter(isGymEx);
         if (pool.length) picked.push(pool[(i + Math.floor(k / groups.length)) % pool.length].id);
       }
-      return {day:d, title: L.mode === 'gentle' ? 'Gentle strength' : title, exercises: picked.map(id => ({id, sets:L.maxSets, dose:EX[id].dose, restSec:60}))};
+      return {day:d, title: L.mode === 'gentle' ? 'Gentle strength' : title, exercises: picked.map(id => ({id, sets:L.maxSets, dose:EX[id].dose, restSec:EX[id].unit === 'sec' ? 45 : restFor(EX[id].equip, a.goal)}))};
     });
     out.summary = L.mode === 'gentle' ? `A gentle plan with ${days.length} short sessions a week to build the habit safely.` : gym ? `${days.length} gym sessions a week, about ${a.minutes} minutes each. Start light and add weight when the last reps feel easy.` : `${days.length} workouts a week, about ${a.minutes} minutes each, with what you have at home.`;
   }
@@ -3474,7 +3494,7 @@ function newSession(day){
     goal, exercises: items.map(x => { const e = EX[x.id], last = lastSetsFor(x.id), weighted = isWeighted(e);
       const sug = weighted || e.unit !== 'sec' ? suggestNext(last, e.unit === 'sec' ? [x.dose, x.dose] : weighted ? range : [x.dose, x.dose + 5], weightStep(e)) : null;
       const n = Math.max(1, x.sets || 3), lastW = last ? Math.max(...last.map(s => s.w || 0)) : 0;
-      return {id:x.id, src:x.src, lo: e.unit === 'sec' ? x.dose : weighted ? range[0] : x.dose, hi: e.unit === 'sec' ? x.dose : weighted ? range[1] : x.dose,
+      return {id:x.id, src:x.src, restSec:x.restSec, lo: e.unit === 'sec' ? x.dose : weighted ? range[0] : x.dose, hi: e.unit === 'sec' ? x.dose : weighted ? range[1] : x.dose,
         last, sug, sets: Array.from({length:n}, () => ({w:null, r:null, done:false, pw: weighted ? (sug ? sug.w : lastW || null) : 0, pr: sug ? sug.r : (weighted ? range[0] : x.dose)}))}; })};
 }
 let ssClock = 0;
@@ -3487,6 +3507,13 @@ function openSession(day){
 }
 function hideSession(){ clearInterval(ssClock); const el = document.getElementById('session'); el.hidden = true; el.innerHTML = ''; document.body.style.overflow = ''; releaseWake(); if (ui.mode !== 'challenge') render(); }
 function tickSession(){ const s = store.get('session', null), c = document.getElementById('ss-clock'); if (s && c) c.textContent = fmtClock((Date.now() - new Date(s.startedAt)) / 1000); }
+// Rest between sets for an exercise: what you set last time, else the plan's, else the default for your goal and equipment.
+function restOf(id, goal, planRest){
+  const mine = (store.get('rest', {}) || {})[id], e = EX[id];
+  return mine || planRest || (e && e.unit === 'sec' ? 45 : restFor(e && e.equip, goal));
+}
+const fmtRest = sec => sec >= 60 ? `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}` : `${sec} s`;
+function setRest(id, sec){ const m = store.get('rest', {}) || {}; m[id] = Math.max(15, Math.min(300, sec)); store.set('rest', m); }
 function ssRow(x, i, j, best){
   const e = EX[x.id], s = x.sets[j], prev = x.last && x.last[j], w = isWeighted(e), pr = s.done && isPR(best, x.id, {w:+s.w || 0, r:+s.r || 0, done:true});
   return `<div class="ss-row${s.done ? ' done' : ''}" id="ss-${i}-${j}"><span class="ss-n">${j + 1}${pr ? '<b class="pr-tag">PR</b>' : ''}</span><span class="ss-prev">${prev ? fmtSet(e, prev) : '–'}</span>
@@ -3509,15 +3536,21 @@ function drawSession(){
       return `<section class="ss-ex">
         <div class="ss-h">${animFor(e.id) ? `<button class="th-btn" data-info="${e.id}" aria-label="How to do ${esc(e.name)}">${animSvg(e.id, 'th', 'data-ar="1"')}</button><b class="ss-n2">${esc(e.name)}</b>` : `<b>${esc(e.name)}</b><button class="btn sm ghost" data-info="${e.id}">How to</button>`}</div>
         <p class="small muted">${target}${x.last ? ` · Last: ${x.last.map(y => fmtSet(e, y)).join(', ')}` : ''}</p>
+        ${(() => { const r = restOf(x.id, s.goal, x.restSec); return `<div class="ss-restctl"><span>${ico('alarm')} Rest between sets</span><button data-ssrest="${i}|-15" aria-label="15 seconds less rest">−</button><b>${fmtRest(r)}</b><button data-ssrest="${i}|15" aria-label="15 seconds more rest">+</button></div>`; })()}
         ${sug ? `<p class="ss-sug">${sug}</p>` : ''}
         ${warm.length ? `<p class="small muted">Warm up: ${warm.map(y => `${y.w} kg × ${y.r}`).join(' · ')}</p>` : ''}
         ${plates ? `<p class="small muted">${work} kg = 20 kg bar + ${plates.length ? plates.join(' + ') + ' kg each side' : 'nothing'}</p>` : ''}
         <div class="ss-grid${w ? ' w' : ''}"><span>Set</span><span>Previous</span>${w ? '<span>kg</span>' : ''}<span>${unit === 'sec' ? 'Sec' : 'Reps'}</span><span></span></div>
-        ${x.sets.map((_, j) => ssRow(x, i, j, best)).join('')}
+        ${x.sets.map((_, j) => ssRow(x, i, j, best) + (j < x.sets.length - 1 ? `<div class="ss-gap${x.sets[j].done && x.sets[j + 1].done ? ' rested' : ''}" data-gap="${i}-${j}"><i></i><span>${ico('alarm')}<b>${fmtRest(restOf(x.id, s.goal, x.restSec))}</b> rest</span><i></i></div>` : '')).join('')}
         <button class="linkish" data-ssadd="${i}">+ Add set</button></section>`; }).join('')}
     <button class="btn primary wide" data-ss="finish">Finish workout</button>
     <button class="linkish" data-ss="discard">Discard workout</button></div>`;
 }
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-ssrest]'); if (!t) return;
+  const [i, d] = t.dataset.ssrest.split('|').map(Number), s = store.get('session', null); if (!s || !s.exercises[i]) return;
+  const x = s.exercises[i]; setRest(x.id, restOf(x.id, s.goal, x.restSec) + d); buzz(8); drawSession();
+});
 function saveSessionField(i, j, f, v){
   const s = store.get('session', null); if (!s) return;
   const n = v === '' ? null : Math.max(0, Math.min(f === 'w' ? 999 : 999, parseFloat(String(v).replace(',', '.'))));
@@ -3540,7 +3573,7 @@ function toggleSet(i, j){
   if (st.done){
     buzz(15);
     if (isPR(best, x.id, st)){ tone(1175, .15); buzz([20, 40, 20]); toast(`New record on ${EX[x.id].name}!`); }
-    if (j < x.sets.length - 1 || i < s.exercises.length - 1) startTimer(e.unit === 'sec' ? 45 : restFor(e.equip, s.goal), 'Rest · next: ' + (j < x.sets.length - 1 ? `set ${j + 2}` : EX[s.exercises[i + 1].id].name));
+    if (j < x.sets.length - 1 || i < s.exercises.length - 1) startTimer(restOf(x.id, s.goal, x.restSec), j < x.sets.length - 1 ? `${i}-${j}` : null, 'Rest · next: ' + (j < x.sets.length - 1 ? `set ${j + 2}` : EX[s.exercises[i + 1].id].name));
   }
 }
 function finishSession(){
@@ -4527,7 +4560,7 @@ const HELP = [
   {id:'today', icon:'today', tone:'accent', title:'Today', line:'What to do today, in order.', anim:'squat',
     steps:['Tap a moving picture to see how the exercise is done.', 'Tick each exercise when it’s done.', 'Pick another day at the top to look ahead.'], go:'today'},
   {id:'workout', icon:'workout', tone:'accent', title:'Live workout', line:'Log every set while you train.', anim:'db-bench',
-    steps:['Tap Start workout on Today.', 'Each card shows last time and a suggested weight or reps.', 'Tick a set: the rest timer starts and records light up.'], go:'workout', goLabel:'Start a workout'},
+    steps:['Tap Start workout on Today.', 'Each card shows last time, a suggested weight or reps, and the rest between sets (change it with − and +).', 'Tick a set: the rest countdown runs between that set and the next.'], go:'workout', goLabel:'Start a workout'},
   {id:'plan', icon:'plan', tone:'blue', title:'Plan', line:'Your week and your 4-week block.',
     steps:['Each day shows its session, time and exercises.', 'The block goes Base, Build, Push and an easy week.', 'Change your answers any time from this screen.'], go:'sched'},
   {id:'alarm', icon:'alarm', tone:'blue', title:'Wake-up alarm', line:'Rings until you do your push-ups or squats.', anim:'pushup',
@@ -4811,11 +4844,11 @@ function demoEnter(){
     Object.keys(localStorage).filter(k => k.startsWith('homereps.')).forEach(k => localStorage.removeItem(k));
   } catch (e){ return toast('This browser blocks saving, so the demo can’t start.'); }
   const now = new Date(), day = n => { const d = new Date(now); d.setDate(d.getDate() - n); d.setHours(18, 40, 0, 0); return d; };
-  const ans = {age:'25-34', track:'gym', sector:'gym', kit:'gym', goal:'gain', level:'some', dpw:4, days:DPW_DAYS[4], minutes:60, time:'18:30', wake:'07:00', sleepUsual:'7-8', why:'Feel strong every single day'};
+  const ans = {age:'25-34', track:'gym', sector:'gym', kit:'gym', goal:'gain', level:'some', dpw:4, days:trainDaysFrom(new Date(), 4), minutes:60, time:'18:30', wake:'07:00', sleepUsual:'7-8', why:'Feel strong every single day'};
   store.set('onboarding', {v:3, at:day(30).toISOString(), answers:ans});
   store.set('health', {v:1, at:day(30).toISOString(), consent:{granted:true, at:day(30).toISOString(), version:CONSENT_V}, parq:{heart:false, chest:false, dizzy:false, chronic:false, meds:false, joint:false, supervised:false, pregnant:false}, injuries:[]});
   try {
-    const pa = {...ans, kind:'training', days:DPW_DAYS[4], minutes:60, equipment:GYM_KIT, injuries:[], healthConsent:true, parq:{heart:false, chest:false, dizzy:false, chronic:false, meds:false, joint:false, supervised:false, pregnant:false}}, c = planContext(pa), res = validatePlan(localDraft(pa, c), c.L, c), st = day(9);
+    const pa = {...ans, kind:'training', days:trainDaysFrom(new Date(), 4), minutes:60, equipment:GYM_KIT, injuries:[], healthConsent:true, parq:{heart:false, chest:false, dizzy:false, chronic:false, meds:false, joint:false, supervised:false, pregnant:false}}, c = planContext(pa), res = validatePlan(localDraft(pa, c), c.L, c), st = day(9);
     store.set('plan', {v:1, at:st.toISOString(), start:`${st.getFullYear()}-${pad2(st.getMonth() + 1)}-${pad2(st.getDate())}`, status:'approved', source:'auto', kind:'training', note:'', issues:res.issues, plan:res.plan});
   } catch (e){}
   // Twelve days in a row of training, getting a little stronger each time.
