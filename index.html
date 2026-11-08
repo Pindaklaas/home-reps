@@ -1008,6 +1008,66 @@ h3.ih .itile .ico{width:18px;height:18px}
 .waist-chart .wc-area{fill:color-mix(in srgb,var(--good) 14%,transparent);stroke:none}
 .waist-chart .wc-dot{fill:var(--surface);stroke:var(--good);stroke-width:2.5}.waist-chart .wc-dot.last{fill:var(--good)}
 .waist-chart text{font-size:12px;font-weight:700;fill:var(--muted);font-variant-numeric:tabular-nums}.waist-chart .wc-last{fill:var(--ink);font-size:14px}.waist-chart .wc-d{font-weight:600;font-size:11px}
+/* progress photos */
+.ph-hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px 16px}
+.ph-hero .itile{width:56px;height:56px;border-radius:18px}.ph-hero .itile .ico{width:28px;height:28px}
+.ph-hero b{font-family:var(--display);font-size:24px;text-transform:uppercase}.ph-hero>span{color:var(--muted);font-size:14px;max-width:260px}
+.ph-hero .btn{display:inline-flex;align-items:center;gap:6px;margin-top:6px}.ph-hero .btn .ico{width:18px;height:18px}
+.ph-tips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ph-tips span{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 6px}
+.ph-tips b{font-size:12.5px}.ph-tips small{font-size:11px;color:var(--muted)}.ph-tips .itile{width:34px;height:34px;border-radius:11px}
+.ph-cmp,.ph-single{position:relative;border-radius:18px;overflow:hidden;background:var(--ink);aspect-ratio:3/4;user-select:none;-webkit-user-select:none}
+.ph-cmp img,.ph-single img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph-after{position:absolute;inset:0;clip-path:inset(0 0 0 var(--x))}
+.ph-handle{position:absolute;top:0;bottom:0;left:var(--x);width:0;pointer-events:none}
+.ph-handle::before{content:'';position:absolute;top:0;bottom:0;left:-1.5px;width:3px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.4)}
+.ph-handle i{position:absolute;top:50%;left:-20px;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.ph-handle i::before,.ph-handle i::after{content:'';position:absolute;top:14px;border:6px solid transparent}
+.ph-handle i::before{left:4px;border-right-color:var(--ink)}.ph-handle i::after{right:4px;border-left-color:var(--ink)}
+.ph-range{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:ew-resize;touch-action:pan-y}
+.ph-tag{position:absolute;top:10px;background:rgba(0,0,0,.55);color:#fff;border-radius:10px;padding:5px 9px;font-family:var(--display);font-weight:700;font-size:15px;text-transform:uppercase;line-height:1.1;pointer-events:none}
+.ph-tag small{display:block;font-family:var(--text);font-weight:600;font-size:11px;text-transform:none;opacity:.85}
+.ph-tag.l{left:10px}.ph-tag.r{right:10px;text-align:right}
+.ph-date{position:absolute;left:10px;top:10px;background:rgba(0,0,0,.55);color:#fff;border-radius:10px;padding:4px 9px;font-size:12px;font-weight:700}
+.veil img{filter:blur(22px) saturate(.6)}
+.ph-reveal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:0;background:rgba(255,255,255,.9);color:#151A21;border-radius:999px;padding:10px 18px;font-weight:700;z-index:2}
+.ph-stats{display:flex;gap:6px}.ph-stats span{flex:1;display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 6px}
+.ph-stats b{font-family:var(--display);font-size:20px;line-height:1.1}.ph-stats small{font-size:11.5px;color:var(--muted)}
+.ph-next{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+.ph-next.due{border-color:var(--accent)}.ph-next>span{display:flex;flex-direction:column}.ph-next>span>span{font-size:12.5px;color:var(--muted)}
+[data-phshare]{display:flex;align-items:center;justify-content:center;gap:6px}[data-phshare] .ico{width:18px;height:18px}
+.ph-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.ph-grid figure{position:relative;margin:0;border-radius:12px;overflow:hidden;background:var(--ink);aspect-ratio:3/4}
+.ph-grid img{width:100%;height:100%;object-fit:cover;display:block}
+.ph-grid figcaption{position:absolute;left:0;right:0;bottom:0;padding:14px 6px 4px;font-size:10.5px;font-weight:700;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.ph-del{position:absolute;top:4px;right:4px;min-width:28px;height:28px;border-radius:14px;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:12px;padding:0 8px}
+.ph-del.armed{background:var(--bad)}
+p .ico{width:14px;height:14px;vertical-align:-2px}
+#phcam{position:fixed;inset:0;z-index:90;background:#000;color:#fff;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) 12px calc(14px + env(safe-area-inset-bottom,0px));gap:8px}
+#phcam[hidden]{display:none}
+.pc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pc-x{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:18px;display:grid;place-items:center;padding:0}
+.pc-x svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pc-poses{display:flex;background:rgba(255,255,255,.12);border-radius:999px;padding:3px}
+.pc-poses button{border:0;background:none;color:#fff;font-weight:700;font-size:13px;padding:7px 14px;border-radius:999px}
+.pc-poses button[aria-pressed="true"]{background:#fff;color:#000}
+.pc-view{position:relative;flex:1;min-height:0;border-radius:18px;overflow:hidden;background:#111}
+.pc-view video,.pc-ghost{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mirror{transform:scaleX(-1)}
+.pc-ghost{opacity:.35;pointer-events:none}
+.pc-guide{position:absolute;left:50%;top:50%;height:78%;transform:translate(-50%,-50%);fill:none;stroke:rgba(255,255,255,.55);stroke-width:1.2;stroke-dasharray:3 3;pointer-events:none}
+.pc-count{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:120px;font-weight:800;text-shadow:0 4px 24px rgba(0,0,0,.6)}
+.pc-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.pc-flash.go{animation:pcflash .4s ease-out}
+@keyframes pcflash{from{opacity:.9}to{opacity:0}}
+.pc-tip{margin:0;text-align:center;font-size:13.5px;opacity:.85}
+.pc-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
+.pc-opt{justify-self:center;border:1px solid rgba(255,255,255,.3);background:none;color:#fff;border-radius:999px;padding:7px 12px;font-weight:700;font-size:12.5px}
+.pc-opt[aria-pressed="false"]{opacity:.55}
+.pc-shoot{width:74px;height:74px;border-radius:50%;border:4px solid #fff;background:none;padding:5px}
+.pc-shoot i{display:block;width:100%;height:100%;border-radius:50%;background:#fff;transition:transform .15s}
+.pc-shoot:active i{transform:scale(.88)}
+.pc-file{text-align:center;font-size:12.5px;opacity:.7;text-decoration:underline;cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -3752,8 +3812,8 @@ function drawProgress(){
     <div class="legend"><span><i class="c-good"></i>Green 75%+</span><span><i class="c-amber"></i>Yellow 45–74%</span><span><i class="c-bad"></i>Red under 45%</span></div></div>`;
   const hh = heroNow();
   lv += `<button class="cta-card" data-jump="hero" style="text-align:left;width:100%">${tile('star', 'gold')}<span><b>${esc(hh.cls.name)}</b><span class="small muted">Your hero · ${hh.power} power</span></span><span class="btn sm">See</span></button>`;
-  el.innerHTML = subTabs('progress') + sec('progress:streak', sk) + sec('progress:level', lv) + sec('progress:strength', waistCard() + h || '<div class="empty"><p class="small">Charts appear after your first logged workout.</p></div>');
-  applySub(el, 'progress');
+  el.innerHTML = subTabs('progress') + sec('progress:streak', sk) + sec('progress:level', lv) + (waistAllowed() ? sec('progress:photos', '<div id="photos-box" class="stack"></div>') : '') + sec('progress:strength', waistCard() + h || '<div class="empty"><p class="small">Charts appear after your first logged workout.</p></div>');
+  applySub(el, 'progress'); drawPhotos();
 }
 document.getElementById('v-progress').addEventListener('click', ev => {
   const t = ev.target.closest('[data-lift]'); if (t){ ui.lift = t.dataset.lift; drawProgress(); }
@@ -4317,6 +4377,7 @@ function bellySheet(){
     ${row('moon', 'legend', 'Sleep 7 to 9 hours', 'Short sleep makes you hungrier the next day.')}
     ${row('shield', 'amber', 'A core move every session', 'A strong, flat stomach under it, and a better back.')}
     ${waistAllowed() ? `<div class="cta-card">${tile('progress', 'good')}<span><b>Measure your waist</b><span class="small muted">Once a week. It shows belly fat going better than the scale.</span></span><button class="btn sm primary" data-jump="waist">Add</button></div>` : ''}
+    ${photosAllowed() ? `<div class="cta-card">${tile('camera', 'blue')}<span><b>Take a day-one photo</b><span class="small muted">Stays on your phone. In 4 weeks, slide to compare.</span></span><button class="btn sm" data-phshoot="front">Take</button></div>` : ''}
     <div class="row"><button class="btn primary" data-close="1">Let’s go</button></div>`);
 }
 // Waist size, measured weekly at the belly button. Hidden for anyone whose answers suggested eating concerns.
@@ -4347,6 +4408,173 @@ document.addEventListener('click', ev => {
   if (!(v >= 40 && v <= 200)) return toast('Enter your waist in cm, for example 88.');
   const d = gDay(new Date()), L = waistLog().filter(x => x.d !== d); L.push({d, cm:Math.round(v * 10) / 10}); L.sort((x, y) => x.d.localeCompare(y.d));
   store.set('waist', L.slice(-104)); buzz(15); toast('Saved. See you next week.'); drawProgress();
+});
+
+/* ---------- progress photos: on this phone only, same spot every time, compare and share ---------- */
+// Stored in IndexedDB (never localStorage, never uploaded). The demo uses its own store so real photos never show in a video.
+const PHOTO_EVERY = 28;   // days between photo days
+const PHOTO_POSES = [['front', 'Front'], ['side', 'Side']];
+const photosAllowed = () => waistAllowed();
+let phDbP = null;
+function phDb(){
+  if (phDbP) return phDbP;
+  phDbP = new Promise((res, rej) => { try {
+    const r = indexedDB.open(demoOn() ? 'neutron-photos-demo' : 'neutron-photos', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('photos', {keyPath:'id'});
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  } catch (e){ rej(e); } });
+  phDbP.catch(() => { phDbP = null; });
+  return phDbP;
+}
+const phTx = (mode, fn) => phDb().then(db => new Promise((res, rej) => { const t = db.transaction('photos', mode), st = t.objectStore('photos'), r = fn(st); t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error); }));
+const phAll = () => phTx('readonly', st => st.getAll()).then(l => (l || []).sort((a, b) => a.at.localeCompare(b.at)));
+const phPut = rec => phTx('readwrite', st => st.put(rec));
+const phDel = id => phTx('readwrite', st => st.delete(id));
+const ph = {list:null, urls:{}, pose:'front', veil:true, err:false};
+function phUrl(p){ return ph.urls[p.id] || (ph.urls[p.id] = URL.createObjectURL(p.blob)); }
+async function phLoad(){ try { ph.list = await phAll(); ph.err = false; } catch (e){ ph.list = []; ph.err = true; } return ph.list; }
+const phDays = (a, b) => Math.round((new Date(b) - new Date(a)) / 864e5);
+function photoDue(){
+  if (!ph.list || !ph.list.length) return {due:true, left:0, first:true};
+  const last = ph.list[ph.list.length - 1], left = PHOTO_EVERY - phDays(last.at, new Date());
+  return {due:left <= 0, left:Math.max(0, left), first:false};
+}
+// The Photos tab in Progress.
+async function drawPhotos(){
+  const box = document.getElementById('photos-box'); if (!box) return;
+  if (!ph.list) await phLoad();
+  if (ph.err){ box.innerHTML = `<div class="empty"><p class="small">Photos can’t be saved in this view. Install the app on your phone to use them.</p></div>`; return; }
+  const all = ph.list, mine = all.filter(p => p.pose === ph.pose), due = photoDue();
+  const tips = `<div class="ph-tips">${[['body', 'Same spot', 'Same wall behind you'], ['sun', 'Same light', 'Same time of day'], ['shield', 'Only on this phone', 'Never uploaded']].map(([i, t, d]) => `<span>${tile(i, i === 'shield' ? 'good' : 'blue')}<b>${t}</b><small>${d}</small></span>`).join('')}</div>`;
+  if (!all.length){
+    box.innerHTML = `<div class="ph-hero">${tile('camera', 'accent')}<b>Your day-one photo</b><span>In a few weeks you’ll see what the mirror doesn’t show.</span>
+      <button class="btn primary" data-phshoot="front">${ico('camera')} Take it now</button></div>${tips}`;
+    return;
+  }
+  const first = mine[0], last = mine[mine.length - 1];
+  let h = `<div class="chips">${PHOTO_POSES.map(([k, l]) => `<button class="chip" data-phpose="${k}" aria-pressed="${ph.pose === k}">${l}</button>`).join('')}</div>`;
+  if (mine.length >= 2) h += phCompareHtml(first, last) + phStats(first, last);
+  else if (mine.length === 1) h += `<div class="ph-single${ph.veil ? ' veil' : ''}"><img src="${phUrl(first)}" alt="Your ${ph.pose} photo"><span class="ph-date">${phDate(first.at)}</span>${ph.veil ? '<button class="ph-reveal" data-phveil="0">Tap to show</button>' : ''}</div>`;
+  else h += `<div class="empty"><p class="small">No ${ph.pose} photo yet.</p></div>`;
+  h += `<div class="ph-next${due.due ? ' due' : ''}">${tile('camera', due.due ? 'accent' : 'blue')}<span><b>${due.due ? 'Photo day' : `Next photo in ${due.left} days`}</b><span>Every ${PHOTO_EVERY / 7} weeks, same spot and light.</span></span>
+    <button class="btn sm ${due.due ? 'primary' : ''}" data-phshoot="${ph.pose}">Take photo</button></div>`;
+  if (mine.length >= 2) h += `<button class="btn wide" data-phshare="1">${ico('photo')} Share before / after</button>`;
+  h += `<div class="row" style="justify-content:space-between"><b>All photos</b><button class="btn sm ghost" data-phveil="${ph.veil ? 0 : 1}">${ph.veil ? 'Show' : 'Hide'}</button></div>
+    <div class="ph-grid${ph.veil ? ' veil' : ''}">${all.slice().reverse().map(p => `<figure><img src="${phUrl(p)}" alt="${p.pose} photo, ${phDate(p.at)}" loading="lazy"><figcaption>${phDate(p.at)} · ${p.pose}</figcaption><button class="ph-del" data-phdel="${p.id}" aria-label="Delete this photo">✕</button></figure>`).join('')}</div>
+    <p class="small muted">${ico('shield')} Your photos stay on this phone. They’re never uploaded or shared unless you tap Share.</p>`;
+  box.innerHTML = h;
+  phSliderInit();
+}
+const phDate = at => new Date(at).toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'});
+function phCompareHtml(a, b){
+  const wk = Math.max(1, Math.round(phDays(a.at, b.at) / 7));
+  return `<div class="ph-cmp${ph.veil ? ' veil' : ''}" id="ph-cmp" style="--x:50%">
+    <img src="${phUrl(a)}" alt="Before, ${phDate(a.at)}"><div class="ph-after"><img src="${phUrl(b)}" alt="Now, ${phDate(b.at)}"></div>
+    <span class="ph-tag l">Day one<small>${phDate(a.at)}</small></span><span class="ph-tag r">Now<small>${wk} week${wk > 1 ? 's' : ''} later</small></span>
+    <span class="ph-handle" aria-hidden="true"><i></i></span>
+    <input type="range" min="0" max="100" value="50" class="ph-range" aria-label="Slide to compare before and now">
+    ${ph.veil ? '<button class="ph-reveal" data-phveil="0">Tap to show</button>' : ''}</div>`;
+}
+// What happened between the two photos: days you trained, and the waist change if you log it.
+function phStats(a, b){
+  const da = tcDay(new Date(a.at)), db = tcDay(new Date(b.at)), act = [...activeDays()].filter(d => d >= da && d <= db).length;
+  const out = act ? [[String(act), act === 1 ? 'day trained' : 'days trained']] : [];
+  const L = waistLog();
+  if (L.length >= 2){
+    const near = d => L.reduce((best, x) => x.d <= d ? x : best, L[0]), wa = near(da), wb = near(db);
+    if (wa !== wb){ const diff = Math.round((wb.cm - wa.cm) * 10) / 10; out.push([(diff > 0 ? '+' : diff < 0 ? '−' : '') + Math.abs(diff) + ' cm', 'waist']); }
+  }
+  return out.length ? `<div class="ph-stats">${out.map(([v, l]) => `<span><b>${v}</b><small>${l}</small></span>`).join('')}</div>` : '';
+}
+function phSliderInit(){ const c = document.getElementById('ph-cmp'); if (!c) return; const r = c.querySelector('.ph-range'); r.addEventListener('input', () => c.style.setProperty('--x', r.value + '%')); }
+// A before/after image to share: side by side, dates, the Neutrón name. Made on the phone.
+async function phShare(){
+  const mine = ph.list.filter(p => p.pose === ph.pose); if (mine.length < 2) return;
+  const [a, b] = [mine[0], mine[mine.length - 1]], load = p => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = phUrl(p); });
+  try {
+    const [ia, ib] = await Promise.all([load(a), load(b)]), H = 1200, wa = Math.round(ia.width * H / ia.height), wb = Math.round(ib.width * H / ib.height), gap = 16, foot = 120;
+    const cv = document.createElement('canvas'); cv.width = wa + wb + gap; cv.height = H + foot; const x = cv.getContext('2d');
+    x.fillStyle = '#151A21'; x.fillRect(0, 0, cv.width, cv.height); x.drawImage(ia, 0, 0, wa, H); x.drawImage(ib, wa + gap, 0, wb, H);
+    const wk = Math.max(1, Math.round(phDays(a.at, b.at) / 7));
+    x.fillStyle = '#fff'; x.font = '700 46px "Barlow Condensed", sans-serif'; x.textBaseline = 'middle';
+    x.fillText('DAY ONE', 28, H + 44); x.fillText(`${wk} WEEK${wk > 1 ? 'S' : ''} LATER`, wa + gap + 28, H + 44);
+    x.font = '500 28px Figtree, sans-serif'; x.fillStyle = '#C9D1DB'; x.fillText(phDate(a.at), 28, H + 88); x.fillText(phDate(b.at), wa + gap + 28, H + 88);
+    x.font = '800 40px "Barlow Condensed", sans-serif'; x.fillStyle = '#E2472B'; x.textAlign = 'right'; x.fillText('NEUTRÓN', cv.width - 28, H + 64);
+    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .9)), file = new File([blob], 'neutron-before-after.jpg', {type:'image/jpeg'});
+    if (navigator.canShare && navigator.canShare({files:[file]})){ try { await navigator.share({files:[file], title:'My progress'}); return; } catch (e){ if (e && e.name === 'AbortError') return; } }
+    const a2 = document.createElement('a'); a2.href = URL.createObjectURL(blob); a2.download = file.name; document.body.appendChild(a2); a2.click(); a2.remove(); toast('Saved to your phone.');
+  } catch (e){ toast('Couldn’t make the image. Try again.'); }
+}
+// The camera: the last photo of this pose shows faintly on top, so you stand in the same place.
+const phCam = {stream:null, face:'environment', pose:'front', ghost:true, timer:3, t:0};
+async function photoCam(pose){
+  if (!photosAllowed()) return;
+  phCam.pose = pose || ph.pose || 'front';
+  if (!ph.list) await phLoad();
+  if (ph.err) return toast('Photos can’t be saved in this view.');
+  let el = document.getElementById('phcam'); if (!el){ el = document.createElement('div'); el.id = 'phcam'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Progress photo camera'); document.body.appendChild(el); }
+  const ref = ph.list.filter(p => p.pose === phCam.pose)[0];
+  el.innerHTML = `<div class="pc-top"><button class="pc-x" data-pc="close" aria-label="Close">✕</button>
+      <div class="pc-poses">${PHOTO_POSES.map(([k, l]) => `<button data-pc="pose" data-v="${k}" aria-pressed="${phCam.pose === k}">${l}</button>`).join('')}</div>
+      <button class="pc-x" data-pc="flip" aria-label="Switch camera">${ICON_FLIP}</button></div>
+    <div class="pc-view"><video playsinline muted autoplay class="${phCam.face === 'user' ? 'mirror' : ''}"></video>
+      ${ref && phCam.ghost ? `<img class="pc-ghost ${phCam.face === 'user' ? 'mirror' : ''}" src="${phUrl(ref)}" alt="">` : `<svg class="pc-guide" viewBox="0 0 100 160" aria-hidden="true"><circle cx="50" cy="22" r="11"/><path d="M28 48q22-12 44 0l4 50h-12l-2 58H38l-2-58H24z"/></svg>`}
+      <span class="pc-count" aria-live="assertive"></span><span class="pc-flash"></span></div>
+    <p class="pc-tip">${ref ? 'Line yourself up with your first photo.' : 'Phone at waist height, about 2 m away. Whole body in the frame.'}</p>
+    <div class="pc-bar">${ref ? `<button class="pc-opt" data-pc="ghost" aria-pressed="${phCam.ghost}">Overlay</button>` : '<span></span>'}
+      <button class="pc-shoot" data-pc="shoot" aria-label="Take photo"><i></i></button>
+      <button class="pc-opt" data-pc="timer">${phCam.timer ? phCam.timer + ' s' : 'No timer'}</button></div>
+    <label class="pc-file">or pick from your gallery<input type="file" accept="image/*" data-pc="file" hidden></label>`;
+  el.hidden = false; document.body.style.overflow = 'hidden';
+  try {
+    if (phCam.stream) phCam.stream.getTracks().forEach(t => t.stop());
+    phCam.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:phCam.face, width:{ideal:1280}, height:{ideal:1920}}, audio:false});
+    const v = el.querySelector('video'); v.srcObject = phCam.stream; await v.play();
+  } catch (e){ el.querySelector('.pc-tip').textContent = 'No camera here. Pick a photo from your gallery instead.'; }
+}
+const ICON_FLIP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/></svg>';
+function photoCamClose(){
+  clearTimeout(phCam.t); if (phCam.stream){ phCam.stream.getTracks().forEach(t => t.stop()); phCam.stream = null; }
+  const el = document.getElementById('phcam'); if (el){ el.hidden = true; el.innerHTML = ''; } document.body.style.overflow = '';
+}
+// Shrink to 1100 px tall as JPEG, then save. Nothing leaves the phone.
+async function phSave(source, w, h){
+  const H = Math.min(1100, h), W = Math.round(w * H / h), cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  cv.getContext('2d').drawImage(source, 0, 0, W, H);
+  const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .82)), at = new Date().toISOString();
+  await phPut({id:'p' + Date.now(), at, pose:phCam.pose, blob}); store.set('photoLast', at);
+  await phLoad(); ph.pose = phCam.pose; ph.veil = false;
+  photoCamClose(); buzz([30, 50, 30]); tone(1046, .12);
+  toast(ph.list.filter(p => p.pose === phCam.pose).length > 1 ? 'Saved. Slide to compare.' : 'Day one saved. See you in 4 weeks.');
+  jumpTo('photos');
+}
+async function phShoot(){
+  const el = document.getElementById('phcam'), v = el && el.querySelector('video'); if (!v || !v.videoWidth) return;
+  const count = el.querySelector('.pc-count'), shoot = () => { const fl = el.querySelector('.pc-flash'); fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go'); phSave(v, v.videoWidth, v.videoHeight); };
+  if (!phCam.timer) return shoot();
+  let n = phCam.timer; const step = () => { if (!el.isConnected || el.hidden) return; if (n <= 0){ count.textContent = ''; return shoot(); } count.textContent = n; tone(n === 1 ? 988 : 660, .1); n--; phCam.t = setTimeout(step, 1000); };
+  step();
+}
+document.addEventListener('click', async ev => {
+  const t = ev.target.closest('[data-pc],[data-phshoot],[data-phpose],[data-phveil],[data-phdel],[data-phshare]'); if (!t) return;
+  if (t.dataset.phshoot) return photoCam(t.dataset.phshoot);
+  if (t.dataset.phpose){ ph.pose = t.dataset.phpose; return drawPhotos(); }
+  if (t.dataset.phveil != null){ ph.veil = t.dataset.phveil === '1'; return drawPhotos(); }
+  if (t.dataset.phshare) return phShare();
+  if (t.dataset.phdel){ if (!t.dataset.armed){ t.dataset.armed = '1'; t.textContent = 'Delete?'; t.classList.add('armed'); return; }
+    await phDel(t.dataset.phdel).catch(() => {}); if (ph.urls[t.dataset.phdel]){ URL.revokeObjectURL(ph.urls[t.dataset.phdel]); delete ph.urls[t.dataset.phdel]; } await phLoad(); return drawPhotos(); }
+  const a = t.dataset.pc;
+  if (a === 'close') return photoCamClose();
+  if (a === 'pose'){ phCam.pose = t.dataset.v; return photoCam(phCam.pose); }
+  if (a === 'flip'){ phCam.face = phCam.face === 'user' ? 'environment' : 'user'; return photoCam(phCam.pose); }
+  if (a === 'ghost'){ phCam.ghost = !phCam.ghost; return photoCam(phCam.pose); }
+  if (a === 'timer'){ phCam.timer = phCam.timer === 3 ? 10 : phCam.timer === 10 ? 0 : 3; t.textContent = phCam.timer ? phCam.timer + ' s' : 'No timer'; return; }
+  if (a === 'shoot') return phShoot();
+});
+document.addEventListener('change', ev => {
+  if (!ev.target.matches || !ev.target.matches('[data-pc="file"]')) return;
+  const f = ev.target.files && ev.target.files[0]; if (!f) return;
+  const img = new Image(); img.onload = () => phSave(img, img.naturalWidth, img.naturalHeight); img.src = URL.createObjectURL(f);
 });
 
 /* ---------- rankings and leagues (shared store in the prototype; Supabase in the app) ---------- */
@@ -4586,6 +4814,7 @@ function jumpTo(where){
   if (where === 'meal'){ if (ui.mode !== 'train') setMode('train'); ui.sub = {...ui.sub, food:'today'}; store.set('subs', ui.sub); setTab('food'); return setTimeout(() => document.querySelector('[data-meal="open"]')?.click(), 120); }
   if (where === 'duels'){ if (ui.mode !== 'challenge') setMode('challenge'); return setTimeout(duelsSheet, 150); }
   if (where === 'challenge') return setMode('challenge');
+  if (where === 'photos'){ if (ui.mode !== 'train') setMode('train'); ui.sub = {...ui.sub, progress:'photos'}; store.set('subs', ui.sub); setTab('progress'); return window.scrollTo({top:0}); }
   if (where === 'waist'){ if (ui.mode !== 'train') setMode('train'); ui.sub = {...ui.sub, progress:'strength'}; store.set('subs', ui.sub); setTab('progress'); return setTimeout(() => { const c = document.getElementById('waist-card'); if (c){ c.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'center'}); flash(c); document.getElementById('waist-in')?.focus(); } }, 150); }
   if (where === 'hero'){ if (ui.mode !== 'train') setMode('train'); ui.bodyMode = 'hero'; store.set('bodyMode', 'hero'); setTab('body'); return window.scrollTo({top:0}); }
   if (['today', 'sched', 'body', 'progress', 'food', 'recipes'].includes(where)){ if (ui.mode !== 'train') setMode('train'); return setTab(where); }
@@ -4642,6 +4871,8 @@ const HELP = [
     steps:['Tap a muscle on the figure, or swipe to turn it around.', 'Recovery map: red is worked in the last 3 days.', 'Add any exercise to your week with + Schedule.'], go:'body'},
   {id:'belly', icon:'flame', tone:'accent', title:'Belly fat', line:'What really works, and how to track it.', anim:'goblet-squat',
     steps:['Fat leaves your whole body at once: crunches alone don’t burn belly fat.', 'Strength 3 times a week, 8,000+ steps and a small calorie gap do.', 'Measure your waist once a week: it shows belly fat going better than the scale.'], go:'waist', goLabel:'Track my waist'},
+  {id:'photos', icon:'camera', tone:'blue', title:'Progress photos', line:'Same spot every 4 weeks, then slide to compare.',
+    steps:['Progress → Photos → Take it now. Front and side.', 'Next time, your first photo shows faintly on the camera: line yourself up with it.', 'Slide to compare, or share a before / after. Photos never leave your phone.'], go:'photos', goLabel:'Open photos'},
   {id:'hero', icon:'star', tone:'gold', title:'Your hero', line:'You as a game character that levels up with every rep.',
     steps:['Body → My hero.', 'Each muscle has a level and a colour: bronze, silver, gold, then purple.', 'Six stats give you a class: Tank, Marathoner, Monk, Striker, Spartan or All-rounder.'], go:'hero', goLabel:'See my hero'},
   {id:'quests', icon:'today', tone:'good', title:'Daily quests', line:'Five small wins every day, with XP for each.',
@@ -4794,14 +5025,16 @@ document.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key =
 const SUBS = {
   sched:[['week', 'plan', 'My week'], ['alarm', 'alarm', 'Alarm']],
   food:[['today', 'food', 'Today'], ['ideas', 'bulb', 'Ideas'], ['recipes', 'recipe', 'Recipes'], ['setup', 'plan', 'My answers']],
-  progress:[['streak', 'flame', 'Streak'], ['level', 'star', 'Level'], ['strength', 'progress', 'Charts']],
+  progress:[['streak', 'flame', 'Streak'], ['level', 'star', 'Level'], ['strength', 'progress', 'Charts'], ['photos', 'camera', 'Photos']],
   hero:[['stats', 'progress', 'Stats'], ['muscles', 'body', 'Muscles']],
   challenge:[['all', 'bolt', 'Challenges'], ['recent', 'medal', 'My battles']]
 };
 ui.sub = store.get('subs', {}) || {};
-const subOf = k => (ui.sub && ui.sub[k] && SUBS[k].some(s => s[0] === ui.sub[k])) ? ui.sub[k] : SUBS[k][0][0];
+// Photos (and the waist) are hidden for anyone whose answers suggested eating concerns.
+const subList = k => SUBS[k].filter(([v]) => !(k === 'progress' && v === 'photos' && !waistAllowed()));
+const subOf = k => (ui.sub && ui.sub[k] && subList(k).some(s => s[0] === ui.sub[k])) ? ui.sub[k] : subList(k)[0][0];
 const sec = (key, html) => `<div data-sec="${key}">${html}</div>`;
-const subTabs = k => `<div class="subtabs" role="tablist" aria-label="Sections">${SUBS[k].map(([v, i, l]) => `<button role="tab" data-subtab="${k}:${v}" aria-selected="${subOf(k) === v}">${ico(i)}<span>${l}</span></button>`).join('')}</div>`;
+const subTabs = k => `<div class="subtabs" role="tablist" aria-label="Sections">${subList(k).map(([v, i, l]) => `<button role="tab" data-subtab="${k}:${v}" aria-selected="${subOf(k) === v}">${ico(i)}<span>${l}</span></button>`).join('')}</div>`;
 function applySub(root, k){
   const cur = k + ':' + subOf(k);
   (root || document).querySelectorAll(`[data-sec^="${k}:"]`).forEach(el => { el.hidden = el.dataset.sec !== cur; });
@@ -4823,7 +5056,8 @@ function questList(){
     {icon:'workout', tone:'accent', name:'Train', what:'Any workout or challenge counts.', xp:15, have:trained ? 1 : 0, need:1, go:ui.mode === 'challenge' ? 'data-jump="challenge"' : 'data-jump="workout"'},
     {icon:'bulb', tone:'amber', name:'A or B?', what:'Spot the right form. One try each.', xp:5, have:n('ab'), need:GAME.perDay.ab, go:ab ? `data-ab="${esc(ab.id)}"` : 'data-open="learn"'},
     {icon:'help', tone:'amber', name:'Tip', what:'Ten seconds to read, worth knowing.', xp:2, have:n('tip'), need:GAME.perDay.tip, go:tip ? `data-tip="${esc(tip.id)}"` : 'data-open="learn"'},
-    {icon:'photo', tone:'good', name:'Meal photo', what:'A picture and two taps.', xp:3, have:n('meal'), need:GAME.perDay.meal, go:'data-jump="meal"'}
+    {icon:'photo', tone:'good', name:'Meal photo', what:'A picture and two taps.', xp:3, have:n('meal'), need:GAME.perDay.meal, go:'data-jump="meal"'},
+    ...(() => { const last = store.get('photoLast', null); return photosAllowed() && last && phDays(last, new Date()) >= PHOTO_EVERY ? [{icon:'camera', tone:'blue', name:'Photo day', what:'Same spot, same light. Then slide to compare.', xp:null, have:0, need:1, go:'data-phshoot="front"'}] : []; })()
   ];
 }
 const ringSvg = (k, size) => { const C = 2 * Math.PI * 22; return `<svg viewBox="0 0 52 52" aria-hidden="true" ${size ? `width="${size}" height="${size}"` : ''}><circle class="q-trk" cx="26" cy="26" r="22"/><circle class="q-arc" cx="26" cy="26" r="22" style="stroke-dasharray:${(Math.min(1, k) * C).toFixed(1)} ${C.toFixed(1)}"/></svg>`; };
@@ -4832,7 +5066,7 @@ function questsSheet(){
   openSheet(`<div class="help-head">${tile('today', 'good')}<span><h2>Daily quests</h2><span class="small muted">${done} of ${Q.length} done today. New ones tomorrow.</span></span></div>
     <div class="q-list">${Q.map(q => { const ok = q.have >= q.need;
       return `<button class="q-item t-${q.tone}${ok ? ' ok' : ''}" ${q.go}><span class="q-ring">${ringSvg(q.have / q.need)}${ok ? '<svg class="q-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>' : ico(q.icon)}</span>
-        <span class="qi-t"><b>${q.name}</b><span>${q.what}</span></span><span class="qi-r"><b>${ok ? 'Done' : '+' + q.xp + ' XP'}</b><span>${Math.min(q.have, q.need)}/${q.need}</span></span></button>`; }).join('')}</div>
+        <span class="qi-t"><b>${q.name}</b><span>${q.what}</span></span><span class="qi-r"><b>${ok ? 'Done' : q.xp == null ? 'Due' : '+' + q.xp + ' XP'}</b><span>${Math.min(q.have, q.need)}/${q.need}</span></span></button>`; }).join('')}</div>
     <div class="row"><button class="btn ghost" data-close="1">Close</button></div>`);
 }
 function duelsSheet(){
@@ -5500,6 +5734,7 @@ document.addEventListener('click', ev => {
     if (!t.dataset.armed){ const old = t.textContent; t.dataset.armed = '1'; t.textContent = 'Tap again to confirm'; setTimeout(()=>{ delete t.dataset.armed; t.textContent = old; }, 3000); return; }
     if (t.id==='del-health'){ store.del('health'); store.del('plan'); render(); return toast('Health answers and plan deleted'); }
     try { Object.keys(localStorage).filter(k => k.startsWith('homereps.')).forEach(k => localStorage.removeItem(k)); } catch(e){}
+    try { indexedDB.deleteDatabase('neutron-photos'); } catch(e){}
     location.reload(); return;
   }
   if (t.id==='clear-sched'){
