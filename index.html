@@ -4502,6 +4502,9 @@ async function phShare(){
     x.font = '800 40px "Barlow Condensed", sans-serif'; x.fillStyle = '#E2472B'; x.textAlign = 'right'; x.fillText('NEUTRÓN', cv.width - 28, H + 64);
     const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .9)), file = new File([blob], 'neutron-before-after.jpg', {type:'image/jpeg'});
     if (navigator.canShare && navigator.canShare({files:[file]})){ try { await navigator.share({files:[file], title:'My progress'}); return; } catch (e){ if (e && e.name === 'AbortError') return; } }
+    // Inside the Claude link the page can't download by itself: ask the viewer through the downloads capability.
+    const dl = window.claude && window.claude.use ? await window.claude.use('downloads').catch(() => null) : null;
+    if (dl){ try { await dl.save({filename:file.name, data:blob}); toast('Saved to your phone.'); } catch (e){ if (!e || e.code !== 'declined') toast('Couldn’t save the image here.'); } return; }
     const a2 = document.createElement('a'); a2.href = URL.createObjectURL(blob); a2.download = file.name; document.body.appendChild(a2); a2.click(); a2.remove(); toast('Saved to your phone.');
   } catch (e){ toast('Couldn’t make the image. Try again.'); }
 }
