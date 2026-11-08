@@ -9,8 +9,8 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const block = (name) => html.split(`/* ${name}:start`)[1].split(`/* ${name}:end */`)[0].replace(/^[^\n]*\n/, '');
 const ctx = {};
 vm.runInNewContext(block('safety-core') + '\n' + block('habits-core') +
-  '\nObject.assign(this, {factorScores, batteryScore, batteryColor, blockWeek, phaseFor, sessionSets, weekPlanning});', ctx);
-const { factorScores, batteryScore, batteryColor, blockWeek, phaseFor, sessionSets, weekPlanning } = ctx;
+  '\nObject.assign(this, {factorScores, batteryScore, batteryColor, blockWeek, phaseFor, sessionSets, weekPlanning, trainDaysFrom});', ctx);
+const { factorScores, batteryScore, batteryColor, blockWeek, phaseFor, sessionSets, weekPlanning, trainDaysFrom } = ctx;
 
 test('battery: nothing logged means no score', () => {
   assert.equal(batteryScore({}), null);
@@ -68,4 +68,16 @@ test('planning: every day of the week, training days carry time and length', () 
   assert.deepEqual({...rows[0]}, {day:'mon', type:'train', title:'Push', time:'18:30', minutes:60, count:3});
   assert.equal(rows[1].type, 'rest');
   assert.equal(rows[3].title, 'Pull');
+});
+
+test('training days start on the sign-up day, with the same rhythm', () => {
+  const sunday = new Date(2026, 10, 8), wednesday = new Date(2026, 10, 11);
+  assert.deepEqual(Array.from(trainDaysFrom(sunday, 3)), ['sun', 'tue', 'thu']);
+  assert.deepEqual(Array.from(trainDaysFrom(wednesday, 4)), ['wed', 'thu', 'sat', 'sun']);
+  assert.deepEqual(Array.from(trainDaysFrom(wednesday, 2)), ['wed', 'sat']);
+  for (let d = 0; d < 7; d++) for (const n of [2, 3, 4, 5, 6]){
+    const days = trainDaysFrom(new Date(2026, 10, 8 + d), n);
+    assert.equal(days.length, n); assert.equal(new Set(days).size, n);
+    assert.equal(days[0], ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][(0 + d) % 7]);
+  }
 });
