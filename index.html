@@ -428,6 +428,33 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .al-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:color-mix(in srgb,var(--bad) 55%,transparent)}
 .al-hold.holding .al-fill{width:100%;transition:width 3s linear}
 .al-lbl{position:relative}
+.al-camscr{justify-content:flex-start}
+.al-camwrap{position:relative;flex:1;min-height:300px;max-height:62vh;border-radius:24px;overflow:hidden;background:#000}
+.al-camwrap .ar-cam{position:absolute;inset:0;height:auto;border-radius:0}
+.al-camwrap .cam-cue{bottom:20px}
+.al-hud{position:absolute;left:14px;top:10px;display:flex;align-items:baseline;gap:6px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6);pointer-events:none}
+.al-hud b{font-family:var(--display);font-size:clamp(64px,20vw,96px);line-height:.9;font-variant-numeric:tabular-nums}
+.al-hud span{font-size:18px;font-weight:700;opacity:.85}
+.al-seen{position:absolute;right:12px;top:14px;font-size:13px;font-weight:700;color:#fff;background:rgba(0,0,0,.5);border-radius:999px;padding:5px 10px;transition:background-color .2s}
+.al-seen.ok{background:var(--good);color:#04140c}
+.al-bar{position:absolute;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,.2)}
+.al-bar i{display:block;height:100%;background:var(--accent);transition:width .3s var(--out)}
+.al-place{display:flex;gap:12px;align-items:center}
+.al-place svg{width:64px;height:48px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.al-place b{display:block;font-size:15px}.al-place small{display:block;font-size:12.5px;opacity:.7}
+.al-tapfb{background:none;border:0;color:inherit;text-decoration:underline;opacity:.75;font-size:14px;padding:8px}
+.al-moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.al-mv{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px 10px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);text-align:center;transition:transform .14s var(--out),background-color .2s,border-color .2s}
+.al-mv .mv-th{width:100%;max-width:72px;height:54px}.al-mv .mv-th svg{width:100%;height:100%}
+.al-mv b{font-size:13px;line-height:1.2}.al-mv small{font-size:11px;color:var(--muted);line-height:1.2}
+.al-mv[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.al-mv:active{transform:scale(.96)}.al-mv:disabled{opacity:.45}
+.al-lvls{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.al-lvls .pick{display:flex;flex-direction:column;align-items:center;border-radius:16px;padding:8px 4px;line-height:1.2;text-align:center}
+.al-lvls .pick b{font-family:var(--display);font-size:24px}
+.al-step{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+.al-step .btn{width:44px;height:44px;padding:0;border-radius:50%;font-size:22px;justify-content:center}
+.al-step span{font-size:14px;color:var(--muted)}.al-step span b{color:var(--ink);font-size:16px}
 .al-count{display:flex;align-items:baseline;justify-content:center;gap:10px}
 .al-count b{font-family:var(--display);font-size:clamp(90px,28vw,140px);line-height:.9;font-variant-numeric:tabular-nums}
 .al-count span{font-size:18px;opacity:.7}
@@ -2142,7 +2169,7 @@ function trainDaysFrom(date, dpw){
 
 /* pose-core:start — rep counting from body landmarks, pure (no DOM). Same rules will run in the native app. Tested in tests/pose.test.mjs */
 // Landmark indices (MediaPipe / ML Kit 33-point body model).
-const LM = {ls:11, rs:12, le:13, re:14, lw:15, rw:16, lh:23, rh:24, lk:25, rk:26, la:27, ra:28};
+const LM = {nose:0, ls:11, rs:12, le:13, re:14, lw:15, rw:16, lh:23, rh:24, lk:25, rk:26, la:27, ra:28};
 function angleAt(a, b, c){
   const ux = a.x - b.x, uy = a.y - b.y, vx = c.x - b.x, vy = c.y - b.y, d = Math.hypot(ux, uy) * Math.hypot(vx, vy);
   if (!d) return null;
@@ -2154,22 +2181,40 @@ function sideOf(lm){
   const sum = s => ['s','e','w','h','k','a'].reduce((n, k) => n + vis(lm[LM[s + k]]), 0);
   return sum('l') >= sum('r') ? 'l' : 'r';
 }
+// Where the phone goes for each move: side-on, or facing you.
+const POSE_VIEW = {pushup:'side', squat:'side', situp:'side', jacks:'front', pullup:'front'};
 function poseFeatures(move, lm){
   if (!lm || lm.length < 29) return {ok:false, why:'nobody'};
+  if (move === 'jacks' || move === 'pullup'){
+    // Facing the camera: both arms must move. joint = 180 at rest, small at the top.
+    const B = k => [lm[LM['l' + k]], lm[LM['r' + k]]], [ls, rs] = B('s'), [le, re] = B('e'), [lw, rw] = B('w'), [lh, rh] = B('h');
+    const need = move === 'jacks' ? [ls, rs, lw, rw, lh, rh] : [ls, rs, le, re, lw, rw];
+    if (need.some(p => vis(p) < 0.5)) return {ok:false, why:'frame'};
+    const conf = Math.min(...need.map(vis));
+    if (move === 'jacks') return {ok:true, conf, joint:180 - Math.min(angleAt(lh, ls, lw), angleAt(rh, rs, rw)), body:null};
+    if (lw.y > ls.y || rw.y > rs.y) return {ok:false, why:'hang'};
+    return {ok:true, conf, joint:Math.max(angleAt(ls, le, lw), angleAt(rs, re, rw)), body:null};
+  }
   const s = sideOf(lm), P = k => lm[LM[s + k]];
   const sh = P('s'), el = P('e'), wr = P('w'), hip = P('h'), kn = P('k'), an = P('a');
-  const need = move === 'pushup' ? [sh, el, wr, hip, an] : [sh, hip, kn, an];
+  const need = move === 'pushup' ? [sh, el, wr, hip, an] : move === 'situp' ? [sh, hip, kn] : [sh, hip, kn, an];
   if (need.some(p => vis(p) < 0.5)) return {ok:false, why:'frame'};
   const conf = Math.min(...need.map(vis));
   if (move === 'pushup') return {ok:true, conf, joint:angleAt(sh, el, wr), body:angleAt(sh, hip, an)};
+  if (move === 'situp') return {ok:true, conf, joint:angleAt(sh, hip, kn), body:null};
   return {ok:true, conf, joint:angleAt(hip, kn, an), body:angleAt(sh, hip, kn)};
 }
 // A rep counts when the joint goes below `down` and back above `up`, with a straight body (push-ups) and not faster than minMs.
-const REP_RULES = {pushup:{down:95, up:150, body:150, minMs:450, partial:25}, squat:{down:105, up:160, body:0, minMs:500, partial:25}};
+// Sit-ups: hip angle (lying ~130°, sitting up ~60°). Jumping jacks: both arms overhead and back down. Pull-ups: both elbows bend from a straight hang.
+const REP_RULES = {pushup:{down:95, up:150, body:150, minMs:450, partial:25}, squat:{down:105, up:160, body:0, minMs:500, partial:25},
+  situp:{down:75, up:115, body:0, minMs:700, partial:20}, jacks:{down:70, up:140, body:0, minMs:350, partial:30}, pullup:{down:85, up:145, body:0, minMs:900, partial:25}};
 const CUES = {
   pushup:{start:'Start at the top with straight arms', lower:'Go a little lower', body:'Keep your body in a straight line'},
   squat:{start:'Stand tall to start', lower:'Squat a little deeper', body:''},
-  nobody:'Step into the picture', frame:'Get your whole body in the picture', fast:'Slow down a little', dark:'Too dark: turn on a light'
+  situp:{start:'Lie back, knees bent, to start', lower:'Sit all the way up', body:''},
+  jacks:{start:'Stand tall, arms by your sides', lower:'Arms all the way overhead', body:''},
+  pullup:{start:'Hang with straight arms to start', lower:'Pull your chin over the bar', body:''},
+  hang:'Hold the bar above your head', nobody:'Step into the picture', frame:'Get your whole body in the picture', fast:'Slow down a little', dark:'Too dark: turn on a light'
 };
 // Average brightness (0-255) of a small RGBA frame sample; below this the camera can't see you well.
 const DARK_LUMA = 45;
@@ -2221,8 +2266,23 @@ function nextAlarmAt(cfg, now){
   }
   return null;
 }
-// The task that stops the alarm. Gentle health mode always gets an easy minute of movement.
-function alarmTask(cfg, gentle){ return gentle ? {move:'mobility', sec:60} : {move:cfg.move === 'squat' ? 'squat' : 'pushup', reps:Math.max(1, Math.min(30, +cfg.reps || 10))}; }
+// Moves the camera can count to stop the alarm: reps for Easy, Medium and Hard, the most you can set, and the exercise id (animation, injury list).
+const ALARM_MOVES = {
+  pushup:{name:'Push-ups', reps:[5, 10, 20], max:50, ex:'pushup'},
+  squat:{name:'Squats', reps:[10, 20, 30], max:60, ex:'squat'},
+  situp:{name:'Sit-ups', reps:[8, 15, 25], max:50, ex:'situp'},
+  jacks:{name:'Jumping jacks', reps:[20, 40, 60], max:100, ex:'jacks'},
+  pullup:{name:'Pull-ups', reps:[2, 5, 10], max:20, ex:'pull-up', bar:true}
+};
+const ALARM_LEVELS = [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard']];
+// Starting level from training experience (1-3).
+const alarmLevelFor = lvl => ALARM_LEVELS[Math.max(1, Math.min(3, Math.round(+lvl) || 1)) - 1][0];
+// The task that stops the alarm. A level sets the reps; without one, your own number is used. Gentle health mode always gets an easy minute of movement.
+function alarmTask(cfg, gentle){
+  if (gentle) return {move:'mobility', sec:60};
+  const move = ALARM_MOVES[cfg.move] ? cfg.move : 'pushup', M = ALARM_MOVES[move], li = ALARM_LEVELS.findIndex(l => l[0] === cfg.level);
+  return {move, reps:Math.max(1, Math.min(M.max, Math.round(li >= 0 ? M.reps[li] : +cfg.reps || 10)))};
+}
 // Leaving the task: commitment mode rings again after `rearm` minutes, but never beyond maxMin from the first ring.
 function afterAbandon(cfg, firstRing, now){
   if (cfg.mode !== 'commit') return {status:'stopped'};
@@ -2389,7 +2449,8 @@ const GAME = {
   pointsPerLevel:10,                  // points earned on reaching level n = pointsPerLevel × n
   limits:{
     eventsPerMin:20, maxSessionReps:200, replayTolMs:40, minConf:.5,
-    rep:{pushup:{minMs:450, maxPerMin:60, perDay:600}, squat:{minMs:500, maxPerMin:60, perDay:800}}
+    rep:{pushup:{minMs:450, maxPerMin:60, perDay:600}, squat:{minMs:500, maxPerMin:60, perDay:800}, situp:{minMs:700, maxPerMin:50, perDay:600},
+      jacks:{minMs:350, maxPerMin:120, perDay:1500}, pullup:{minMs:900, maxPerMin:30, perDay:300}}
   },
   streakKinds:['alarm', 'workout', 'challenge'],
   // Flags that take an account out of the rankings until someone reviews it (others only cost that session's XP).
@@ -3134,9 +3195,9 @@ const camError = e => e && e.name === 'NotAllowedError' ? 'Camera permission was
   : e && e.name === 'NotFoundError' ? 'No camera found. Count by tapping instead.'
   : 'The camera isn’t available here (it is in the mobile app). Count by tapping instead.';
 const SKEL = [[11,13],[13,15],[12,14],[14,16],[11,12],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28]];
-function drawSkeleton(ctx, w, h, pts){
+function drawSkeleton(ctx, w, h, pts, color){
   ctx.clearRect(0, 0, w, h); if (!pts) return;
-  ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.strokeStyle = 'rgba(255,255,255,.85)';
+  ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.strokeStyle = color || 'rgba(255,255,255,.85)';
   SKEL.forEach(([a, b]) => { const p = pts[a], q = pts[b]; if (vis(p) < .5 || vis(q) < .5) return; ctx.beginPath(); ctx.moveTo(p.x * w, p.y * h); ctx.lineTo(q.x * w, q.y * h); ctx.stroke(); });
 }
 // Starts the camera in `box` and calls onUpdate({reps, cue, counted}) for every frame. Resolves with a stop() function.
@@ -3160,12 +3221,14 @@ async function startCamCounter(box, move, onUpdate, extStream){
         lastT = t;
         if (canvas.width !== video.videoWidth){ canvas.width = video.videoWidth; canvas.height = video.videoHeight; }
         const r = lm.detectForVideo(video, t), pts = r.landmarks && r.landmarks[0];
-        drawSkeleton(ctx, canvas.width, canvas.height, pts);
         const st = counter.update(t, poseFeatures(move, pts));
         if (++nf % 30 === 1){ try { pctx.drawImage(video, 0, 0, 32, 24); dark = lumaOf(pctx.getImageData(0, 0, 32, 24).data) < DARK_LUMA; } catch (e){ dark = false; } }
         const cue = st.cue || (dark ? CUES.dark : '');
-        cueEl.textContent = cue || (st.phase === 'down' ? 'Up!' : ''); cueEl.classList.toggle('warn', !!cue && cue !== CUES[move].start);
-        onUpdate(st);
+        const warn = !!cue && cue !== CUES[move].start;
+        // Green skeleton when the move is tracked cleanly, red when it needs fixing.
+        drawSkeleton(ctx, canvas.width, canvas.height, pts, warn ? 'rgba(255,90,70,.95)' : st.conf != null ? 'rgba(80,230,150,.95)' : 'rgba(255,255,255,.85)');
+        cueEl.textContent = cue || (st.phase === 'down' ? 'Up!' : ''); cueEl.classList.toggle('warn', warn);
+        onUpdate({...st, seen:!!pts, tracked:st.conf != null});
       }
       raf = requestAnimationFrame(frame);
     })();
@@ -3174,10 +3237,32 @@ async function startCamCounter(box, move, onUpdate, extStream){
 }
 
 /* ---------- arena: camera option for push-up and squat challenges ---------- */
-const camMoveFor = ch => ch.moves.length === 1 && (ch.moves[0] === 'pushup' || ch.moves[0] === 'squat') && (ch.fmt === 'amrap' || ch.fmt === 'fortime') ? ch.moves[0] : null;
+const camMoveFor = ch => ch.moves.length === 1 && REP_RULES[ch.moves[0]] && (ch.fmt === 'amrap' || ch.fmt === 'fortime') ? ch.moves[0] : null;
+const camPlaceText = move => POSE_VIEW[move] === 'front' ? `Phone propped up in front of you${move === 'pullup' ? ', facing the bar' : ''}, whole body in the picture.` : 'Phone on the floor, side-on, whole body in the picture.';
+// A tiny drawing of where the phone goes: beside you, or in front of you.
+const placeSvg = view => view === 'front'
+  ? '<svg viewBox="0 0 64 48" aria-hidden="true"><rect x="4" y="16" width="11" height="19" rx="2.5"/><path d="M17 25.5h12" stroke-dasharray="2 3"/><circle cx="45" cy="9" r="4"/><path d="M45 13v15M45 28l-6 14M45 28l6 14M45 17l-9 7M45 17l9 7"/></svg>'
+  : '<svg viewBox="0 0 64 48" aria-hidden="true"><rect x="2" y="27" width="11" height="17" rx="2.5"/><path d="M15 35h7" stroke-dasharray="2 3"/><circle cx="28" cy="27" r="4"/><path d="M32 29l26 6M33 29l1 12M58 35v8M2 46h60"/></svg>';
 
 /* ---------- wake-up alarm (in the prototype it only rings while the app is open) ---------- */
-const alarmCfg = () => ({...ALARM_DEFAULT, ...(store.get('alarm', {}) || {})});
+function alarmCfg(){
+  const st = store.get('alarm', {}) || {}, c = {...ALARM_DEFAULT, ...st};
+  if (!('level' in st) && !('reps' in st)){ const o = store.get('onboarding', null), a = (o && o.answers) || {}; c.level = alarmLevelFor(+P_().level || LEVEL_MAP[a.level] || 1); }
+  return c;
+}
+// Moves you can't pick for the alarm: your injuries, and high-impact ones until the health check says it's fine.
+function alarmBlocked(){
+  const L = currentLimits(), out = {};
+  Object.entries(ALARM_MOVES).forEach(([k, m]) => { if (L.avoid.includes(m.ex)) out[k] = HIGH_IMPACT.includes(m.ex) && L.mode === 'gentle' ? 'After the health check' : 'Not with your injury'; });
+  return out;
+}
+// Only a real health risk turns the alarm into an easy minute of movement.
+const alarmGentle = () => { const hl = store.get('health', null); return !!hl && assessHealth(hl).risk; };
+function curAlarmTask(){
+  const c = alarmCfg(), bl = alarmBlocked();
+  if (bl[c.move]) c.move = Object.keys(ALARM_MOVES).find(k => !bl[k]) || c.move;
+  return alarmTask(c, alarmGentle() || !!bl[c.move]);
+}
 let alarmRun = null;      // {firstRing, how, stop, reps, phase}
 let alarmAudio = null;
 function ringStart(){
@@ -3202,34 +3287,48 @@ function openAlarm(firstRing){
   drawAlarm(); ringStart(); holdWake();
 }
 function closeAlarm(){
-  ringStop(); if (alarmRun && alarmRun.stop) alarmRun.stop(); alarmRun = null; releaseWake();
+  ringStop(); if (alarmRun){ clearTimeout(alarmRun.fbT); if (alarmRun.stop) alarmRun.stop(); } alarmRun = null; releaseWake();
   const el = document.getElementById('alarm'); el.hidden = true; el.innerHTML = ''; document.body.style.overflow = '';
   if (ui.mode !== 'challenge') render();
 }
 function drawAlarm(){
-  const el = document.getElementById('alarm'), cfg = alarmCfg(), task = alarmTask(cfg, currentLimits().mode === 'gentle');
+  const el = document.getElementById('alarm'), cfg = alarmCfg(), task = curAlarmTask();
   const o = store.get('onboarding', null), why = o && o.answers && o.answers.why, now = new Date();
-  const reps = task.move === 'pushup' || task.move === 'squat';
-  const taskTxt = task.move === 'pushup' ? `${task.reps} push-ups` : task.move === 'squat' ? `${task.reps} squats` : '1 minute of easy movement';
+  const reps = !!ALARM_MOVES[task.move], M = ALARM_MOVES[task.move];
+  const taskTxt = reps ? `${task.reps} ${M.name.toLowerCase()}` : '1 minute of easy movement';
   if (alarmRun.phase === 'ring'){
     el.innerHTML = `<div class="ar-in al-in"><span class="al-time">${pad2(now.getHours())}:${pad2(now.getMinutes())}</span>
       <h2 class="ar-name">Good morning</h2>${why ? `<p class="ar-blurb">“${esc(why)}”</p>` : ''}
-      <div class="al-task${reps ? ' has-th' : ''}"><span><span class="small" style="opacity:.7;display:block">To switch it off</span><b>${taskTxt}</b></span>${reps ? `<span class="mv-th">${animSvg(task.move, '', 'data-ar="1.33"')}</span>` : ''}</div>
+      <div class="al-task${reps ? ' has-th' : ''}"><span><span class="small" style="opacity:.7;display:block">To switch it off</span><b>${taskTxt}</b></span>${reps ? `<span class="mv-th">${animSvg(M.ex, '', 'data-ar="1.33"')}</span>` : ''}</div>
       <button class="ar-go" data-al="start">Let’s do it</button>
       <button class="al-hold" data-al="hold"><span class="al-fill"></span><span class="al-lbl">Emergency stop: hold 3 seconds</span></button>
       ${cfg.mode === 'commit' ? `<p class="ar-note">Commitment mode: if you leave the task, it rings again in ${cfg.rearm} minutes.</p>` : ''}</div>`;
   } else if (alarmRun.phase === 'task'){
-    const useCam = reps && camSupported(), noun = task.move === 'squat' ? 'squat' : 'push-up';
+    const useCam = reps && camSupported() && !alarmRun.noCam, pct = reps ? Math.round(alarmRun.reps / task.reps * 100) : 0, view = reps && POSE_VIEW[task.move];
     if (!alarmRun.t0){ alarmRun.t0 = performance.now(); alarmRun.startedAt = new Date().toISOString(); alarmRun.repTimes = []; alarmRun.conf = []; }
-    el.innerHTML = `<div class="ar-in al-in"><div class="ar-top"><button class="ar-x" data-al="leave">Later</button><b class="ar-title">${taskTxt}</b></div>
-      ${reps ? `<div class="al-count"><b id="al-n">${alarmRun.reps}</b><span>of ${task.reps}</span></div>
-        ${useCam ? '<div class="ar-cam" id="al-cam"></div><p class="ar-note">Phone on the floor, side-on, whole body in the picture. Nothing is recorded or sent.</p>' : ''}
-        <button class="ar-tap" data-al="tap">${useCam ? 'Camera not working? Tap each one' : `Tap each ${noun}`}</button>`
+    // Camera first: the phone has to see you do it. Tapping only shows up if the camera fails or can't see you for a while.
+    el.innerHTML = `<div class="ar-in al-in${useCam ? ' al-camscr' : ''}"><div class="ar-top"><button class="ar-x" data-al="leave">Later</button><b class="ar-title">${taskTxt}</b></div>
+      ${reps && useCam ? `<div class="al-camwrap"><div class="ar-cam al-cam" id="al-cam"></div>
+          <div class="al-hud"><b id="al-n">${alarmRun.reps}</b><span>/ ${task.reps}</span></div>
+          <span class="al-seen" id="al-seen">Looking for you…</span>
+          <span class="al-bar"><i id="al-bar" style="width:${pct}%"></i></span></div>
+        <div class="al-place">${placeSvg(view)}<span><b>${view === 'front' ? 'Phone in front of you' : 'Phone side-on'}</b><small>${camPlaceText(task.move)} Nothing is recorded or sent.</small></span></div>
+        <button class="al-tapfb" data-al="tapmode" id="al-tapfb" hidden>Camera can’t see you? Count by tapping</button>`
+      : reps ? `<div class="al-count"><b id="al-n">${alarmRun.reps}</b><span>of ${task.reps}</span></div>${alarmRun.camErr ? `<p class="ar-note">${alarmRun.camErr}</p>` : ''}
+        <button class="ar-tap" data-al="tap">Tap each one</button>`
       : `<div class="al-count"><b id="al-n">60</b><span>seconds</span></div><p class="ar-blurb">March on the spot and roll your shoulders. Stop if anything hurts.</p><button class="ar-tap" data-al="mob">Start the minute</button>`}</div>`;
     if (useCam){
-      startCamCounter(document.getElementById('al-cam'), task.move, st => { if (st.counted && alarmRun) alarmRep('camera', st); })
+      let seenTxt = '';
+      const showFb = () => { const b = document.getElementById('al-tapfb'); if (b) b.hidden = false; };
+      clearTimeout(alarmRun.fbT); alarmRun.fbT = setTimeout(() => { if (alarmRun && !alarmRun.cam) showFb(); }, 30000);
+      startCamCounter(document.getElementById('al-cam'), task.move, st => {
+        if (!alarmRun) return;
+        const txt = st.tracked ? 'Got you ✓' : st.seen ? 'Almost: whole body in' : 'Looking for you…';
+        if (txt !== seenTxt){ seenTxt = txt; const s = document.getElementById('al-seen'); if (s){ s.textContent = txt; s.classList.toggle('ok', !!st.tracked); } }
+        if (st.counted) alarmRep('camera', st);
+      })
         .then(stop => { if (alarmRun) alarmRun.stop = stop; else stop(); })
-        .catch(e => { const b = document.getElementById('al-cam'); if (b) b.outerHTML = `<p class="ar-note">${camError(e)}</p>`; });
+        .catch(e => { if (!alarmRun) return; alarmRun.noCam = true; alarmRun.camErr = camError(e); drawAlarm(); });
     }
   } else if (alarmRun.phase === 'confirm'){
     el.innerHTML = `<div class="ar-in al-in"><h2 class="ar-name">Stop today’s alarm?</h2>
@@ -3238,15 +3337,16 @@ function drawAlarm(){
   }
 }
 function alarmRep(how, st){
-  const task = alarmTask(alarmCfg(), currentLimits().mode === 'gentle'); if (!alarmRun || alarmRun.phase !== 'task') return;
+  const task = curAlarmTask(); if (!alarmRun || alarmRun.phase !== 'task') return;
   alarmRun.reps++;
   if (how === 'camera'){ alarmRun.cam = (alarmRun.cam || 0) + 1; alarmRun.repTimes.push(Math.round(performance.now() - alarmRun.t0)); if (st && st.conf != null) alarmRun.conf.push(st.conf);
     if (st && masterUnlocks(task, alarmRun.reps, st.heldMs)) alarmRun.master = true; }
-  const n = document.getElementById('al-n'); if (n){ n.textContent = alarmRun.reps; bump(n); } buzz(10); tone(how === 'camera' ? 988 : 784, .08);
+  const n = document.getElementById('al-n'); if (n){ n.textContent = alarmRun.reps; bump(n); } buzz(10);
+  const bar = document.getElementById('al-bar'); if (bar) bar.style.width = Math.min(100, Math.round(alarmRun.reps / task.reps * 100)) + '%'; tone(how === 'camera' ? 988 : 784, .08);
   if (alarmRun.reps >= task.reps) alarmDone(alarmRun.cam === alarmRun.reps ? 'camera' : 'tap');
 }
 function alarmDone(how){
-  const task = alarmTask(alarmCfg(), currentLimits().mode === 'gentle'), r = alarmRun || {}, cam = how === 'camera';
+  const task = curAlarmTask(), r = alarmRun || {}, cam = how === 'camera';
   const conf = r.conf && r.conf.length ? r.conf.reduce((a, b) => a + b, 0) / r.conf.length : null;
   const res = gameEvent({kind:'alarm', id:'al-' + localDay(new Date()), verified:cam, move:task.move, reps:cam ? r.reps : 0, repTimes:cam ? r.repTimes : [], startedAt:r.startedAt || new Date().toISOString(), endedAt:new Date().toISOString(), conf, quiet:true});
   store.set('alarmState', {...(store.get('alarmState', {}) || {}), day:localDay(new Date()), status:'done', how});
@@ -3269,6 +3369,7 @@ document.getElementById('alarm').addEventListener('click', ev => {
   const a = t.dataset.al, cfg = alarmCfg();
   if (a === 'start'){ ringStop(); alarmRun.phase = 'task'; return drawAlarm(); }
   if (a === 'tap') return alarmRep('tap');
+  if (a === 'tapmode'){ if (alarmRun.stop) alarmRun.stop(); alarmRun.stop = null; alarmRun.noCam = true; alarmRun.camErr = ''; return drawAlarm(); }
   if (a === 'mob' && !alarmRun.mobT){
     const end = Date.now() + 60000; t.disabled = true;
     alarmRun.mobT = setInterval(() => { const left = Math.ceil((end - Date.now()) / 1000), n = document.getElementById('al-n');
@@ -3286,17 +3387,20 @@ document.getElementById('alarm').addEventListener('click', ev => {
   if (a === 'stop'){ store.set('alarmState', {day:localDay(new Date()), status:'stopped'}); closeAlarm(); return toast('Alarm stopped. Tomorrow is a fresh start.'); }
 });
 function alarmSettingsHtml(){
-  const c = alarmCfg(), next = nextAlarmAt(c, new Date()), gentle = currentLimits().mode === 'gentle';
+  const c = alarmCfg(), next = nextAlarmAt(c, new Date()), gentle = alarmGentle(), bl = alarmBlocked(), task = curAlarmTask();
   const chip = (k, opts) => `<div class="chipset">${opts.map(([v, l]) => `<button class="pick" data-alcfg="${k}" data-v="${v}" aria-pressed="${String(c[k]) === String(v)}">${l}</button>`).join('')}</div>`;
   let h = `<div id="alarm-set" class="panel stack">
     <label class="consent" style="padding:0;border:0;background:none"><input type="checkbox" id="al-on" ${c.on ? 'checked' : ''}><span>Ring every morning until I do my task<small>${c.on && next ? `Next: ${DAY_FULL[WEEKDAY(next)]} at ${c.time}` : 'Off'}${c.pausedUntil ? ` · paused until ${c.pausedUntil}` : ''}</small></span></label>`;
-  if (c.on) h += `<div class="ob-grid"><label class="ob-field">Time<input type="time" id="al-time" value="${esc(c.time)}"></label>
-      ${block('Reps to stop it', chip('reps', [['5','5'],['10','10'],['15','15']]))}</div>
-    ${block('Exercise', chip('move', [['pushup','Push-ups'],['squat','Squats']]))}
+  const M = ALARM_MOVES[task.move] || ALARM_MOVES.pushup;
+  if (c.on) h += `<label class="ob-field">Time<input type="time" id="al-time" value="${esc(c.time)}"></label>
+    ${gentle ? '' : block('What stops it', `<div class="al-moves">${Object.entries(ALARM_MOVES).map(([k, m]) => `<button class="al-mv" data-alcfg="move" data-v="${k}" aria-pressed="${task.move === k}" ${bl[k] ? 'disabled' : ''}>
+        <span class="mv-th">${animSvg(m.ex, '', 'data-ar="1.33"')}</span><b>${m.name}</b><small>${bl[k] || (m.bar ? 'Needs a bar' : POSE_VIEW[k] === 'front' ? 'Phone in front' : 'Phone side-on')}</small></button>`).join('')}</div>`)
+    + block('Level', `<div class="al-lvls">${ALARM_LEVELS.map(([v, l], i) => `<button class="pick" data-alcfg="level" data-v="${v}" aria-pressed="${c.level === v}"><b>${M.reps[i]}</b>${l}</button>`).join('')}</div>
+      <div class="al-step"><button class="btn sm ghost" data-alcfg="step" data-v="-1" aria-label="One less">−</button><span><b>${task.reps}</b> ${esc(M.name.toLowerCase())} to stop it</span><button class="btn sm ghost" data-alcfg="step" data-v="1" aria-label="One more">+</button></div>`)}
     ${block('Mode', chip('mode', [['commit','Commitment'],['gentle','Gentle']]))}
     ${c.mode === 'commit' ? block('If I leave the task, ring again in', chip('rearm', [['3','3 min'],['5','5 min'],['10','10 min']])) : ''}
     ${block('Sick or travelling?', chip('pause', [['1','Pause 1 day'],['3','3 days'],['7','1 week'],['0','Resume']]))}
-    ${gentle ? '<p class="small muted">Gentle health mode: the task is one easy minute of movement.</p>' : ''}
+    ${gentle ? '<p class="small muted">Gentle health mode: the task is one easy minute of movement.</p>' : '<p class="small muted">The camera checks each rep. Nothing is recorded or sent.</p>'}
     <button class="btn sm" id="al-test" style="align-self:flex-start">Try it now</button>`;
   h += `<p class="small muted">Prototype: it only rings while the app is open. The mobile app will ring even when your phone is locked, and you can always stop it in an emergency.</p></div>`;
   return h;
@@ -3306,8 +3410,9 @@ document.getElementById('v-sched').addEventListener('click', ev => {
   const t = ev.target.closest('[data-alcfg],#al-test'); if (!t) return;
   if (t.id === 'al-test') return openAlarm(new Date());
   const k = t.dataset.alcfg, v = t.dataset.v;
+  if (k === 'step'){ const t = curAlarmTask(); return setAlarmCfg({level:null, reps:Math.max(1, Math.min((ALARM_MOVES[t.move] || ALARM_MOVES.pushup).max, t.reps + (+v)))}); }
   if (k === 'pause'){ if (v === '0') return setAlarmCfg({pausedUntil:null}); const d = new Date(); d.setDate(d.getDate() + (+v) - 1); toast('Alarm paused. Get well soon, or have a good trip.'); return setAlarmCfg({pausedUntil:localDay(d)}); }
-  setAlarmCfg({[k]: k === 'mode' || k === 'move' ? v : +v});
+  setAlarmCfg({[k]: k === 'mode' || k === 'move' || k === 'level' ? v : +v});
 });
 document.getElementById('v-sched').addEventListener('change', ev => {
   if (ev.target.id === 'al-on') setAlarmCfg({on:ev.target.checked});
@@ -4864,10 +4969,10 @@ const HELP = [
     steps:['Tap Start workout on Today.', 'Each card shows last time, a suggested weight or reps, and the rest between sets (change it with − and +).', 'Tick a set: the rest countdown runs between that set and the next.'], go:'workout', goLabel:'Start a workout'},
   {id:'plan', icon:'plan', tone:'blue', title:'Plan', line:'Your week and your 4-week block.',
     steps:['Each day shows its session, time and exercises.', 'The block goes Base, Build, Push and an easy week.', 'Change your answers any time from this screen.'], go:'sched'},
-  {id:'alarm', icon:'alarm', tone:'blue', title:'Wake-up alarm', line:'Rings until you do your push-ups or squats.', anim:'pushup',
-    steps:['Turn it on in Plan and pick the time and reps.', 'Phone on the floor, side-on: the camera counts each rep.', 'Emergency stop: hold the button 3 seconds. Sick or travelling? Pause it.'], go:'alarm', goLabel:'Set my alarm'},
+  {id:'alarm', icon:'alarm', tone:'blue', title:'Wake-up alarm', line:'Rings until the camera sees you do your reps.', anim:'pushup',
+    steps:['Turn it on in Plan, pick the time, the exercise and your level.', 'Put the phone where the card shows: the camera counts each rep.', 'Emergency stop: hold the button 3 seconds. Sick or travelling? Pause it.'], go:'alarm', goLabel:'Set my alarm'},
   {id:'camera', icon:'camera', tone:'ink', title:'Camera counting', line:'Counts reps for you. Nothing is recorded or sent.',
-    steps:['Put the phone on the floor, side-on, with your whole body in the picture.', 'Go all the way down and up; half reps don’t count.', 'Too dark? Turn on a light. You can always tap instead.']},
+    steps:['Side-on for push-ups, squats and sit-ups; in front of you for jumping jacks and pull-ups. Whole body in the picture.', 'Go all the way down and up; half reps don’t count.', 'Too dark? Turn on a light. If the camera can’t see you, you can tap instead.']},
   {id:'battery', icon:'battery', tone:'good', title:'Your battery', line:'How charged you are today. Sleep counts most.',
     steps:['Log sleep, food, water and steps with one tap each.', 'Green with 8 hours of sleep.', 'Red battery: the app makes today’s training easier.'], go:'today'},
   {id:'body', icon:'body', tone:'blue', title:'Body', line:'Pick a muscle, see exercises for it.',
@@ -5055,7 +5160,7 @@ function questList(){
   const ab = learnList('ab').find(x => !g.answered.includes(x.id)), tip = learnList('tip').find(x => !g.read.includes(x.id)), al = alarmCfg();
   const trained = n('workout') + n('challenge') > 0 || ((doneLog || {})[dateStr(new Date())] || []).length > 0;
   return [
-    {icon:'alarm', tone:'blue', name:'Alarm', what:'Do your push-ups or squats when it rings.', xp:30, have:n('alarm'), need:1, go:'data-jump="alarm"'},
+    {icon:'alarm', tone:'blue', name:'Alarm', what:'Do your reps in front of the camera when it rings.', xp:30, have:n('alarm'), need:1, go:'data-jump="alarm"'},
     {icon:'workout', tone:'accent', name:'Train', what:'Any workout or challenge counts.', xp:15, have:trained ? 1 : 0, need:1, go:ui.mode === 'challenge' ? 'data-jump="challenge"' : 'data-jump="workout"'},
     {icon:'bulb', tone:'amber', name:'A or B?', what:'Spot the right form. One try each.', xp:5, have:n('ab'), need:GAME.perDay.ab, go:ab ? `data-ab="${esc(ab.id)}"` : 'data-open="learn"'},
     {icon:'help', tone:'amber', name:'Tip', what:'Ten seconds to read, worth knowing.', xp:2, have:n('tip'), need:GAME.perDay.tip, go:tip ? `data-tip="${esc(tip.id)}"` : 'data-open="learn"'},
@@ -5449,7 +5554,7 @@ function arenaIntro(){
     <ul class="ar-moves${one ? ' one' : ''}">${moves}</ul>
     ${arena.lowBatt ? '<p class="ar-note">Low battery today, so we switched on the easier version. Switch it off if you feel good.</p>' : ''}
     <label class="ar-switch"><input type="checkbox" id="ar-scaled" ${arena.scaled ? 'checked' : ''}><span><b>Easier version</b><small>${esc(ch.easy)} Counts for XP, not for medals that unlock levels.</small></span></label>
-    ${camMoveFor(ch) && camSupported() ? `<label class="ar-switch"><input type="checkbox" id="ar-cam-on" ${arena.cam ? 'checked' : ''}><span><b>Count with the camera</b><small>Phone on the floor, side-on, whole body in the picture. Nothing is recorded or sent.</small></span></label>` : ''}
+    ${camMoveFor(ch) && camSupported() ? `<label class="ar-switch"><input type="checkbox" id="ar-cam-on" ${arena.cam ? 'checked' : ''}><span><b>Count with the camera</b><small>${camPlaceText(camMoveFor(ch))} Nothing is recorded or sent.</small></span></label>` : ''}
     ${camSupported() ? `<label class="ar-switch"><input type="checkbox" id="ar-rec-on" ${arena.rec ? 'checked' : ''}><span><b>Record my attempt</b><small>The video stays on this phone. You choose afterwards whether to share it in a duel.</small></span></label>` : ''}
     <p class="ar-note">Warm up first: a minute of marching, arm circles and a few easy squats. Stop if anything hurts.</p>
     <button class="ar-go" data-ar="go">Start</button>`;

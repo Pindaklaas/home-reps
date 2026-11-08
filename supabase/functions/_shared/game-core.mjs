@@ -8,7 +8,8 @@ const GAME = {
   pointsPerLevel:10,                  // points earned on reaching level n = pointsPerLevel × n
   limits:{
     eventsPerMin:20, maxSessionReps:200, replayTolMs:40, minConf:.5,
-    rep:{pushup:{minMs:450, maxPerMin:60, perDay:600}, squat:{minMs:500, maxPerMin:60, perDay:800}}
+    rep:{pushup:{minMs:450, maxPerMin:60, perDay:600}, squat:{minMs:500, maxPerMin:60, perDay:800}, situp:{minMs:700, maxPerMin:50, perDay:600},
+      jacks:{minMs:350, maxPerMin:120, perDay:1500}, pullup:{minMs:900, maxPerMin:30, perDay:300}}
   },
   streakKinds:['alarm', 'workout', 'challenge'],
   // Flags that take an account out of the rankings until someone reviews it (others only cost that session's XP).

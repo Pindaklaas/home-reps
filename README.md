@@ -55,7 +55,7 @@ Known limit: the server counts days in UTC, so "one alarm a day" resets at 01:00
 
 1. Add a row to `EX_RAW` in `index.html`: id, name, muscle groups, equipment, level 1-3, dose, unit, steps.
 2. Add its animation to `ANIMS` (one or more key poses; copy a similar exercise). `tests/anim.test.mjs` fails until you do.
-3. For camera counting, add the joint angles to `REP_RULES` and the cues to `CUES` in the `pose-core` block, the limits to `GAME.limits.rep` in `game-core`, and the move to `KINDS` and `clean()` in `supabase/functions/_shared/submit.mjs`. Add a test with a recorded or simulated pose sequence in `tests/pose.test.mjs`.
+3. For camera counting, add the joint angles to `REP_RULES`, the cues to `CUES` and the phone position to `POSE_VIEW` in the `pose-core` block, and the limits to `GAME.limits.rep` in `game-core` (then run `node scripts/sync-game-core.mjs`). To offer it for the alarm, add it to `ALARM_MOVES` with reps for Easy, Medium and Hard. Add a test with a recorded or simulated pose sequence in `tests/pose.test.mjs`.
 
 ## How to tune XP, levels and limits
 

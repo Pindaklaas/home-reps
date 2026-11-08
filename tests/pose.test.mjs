@@ -86,3 +86,32 @@ test('features: picks the visible side and needs the key joints', () => {
   assert.equal(Math.round(f.joint), 180);
   assert.equal(Math.round(f.body), 180);
 });
+
+test('sit-ups, jumping jacks and pull-ups count full reps only', () => {
+  const sit = [[130]]; for (let i = 0; i < 3; i++) sit.push(...rep(130, 60, 0));
+  assert.equal(run('situp', sit).reps, 3);
+  assert.equal(run('situp', [[130], ...rep(130, 95, 0), [130]]).reps, 0);
+  const jacks = [[170]]; for (let i = 0; i < 4; i++) jacks.push(...rep(170, 20, 0, 2));
+  assert.equal(run('jacks', jacks).reps, 4);
+  assert.equal(run('jacks', [[170], ...rep(170, 100, 0, 2), [170]]).reps, 0);
+  const pull = [[170]]; for (let i = 0; i < 2; i++) pull.push(...rep(170, 60, 0, 6));
+  assert.equal(run('pullup', pull).reps, 2);
+});
+
+test('facing-camera moves need both arms', () => {
+  const pt = (x, y) => ({x, y, visibility:.9});
+  const lm = Array.from({length:33}, () => pt(.5, .5));
+  // Arms down by the sides: jacks joint near 180.
+  lm[11] = pt(.4, .3); lm[12] = pt(.6, .3); lm[23] = pt(.42, .6); lm[24] = pt(.58, .6);
+  lm[13] = pt(.38, .45); lm[14] = pt(.62, .45); lm[15] = pt(.38, .58); lm[16] = pt(.62, .58);
+  const down = poseFeatures('jacks', lm); assert.ok(down.ok); assert.ok(down.joint > 150);
+  // Only one arm up: still counts as down.
+  lm[15] = pt(.38, .05); const one = poseFeatures('jacks', lm); assert.ok(one.joint > 140);
+  // Both up: small joint.
+  lm[16] = pt(.62, .05); assert.ok(poseFeatures('jacks', lm).joint < 40);
+  // Pull-ups: hands must be above the shoulders.
+  lm[15] = pt(.38, .58); lm[16] = pt(.62, .58);
+  assert.equal(poseFeatures('pullup', lm).why, 'hang');
+  lm[13] = pt(.38, .15); lm[14] = pt(.62, .15); lm[15] = pt(.38, .0); lm[16] = pt(.62, .0);
+  const hang = poseFeatures('pullup', lm); assert.ok(hang.ok); assert.ok(hang.joint > 150);
+});
