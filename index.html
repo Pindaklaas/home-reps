@@ -997,6 +997,17 @@ h3.ih .itile .ico{width:18px;height:18px}
 .ss-gap.rested span{color:var(--good);border-color:color-mix(in srgb,var(--good) 40%,var(--line))}
 .rest-sub{display:flex;align-items:center;gap:4px}
 .rest-sub .ico{width:13px;height:13px;color:var(--blue)}
+.bf-row{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.bf-row>span{display:flex;flex-direction:column}.bf-row>span>span{font-size:13px;color:var(--muted)}
+.bf-myth{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;background:var(--accent-soft);border-radius:16px;padding:10px 12px}
+.bf-myth .mv svg{width:64px;height:64px;background:var(--surface);border-radius:12px}
+.bf-myth>span:nth-child(2){display:flex;flex-direction:column}.bf-myth>span:nth-child(2)>span{font-size:13px}
+.bf-myth i{font-style:normal;font-weight:800;font-size:20px;color:#fff;background:var(--bad);width:32px;height:32px;border-radius:50%;display:grid;place-items:center}
+.waist-chart{width:100%;height:auto;display:block}
+.waist-chart .wc-line{fill:none;stroke:var(--good);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.waist-chart .wc-area{fill:color-mix(in srgb,var(--good) 14%,transparent);stroke:none}
+.waist-chart .wc-dot{fill:var(--surface);stroke:var(--good);stroke-width:2.5}.waist-chart .wc-dot.last{fill:var(--good)}
+.waist-chart text{font-size:12px;font-weight:700;fill:var(--muted);font-variant-numeric:tabular-nums}.waist-chart .wc-last{fill:var(--ink);font-size:14px}.waist-chart .wc-d{font-weight:600;font-size:11px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:380px){.kpi .v{font-size:23px}.ex{grid-template-columns:1fr}.ex .actions{grid-row:auto;grid-column:1;flex-direction:row}}
 @media (max-width:380px){.ex.has-th{grid-template-columns:64px minmax(0,1fr)}.ex.has-th .actions{grid-column:1/-1;grid-row:3}}
@@ -2600,7 +2611,8 @@ function healthInit(){
 
 /* ---------- Training setup (the only questionnaire): age, goal, experience, days, time and sleep, safety ---------- */
 const FLOWS = {};
-const GYM_GOALS = [['gain','Build muscle'],['strength','Get stronger'],['lose','Lose fat'],['endure','Get fitter']];
+// 'Lose belly fat' is what people ask for. It runs the fat-loss plan (fat can't be lost from one spot) with a core move every session.
+const GYM_GOALS = [['gain','Build muscle'],['strength','Get stronger'],['belly','Lose belly fat'],['lose','Lose fat'],['endure','Get fitter']];
 const GYM_EXP = [['start','New to the gym'],['some','Under a year'],['regular','1–3 years'],['advanced','3+ years']];
 const GYM_MIN = [['30','30'],['45','45'],['60','60'],['75','75']];
 const KIT_OPTS = [['none','Nothing'],['db','Dumbbells or bands'],['gym','A full gym']];
@@ -2624,7 +2636,7 @@ FLOWS.gym = {
   closable: () => true,
   init(){
     const o = store.get('onboarding', null), oa = (o && o.answers) || {};
-    return {_age:ageKnown(), goal:['gain','strength','lose','endure'].includes(oa.goal) ? oa.goal : undefined, level:oa.level, dpw:String(oa.dpw || 3),
+    return {_age:ageKnown(), goal:oa.focus === 'belly' ? 'belly' : ['gain','strength','lose','endure'].includes(oa.goal) ? oa.goal : undefined, level:oa.level, dpw:String(oa.dpw || 3),
       minutes:String(oa.minutes >= 30 ? oa.minutes : 60), time:oa.time, sleepUsual:oa.sleepUsual, sector:oa.sector, kit:oa.kit, wake:oa.wake, ...healthInit()};
   },
   steps: [
@@ -2645,14 +2657,15 @@ FLOWS.gym = {
     if (a.healthConsent) store.set('health', {...healthRecord(a), eating: prev && prev.eating});
     const o = store.get('onboarding', null) || {v:3, at:iso, answers:{}};
     const track = a.kit === 'gym' ? 'gym' : 'home';
-    o.v = 3; o.answers = {...o.answers, track, sector:a.sector, kit:a.kit, wake:a.wake, goal:a.goal, level:a.level, dpw:+a.dpw, days:trainDaysFrom(now, +a.dpw), minutes:+a.minutes, time:a.time, sleepUsual:a.sleepUsual};
+    o.v = 3; const belly = a.goal === 'belly'; if (belly) a.goal = 'lose'; a.focus = belly ? 'belly' : null;
+    o.answers = {...o.answers, track, sector:a.sector, kit:a.kit, wake:a.wake, goal:a.goal, focus:a.focus, level:a.level, dpw:+a.dpw, days:trainDaysFrom(now, +a.dpw), minutes:+a.minutes, time:a.time, sleepUsual:a.sleepUsual};
     store.set('onboarding', o);
     if (a.wake && !alarmCfg().on) store.set('alarm', {...alarmCfg(), time:a.wake});
     const pa = {...a, kind:'training', track, days:o.answers.days, minutes:+a.minutes, equipment:kitEquip(a), injuries:a.healthConsent ? (a.injuries || []) : []};
     const c = planContext(pa), res = validatePlan(localDraft(pa, c), c.L, c);
     const start = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     store.set('plan', {v:1, at:iso, start, status:'pending_review', source:'auto', kind:'training', note:'', issues:res.issues, plan:res.plan});
-    setTimeout(() => { ui.tab = 'sched'; ui.day = null; lastPct = null; setMode('train'); const q = gameEvent({kind:'questionnaire', quiet:true}); celebrate(q.xp ? `Your plan is ready! +${q.xp} XP` : 'Your plan is ready. Here’s your week!'); }, 60);
+    setTimeout(() => { ui.tab = 'sched'; ui.day = null; lastPct = null; setMode('train'); const q = gameEvent({kind:'questionnaire', quiet:true}); celebrate(q.xp ? `Your plan is ready! +${q.xp} XP` : 'Your plan is ready. Here’s your week!'); if (belly) setTimeout(bellySheet, 1800); }, 60);
   }
 };
 
@@ -2882,6 +2895,10 @@ function localDraft(a, c){
         let pool = exFor(groups[k % groups.length]).filter(e => allowed.has(e.id) && !picked.includes(e.id));
         if (gym && pool.some(isGymEx)) pool = pool.filter(isGymEx);
         if (pool.length) picked.push(pool[(i + Math.floor(k / groups.length)) % pool.length].id);
+      }
+      if (a.focus === 'belly' && L.mode !== 'gentle' && !picked.some(id => EX[id].groups.some(g => g === 'abs' || g === 'obliques'))){
+        const core = [...exFor('abs'), ...exFor('obliques')].find(e => allowed.has(e.id) && !picked.includes(e.id));
+        if (core){ if (picked.length >= per) picked.pop(); picked.push(core.id); }
       }
       return {day:d, title: L.mode === 'gentle' ? 'Gentle strength' : title, exercises: picked.map(id => ({id, sets:L.maxSets, dose:EX[id].dose, restSec:EX[id].unit === 'sec' ? 45 : restFor(EX[id].equip, a.goal)}))};
     });
@@ -3735,7 +3752,7 @@ function drawProgress(){
     <div class="legend"><span><i class="c-good"></i>Green 75%+</span><span><i class="c-amber"></i>Yellow 45–74%</span><span><i class="c-bad"></i>Red under 45%</span></div></div>`;
   const hh = heroNow();
   lv += `<button class="cta-card" data-jump="hero" style="text-align:left;width:100%">${tile('star', 'gold')}<span><b>${esc(hh.cls.name)}</b><span class="small muted">Your hero · ${hh.power} power</span></span><span class="btn sm">See</span></button>`;
-  el.innerHTML = subTabs('progress') + sec('progress:streak', sk) + sec('progress:level', lv) + sec('progress:strength', h || '<div class="empty"><p class="small">Charts appear after your first logged workout.</p></div>');
+  el.innerHTML = subTabs('progress') + sec('progress:streak', sk) + sec('progress:level', lv) + sec('progress:strength', waistCard() + h || '<div class="empty"><p class="small">Charts appear after your first logged workout.</p></div>');
   applySub(el, 'progress');
 }
 document.getElementById('v-progress').addEventListener('click', ev => {
@@ -4145,6 +4162,14 @@ const LEARN_DEFAULT = [
   {id:'tip-desk', type:'tip', day:'2026-11-17', topic:'Desk breaks', title:'Get up every 45 minutes', text:'Sitting all day stiffens your hips and back. Stand up every 45 minutes and do 10 squats: your body will thank you.', anim:'squat'},
   {id:'quiz-shoulders', type:'ab', day:'2026-11-18', topic:'Shoulders', title:'Which one works your shoulders?', a:{label:'Leg press', anim:'leg-press'}, b:{label:'Bicycle crunch', anim:'bicycle'}, c:{label:'Lateral raise', anim:'lateral-raise'}, correct:'c',
     why:'Lifting the weights out to your sides works the middle of your shoulders. Keep a slight bend in your elbows.'},
+  {id:'quiz-belly', type:'ab', order:4, topic:'Belly fat', title:'What really gets rid of belly fat?', clip:[
+      {anim:'crunch', text:'Crunches build abs. They don’t burn the fat on top.', mark:'no', ms:3200},
+      {anim:'jacks', text:'Only cardio and eating the same: slow results.', mark:'no', ms:3000},
+      {anim:'goblet-squat', text:'Lift 3 times a week to keep your muscle.', mark:'ok', ms:3000},
+      {anim:'farmer-walk', text:'Walk 8,000+ steps every day.', mark:'ok', ms:3000},
+      {anim:'plank', text:'A small calorie gap does the rest. Core work keeps it strong.', mark:'ok', ms:3600}],
+    a:{label:'100 crunches a day', anim:'crunch'}, b:{label:'Strength, walking and a small calorie gap', anim:'goblet-squat'}, c:{label:'Lots of cardio, eat the same', anim:'jacks'}, correct:'b',
+    why:'Fat can’t be burned from one spot. Belly fat goes when your overall body fat goes: strength training, daily walking and eating a little less. Crunches strengthen the muscle underneath.'},
   {id:'tip-breathe', type:'tip', order:1, topic:'Breathing', title:'Breathe out on the effort', text:'Exhale as you push up or stand up, inhale on the way down. Your core stays tight and every rep feels steadier.', anim:'squat'},
   {id:'tip-sleep', type:'tip', order:2, topic:'Sleep', title:'Sleep is part of training', text:'Most muscle repair happens while you sleep. Seven to nine hours does more for your progress than any supplement.'},
   {id:'tip-protein', type:'tip', order:3, topic:'Protein', title:'Protein at every meal', text:'A palm-sized portion of protein at each of 3 or 4 meals builds more muscle than one huge serving at dinner.'},
@@ -4280,6 +4305,49 @@ function tipCalendarHtml(){
   }
   return `<div class="tip-cal">${rows.join('')}</div>`;
 }
+
+/* ---------- belly fat: what really works, and the waist as the measure ---------- */
+function bellySheet(){
+  const row = (icon, tone, t, d) => `<div class="bf-row">${tile(icon, tone)}<span><b>${t}</b><span>${d}</span></span></div>`;
+  openSheet(`<div class="help-head">${tile('flame', 'accent')}<span><h2>How belly fat really goes</h2><span class="small muted">No tricks. This is what works, and your plan does all of it.</span></span></div>
+    <div class="bf-myth"><span class="mv">${animSvg('crunch', 'th', 'data-ar="1"')}</span><span><b>Myth: crunches burn belly fat</b><span>You can’t burn fat from one spot. It leaves your whole body at once, and the belly often goes last.</span></span><i aria-hidden="true">✕</i></div>
+    ${row('workout', 'accent', 'Strength 3 times a week', 'Keeps your muscle, so what you lose is fat.')}
+    ${row('body', 'blue', '8,000+ steps a day', 'The easiest fat burner there is.')}
+    ${row('food', 'good', 'A small calorie gap', 'Protein at every meal, no crash diets. Food shows your numbers.')}
+    ${row('moon', 'legend', 'Sleep 7 to 9 hours', 'Short sleep makes you hungrier the next day.')}
+    ${row('shield', 'amber', 'A core move every session', 'A strong, flat stomach under it, and a better back.')}
+    ${waistAllowed() ? `<div class="cta-card">${tile('progress', 'good')}<span><b>Measure your waist</b><span class="small muted">Once a week. It shows belly fat going better than the scale.</span></span><button class="btn sm primary" data-jump="waist">Add</button></div>` : ''}
+    <div class="row"><button class="btn primary" data-close="1">Let’s go</button></div>`);
+}
+// Waist size, measured weekly at the belly button. Hidden for anyone whose answers suggested eating concerns.
+const waistAllowed = () => { const hl = store.get('health', null); return !(hl && hl.eating && hl.eating.refer); };
+// A chart scaled to your own range, so a few centimetres show clearly.
+function waistChart(L){
+  const w = 320, h = 130, pad = 22, ys = L.map(x => x.cm), lo = Math.floor(Math.min(...ys) - 1), hi = Math.ceil(Math.max(...ys) + 1);
+  const X = i => pad + i * (w - pad * 2) / Math.max(1, L.length - 1), Y = v => 14 + (hi - v) / (hi - lo) * (h - 40);
+  const pts = L.map((x, i) => `${X(i).toFixed(1)},${Y(x.cm).toFixed(1)}`).join(' '), dl = d => new Date(d + 'T12:00').toLocaleDateString(undefined, {day:'numeric', month:'short'});
+  return `<svg class="waist-chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="Waist from ${L[0].cm} to ${L[L.length - 1].cm} cm">
+    <polyline points="${pad},${(h - 26).toFixed(1)} ${pts} ${X(L.length - 1).toFixed(1)},${(h - 26).toFixed(1)}" class="wc-area"/>
+    <polyline points="${pts}" class="wc-line"/>${L.map((x, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(x.cm).toFixed(1)}" r="${i === L.length - 1 ? 5 : 3.5}" class="wc-dot${i === L.length - 1 ? ' last' : ''}"/>`).join('')}
+    <text x="${X(0)}" y="${(Y(L[0].cm) - 9).toFixed(1)}" text-anchor="start">${L[0].cm}</text><text x="${X(L.length - 1)}" y="${(Y(L[L.length - 1].cm) - 10).toFixed(1)}" text-anchor="end" class="wc-last">${L[L.length - 1].cm} cm</text>
+    <text x="${X(0)}" y="${h - 6}" text-anchor="start" class="wc-d">${dl(L[0].d)}</text><text x="${X(L.length - 1)}" y="${h - 6}" text-anchor="end" class="wc-d">${dl(L[L.length - 1].d)}</text></svg>`;
+}
+const waistLog = () => (store.get('waist', []) || []).filter(x => x && x.cm > 0);
+function waistCard(){
+  const o = store.get('onboarding', null), a = (o && o.answers) || {};
+  if (!waistAllowed() || !(a.focus === 'belly' || a.goal === 'lose' || waistLog().length)) return '';
+  const L = waistLog(), first = L[0], last = L[L.length - 1], diff = first && last && L.length > 1 ? Math.round((last.cm - first.cm) * 10) / 10 : null;
+  return `<div class="panel stack waist" id="waist-card"><div class="row" style="justify-content:space-between"><b>Waist</b>${diff != null ? `<span class="badge ${diff < 0 ? 'ok' : ''}">${diff > 0 ? '+' : ''}${diff} cm since ${new Date(first.d + 'T12:00').toLocaleDateString(undefined, {day:'numeric', month:'short'})}</span>` : ''}</div>
+    ${L.length > 1 ? waistChart(L.slice(-12)) : `<p class="small muted">Measure around your belly button, relaxed, once a week. Same day, same time.</p>`}
+    <div class="row"><input id="waist-in" class="why-in" type="number" inputmode="decimal" min="40" max="200" step="0.5" placeholder="${last ? last.cm : 'e.g. 88'}" aria-label="Waist in centimetres" style="max-width:130px"><span class="small muted">cm</span><button class="btn sm primary" data-waistsave="1">Save</button></div></div>`;
+}
+document.addEventListener('click', ev => {
+  if (!ev.target.closest('[data-waistsave]')) return;
+  const v = parseFloat(String((document.getElementById('waist-in') || {}).value || '').replace(',', '.'));
+  if (!(v >= 40 && v <= 200)) return toast('Enter your waist in cm, for example 88.');
+  const d = gDay(new Date()), L = waistLog().filter(x => x.d !== d); L.push({d, cm:Math.round(v * 10) / 10}); L.sort((x, y) => x.d.localeCompare(y.d));
+  store.set('waist', L.slice(-104)); buzz(15); toast('Saved. See you next week.'); drawProgress();
+});
 
 /* ---------- rankings and leagues (shared store in the prototype; Supabase in the app) ---------- */
 const net = {players:[], ready:false, err:false, saving:null, savedJson:''};
@@ -4518,6 +4586,7 @@ function jumpTo(where){
   if (where === 'meal'){ if (ui.mode !== 'train') setMode('train'); ui.sub = {...ui.sub, food:'today'}; store.set('subs', ui.sub); setTab('food'); return setTimeout(() => document.querySelector('[data-meal="open"]')?.click(), 120); }
   if (where === 'duels'){ if (ui.mode !== 'challenge') setMode('challenge'); return setTimeout(duelsSheet, 150); }
   if (where === 'challenge') return setMode('challenge');
+  if (where === 'waist'){ if (ui.mode !== 'train') setMode('train'); ui.sub = {...ui.sub, progress:'strength'}; store.set('subs', ui.sub); setTab('progress'); return setTimeout(() => { const c = document.getElementById('waist-card'); if (c){ c.scrollIntoView({behavior:RM() ? 'auto' : 'smooth', block:'center'}); flash(c); document.getElementById('waist-in')?.focus(); } }, 150); }
   if (where === 'hero'){ if (ui.mode !== 'train') setMode('train'); ui.bodyMode = 'hero'; store.set('bodyMode', 'hero'); setTab('body'); return window.scrollTo({top:0}); }
   if (['today', 'sched', 'body', 'progress', 'food', 'recipes'].includes(where)){ if (ui.mode !== 'train') setMode('train'); return setTab(where); }
 }
@@ -4571,6 +4640,8 @@ const HELP = [
     steps:['Log sleep, food, water and steps with one tap each.', 'Green with 8 hours of sleep.', 'Red battery: the app makes today’s training easier.'], go:'today'},
   {id:'body', icon:'body', tone:'blue', title:'Body', line:'Pick a muscle, see exercises for it.',
     steps:['Tap a muscle on the figure, or swipe to turn it around.', 'Recovery map: red is worked in the last 3 days.', 'Add any exercise to your week with + Schedule.'], go:'body'},
+  {id:'belly', icon:'flame', tone:'accent', title:'Belly fat', line:'What really works, and how to track it.', anim:'goblet-squat',
+    steps:['Fat leaves your whole body at once: crunches alone don’t burn belly fat.', 'Strength 3 times a week, 8,000+ steps and a small calorie gap do.', 'Measure your waist once a week: it shows belly fat going better than the scale.'], go:'waist', goLabel:'Track my waist'},
   {id:'hero', icon:'star', tone:'gold', title:'Your hero', line:'You as a game character that levels up with every rep.',
     steps:['Body → My hero.', 'Each muscle has a level and a colour: bronze, silver, gold, then purple.', 'Six stats give you a class: Tank, Marathoner, Monk, Striker, Spartan or All-rounder.'], go:'hero', goLabel:'See my hero'},
   {id:'quests', icon:'today', tone:'good', title:'Daily quests', line:'Five small wins every day, with XP for each.',
