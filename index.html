@@ -19,7 +19,7 @@
 :root{
   --bg:#EDF0F3; --surface:#FFFFFF; --ink:#151A21; --muted:#5E6773; --line:#D7DCE3;
   --skin:#CDD3DB; --muscle:#A9B2BE; --muscle-hover:#8E99A7;
-  --accent:#E2472B; --accent-ink:#FFFFFF; --accent-soft:#FBE1DA; --good:#1C8A57; --good-soft:#DDF2E7;
+  --accent:#E2472B; --accent-2:#E0245E; --accent-ink:#FFFFFF; --accent-soft:#FBE1DA; --good:#1C8A57; --good-soft:#DDF2E7;
   --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --text:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
   --amber:#D99A1E; --blue:#4A7BD0;
@@ -31,11 +31,11 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#101318; --surface:#191E25; --ink:#EDF0F3; --muted:#9AA3AE; --line:#2B323C;
   --skin:#2A313A; --muscle:#46505D; --muscle-hover:#5A6574;
-  --accent:#FF6448; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}}
+  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#101318; --surface:#191E25; --ink:#EDF0F3; --muted:#9AA3AE; --line:#2B323C;
   --skin:#2A313A; --muscle:#46505D; --muscle-hover:#5A6574;
-  --accent:#FF6448; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}
+  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--text);font-size:15px;line-height:1.45}
 *{box-sizing:border-box}
@@ -131,7 +131,36 @@ legend{font-size:13px;font-weight:600;margin-bottom:6px}
 .meal .n{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 
 /* today */
-.day-hero{background:var(--ink);color:var(--bg);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:6px}
+.day-hero{position:relative;overflow:hidden;background:radial-gradient(circle at 92% 8%,color-mix(in srgb,var(--accent) 30%,transparent),transparent 58%),var(--arena);color:var(--arena-ink);border:1px solid color-mix(in srgb,var(--arena-ink) 9%,transparent);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.dh-top{display:flex;align-items:center;gap:12px}.dh-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.rx{position:relative;width:108px;height:108px;flex:none;margin:-6px -4px -6px 0}
+.rx svg{width:100%;height:100%;overflow:visible}
+.rx-track{fill:none;stroke:color-mix(in srgb,currentColor 14%,transparent);stroke-width:7}
+.rx-arc{fill:none;stroke:url(#rxg);stroke-width:7;stroke-linecap:round;transform:rotate(-90deg);transform-origin:60px 60px;transition:stroke-dashoffset .9s var(--out)}
+.rx-orbit{fill:none;stroke:color-mix(in srgb,currentColor 22%,transparent);stroke-width:1.2;stroke-dasharray:2 4}
+.rx-core{transition:r .6s var(--spring);animation:rxbreath 2.6s ease-in-out infinite;transform-origin:60px 60px}
+.rx.rest .rx-core{animation-duration:5s;opacity:.7}
+.rx-p{transform-origin:60px 60px;animation:spin 7s linear infinite}
+.rx-p .a{fill:var(--accent)}.rx-p .b{fill:var(--accent-2)}
+.rx-v{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:26px;line-height:1;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.45);pointer-events:none}
+.rx-v small{font-size:13px;margin-left:1px}.rx.rest .rx-v small{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0}
+.rx.pulse{animation:rxpulse .6s var(--spring)}
+.day-hero.crit .rx-core{animation:rxcrit 1.1s ease-in-out infinite}
+.day-hero.crit .k{color:var(--accent)}
+@keyframes rxbreath{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes rxcrit{0%,100%{transform:scale(1.05);filter:brightness(1)}50%{transform:scale(1.3);filter:brightness(1.4)}}
+@keyframes rxpulse{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.cmass{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:color-mix(in srgb,var(--arena) 82%,transparent);color:var(--arena-ink);animation:fadein .25s ease-out;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.cmass.out{opacity:0;transition:opacity .3s}
+.cm-wave{position:fixed;left:var(--cx);top:var(--cy);width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:6px solid var(--accent);box-shadow:0 0 40px var(--accent-2),inset 0 0 30px var(--accent-2);animation:cmwave 1.1s var(--out) forwards}
+.cm-wave.w2{border-color:var(--accent-2);animation-delay:.18s;opacity:0}
+.cm-txt{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:24px;animation:cmpop .7s var(--spring) .25s both}
+.cm-txt b{font-family:var(--display);font-size:clamp(64px,20vw,110px);line-height:.86;text-transform:uppercase;background:linear-gradient(120deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.cm-txt span{font-size:15px;opacity:.85}
+.btn.share-week{background:linear-gradient(100deg,var(--accent),var(--accent-2));color:#fff;border:0;min-height:48px;justify-content:center}
+@keyframes cmwave{0%{transform:scale(.2);opacity:1}100%{transform:scale(28);opacity:0}}
+@keyframes cmpop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadein{from{opacity:0}}
 .day-hero .k{font-family:var(--display);font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:13px;opacity:.75}
 .day-hero h2{font-size:32px}
 .day-hero .facts{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;margin-top:4px;font-variant-numeric:tabular-nums}
@@ -342,7 +371,7 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .toast{animation:toastIn .35s var(--spring)}
 @keyframes toastIn{from{transform:translate(-50%,16px);opacity:0}}
 #onboard .in{animation:viewIn .3s var(--out)}
-#confetti{position:fixed;inset:0;pointer-events:none;z-index:80}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:95}
 
 /* ---------- compact flow pickers ---------- */
 #onboard .in{gap:18px}
@@ -511,12 +540,12 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .streak-big{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;width:100%}
 .streak-big span{display:flex;flex-direction:column}
 .flame{width:30px;height:30px;fill:var(--accent);flex:none}
-.hero-go{margin-top:8px;align-self:flex-start;padding:11px 20px;font-size:15px}
+.day-hero .btn.hero-go{margin-top:6px;align-self:stretch;justify-content:center;min-height:50px;font-size:16px;border-radius:16px;background:linear-gradient(100deg,var(--accent),var(--accent-2));border:0;box-shadow:0 8px 22px -10px var(--accent-2)}
 /* ---------- streak chip ---------- */
 .streak-chip{display:inline-flex;align-items:center;gap:3px;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
 .streak-chip .flame{width:20px;height:20px}
 /* ---------- progress ---------- */
-.streak-card{background:var(--ink);color:var(--bg);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px}
+.streak-card{background:radial-gradient(circle at 92% 8%,color-mix(in srgb,var(--accent) 26%,transparent),transparent 58%),var(--arena);color:var(--arena-ink);border:1px solid color-mix(in srgb,var(--arena-ink) 9%,transparent);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .streak-top{display:flex;align-items:center;gap:12px}
 .streak-top .flame{width:44px;height:44px;animation:pop .6s var(--spring)}
 .streak-top>span:nth-child(2){display:flex;flex-direction:column;line-height:1}
@@ -545,9 +574,14 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 /* ---------- mode picker: Challenge or Training ---------- */
 #modepick{position:fixed;inset:0;z-index:65;background:var(--bg);overflow:auto}
 #modepick .mp-in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+.mp-brand{display:flex;align-items:center;gap:10px;animation:drop .5s var(--spring) both}
+.mp-brand .brand{font-size:26px}
+.mp-logo{width:44px;height:44px;flex:none;filter:drop-shadow(0 6px 14px color-mix(in srgb,var(--accent) 45%,transparent))}
+.mpl-bg{fill:var(--accent)}.mpl-orb{fill:none;stroke:#151A21;stroke-width:5}
+.mpl-n{font-family:var(--display);font-weight:800;font-size:82px;fill:#fff}.mpl-p{fill:#fff;stroke:#151A21;stroke-width:2}
 .mp-hi{font-family:var(--display);font-weight:700;font-size:32px;line-height:1;text-transform:uppercase;letter-spacing:.02em;animation:drop .5s var(--spring) both}
 .mp-card{position:relative;overflow:hidden;flex:1;min-height:210px;border:0;border-radius:28px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;text-align:left;transition:transform .35s var(--spring),opacity .25s}
-.mp-ch{background:var(--accent);color:var(--accent-ink);animation:inTop .7s var(--spring) .05s both}
+.mp-ch{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--accent-ink);animation:inTop .7s var(--spring) .05s both}
 .mp-tr{background:var(--ink);color:var(--bg);animation:inBottom .7s var(--spring) .15s both}
 .mp-t{font-family:var(--display);font-weight:700;font-size:62px;line-height:.85;text-transform:uppercase}
 .mp-s{font-size:15px;opacity:.9;max-width:30ch}
@@ -579,7 +613,7 @@ body.mode-challenge nav.tabs{display:none}
 body.mode-challenge .app{padding-bottom:40px}
 
 /* ---------- challenge hub ---------- */
-.rank-card{display:grid;grid-template-columns:auto 1fr;gap:12px 16px;align-items:center;background:var(--ink);color:var(--bg);border-radius:var(--r);padding:16px}
+.rank-card{display:grid;grid-template-columns:auto 1fr;gap:12px 16px;align-items:center;background:radial-gradient(circle at 92% 8%,color-mix(in srgb,var(--accent) 26%,transparent),transparent 58%),var(--arena);color:var(--arena-ink);border:1px solid color-mix(in srgb,var(--arena-ink) 9%,transparent);border-radius:22px;padding:16px}
 .rank-badge{width:66px;height:66px;border-radius:20px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:36px;font-weight:700;transform:rotate(-6deg);box-shadow:0 10px 24px -10px var(--accent);animation:pop .6s var(--spring)}
 .rank-name{font-family:var(--display);font-size:32px;line-height:1;text-transform:uppercase;display:block}
 .xpbar{height:8px;border-radius:4px;background:color-mix(in srgb,currentColor 18%,transparent);overflow:hidden;margin:8px 0 4px}
@@ -589,7 +623,7 @@ body.mode-challenge .app{padding-bottom:40px}
 .mdot.bronze,.m-bronze{--m:var(--bronze)}.mdot.silver,.m-silver{--m:var(--silver)}.mdot.gold,.m-gold{--m:var(--gold)}.mdot.legend,.m-legend{--m:var(--legend)}
 .mdot{background:var(--m,var(--line))}
 .m-fill,.m-rib{fill:var(--m,var(--line))}.m-rib{opacity:.55}
-.feat{position:relative;overflow:hidden;background:var(--accent);color:var(--accent-ink);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.feat{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--accent-ink);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .feat h2{font-size:44px}
 .feat .btn{align-self:flex-start;margin-top:4px;background:var(--accent-ink);color:var(--accent);border-color:var(--accent-ink);padding:10px 20px}
 .feat::after{content:"";position:absolute;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;border:20px solid color-mix(in srgb,var(--accent-ink) 14%,transparent);animation:spinslow 18s linear infinite}
@@ -828,10 +862,11 @@ details.steps ol{margin-top:8px}
 .t-accent{--t:var(--accent)}.t-blue{--t:var(--blue)}.t-good{--t:var(--good)}.t-amber{--t:var(--amber)}.t-gold{--t:var(--gold)}.t-legend{--t:var(--legend)}.t-ink{--t:var(--ink)}
 .help-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;padding:0;color:var(--ink);flex:none}
 .help-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-.hint{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1.5px solid var(--accent);border-radius:16px;padding:10px 10px 10px 12px;margin:0 0 12px;animation:rise .35s var(--out)}
-.hint p{font-size:14px;line-height:1.35;margin:0}
-.hint .itile{width:34px;height:34px;border-radius:11px}
-.hint-x{border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:12.5px;border-radius:999px;padding:7px 10px;white-space:nowrap}
+.hint{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--accent-soft);border-radius:14px;padding:6px 6px 6px 12px;margin:0 0 12px;animation:rise .35s var(--out)}
+.hint p{font-size:13.5px;line-height:1.3;margin:0;font-weight:600}
+.hint>.ico{width:18px;height:18px;color:var(--accent)}
+.hint-x{border:0;background:transparent;color:var(--ink);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;opacity:.6}
+.hint-x svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
 .hint.out{opacity:0;transform:translateY(-6px) scale(.98);transition:opacity .25s,transform .25s var(--out)}
 .flash{animation:flash 1.2s var(--out)}
 @keyframes flash{0%,60%{box-shadow:0 0 0 3px var(--accent);border-radius:14px}100%{box-shadow:0 0 0 0 transparent}}
@@ -930,6 +965,7 @@ h3.ih .itile .ico{width:18px;height:18px}
 /* menus: home menu tiles, sub-tabs, quests list */
 [data-sec][hidden]{display:none!important}
 .home-menu{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.home-menu.m-6{grid-template-columns:repeat(3,1fr)}.home-menu.m-6 .mtile{padding:12px 4px 11px}
 .mtile{--t:var(--accent);border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:10px 4px 9px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;color:var(--ink);transition:transform .2s var(--spring)}
 .mtile:active{transform:scale(.95)}
 .mtile b{font-size:12.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
@@ -946,7 +982,7 @@ h3.ih .itile .ico{width:18px;height:18px}
 .subtabs button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .subtabs button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
 .dh-chips{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px}
-.dh-chips span{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;background:color-mix(in srgb,var(--bg) 14%,transparent);border-radius:999px;padding:4px 10px}
+.dh-chips span{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;background:color-mix(in srgb,currentColor 12%,transparent);border-radius:999px;padding:4px 10px}
 .dh-chips .ico{width:15px;height:15px}
 .exs-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
 .exs-head h3{margin:12px 0 8px}
@@ -1643,12 +1679,12 @@ function drawToday(){
   const L = todayAnim ? 'list in' : 'list';
   const ob = store.get('onboarding', null), why = ob && ob.answers && ob.answers.why, hl = store.get('health', null), Lt = currentLimits();
   const pi = planInfo(), mins = pi && pi.a.minutes ? Math.min(pi.a.minutes, Lt.maxMinutes) : null, P0 = store.get('plan', null);
-  let h = `<div class="day-hero">
-    <span class="k">${isToday?'Today':''} ${DAY_FULL[day]}</span>
-    <h2>${mine.length ? 'Your workout' : esc(rec.plan.title)}</h2>
+  const crit = all.length && pct === 100;
+  let h = `<div class="day-hero${crit ? ' crit' : ''}"><div class="dh-top"><div class="dh-txt">
+    <span class="k">${crit ? 'Critical mass ⚡' : `${isToday?'Today':''} ${DAY_FULL[day]}`}</span>
+    <h2>${mine.length ? 'Your workout' : esc(rec.plan.title)}</h2></div>${reactorSvg(all.length ? (lastPct === null ? pct : lastPct) : null, nDone, all.length)}</div>
     ${all.length ? `<div class="dh-chips"><span>${ico('workout')}${all.length} exercises</span>${mins ? `<span>${ico('alarm')}${mins} min</span>` : ''}${pi && pi.a.time ? `<span>${ico('today')}${esc(pi.a.time)}</span>` : ''}</div>` : `<p class="small" style="opacity:.85">${esc(rec.plan.note)}</p>`}
     ${isToday && (rec.items.length || mine.length) ? (() => { const ss = store.get('session', null); return `<button class="btn primary hero-go" data-startwo="${day}">${ss ? 'Resume workout · ' + fmtClock((Date.now() - new Date(ss.startedAt)) / 1000) : '▶ Start workout'}</button>`; })() : ''}
-    ${all.length?`<div class="prog-row"><span>${nDone} of ${all.length} done</span><b>${pct}%</b></div><div class="progress" aria-label="${pct}% done"><span style="width:${lastPct===null?pct:lastPct}%"></span></div>`:''}
   </div>`;
   if (!(ob && ob.answers && ob.answers.goal) || !P0) h += planCard();
   h += homeMenu('train');
@@ -1664,13 +1700,50 @@ function drawToday(){
     h += `<h3>Recovery</h3><div class="${L}">${STRETCHES.map(([n,d],i)=>`<div class="check" style="--i:${i}"><span></span><span><span class="name">${n}</span><br><span class="sub">${d}</span></span><span></span></div>`).join('')}</div>`;
   }
   document.getElementById('today-content').innerHTML = h;
-  const bar = document.querySelector('#today-content .progress span');
-  if (bar && lastPct!==null && lastPct!==pct) requestAnimationFrame(()=>requestAnimationFrame(()=>{ bar.style.width = pct+'%'; }));
-  if (justKey && pct===100 && lastPct!==null && lastPct<100) celebrate();
+  const rx = document.querySelector('#today-content .rx');
+  if (rx && lastPct!==null && lastPct!==pct) requestAnimationFrame(()=>requestAnimationFrame(()=>reactorSet(rx, pct)));
+  if (justKey && pct===100 && lastPct!==null && lastPct<100) criticalMass();
   lastPct = pct; justKey = null; todayAnim = true; heroCheck();
 }
-function celebrate(msg){
-  toast(msg || 'Workout complete! Great job.'); buzz([30,60,30]);
+// The reactor: a core that charges as you finish the day's exercises. Each one done adds a particle to its orbit.
+const RX_C = 2 * Math.PI * 52;
+function reactorSvg(pct, n, total){
+  const rest = pct == null, k = Math.min(n || 0, 10);
+  const parts = Array.from({length:k}, (_, i) => `<g class="rx-p" style="animation-delay:${(-i / Math.max(k, 1) * 7).toFixed(2)}s"><circle cx="60" cy="22" r="${i % 3 ? 3.2 : 4.4}" class="${i % 2 ? 'b' : 'a'}"/></g>`).join('');
+  return `<div class="rx${rest ? ' rest' : ''}" data-pct="${rest ? '' : pct}" role="img" aria-label="${rest ? 'Rest day' : `${n} of ${total} done`}">
+    <svg viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="rxg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent-2)"/></linearGradient>
+      <radialGradient id="rxn"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent-2)" stop-opacity="0"/></radialGradient></defs>
+      <circle cx="60" cy="60" r="52" class="rx-track"/>
+      ${rest ? '' : `<circle cx="60" cy="60" r="52" class="rx-arc" stroke-dasharray="${RX_C.toFixed(1)}" stroke-dashoffset="${(RX_C * (1 - pct / 100)).toFixed(1)}"/>`}
+      <ellipse cx="60" cy="60" rx="38" ry="14" class="rx-orbit" transform="rotate(-28 60 60)"/>
+      <circle cx="60" cy="60" r="${rest ? 16 : 14 + (pct || 0) / 12}" fill="url(#rxn)" class="rx-core"/>${parts}</svg>
+    <span class="rx-v"><span>${rest ? '<small>Rest</small>' : `${pct}<small>%</small>`}</span></span></div>`;
+}
+function reactorSet(el, pct){
+  const arc = el.querySelector('.rx-arc'); if (arc) arc.style.strokeDashoffset = (RX_C * (1 - pct / 100)).toFixed(1);
+  const core = el.querySelector('.rx-core'); if (core) core.setAttribute('r', 14 + pct / 12);
+  const v = el.querySelector('.rx-v > span'), from = +el.dataset.pct || 0; el.dataset.pct = pct;
+  if (v){ if (RM()) v.innerHTML = `${pct}<small>%</small>`; else { const t0 = performance.now(); (function up(t){ const k = Math.min(1, (t - t0) / 700), n = Math.round(from + (pct - from) * (1 - Math.pow(1 - k, 3)));
+    v.innerHTML = `${n}<small>%</small>`; if (k < 1 && v.isConnected) requestAnimationFrame(up); })(t0); } }
+  el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+}
+// The day's last exercise: a shockwave from the reactor, the Neutrón sound, confetti, and the week to share.
+function criticalMass(){
+  buzz([40, 60, 40, 60, 120]);
+  if (RM()) return celebrate('Critical mass! Day complete.');
+  const rx = document.querySelector('#today-content .rx'), r = rx ? rx.getBoundingClientRect() : {left:innerWidth / 2, top:innerHeight / 3, width:0, height:0};
+  const el = document.createElement('div'); el.className = 'cmass'; el.setAttribute('role', 'status');
+  el.style.setProperty('--cx', (r.left + r.width / 2) + 'px'); el.style.setProperty('--cy', (r.top + r.height / 2) + 'px');
+  el.innerHTML = `<i class="cm-wave"></i><i class="cm-wave w2"></i><div class="cm-txt"><b>Critical<br>mass</b><span>Day complete. The core is charged.</span>
+    <button class="btn primary" data-shareweek="1">Share my week</button></div>`;
+  document.body.appendChild(el); try { neutronBurst(); } catch (e){}
+  setTimeout(() => celebrate('', true), 350);
+  const close = () => { if (!el.isConnected) return; el.classList.add('out'); setTimeout(() => el.remove(), 300); };
+  el.addEventListener('click', ev => { if (!ev.target.closest('[data-shareweek]')) close(); else setTimeout(close, 50); });
+  setTimeout(close, 5200);
+}
+function celebrate(msg, quiet){
+  if (!quiet) toast(msg || 'Workout complete! Great job.'); buzz([30,60,30]);
   if (RM()) return;
   const cv = document.createElement('canvas'); cv.id = 'confetti'; document.body.appendChild(cv);
   const dpr = devicePixelRatio || 1, W = innerWidth, H = innerHeight; cv.width = W*dpr; cv.height = H*dpr;
@@ -3917,6 +3990,7 @@ function drawProgress(){
     <div class="legend"><span><i class="c-good"></i>Green 75%+</span><span><i class="c-amber"></i>Yellow 45–74%</span><span><i class="c-bad"></i>Red under 45%</span></div></div>`;
   const hh = heroNow();
   lv += `<button class="cta-card" data-jump="hero" style="text-align:left;width:100%">${tile('star', 'gold')}<span><b>${esc(hh.cls.name)}</b><span class="small muted">Your hero · ${hh.power} power</span></span><span class="btn sm">See</span></button>`;
+  sk += `<button class="btn wide share-week" data-shareweek="1">${ico('photo')} Share my week</button>`;
   el.innerHTML = subTabs('progress') + sec('progress:streak', sk) + sec('progress:level', lv) + (waistAllowed() ? sec('progress:photos', '<div id="photos-box" class="stack"></div>') : '') + sec('progress:strength', waistCard() + h || '<div class="empty"><p class="small">Charts appear after your first logged workout.</p></div>');
   applySub(el, 'progress'); drawPhotos();
 }
@@ -4605,14 +4679,67 @@ async function phShare(){
     x.fillText('DAY ONE', 28, H + 44); x.fillText(`${wk} WEEK${wk > 1 ? 'S' : ''} LATER`, wa + gap + 28, H + 44);
     x.font = '500 28px Figtree, sans-serif'; x.fillStyle = '#C9D1DB'; x.fillText(phDate(a.at), 28, H + 88); x.fillText(phDate(b.at), wa + gap + 28, H + 88);
     x.font = '800 40px "Barlow Condensed", sans-serif'; x.fillStyle = '#E2472B'; x.textAlign = 'right'; x.fillText('NEUTRÓN', cv.width - 28, H + 64);
-    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .9)), file = new File([blob], 'neutron-before-after.jpg', {type:'image/jpeg'});
-    if (navigator.canShare && navigator.canShare({files:[file]})){ try { await navigator.share({files:[file], title:'My progress'}); return; } catch (e){ if (e && e.name === 'AbortError') return; } }
-    // Inside the Claude link the page can't download by itself: ask the viewer through the downloads capability.
-    const dl = window.claude && window.claude.use ? await window.claude.use('downloads').catch(() => null) : null;
-    if (dl){ try { await dl.save({filename:file.name, data:blob}); toast('Saved to your phone.'); } catch (e){ if (!e || e.code !== 'declined') toast('Couldn’t save the image here.'); } return; }
-    const a2 = document.createElement('a'); a2.href = URL.createObjectURL(blob); a2.download = file.name; document.body.appendChild(a2); a2.click(); a2.remove(); toast('Saved to your phone.');
+    await shareBlob(await new Promise(r => cv.toBlob(r, 'image/jpeg', .9)), 'neutron-before-after.jpg', 'My progress');
   } catch (e){ toast('Couldn’t make the image. Try again.'); }
 }
+// Share an image made on the phone: the share sheet when there is one, else save it.
+async function shareBlob(blob, name, title){
+  const file = new File([blob], name, {type:blob.type || 'image/jpeg'});
+  if (navigator.canShare && navigator.canShare({files:[file]})){ try { await navigator.share({files:[file], title}); return; } catch (e){ if (e && e.name === 'AbortError') return; } }
+  // Inside the Claude link the page can't download by itself: ask the viewer through the downloads capability.
+  const dl = window.claude && window.claude.use ? await window.claude.use('downloads').catch(() => null) : null;
+  if (dl){ try { await dl.save({filename:name, data:blob}); toast('Saved to your phone.'); } catch (e){ if (!e || e.code !== 'declined') toast('Couldn’t save the image here.'); } return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); toast('Saved to your phone.');
+}
+// Your week as a phone story (1080 × 1920): the reactor, the days, streak, XP and level. Drawn on the phone, shared only on tap.
+function weekRecap(now){
+  now = now || new Date();
+  const ws = weekStart(now), act = activeDays(), o = store.get('onboarding', null), plan = (o && o.answers && o.answers.days) || ['mon','wed','fri'];
+  const days = Array.from({length:7}, (_, i) => { const d = new Date(ws); d.setDate(ws.getDate() + i); return {d, on:act.has(tcDay(d)), planned:plan.includes(tcWeekday(d)), future:d > now}; });
+  const L = gLevel(), h = heroNow();
+  const moves = days.reduce((n, x) => n + ((doneLog || {})[dateStr(new Date(x.d.getFullYear(), x.d.getMonth(), x.d.getDate(), 12))] || []).length, 0) + workoutLog().filter(s => new Date(s.endedAt) >= ws).reduce((n, s) => n + s.exercises.length, 0);
+  return {ws, days, moves, done:days.filter(x => x.on).length, planned:plan.length, streak:streakNow().current, xp:weekXp(gameS().ledger, now), level:L.level, rank:rankFor(L.level), cls:h.cls.name};
+}
+async function shareWeek(){
+  try {
+    try { await document.fonts.ready; } catch (e){}
+    const R = weekRecap(), W = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d');
+    const A = '#FF6448', B = '#FF4D8A', D = '"Barlow Condensed", "Arial Narrow", sans-serif', T = 'Figtree, sans-serif';
+    let g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#12151B'); g.addColorStop(1, '#1B0F18'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    g = x.createRadialGradient(W / 2, 760, 40, W / 2, 760, 620); g.addColorStop(0, 'rgba(255,100,72,.35)'); g.addColorStop(1, 'rgba(255,77,138,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    x.textBaseline = 'alphabetic'; x.fillStyle = '#fff'; x.font = `700 64px ${D}`; x.fillText('NEUTR', 72, 132); const w1 = x.measureText('NEUTR').width;
+    x.fillStyle = A; x.fillText('Ó', 72 + w1, 132); x.fillStyle = '#fff'; x.fillText('N', 72 + w1 + x.measureText('Ó').width, 132);
+    const end = new Date(R.ws); end.setDate(R.ws.getDate() + 6), fmtD = d => d.toLocaleDateString(undefined, {day:'numeric', month:'short'});
+    x.textAlign = 'right'; x.font = `600 38px ${T}`; x.fillStyle = 'rgba(255,255,255,.7)'; x.fillText(`${fmtD(R.ws)} – ${fmtD(end)}`, W - 72, 128);
+    x.textAlign = 'left'; x.font = `700 170px ${D}`; x.fillStyle = '#fff'; x.fillText('MY WEEK', 66, 330);
+    // the reactor
+    const cx = W / 2, cy = 760, r = 250, f = Math.min(1, R.done / Math.max(1, R.planned));
+    x.lineWidth = 30; x.lineCap = 'round'; x.strokeStyle = 'rgba(255,255,255,.12)'; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.stroke();
+    if (f > 0){ g = x.createLinearGradient(cx - r, cy - r, cx + r, cy + r); g.addColorStop(0, A); g.addColorStop(1, B); x.strokeStyle = g; x.beginPath(); x.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * f); x.stroke(); }
+    x.save(); x.translate(cx, cy); x.rotate(-28 * Math.PI / 180); x.lineWidth = 3; x.setLineDash([8, 14]); x.strokeStyle = 'rgba(255,255,255,.25)'; x.beginPath(); x.ellipse(0, 0, 200, 76, 0, 0, Math.PI * 2); x.stroke();
+    for (let i = 0; i < R.done; i++){ const t = i / Math.max(1, R.done) * Math.PI * 2 + .6; x.fillStyle = i % 2 ? B : A; x.beginPath(); x.arc(Math.cos(t) * 200, Math.sin(t) * 76, 18, 0, Math.PI * 2); x.fill(); }
+    x.restore();
+    g = x.createRadialGradient(cx, cy, 0, cx, cy, 150); g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(.35, 'rgba(255,100,72,.75)'); g.addColorStop(1, 'rgba(255,77,138,0)'); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, 150, 0, Math.PI * 2); x.fill();
+    x.textAlign = 'center'; x.fillStyle = '#fff'; x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 24; x.font = `700 210px ${D}`; x.fillText(`${R.done}/${R.planned}`, cx, cy + 62);
+    x.shadowBlur = 0; x.font = `600 46px ${T}`; x.fillStyle = 'rgba(255,255,255,.85)'; x.fillText(R.done === 1 ? 'workout' : 'workouts', cx, cy + 130);
+    // the days
+    const DL = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    R.days.forEach((d, i) => { const dx = 120 + i * 140, dy = 1150;
+      x.beginPath(); x.arc(dx, dy, 46, 0, Math.PI * 2);
+      if (d.on){ g = x.createLinearGradient(dx - 46, dy - 46, dx + 46, dy + 46); g.addColorStop(0, A); g.addColorStop(1, B); x.fillStyle = g; x.fill(); }
+      else { x.lineWidth = 4; x.setLineDash(d.planned && !d.future ? [] : [6, 8]); x.strokeStyle = d.planned ? 'rgba(255,255,255,.5)' : 'rgba(255,255,255,.2)'; x.stroke(); x.setLineDash([]); }
+      x.fillStyle = d.on ? '#fff' : 'rgba(255,255,255,.6)'; x.font = `700 40px ${D}`; x.fillText(DL[i], dx, dy + 14); });
+    // the numbers
+    [[`${R.streak}`, 'day streak'], R.xp > 0 ? [`+${R.xp}`, 'XP this week'] : [`${R.moves}`, R.moves === 1 ? 'exercise done' : 'exercises done'], [`${R.level}`, `level · ${R.rank}`]].forEach(([v, l], i) => {
+      const bx = 72 + i * 322, by = 1290; x.fillStyle = 'rgba(255,255,255,.07)'; x.beginPath(); if (x.roundRect) x.roundRect(bx, by, 292, 250, 36); else x.rect(bx, by, 292, 250); x.fill();
+      x.fillStyle = '#fff'; x.font = `700 120px ${D}`; x.fillText(v, bx + 146, by + 140); x.fillStyle = 'rgba(255,255,255,.7)'; x.font = `600 34px ${T}`; x.fillText(l, bx + 146, by + 200); });
+    x.fillStyle = '#fff'; x.font = `700 64px ${D}`; x.fillText(R.cls.toUpperCase(), cx, 1660);
+    x.fillStyle = 'rgba(255,255,255,.55)'; x.font = `600 34px ${T}`; x.fillText('My hero class', cx, 1712);
+    x.fillStyle = 'rgba(255,255,255,.4)'; x.font = `600 32px ${T}`; x.fillText('Made with Neutrón', cx, 1840);
+    await shareBlob(await new Promise(res => cv.toBlob(res, 'image/png')), 'neutron-my-week.png', 'My week');
+  } catch (e){ toast('Couldn’t make the image. Try again.'); }
+}
+document.addEventListener('click', ev => { if (ev.target.closest('[data-shareweek]')) shareWeek(); });
 // The camera: the last photo of this pose shows faintly on top, so you stand in the same place.
 const phCam = {stream:null, face:'environment', pose:'front', ghost:true, timer:3, t:0};
 async function photoCam(pose){
@@ -4951,7 +5078,7 @@ function hintText(k){
 function hintHtml(k){
   if (!hintsOn() || hintSeen(k)) return '';
   const h = hintText(k); if (!h) return '';
-  return `<div class="hint" data-hint="${k}" role="note">${tile(h[0], 'accent')}<p>${esc(h[1])}</p><button class="hint-x" data-hintx="${k}" aria-label="Got it">Got it</button></div>`;
+  return `<div class="hint" data-hint="${k}" role="note">${ico(h[0])}<p>${esc(h[1])}</p><button class="hint-x" data-hintx="${k}" aria-label="Got it"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>`;
 }
 function dismissHint(k, el){
   store.set('hints', {...(store.get('hints', {}) || {}), [k]:1});
@@ -4963,6 +5090,8 @@ function dismissHint(k, el){
 const HELP = [
   {id:'modes', icon:'bolt', tone:'accent', title:'Training or Challenge', line:'Two ways to use the app. You choose every time you open it.',
     steps:['Training: your week, workouts, food and progress.', 'Challenge: short battles against the clock for medals.', 'Switch any time with the pill at the top right.'], go:'challenge', goLabel:'Try a challenge'},
+  {id:'reactor', icon:'bolt', tone:'accent', title:'The reactor', line:'The glowing core on today’s card charges as you train.',
+    steps:['Tick an exercise: the core grows and a particle joins its orbit.', 'Finish them all for critical mass.', 'Share your week as a story from Progress → Streak.'], go:'today', goLabel:'See today'},
   {id:'today', icon:'today', tone:'accent', title:'Today', line:'What to do today, in order.', anim:'squat',
     steps:['Tap a moving picture to see how the exercise is done.', 'Tick each exercise when it’s done.', 'Pick another day at the top to look ahead.'], go:'today'},
   {id:'workout', icon:'workout', tone:'accent', title:'Live workout', line:'Log every set while you train.', anim:'db-bench',
@@ -5201,8 +5330,9 @@ function homeMenu(mode){
     duels:{icon:'duel', tone:'legend', name:'Duels', sub:openDuels ? `${openDuels} waiting` : 'Challenge', a:'data-open="duels"', dot:openDuels > 0},
     help:{icon:'help', tone:'ink', name:'Help', sub:'How it works', a:'data-open="help"'}
   };
-  const keys = mode === 'challenge' ? ['quests', 'battery', 'ranks', 'duels', 'hero', 'ab', 'alarm', 'help'] : ['quests', 'battery', 'hero', 'ab', 'ranks', 'alarm', 'meal', 'help'];
-  return `<nav class="home-menu" aria-label="Menu">${keys.map(k => { const t = T[k];
+  // Only what matters on each screen: Help lives behind the ? in the header, meals in Food.
+  const keys = mode === 'challenge' ? ['battery', 'quests', 'duels', 'ranks'] : ['quests', 'battery', 'hero', 'ab', 'ranks', 'alarm'];
+  return `<nav class="home-menu m-${keys.length}" aria-label="Menu">${keys.map(k => { const t = T[k];
     return `<button class="mtile t-${t.tone}" ${t.a}><span class="mt-ico">${t.ring != null ? ringSvg(t.ring) : ''}${ico(t.icon)}${t.dot ? '<i class="mt-dot"></i>' : ''}</span><b>${t.name}</b><span>${esc(t.sub)}</span></button>`; }).join('')}</nav>`;
 }
 document.addEventListener('click', ev => {
@@ -5281,9 +5411,11 @@ function demoEnter(){
     history:[{id:'squat-sprint', at:day(3).toISOString(), score:72, scaled:false, medal:'silver', xp:60, pb:true}, {id:'plank-clock', at:day(6).toISOString(), score:95, scaled:false, medal:'silver', xp:50, pb:true}]});
   const hab = {}; for (let n = 0; n < 14; n++){ const d = day(n); hab[`${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`] = {sleep:n % 5 === 3 ? '7-8' : '8+', food:'yes', water:n ? 7 : 6}; }
   store.set('habits', hab);
-  store.set('alarm', {...ALARM_DEFAULT, on:true, time:'07:00', move:'pushup', reps:10});
+  store.set('alarm', {...ALARM_DEFAULT, on:true, time:'07:00', move:'pushup', level:'medium'});
   store.set('bestStreak', 12);
   store.set('hints', {today:1, sched:1, body:1, progress:1, food:1, recipes:1, challenge:1, hero:1});
+  // Three of today's exercises already ticked, so the reactor is glowing on camera.
+  try { const r = recommend(todayKey()); store.set('done', {[dateStr()]: r.items.slice(0, 3).map(x => 'r:' + x.id)}); } catch (e){}
   store.set('demo', true); store.set('mode', 'train'); store.set('tab', 'today');
   location.reload();
 }
@@ -5344,12 +5476,19 @@ document.addEventListener('click', ev => {
 /* ---------- mode: Challenge or Training ---------- */
 const ICON_BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
 const ICON_DUMB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M3 9v6M18 7v10M21 9v6M6 12h12"/></svg>';
+// The logo, alive: the particle runs round its orbit (still when motion is reduced).
+function logoMark(){
+  const orbit = 'M8,60 a52,19 0 1,0 104,0 a52,19 0 1,0 -104,0';
+  return `<svg class="mp-logo" viewBox="0 0 120 120" aria-hidden="true"><rect width="120" height="120" rx="30" class="mpl-bg"/>
+    <g transform="rotate(-28 60 60)"><path d="${orbit}" class="mpl-orb"/></g><text x="60" y="88" text-anchor="middle" class="mpl-n">N</text>
+    <g transform="rotate(-28 60 60)"><circle r="7" class="mpl-p" ${RM() ? 'cx="27" cy="72"' : ''}>${RM() ? '' : `<animateMotion dur="2.6s" repeatCount="indefinite" path="${orbit}"/>`}</circle></g></svg>`;
+}
 function openModePicker(){
   const el = document.getElementById('modepick'), S = chState(), lvl = gLevel().level, hr = new Date().getHours();
   const hello = hr < 12 ? 'Morning' : hr < 19 ? 'Afternoon' : 'Evening', o = store.get('onboarding', null), setUp = !!(o && o.answers && o.answers.goal);
   const today = setUp && o.answers.time ? 'Today: ' + recommend(todayKey()).plan.title : 'Your plan in 5 taps';
   el.className = '';
-  el.innerHTML = `<div class="mp-in"><p class="mp-hi">${hello}. What’s it today?</p>
+  el.innerHTML = `<div class="mp-in"><div class="mp-brand">${logoMark()}<span class="brand">Neutr<span>ó</span>n</span></div><p class="mp-hi">${hello}. What’s it today?</p>
     <button class="mp-card mp-ch" data-mode="challenge"><span class="mp-ico">${ICON_BOLT}</span><span class="mp-t">Challenge</span>
       <span class="mp-s">3 and 5 minute battles. Beat your best, win medals.</span><span class="mp-tag">${rankFor(lvl)} · Level ${lvl}</span></button>
     <button class="mp-card mp-tr" data-mode="train"><span class="mp-ico">${ICON_DUMB}</span><span class="mp-t">Training</span>
