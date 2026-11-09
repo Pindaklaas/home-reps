@@ -806,6 +806,7 @@ svg.anim .tor.halo{stroke:var(--accent);stroke-width:.03;stroke-linejoin:round}
 svg.anim .kcap{fill:var(--p-skin-hi);opacity:.55}svg.anim .kcap.far{opacity:.25}
 svg.anim .mline{fill:none;stroke:var(--p-skin-lo);stroke-linecap:round;opacity:.7}
 svg.anim .shade{fill:#000;opacity:.16}
+svg.anim .ghost{opacity:.12}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) svg.anim .ghost{opacity:.17}}:root[data-theme="dark"] svg.anim .ghost{opacity:.17}svg.anim .ghost *{fill:var(--ink);stroke:none}
 svg.anim .gnd{stroke:var(--line);stroke-width:.006}
 svg.anim .rom-l{fill:none;stroke:var(--accent);stroke-width:.009;stroke-dasharray:.004 .022;stroke-linecap:round;opacity:.75}
 svg.anim .rom-a{fill:var(--accent);opacity:.75}
@@ -2608,7 +2609,7 @@ function lerpPose(a, b, t){
 const ease = t => .5 - Math.cos(Math.PI * t) / 2;
 // Where in the loop we are: keys play in order and return to the first. Each key holds, then moves to the next.
 function poseAt(anim, ms){
-  const ks = anim.keys, n = ks.length, hold = anim.hold != null ? anim.hold : 260, move = anim.move || 850;
+  const ks = anim.keys, n = ks.length, hold = anim.hold != null ? anim.hold : 380, move = anim.move || 900;
   if (n === 1) return {pose:ks[0], k:0, t:0};
   const legs = n === 2 ? 2 : n, seg = hold + move, tt = ms % (legs * seg), i = Math.floor(tt / seg), r = tt - i * seg;
   const from = ks[i % n], to = ks[(i + 1) % n];
@@ -4281,7 +4282,7 @@ const hinge = (x) => mergeP({v:'side', hip:[-.13, .46], tr:22, a:[{u:-92, f:-90}
 const hang = (x) => mergeP({v:'side', hip:[0, .66], tr:92, a:[{h:[.04, 1.25], b:-1}, {h:[.02, 1.25], b:-1}], l:[{h:[-.06, .18], b:1, ft:-60}, {h:[-.09, .2], b:1, ft:-60}], pr:[{k:'bar', x:.03, y:1.27, w:.5}]}, x || {});
 const walk = (props) => A([mergeP(STA, {l:[{h:[.15, 0], ft:10}, {h:[-.14, .02], ft:-25}], pr:props}), mergeP(STA, {hip:[0, .51], l:[{h:[.02, .05], ft:-10}, {h:[0, 0], ft:0}], pr:props}),
   mergeP(STA, {l:[{h:[-.14, .02], ft:-25}, {h:[.15, 0], ft:10}], pr:props}), mergeP(STA, {hip:[0, .51], l:[{h:[0, 0], ft:0}, {h:[.02, .05], ft:-10}], pr:props})], {move:420, hold:0});
-const curl = (props, x) => A([mergeP(STA, mergeP({a:[{u:-92, f:-90}, {u:-88, f:-88}], pr:props}, x || {})), mergeP(STA, mergeP({a:[{u:-94, f:75}, {u:-90, f:78}], pr:props}, x || {}))]);
+const curl = (props, x) => A([mergeP(STA, mergeP({a:[{u:-92, f:-90}, {u:-88, f:-88}], pr:props}, x || {})), mergeP(STA, mergeP({a:[{u:-99, f:102}, {u:-95, f:104}], pr:props}, x || {}))]);
 const DB = [{k:'db', at:'hand0'}, {k:'db', at:'hand1', far:1}];
 const press = (props, lowH, highH) => two(mergeP(STA, {a:[{h:lowH, b:-1}, {h:[lowH[0] - .02, lowH[1]], b:-1}], pr:props}), {a:[{h:highH}, {h:[highH[0] - .02, highH[1]]}]});
 const LIE_PRONE = (o) => mergeP({v:'side', hip:[0, .07], tr:0, a:[{u:2, f:2}, {u:1, f:1}], l:[{u:181, f:181, ft:-92}, {u:180, f:180, ft:-92}], pr:[]}, o || {});
@@ -4307,11 +4308,11 @@ const ANIMS = {
   'sumo-squat': two(mergeP(FR, {a:[{h:[.05, .66], b:1}, {h:[-.05, .66], b:-1}], l:[{h:[.3, 0], b:1, ft:20}, {h:[-.3, 0], b:-1, ft:-200}]}),
     {hip:[0, .3], a:[{h:[.05, .5]}, {h:[-.05, .5]}]}, {move:1000}),
   'side-adduction': two({v:'front', hip:[-.04, .1], tr:4, a:[{h:[.31, .12], b:-1}, {h:[.02, .19], b:1}], l:[{h:[-.54, .03], b:1, ft:-90}, {h:[-.22, .02], b:1, ft:-90}], pr:[]},
-    {l:[{h:[-.53, .13]}]}, {move:900, hold:300}),
+    {l:[{h:[-.52, .19]}]}, {move:900, hold:400}),
   'pillow-squeeze': two(bridgeK(0, {pr:[{k:'pad', at:'knee0', off:[0, .01]}]}), {l:[{h:[-.26, 0]}, {h:[-.29, 0]}]}, {move:1300, hold:1100}),
   copenhagen: two(sidePlank(.12, {a:[{h:[.25, .02], b:1}, {u:96, f:96}], l:[{h:[-.56, .02], b:1, ft:-90}, {h:[-.62, .33], b:1, ft:-90}], pr:[{k:'bench', x:-.82, y:.3, w:.32}]}),
     {hip:[-.06, .22], tr:17, l:[{h:[-.6, .27]}, {h:[-.62, .33]}]}, {move:1500, hold:600}),
-  'hip-dips': two(sidePlank(.2), sidePlank(.1)),
+  'hip-dips': two(sidePlank(.24), sidePlank(.06)),
   crunch: two(SUP({a:[{h:[.37, .16], b:1}, {h:[.35, .16], b:1}]}), {tr:28, a:[{h:[.33, .33]}, {h:[.31, .33]}]}),
   situp: two(SUP({a:[{h:[.2, .14], b:1}, {h:[.18, .14], b:1}]}), {tr:72, a:[{h:[.13, .38]}, {h:[.11, .38]}]}),
   'leg-raise': two(SUP({a:[{u:183, f:183}, {u:181, f:181}], l:[{u:182, f:182, ft:180}, {u:180, f:180, ft:180}]}), {l:[{u:92, f:92, ft:90}, {u:90, f:90, ft:90}]}),
@@ -4320,7 +4321,7 @@ const ANIMS = {
   bicycle: A([SUP({tr:24, a:[{h:[.3, .33], b:1}, {h:[.28, .33], b:1}], l:[{u:72, f:182, ft:180}, {u:166, f:166, ft:166}]}), SUP({tr:24, a:[{h:[.3, .33], b:1}, {h:[.28, .33], b:1}], l:[{u:166, f:166, ft:166}, {u:72, f:182, ft:180}]})], {move:500, hold:120}),
   'russian-twist': two({v:'side', hip:[0, .1], tr:122, a:[{h:[.24, .3], b:-1}, {h:[.22, .3], b:-1}], l:[{u:48, f:-8, ft:0}, {u:46, f:-10, ft:-2}], pr:[{k:'db', at:'hand0', big:1}]}, {tr:116, a:[{h:[.06, .05]}, {h:[.04, .05]}]}, {move:650, hold:200}),
   'bird-dog': two(QUAD(), {a:[{h:[.42, .33]}], l:[undefined, {h:[-.67, .31], ft:180}]}, {move:1000, hold:500}),
-  superman: two(LIE_PRONE(), {tr:9, a:[{u:16, f:16}, {u:15, f:15}], l:[{u:170, f:170}, {u:169, f:169}]}, {move:1100, hold:600}),
+  superman: two(LIE_PRONE(), {tr:14, a:[{u:26, f:26}, {u:25, f:25}], l:[{u:163, f:163}, {u:162, f:162}]}, {move:1100, hold:700}),
   'donkey-kick': two(QUAD({l:[{h:[-.42, .02], b:1, ft:180}]}), {l:[{h:[-.42, .56], ft:90}]}),
   'fire-hydrant': two(QUAD(), {l:[{h:[-.34, .3], ft:150}]}),
   'glute-bridge': two(bridgeK(0), bridgeK(1)),
@@ -4341,9 +4342,9 @@ const ANIMS = {
   'good-morning': two(mergeP(ST, {a:[{h:[.02, .92], b:1}, {h:[0, .92], b:1}]}), {hip:[-.12, .47], tr:16, a:[{h:[.2, .63]}, {h:[.18, .63]}]}),
   rdl: two(mergeP(STA, {pr:[{k:'barbell', at:'hand0'}]}), {hip:[-.15, .47], tr:24}),
   deadlift: two(mergeP(STA, {hip:[-.2, .26], tr:42, pr:[{k:'barbell', at:'hand0'}]}), {hip:[0, .5], tr:90}),
-  'barbell-row': two(hinge({pr:[{k:'barbell', at:'hand0'}]}), {a:[{u:-125, f:-60}, {u:-122, f:-57}]}),
-  'backpack-row': two(hinge({pr:[{k:'pack', at:'hand0'}]}), {a:[{u:-125, f:-60}, {u:-122, f:-57}]}),
-  'db-row': two(hinge({hip:[-.16, .44], tr:12, a:[undefined, {h:[.32, .33], b:-1}], pr:[{k:'bench', x:.05, y:.3, w:.5}, {k:'db', at:'hand0'}]}), {a:[{u:-130, f:-60}]}),
+  'barbell-row': two(hinge({pr:[{k:'barbell', at:'hand0'}]}), {a:[{u:162, f:-78}, {u:165, f:-75}]}),
+  'backpack-row': two(hinge({pr:[{k:'pack', at:'hand0'}]}), {a:[{u:162, f:-78}, {u:165, f:-75}]}),
+  'db-row': two(hinge({hip:[-.16, .44], tr:12, a:[undefined, {h:[.32, .33], b:-1}], pr:[{k:'bench', x:.05, y:.3, w:.5}, {k:'db', at:'hand0'}]}), {a:[{u:158, f:-80}]}),
   'cable-row': two({v:'side', hip:[-.18, .22], tr:88, a:[{h:[.37, .46], b:-1}, {h:[.35, .46], b:-1}], l:[{h:[.38, .2], b:1, ft:80}, {h:[.36, .2], b:1, ft:80}], pr:[{k:'bench', x:-.4, y:.18, w:.45}, {k:'cable', from:[.62, .44], to:'hand0'}, {k:'plate', x:.45, y:.2}]}, {tr:96, a:[{h:[.06, .46]}, {h:[.04, .46]}]}),
   'lat-pulldown': two({v:'side', hip:[-.06, .33], tr:92, a:[{h:[.04, .9], b:-1}, {h:[.02, .9], b:-1}], l:[{h:[.25, 0], b:1, ft:0}, {h:[.21, 0], b:1, ft:0}], pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'cable', from:[.04, 1.2], to:'hand0'}, {k:'handle', at:'hand0'}]}, {tr:98, a:[{h:[.1, .64]}, {h:[.08, .64]}]}),
   'pull-up': two(hang(), {hip:[0, .88], a:[{h:[.04, 1.25]}, {h:[.02, 1.25]}], l:[{h:[-.06, .4]}, {h:[-.09, .42]}]}),
@@ -4369,21 +4370,21 @@ const ANIMS = {
   ohp: press([{k:'barbell', at:'hand0'}], [.09, .8], [.02, 1.1]),
   'backpack-press': press([{k:'pack', at:'hand0'}], [.09, .8], [.02, 1.1]),
   'face-pull': two(mergeP(STA, {a:[{h:[.44, .86], b:1}, {h:[.42, .86], b:1}], pr:[{k:'cable', from:[.66, .88], to:'hand0'}, {k:'handle', at:'hand0'}]}), {a:[{h:[.13, .9]}, {h:[.11, .9]}]}),
-  shrug: two(mergeP(FR, {a:[{u:-90, f:-90}, {u:-90, f:-90}], pr:[{k:'pack', at:'hand0'}]}), {sl:.05}, {move:600, hold:400}),
-  'db-shrug': two(mergeP(FR, {a:[{u:-90, f:-90}, {u:-90, f:-90}], pr:[{k:'db', at:'hand0', front:1}, {k:'db', at:'hand1', front:1}]}), {sl:.05}, {move:600, hold:400}),
+  shrug: two(mergeP(FR, {a:[{u:-90, f:-90}, {u:-90, f:-90}], pr:[{k:'pack', at:'hand0'}]}), {sl:.085}, {move:650, hold:450}),
+  'db-shrug': two(mergeP(FR, {a:[{u:-90, f:-90}, {u:-90, f:-90}], pr:[{k:'db', at:'hand0', front:1}, {k:'db', at:'hand1', front:1}]}), {sl:.085}, {move:650, hold:450}),
   'farmer-walk': walk([{k:'db', at:'hand0'}]),
   'bag-carry': walk([{k:'bag', at:'hand0'}]),
-  'bottle-wrist': two(seat({a:[{u:-60, f:-8}, {u:-62, f:-10}], pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'bottle', at:'hand0', off:[.02, -.03]}]}), {pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'bottle', at:'hand0', off:[.02, .05]}]}),
+  'bottle-wrist': two(seat({a:[{u:-60, f:-8}, {u:-62, f:-10}], pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'bottle', at:'hand0', off:[.035, -.07]}]}), {pr:[{k:'bench', x:-.28, y:.28, w:.4}, {k:'bottle', at:'hand0', off:[.035, .08]}]}),
   'towel-wring': two(mergeP(FR, {a:[{h:[.07, .62], b:1}, {h:[-.07, .66], b:-1}], pr:[{k:'towel', from:'hand0', to:'hand1', wide:1}]}), {a:[{h:[.07, .67]}, {h:[-.07, .61]}]}, {move:500, hold:150}),
-  'yt-raise': two(LIE_PRONE(), {tr:5, a:[{u:22, f:22}, {u:21, f:21}]}),
+  'yt-raise': two(LIE_PRONE(), {tr:7, a:[{u:34, f:34}, {u:33, f:33}]}),
   'snow-angel': two(LIE_PRONE({tr:5, a:[{u:186, f:186}, {u:185, f:185}]}), {a:[{u:20, f:20}, {u:19, f:19}]}, {move:1200, hold:300}),
   'leg-press': two({v:'side', hip:[0, .25], tr:128, a:[{h:[-.02, .36], b:-1}, {h:[-.04, .36], b:-1}], l:[{h:[.14, .5], b:1, ft:45}, {h:[.12, .5], b:1, ft:45}], pr:[{k:'box', x:-.2, y:.2, w:.3}, {k:'sled', at:'ankle0'}, {k:'incline', x:-.05, y:.22, a:128}]}, {l:[{h:[.38, .7]}, {h:[.36, .7]}]}),
   'leg-extension': two({v:'side', hip:[-.05, .43], tr:94, a:[{h:[-.05, .44], b:-1}, {h:[-.07, .44], b:-1}], l:[{u:0, f:-90, ft:0}, {u:-2, f:-92, ft:-2}], pr:[{k:'bench', x:-.3, y:.38, w:.48}, {k:'back', x:-.15, y:.4}, {k:'pad', at:'ankle0'}]}, {l:[{f:-6}, {f:-8}]}),
   'leg-curl': two({v:'side', hip:[0, .4], tr:0, a:[{u:-80, f:-40}, {u:-82, f:-42}], l:[{u:180, f:180, ft:-90}, {u:178, f:178, ft:-90}], pr:[{k:'bench', x:-.55, y:.35, w:.95}, {k:'pad', at:'ankle0'}]}, {l:[{f:85}, {f:83}]}),
-  'calf-raise': two(mergeP(STA, {hip:[0, .62], l:[{h:[0, .12], ft:24}, {h:[-.03, .12], ft:24}], pr:[{k:'box', x:.03, y:.15, w:.35}]}), {hip:[0, .71], l:[{h:[0, .21], ft:-42}, {h:[-.03, .21], ft:-42}]}),
+  'calf-raise': two(mergeP(STA, {hip:[0, .61], l:[{h:[0, .11], ft:28}, {h:[-.03, .11], ft:28}], pr:[{k:'box', x:.03, y:.15, w:.35}]}), {hip:[0, .73], l:[{h:[0, .23], ft:-52}, {h:[-.03, .23], ft:-52}]}),
   'sl-calf': two(mergeP(STA, {hip:[0, .62], a:[{h:[.3, .85], b:-1}], l:[{h:[0, .12], ft:24}, {h:[-.12, .35], ft:-60}], pr:[{k:'box', x:.03, y:.15, w:.35}, {k:'wall', x:.36}]}), {hip:[0, .71], a:[{h:[.3, .92]}], l:[{h:[0, .21], ft:-42}, {h:[-.12, .44]}]}),
   'machine-calf': two(mergeP(STA, {hip:[0, .62], a:[{h:[.05, .85], b:1}, {h:[.03, .85], b:1}], l:[{h:[0, .12], ft:24}, {h:[-.03, .12], ft:24}], pr:[{k:'box', x:.03, y:.15, w:.35}, {k:'pad', at:'sh0', off:[0, .03]}]}), {hip:[0, .71], a:[{h:[.05, .94]}, {h:[.03, .94]}], l:[{h:[0, .21], ft:-42}, {h:[-.03, .21], ft:-42}]}),
-  'tib-raise': two({v:'side', hip:[-.12, .54], tr:95, a:[{u:-95, f:-92}, {u:-93, f:-90}], l:[{h:[.16, 0], ft:0}, {h:[.13, 0], ft:0}], pr:[{k:'wall', x:-.24}]}, {l:[{ft:38}, {ft:38}]}),
+  'tib-raise': two({v:'side', hip:[-.12, .54], tr:95, a:[{u:-95, f:-92}, {u:-93, f:-90}], l:[{h:[.16, 0], ft:0}, {h:[.13, 0], ft:0}], pr:[{k:'wall', x:-.24}]}, {l:[{ft:52}, {ft:52}]}),
   skip: A([mergeP(FR, {a:[{h:[.22, .55], b:1}, {h:[-.22, .55], b:-1}], pr:[{k:'rope', y:1.2}]}), mergeP(FR, {hip:[0, .56], a:[{h:[.22, .6], b:1}, {h:[-.22, .6], b:-1}], l:[{h:[.06, .06], ft:-50}, {h:[-.06, .06], ft:-130}], pr:[{k:'rope', y:-.06}]})], {move:260, hold:30}),
   'cable-crunch': two({v:'side', hip:[0, .27], tr:84, a:[{h:[.12, .62], b:1}, {h:[.1, .62], b:1}], l:[{h:[-.25, .02], b:1, ft:180}, {h:[-.27, .02], b:1, ft:180}], pr:[{k:'cable', from:[.2, 1.18], to:'hand0'}]}, {tr:28, a:[{h:[.32, .4]}, {h:[.3, .4]}]}),
   'wall-hs': two({v:'side', hip:[.01, .58], tr:-90, a:[{h:[.04, 0], b:1}, {h:[.02, 0], b:1}], l:[{h:[-.07, 1.06], ft:90}, {h:[-.09, 1.06], ft:90}], pr:[{k:'wall', x:-.14}]}, {hip:[.015, .585]}, {move:1500, hold:500}),
@@ -4590,6 +4591,15 @@ function animViewBox(anim, glow, ar, big){
 }
 // The pose that shows the work best (the end of the first move).
 const animStill = anim => anim.keys[anim.keys.length > 1 ? 1 : 0];
+// A faint silhouette of where the move ends, behind the moving figure (big views of two-pose moves that really travel).
+function animGhost(anim){
+  if (anim.keys.length !== 2) return '';
+  const a = solvePose(anim.keys[0]), b = solvePose(anim.keys[1]), d = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
+  let mx = Math.max(d(a.hip, b.hip), d(a.head, b.head)); ['hand', 'el', 'knee', 'ankle'].forEach(j => [0, 1].forEach(i => { mx = Math.max(mx, d(a[j][i], b[j][i])); }));
+  if (mx < .05) return '';
+  const items = animScene(mergeP(animStill(anim), {pr:[]}), new Set(), false).filter(([, at]) => !/\b(sh|halo|haloc|mline|kcap|shade|mus)\b/.test(at.class || ''));
+  return `<g class="ghost">${items.map(([t, at]) => `<${t} ${Object.keys(at).filter(k => k !== 'class' && k !== 'data-bb').map(k => `${k}="${at[k]}"`).join(' ')}/>`).join('')}</g>`;
+}
 function animEffort(anim, k, t, ms){ return anim.keys.length === 2 ? (k === 0 ? ease(t) : 1 - ease(t)) : .5 + .5 * Math.sin(ms / 300); }
 const animReg = new Set(); let animRaf = 0, animIO = null;
 function animApply(st, items){
@@ -4617,7 +4627,7 @@ function animMount(svg){
   const glow = animGlow(id), ar = +svg.dataset.ar || 4 / 3, big = svg.classList.contains('big'), vb = animViewBox(anim, glow, ar, big);
   svg.setAttribute('viewBox', vb); animDefs();
   // Big views get a floor line and a dotted guide for the path of the joint that moves most (the range of motion).
-  svg.innerHTML = big ? `<g class="rom">${animRom(anim, vb, glow)}</g><g></g>` : '<g></g>';
+  svg.innerHTML = big ? `<g class="rom">${animRom(anim, vb, glow)}</g>${animGhost(anim)}<g></g>` : '<g></g>';
   const st = {svg, anim, glow, big, g:svg.lastChild, t0:performance.now(), ph:+svg.dataset.ph || 0, small:svg.classList.contains('th'), vis:!animIO};
   if (RM()){ animApply(st, animScene(animStill(anim), glow, big)); svg.style.setProperty('--g', '1'); return; }
   animDraw(st, st.t0); animReg.add(st);
