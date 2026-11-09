@@ -25,17 +25,18 @@
   --amber:#D99A1E; --blue:#4A7BD0;
   --spring:cubic-bezier(.3,1.45,.5,1); --out:cubic-bezier(.2,.8,.2,1);
   --bad:#D63A2F; --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --gold-hi:#FFF3C4; --gold-lo:#A9781A; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
+  --p-skin-hi:#F2C6A6; --p-skin-lo:#C7865F; --p-skin-far-hi:#C08A6B; --p-skin-far-lo:#97634A; --p-hair:#2B1F19; --kit-top-hi:#4D5B70; --kit-top-lo:#2E3846; --kit-bot-hi:#30363F; --kit-bot-lo:#1B1F25; --shoe-hi:#FFFFFF; --shoe-lo:#CDD4DD;
   --fig:#2B333E; --fig-far:#8F99A6; --fig-hl:rgba(255,255,255,.2); --prop:#8D97A4; --prop-soft:#DCE1E7;
   --r:14px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#101318; --surface:#191E25; --ink:#EDF0F3; --muted:#9AA3AE; --line:#2B323C;
   --skin:#2A313A; --muscle:#46505D; --muscle-hover:#5A6574;
-  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-far:#5D6672; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}}
+  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --kit-top-hi:#6E809B; --kit-top-lo:#4B5A70; --kit-bot-hi:#525B68; --kit-bot-lo:#3A414B; --fig:#C3CBD5; --fig-far:#5D6672; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#101318; --surface:#191E25; --ink:#EDF0F3; --muted:#9AA3AE; --line:#2B323C;
   --skin:#2A313A; --muscle:#46505D; --muscle-hover:#5A6574;
-  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-far:#5D6672; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}
+  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --kit-top-hi:#6E809B; --kit-top-lo:#4B5A70; --kit-bot-hi:#525B68; --kit-bot-lo:#3A414B; --fig:#C3CBD5; --fig-far:#5D6672; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--text);font-size:15px;line-height:1.45}
 *{box-sizing:border-box}
@@ -765,21 +766,22 @@ body.mode-challenge .app{padding-bottom:40px}
 
 /* exercise animations */
 svg.anim{display:block;overflow:hidden;--g:0}
-svg.anim .bd{fill:url(#ag-fig);stroke:none}
-svg.anim .bd.far{fill:url(#ag-far)}
-svg.anim .bd.on{fill:url(#ag-on)}svg.anim .bd.on.far{fill:url(#ag-onf)}
-:is(#arena,#alarm) svg.anim :is(.bd,.hd){fill:url(#ag-figA)}:is(#arena,#alarm) svg.anim .bd.far{fill:url(#ag-farA)}
-:is(#arena,#alarm) svg.anim .tor{fill:url(#ag-figA);stroke:url(#ag-figA)}
-:is(#arena,#alarm) svg.anim .bd.on{fill:url(#ag-on)}:is(#arena,#alarm) svg.anim .tor.on{fill:url(#ag-on);stroke:url(#ag-on)}
+svg.anim .pp{stroke:rgba(14,17,22,.38);stroke-width:.006;stroke-linejoin:round}
+svg.anim .sk{fill:url(#ag-sk)}svg.anim .sk.far,svg.anim .ear{fill:url(#ag-skf)}
+svg.anim .kt{fill:url(#ag-kt)}svg.anim .kt.far{fill:url(#ag-ktf)}
+svg.anim .ks{fill:url(#ag-ks)}svg.anim .ks.far{fill:url(#ag-ksf)}
+svg.anim .sho{fill:url(#ag-sho)}svg.anim .sho.far{fill:url(#ag-shof)}
+svg.anim .sole{fill:var(--accent)}svg.anim .sole.far{opacity:.55}
+svg.anim .hair{fill:var(--p-hair)}
+svg.anim .mus{fill:url(#ag-on);opacity:.84}svg.anim .mus.far{opacity:.6}
+svg.anim .tor.mus{stroke:url(#ag-on);stroke-width:.02;stroke-linejoin:round}
 svg.anim .halo,svg.anim .haloc{fill:var(--accent);stroke:none;filter:url(#ag-blur);opacity:calc(.06 + var(--g) * .2)}
 svg.anim .tor.halo{stroke:var(--accent);stroke-width:.035;stroke-linejoin:round}
 svg.anim .gnd{stroke:var(--line);stroke-width:.006}
 svg.anim .rom-l{fill:none;stroke:var(--accent);stroke-width:.009;stroke-dasharray:.004 .022;stroke-linecap:round;opacity:.75}
 svg.anim .rom-a{fill:var(--accent);opacity:.75}
 svg.anim .hl{stroke:var(--fig-hl);stroke-linecap:round;fill:none}
-svg.anim .tor{fill:url(#ag-fig);stroke:url(#ag-fig);stroke-width:.03;stroke-linejoin:round}
-svg.anim .tor.on{fill:url(#ag-on);stroke:url(#ag-on);stroke-width:.026}
-svg.anim .hd{fill:url(#ag-fig)}
+svg.anim .tor.pp{stroke-width:.012}
 svg.anim .sh{fill:url(#ag-sh)}
 svg.anim .pr{fill:var(--prop-soft);stroke:var(--prop);stroke-width:.012}
 svg.anim .wl{opacity:.6}
@@ -4286,10 +4288,19 @@ const LIMB_W = {thigh:.09, shin:.072, foot:.044, upper:.066, fore:.056};
 const STATIC_PROPS = new Set(['bench', 'box', 'wall', 'bar', 'table', 'door', 'stack', 'back', 'incline', 'sled', 'plate', 'cable']);
 // Build the drawing for one pose: a list of [tag, attributes]. Rig y grows up; SVG y grows down.
 // Limb radii [at the root, at the end]: thighs and upper arms taper towards the knee and elbow, calves towards the ankle.
-const LIMB_R = {thigh:[.06, .04], shin:[.043, .027], foot:[.026, .017], upper:[.04, .03], fore:[.031, .023]};
+// Limb shapes [radius at the root, widest radius, radius at the end, where the widest point sits]: thigh, calf, biceps and forearm bulge like real muscle.
+const LIMB_R = {thigh:[.062, .067, .043, .35], shin:[.043, .05, .026, .3], upper:[.038, .042, .031, .5], fore:[.034, .035, .022, .28]};
 function animScene(pose, glow, big){
   const P = solvePose(pose), out = [], f = n => Math.round(n * 1e4) / 1e4, front = P.front;
   // A tapered capsule from a to b (rig coords): the body is built from these, so limbs read as volumes, not sticks.
+  // A limb with a muscle bulge: two curved sides through the widest point, rounded ends.
+  const LIMB = (a, b, r1, rm, r2, t, cls) => {
+    const ax = a[0], ay = -a[1], bx = b[0], by = -b[1], dx = bx - ax, dy = by - ay, l = Math.hypot(dx, dy) || 1e-6, nx = -dy / l, ny = dx / l, mx = ax + dx * t, my = ay + dy * t;
+    const sd = k => { const p0 = [ax + nx * r1 * k, ay + ny * r1 * k], p1 = [mx + nx * rm * k, my + ny * rm * k], p2 = [bx + nx * r2 * k, by + ny * r2 * k];
+      return [p0, [2 * p1[0] - (p0[0] + p2[0]) / 2, 2 * p1[1] - (p0[1] + p2[1]) / 2], p2].map(q => f(q[0]) + ' ' + f(q[1])); };
+    const A = sd(1), B = sd(-1);
+    out.push(['path', {d:`M${A[0]}Q${A[1]} ${A[2]}A${f(r2)} ${f(r2)} 0 0 0 ${B[2]}Q${B[1]} ${B[0]}A${f(r1)} ${f(r1)} 0 0 0 ${A[0]}Z`, class:cls, 'data-bb':`${f(ax)} ${f(ay)} ${f(bx)} ${f(by)} ${f(Math.max(r1, rm, r2) + .02)}`}]);
+  };
   const CAP = (a, b, r1, r2, cls) => {
     const ax = a[0], ay = -a[1], bx = b[0], by = -b[1], l = Math.hypot(bx - ax, by - ay) || 1e-6, nx = -(by - ay) / l, ny = (bx - ax) / l;
     out.push(['path', {d:`M${f(ax + nx * r1)} ${f(ay + ny * r1)}L${f(bx + nx * r2)} ${f(by + ny * r2)}A${f(r2)} ${f(r2)} 0 0 0 ${f(bx - nx * r2)} ${f(by - ny * r2)}L${f(ax - nx * r1)} ${f(ay - ny * r1)}A${f(r1)} ${f(r1)} 0 0 0 ${f(ax + nx * r1)} ${f(ay + ny * r1)}Z`,
@@ -4302,17 +4313,23 @@ function animScene(pose, glow, big){
   const PG = (pts, k) => out.push(['polygon', {points:pts.map(p => f(p[0]) + ',' + f(-p[1])).join(' '), class:k}]);
   const Q = (a, c, b, w, k) => out.push(['path', {d:`M${f(a[0])} ${f(-a[1])}Q${f(c[0])} ${f(-c[1])} ${f(b[0])} ${f(-b[1])}`, 'stroke-width':w, class:k}]);
   const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
-  const seg = (a, b, part, far) => { const on = glow.has(part), [r1, r2] = LIMB_R[part], fc = far ? ' far' : '';
-    if (on && big) CAP(a, b, r1 + .03, r2 + .03, 'halo' + fc);
-    CAP(a, b, r1, r2, 'bd' + (on ? ' on' : '') + fc); };
-  const leg = (i, far) => { seg(P.hp[i], P.knee[i], 'thigh', far); seg(P.knee[i], P.ankle[i], 'shin', far);
-    // the foot: heel at the ankle, a shoe shape towards the toes
-    const fc = far ? ' far' : '', on = glow.has('shin'); CAP(addv(P.ankle[i], [0, -.012]), P.toe[i], .026, .017, 'bd ft' + (on ? ' on' : '') + fc); };
+  // A person in training kit: skin, t-shirt sleeves, shorts and trainers; the working muscle shows on top as an accent overlay.
+  const seg = (a, b, part, far) => { const on = glow.has(part), [r1, rm, r2, t] = LIMB_R[part], fc = far ? ' far' : '';
+    if (on && big) LIMB(a, b, r1 + .028, rm + .028, r2 + .028, t, 'halo' + fc);
+    LIMB(a, b, r1, rm, r2, t, 'pp sk' + fc);
+    if (part === 'thigh') LIMB(a, mix(a, b, .4), r1 + .005, r1 + .006, r1 * .96, .5, 'pp ks' + fc);
+    if (part === 'upper') LIMB(a, mix(a, b, .4), r1 + .006, r1 + .007, r1 * .98, .5, 'pp kt' + fc);
+    if (on) LIMB(a, b, r1, rm, r2, t, 'mus' + fc); };
+  const leg = (i, far) => { const fc = far ? ' far' : ''; seg(P.hp[i], P.knee[i], 'thigh', far); seg(P.knee[i], P.ankle[i], 'shin', far);
+    // trainers: heel at the ankle, toe forward, a light sole
+    // the sole runs under the foot, on the side away from the shin, whatever angle the foot is at
+    const sv = [P.ankle[i][0] - P.knee[i][0], P.ankle[i][1] - P.knee[i][1]], sl = Math.hypot(sv[0], sv[1]) || 1, su = [sv[0] / sl, sv[1] / sl];
+    const heel = addv(P.ankle[i], su, .012); CAP(heel, P.toe[i], .029, .021, 'pp sho' + fc); CAP(addv(heel, su, .022), addv(P.toe[i], su, .016), .009, .007, 'sole' + fc); };
   const arm = (i, far) => { const fc = far ? ' far' : '';
     if (glow.has('delt') && big) C(P.sh[i], .07, 'haloc' + fc);
-    seg(P.sh[i], P.el[i], 'upper', far); seg(P.el[i], P.hand[i], 'fore', far); C(P.hand[i], .027, 'bd hn' + fc);
+    seg(P.sh[i], P.el[i], 'upper', far); seg(P.el[i], P.hand[i], 'fore', far); C(P.hand[i], .029, 'pp sk' + fc);
     // the shoulder cap sits over the top of the arm, so a working shoulder reads as one rounded muscle
-    if (glow.has('delt')) CAP(P.sh[i], mix(P.sh[i], P.el[i], .42), .047, .037, 'bd on dl' + fc); };
+    if (glow.has('delt')) CAP(P.sh[i], mix(P.sh[i], P.el[i], .42), .047, .037, 'mus dl' + fc); };
   // props
   const prop = (p, layer) => {
     const k = p.k, isStatic = STATIC_PROPS.has(k), far = p.far ? 'far' : 'near';
@@ -4355,14 +4372,19 @@ function animScene(pose, glow, big){
     : [at(-.01, .062), at(.12, .064), at(.22, .088), at(.3, .05), at(.3, -.058), at(.2, -.074), at(.08, -.062), at(-.01, -.08)];
   const torso = () => {
     if (big && (glow.has('chest') || glow.has('core'))) PG(glow.has('chest') && glow.has('core') ? T : glow.has('chest') ? T.filter((_, i) => front ? i >= 1 && i <= 6 : i >= 1 && i <= 5) : T.filter((_, i) => front ? i <= 1 || i >= 6 : i <= 1 || i >= 5), 'tor halo');
-    PG(T, 'tor');
+    // neck and head first, so the t-shirt collar sits over the neck
+    const hd = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0)), fwh = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0) - 90);
+    CAP(addv(P.neck, d, -.03), addv(P.neck, hd, .045), .03, .027, 'pp sk');
+    PG(T, 'pp tor kt');
+    PG(front ? [T[0], at(.07, .1), at(.07, -.1), T[7]] : [T[0], at(.07, .062), at(.07, -.064), T[7]], 'pp tor ks');
     const upper = front ? T.slice(1, 7) : T.slice(1, 6), lower = front ? [T[0], T[1], T[6], T[7]] : [T[0], T[1], T[5], T[6], T[7]];
-    if (glow.has('chest')) PG(upper, 'tor on');
-    if (glow.has('core')) PG(lower, 'tor on');
-    if (glow.has('glute')) { const g = front ? P.hip : addv(P.hip, bk, .035); if (big) C(g, .085, 'haloc'); E(g, .058, .058, 'bd on gl'); }
-    const hd = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0));
-    CAP(addv(P.neck, d, -.02), addv(P.neck, hd, .045), .03, .026, 'bd nk');
-    E(P.head, .066, .072, 'hd');
+    if (glow.has('chest')) PG(upper, 'tor mus');
+    if (glow.has('core')) PG(lower, 'tor mus');
+    if (glow.has('glute')) { const g = front ? P.hip : addv(P.hip, bk, .035); if (big) C(g, .085, 'haloc'); E(g, .058, .058, 'mus gl'); }
+    // head: hair at the back and top, a face in front, an ear and a nose so you can tell where the person looks
+    if (front){ E(addv(P.head, hd, .016), .07, .066, 'hair'); E(P.head, .062, .07, 'pp sk'); [-1, 1].forEach(k => E(addv(P.head, fwh, .062 * k), .012, .02, 'sk ear')); E(addv(P.head, hd, .045), .06, .03, 'hair'); }
+    else { E(addv(addv(P.head, hd, .014), fwh, -.016), .07, .068, 'hair'); E(addv(P.head, fwh, .006), .062, .068, 'pp sk');
+      E(addv(P.head, fwh, -.008), .013, .02, 'sk ear'); E(addv(addv(P.head, fwh, .064), hd, -.006), .012, .01, 'sk'); E(addv(addv(P.head, hd, .03), fwh, -.01), .056, .034, 'hair'); }
   };
   if (front && pose.lf){ layer('far'); torso(); leg(0); leg(1); arm(0); arm(1); layer('near'); }
   else if (front){ leg(0); leg(1); layer('far'); torso(); arm(0); arm(1); layer('near'); }
@@ -4434,8 +4456,10 @@ function animDefs(){
   if (document.getElementById('anim-defs')) return;
   const g = (id, a, b) => `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:${a}"/><stop offset="1" style="stop-color:${b}"/></linearGradient>`;
   document.body.insertAdjacentHTML('beforeend', `<svg id="anim-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
-    ${g('ag-fig', 'color-mix(in srgb,var(--fig) 74%,#fff)', 'var(--fig)')}${g('ag-far', 'color-mix(in srgb,var(--fig-far) 82%,#fff)', 'var(--fig-far)')}
-    ${g('ag-figA', '#EEF2F6', '#AFB8C3')}${g('ag-farA', '#6F7884', '#4F5762')}
+    ${g('ag-sk', 'var(--p-skin-hi)', 'var(--p-skin-lo)')}${g('ag-skf', 'var(--p-skin-far-hi)', 'var(--p-skin-far-lo)')}
+    ${g('ag-kt', 'var(--kit-top-hi)', 'var(--kit-top-lo)')}${g('ag-ktf', 'color-mix(in srgb,var(--kit-top-hi) 72%,#000)', 'color-mix(in srgb,var(--kit-top-lo) 72%,#000)')}
+    ${g('ag-ks', 'var(--kit-bot-hi)', 'var(--kit-bot-lo)')}${g('ag-ksf', 'color-mix(in srgb,var(--kit-bot-hi) 75%,#000)', 'color-mix(in srgb,var(--kit-bot-lo) 75%,#000)')}
+    ${g('ag-sho', 'var(--shoe-hi)', 'var(--shoe-lo)')}${g('ag-shof', 'color-mix(in srgb,var(--shoe-hi) 78%,#555)', 'color-mix(in srgb,var(--shoe-lo) 78%,#555)')}
     ${g('ag-on', 'var(--accent)', 'var(--accent-2)')}<radialGradient id="ag-sh"><stop offset="0" style="stop-color:var(--ink);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--ink);stop-opacity:0"/></radialGradient>${g('ag-onf', 'color-mix(in srgb,var(--accent) 55%,var(--fig-far))', 'color-mix(in srgb,var(--accent-2) 55%,var(--fig-far))')}
     <filter id="ag-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".022"/></filter></defs></svg>`);
 }
