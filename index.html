@@ -424,6 +424,9 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .glass.full{border-color:var(--blue);background:linear-gradient(to top,color-mix(in srgb,var(--blue) 55%,transparent) 78%,transparent 78%)}
 /* ---------- weekly planning ---------- */
 .phase-card{background:radial-gradient(circle at 92% 8%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 58%),var(--arena);color:var(--arena-ink);border:1px solid color-mix(in srgb,var(--arena-ink) 9%,transparent);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.days-note{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:13px;line-height:1.35;color:var(--muted)}
+.days-note .btn{margin-top:6px;display:flex}.days-note .ico{width:18px;height:18px;flex:none;color:var(--accent);margin-top:1px}.days-note b{color:var(--ink)}
+.pl-row.recov .pl-main b{color:var(--good)}
 .phase-name{font-family:var(--display);font-size:36px;line-height:1;text-transform:uppercase}
 .pips{display:flex;gap:6px;margin-top:8px}
 .pips i{flex:1;height:6px;border-radius:3px;background:color-mix(in srgb,currentColor 18%,transparent)}
@@ -1651,7 +1654,9 @@ function recommend(day){
   const ap = planForToday();
   if (ap && ap.plan.days.length){
     const d = ap.plan.days.find(x => x.day===day);
-    if (!d) return {plan:{title:'Rest day', focus:[], note:'Rest is part of the plan. Walk, stretch and sleep 8 hours.'}, items:[], sets:0};
+    if (!d){ const o = store.get('onboarding', null), chosen = (o && o.answers && o.answers.days) || [];
+      return chosen.includes(day) ? {plan:{title:'Active recovery', focus:[], note:'Your easy day: a 20-minute walk and the mobility below, so tomorrow you train fresh.'}, items:[], sets:0}
+        : {plan:{title:'Rest day', focus:[], note:'Rest is part of the plan. Walk, stretch and sleep 8 hours.'}, items:[], sets:0}; }
     const info = planInfo(), ph = info ? info.phase : {delta:0, name:'', week:1}, Lp = currentLimits(), cap = Lp.mode === 'gentle' ? Lp.maxSets : Lp.maxSets + 1;
     const col = day === todayKey() ? batteryColor(batteryScore(habitLog(todayISO()))) : 'none';
     const items = d.exercises.filter(x => EX[x.id]).map(x => ({id:x.id, sets:sessionSets(x.sets, ph.delta, col, cap), dose:x.dose}));
@@ -2063,6 +2068,11 @@ function calorieBounds(L, c){
   return {floor, ceil: Math.max(floor, Math.round(c.tdee * (1 + L.maxSurplusPct)))};
 }
 // Checks and repairs any draft (from the AI or the local generator) against the limits. Never trust the draft.
+// Keep n of these days, spread evenly (never the first n in a row, which would leave a long run of rest).
+function spreadPick(list, n){
+  if (!Array.isArray(list) || list.length <= n) return (list || []).slice();
+  return Array.from({length:Math.max(0, n)}, (_, i) => list[Math.round(i * list.length / n)]);
+}
 function validatePlan(raw, L, c){
   const issues = [], p = (raw && typeof raw === 'object') ? raw : {};
   const clean = (v, max) => { const t = String(v == null ? '' : v).slice(0, max || 600).trim(); if (BANNED_TEXT.test(t)){ issues.push('removed unsafe wording'); return ''; } return t; };
@@ -2071,8 +2081,9 @@ function validatePlan(raw, L, c){
   const seen = new Set();
   let days = list(p.days).filter(d => d && WEEK.includes(d.day) && !seen.has(d.day) && seen.add(d.day));
   if (Array.isArray(c.days) && c.days.length){ const n0 = days.length; days = days.filter(d => c.days.includes(d.day)); if (days.length < n0) issues.push('kept only the days you can train'); }
-  if (days.length > L.maxDays){ issues.push('trimmed to ' + L.maxDays + ' training days'); days = days.slice(0, L.maxDays); }
-  if (days.length === 7){ issues.push('kept one rest day'); days = days.slice(0, 6); }
+  if (Array.isArray(c.days) && c.days.length) days.sort((x, y) => c.days.indexOf(x.day) - c.days.indexOf(y.day));
+  if (days.length > L.maxDays){ issues.push('trimmed to ' + L.maxDays + ' training days'); days = spreadPick(days, L.maxDays); }
+  if (days.length === 7){ issues.push('kept one easy day'); days = spreadPick(days, 6); }
   out.days = days.map(d => {
     const ex = list(d.exercises).filter(x => {
       const e = x && c.catalog[x.id];
@@ -2246,13 +2257,16 @@ function phaseFor(level, week){
 }
 // Sets for a session: plan sets + the week's change, one less on a red battery, within safe bounds.
 function sessionSets(base, delta, color, cap){ return Math.max(1, Math.min(cap, base + delta - (color === 'red' ? 1 : 0))); }
-function weekPlanning(planDays, time, minutes){
+// chosenDays: the days you said you train. One the plan doesn't train is active recovery (walk and mobility), not a lost day.
+function weekPlanning(planDays, time, minutes, chosenDays){
   return WEEK.map(day => { const d = (planDays || []).find(x => x.day === day);
-    return d ? {day, type:'train', title:d.title, time:time || null, minutes:+minutes || null, count:d.exercises.length} : {day, type:'rest'}; });
+    return d ? {day, type:'train', title:d.title, time:time || null, minutes:+minutes || null, count:d.exercises.length}
+      : {day, type:(chosenDays || []).includes(day) ? 'recovery' : 'rest'}; });
 }
 // Training days that start on the day you sign up, so day one of the plan is today.
-// Same rhythm for every start day: 2 days = 3 days apart, 3 = every other day, 4 = two on, one off, two on.
-const DPW_OFFSETS = {2:[0, 3], 3:[0, 2, 4], 4:[0, 1, 3, 4], 5:[0, 1, 2, 3, 4], 6:[0, 1, 2, 3, 4, 5]};
+// Same rhythm for every start day: 2 days = 3 days apart, 3 = every other day, 4 = two on, one off, two on,
+// 5 = three on, one off, two on, 6 = one day off, 7 = every day (the plan keeps at least one of them easy).
+const DPW_OFFSETS = {2:[0, 3], 3:[0, 2, 4], 4:[0, 1, 3, 4], 5:[0, 1, 2, 4, 5], 6:[0, 1, 2, 3, 4, 5], 7:[0, 1, 2, 3, 4, 5, 6]};
 function trainDaysFrom(date, dpw){
   const keys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], start = new Date(date).getDay();
   return (DPW_OFFSETS[dpw] || DPW_OFFSETS[3]).map(o => keys[(start + o) % 7]);
@@ -2789,7 +2803,7 @@ const HEALTH_FLAGS = [['heart','Heart condition or high blood pressure'],['chest
 const EAT_FLAGS = [['sick','I make myself sick because I feel uncomfortably full'],['control','I worry I’ve lost control over how much I eat'],
   ['lost','I’ve lost more than 6 kg in the last 3 months'],['fat','I believe I’m fat when others say I’m too thin'],['dominates','Food dominates my life'],['none','None of these']];
 const LEVEL_OPTS = [['start','Just starting'],['some','Now and then'],['regular','Regularly'],['advanced','Advanced']];
-const DPW_OPTS = [['2','2'],['3','3'],['4','4'],['5','5'],['6','6']];
+const DPW_OPTS = [['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','Every day']];
 const DPW_DAYS = {2:['tue','thu'], 3:['mon','wed','fri'], 4:['mon','tue','thu','fri'], 5:['mon','tue','wed','thu','fri'], 6:['mon','tue','wed','thu','fri','sat']};
 const MIN_OPTS = [['10','10'],['20','20'],['30','30'],['45','45']];
 const KIND_OPTS = [['training','Training'],['nutrition','Nutrition'],['both','Both']];
@@ -3067,8 +3081,17 @@ const UPPER = ['Upper body',['chest','upperback','shoulders','biceps','triceps']
 const PUSH = ['Push',['chest','shoulders','triceps']], PULL = ['Pull',['upperback','biceps','traps']], LEGS = ['Legs',['quads','hamstrings','glutes','calves']];
 const FULL = ['Full body',['quads','chest','upperback','hamstrings','shoulders','abs']];
 const GYM_SPLITS = {2:[FULL, FULL], 3:[PUSH, PULL, LEGS], 4:[UPPER, LOWER, UPPER, LOWER], 5:[PUSH, PULL, LEGS, UPPER, LOWER], 6:[PUSH, PULL, LEGS, PUSH, PULL, LEGS]};
+// Reps that fit the goal: fewer and heavier for strength, more for fat loss and fitness. Gentle mode keeps the easy default.
+function goalDose(e, goal, gentle){
+  const d = +e.dose || 10; if (gentle) return d;
+  if (e.unit === 'sec') return goal === 'endure' || goal === 'lose' ? Math.round(d * 1.25 / 5) * 5 : d;
+  if (goal === 'strength') return isGymEx(e) ? Math.max(5, Math.round(d * 0.6)) : d;
+  if (goal === 'lose' || goal === 'endure') return Math.round(d * (isGymEx(e) ? 1.25 : 1.3));
+  return d;
+}
 const SPLITS = {push:['Push',['chest','shoulders','triceps']], legs:['Legs',['quads','glutes','hamstrings','calves']], pull:['Pull',['upperback','biceps','traps','forearms']],
   core:['Core',['abs','obliques','lowerback']], full:['Full body',['chest','quads','upperback','abs','glutes']]};
+const HOME_SPLITS = {4:[SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.full], 5:[SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full], 6:[SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full, SPLITS.legs]};
 function planContext(a){
   const eating = nut(a) ? {scoff:a.scoff || {}, weight:+a.weight, height:+a.height, goal:a.goal} : null;
   const L = safetyLimits({health:{parq:a.parq || {}}, healthChecked:!!a.healthConsent, injuries:(a.injuries || []).filter(x => x !== 'none'), level:levelOf(a.level, a.track), eating});
@@ -3097,10 +3120,11 @@ function buildPlanPrompt(a, c){
 function localDraft(a, c){
   const L = c.L, out = {summary:'', days:[], safetyNotes:[], questionsForCoach:[]};
   if (c.tr){
-    const days = ((a.days && a.days.length) ? a.days : ['mon','wed','fri']).slice(0, L.maxDays);
+    const days = spreadPick((a.days && a.days.length) ? a.days : ['mon','wed','fri'], Math.min(L.maxDays, 6));
     const gym = a.track === 'gym', mins = Math.min(+a.minutes || (gym ? 45 : 20), L.maxMinutes);
     const per = gym ? Math.max(3, Math.min(7, Math.round(mins / 10) + 1)) : Math.max(3, Math.min(6, Math.round((+a.minutes || 20) / 6)));
-    const order = gym ? (a.level === 'start' && days.length <= 3 ? days.map(() => FULL) : (GYM_SPLITS[days.length] || GYM_SPLITS[3])) : [SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full, SPLITS.legs];
+    const order = gym ? (a.level === 'start' && days.length <= 3 ? days.map(() => FULL) : (GYM_SPLITS[days.length] || GYM_SPLITS[3]))
+      : (HOME_SPLITS[days.length] || HOME_SPLITS[6]);
     const allowed = new Set(c.allowed);
     out.days = days.map((d, i) => {
       const [title, groups] = (L.mode === 'gentle' || (!gym && days.length <= 3)) ? SPLITS.full : order[i], picked = [];
@@ -3113,7 +3137,7 @@ function localDraft(a, c){
         const core = [...exFor('abs'), ...exFor('obliques')].find(e => allowed.has(e.id) && !picked.includes(e.id));
         if (core){ if (picked.length >= per) picked.pop(); picked.push(core.id); }
       }
-      return {day:d, title: L.mode === 'gentle' ? 'Gentle strength' : title, exercises: picked.map(id => ({id, sets:L.maxSets, dose:EX[id].dose, restSec:EX[id].unit === 'sec' ? 45 : restFor(EX[id].equip, a.goal)}))};
+      return {day:d, title: L.mode === 'gentle' ? 'Gentle strength' : title, exercises: picked.map(id => ({id, sets:L.maxSets, dose:goalDose(EX[id], a.goal, L.mode === 'gentle'), restSec:EX[id].unit === 'sec' ? 45 : restFor(EX[id].equip, a.goal)}))};
     });
     out.summary = L.mode === 'gentle' ? `A gentle plan with ${days.length} short sessions a week to build the habit safely.` : gym ? `${days.length} gym sessions a week, about ${a.minutes} minutes each. Start light and add weight when the last reps feel easy.` : `${days.length} workouts a week, about ${a.minutes} minutes each, with what you have at home.`;
   }
@@ -3247,22 +3271,26 @@ function planInfo(){
 function plannerHtml(){
   const info = planInfo(), o = store.get('onboarding', null);
   if (!info) return (o && o.answers && o.answers.goal) ? '' : `<div class="cta-card"><span><b>Build your plan</b><span class="small muted">5 taps. We plan your week around your days and hours.</span></span><button class="btn sm primary" data-flow="gym">Start</button></div>`;
-  const {P, a, week, phase} = info, rows = weekPlanning(P.plan.days, a.time, Math.min(+a.minutes || 0, currentLimits().maxMinutes) || null);
+  const {P, a, week, phase} = info, rows = weekPlanning(P.plan.days, a.time, Math.min(+a.minutes || 0, currentLimits().maxMinutes) || null, a.days);
   const now = new Date(), monday = new Date(now); monday.setDate(now.getDate() - DAYS.indexOf(todayKey()));
   let h = `<div class="phase-card"><span class="small" style="opacity:.75">Week ${week} of 4</span><b class="phase-name">${phase.name}</b><p class="small">${phase.tip}</p>
     <div class="pips">${[1,2,3,4].map(i => `<i class="${i < week ? 'past' : i === week ? 'now' : ''}"></i>`).join('')}</div></div>`;
+  const nTrain = P.plan.days.length, nChosen = (a.days || []).length, Lc = currentLimits();
+  if (nChosen > nTrain) h += `<p class="days-note">${ico('shield')}<span><b>${nChosen === 7 ? 'Every day' : nChosen + ' days'}:</b> ${nTrain} training + ${nChosen - nTrain} active recovery. ${Lc.mode === 'gentle'
+    ? (store.get('health', null) ? 'More training days once a doctor clears you.' : 'Do the 20-second health check to train more days. <button class="btn sm" data-flow="safety">Do it now</button>')
+    : nTrain >= 6 ? 'One easy day a week keeps you growing.' : 'More training days come with more experience.'}</span></p>`;
   h += `<button class="btn sm" data-flow="gym" style="align-self:flex-start;margin-top:10px">Change my answers</button>`;
-  if (currentLimits().mode === 'gentle') h += `<p class="banner" style="margin-top:10px">${store.get('health', null) ? 'Gentle mode: up to 3 easy sessions a week until a doctor clears harder training.' : 'Gentle mode: up to 3 easy sessions a week until you do the safety check.'}${store.get('health', null) ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do it now</button>'}</p>`;
+  if (currentLimits().mode === 'gentle' && !(nChosen > nTrain)) h += `<p class="banner" style="margin-top:10px">${store.get('health', null) ? 'Gentle mode: up to 3 easy sessions a week until a doctor clears harder training.' : 'Gentle mode: up to 3 easy sessions a week until you do the safety check.'}${store.get('health', null) ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do it now</button>'}</p>`;
   // The next 7 days starting today, so day one of a new plan is at the top.
   const keyOf = d => ['sun','mon','tue','wed','thu','fri','sat'][d.getDay()];
   const ahead = Array.from({length:7}, (_, i) => { const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i); return {dt, r:rows.find(x => x.day === keyOf(dt))}; });
   h += `<div class="planner">${ahead.map(({dt, r}) => {
     const key = dateStr(dt), done = new Set(doneLog[key] || []), isT = r.day === todayKey();
     const pd = P.plan.days.find(x => x.day === r.day), complete = pd && pd.exercises.length && pd.exercises.every(x => done.has('r:' + x.id));
-    return `<button class="pl-row${isT ? ' today' : ''}${r.type === 'rest' ? ' rest' : ''}${complete ? ' done' : ''}" data-planday="${r.day}" type="button">
+    return `<button class="pl-row${isT ? ' today' : ''}${r.type === 'rest' ? ' rest' : r.type === 'recovery' ? ' recov' : ''}${complete ? ' done' : ''}" data-planday="${r.day}" type="button">
       <span class="pl-day">${DAY_LABEL[r.day]}<b>${dt.getDate()}</b></span>
       <span class="pl-main">${r.type === 'train' ? `<b>${esc(r.title)}</b><span>${[r.time, r.minutes ? r.minutes + ' min' : '', r.count + ' exercises'].filter(Boolean).join(' · ')}</span>`
-        : `<b>Rest</b><span>Walk, stretch, sleep 8 h</span>`}</span>
+        : r.type === 'recovery' ? `<b>Active recovery</b><span>20 min walk · mobility</span>` : `<b>Rest</b><span>Walk, stretch, sleep 8 h</span>`}</span>
       <span class="pl-state">${complete ? '✓' : isT ? 'Today' : ''}</span></button>`; }).join('')}</div>`;
   h += `<p class="small muted habit-line">Every day: 8 h sleep · ${WATER_GOAL} glasses of water · protein at every meal · 8k steps</p>`;
   return h;

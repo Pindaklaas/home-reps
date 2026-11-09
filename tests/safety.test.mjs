@@ -8,8 +8,8 @@ import vm from 'node:vm';
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const core = html.split('/* safety-core:start')[1].split('/* safety-core:end */')[0].replace(/^[^\n]*\n/, '');
 const ctx = {};
-vm.runInNewContext(core + '\nObject.assign(this, {PARQ, SCOFF, HIGH_IMPACT, INJURY_AVOID, assessHealth, screenEating, kcalFloor, safetyLimits, calorieBounds, validatePlan});', ctx);
-const { assessHealth, screenEating, kcalFloor, safetyLimits, calorieBounds, validatePlan, HIGH_IMPACT } = ctx;
+vm.runInNewContext(core + '\nObject.assign(this, {PARQ, SCOFF, HIGH_IMPACT, INJURY_AVOID, assessHealth, screenEating, kcalFloor, safetyLimits, calorieBounds, validatePlan, spreadPick});', ctx);
+const { assessHealth, screenEating, kcalFloor, safetyLimits, calorieBounds, validatePlan, HIGH_IMPACT, spreadPick } = ctx;
 
 const allNo = keys => Object.fromEntries(keys.map(k => [k, false]));
 const PARQ_NO = allNo(ctx.PARQ.map(q => q[0]));
@@ -134,4 +134,21 @@ test('validator: survives garbage input', () => {
     const { plan } = validatePlan(raw, okLimits(), nutCtx);
     assert.ok(Array.isArray(plan.days));
   }
+});
+
+test('trimmed days are spread out, never the first ones in a row', () => {
+  const six = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+  assert.deepEqual(Array.from(spreadPick(six, 3)), ['mon', 'wed', 'fri']);
+  assert.deepEqual(Array.from(spreadPick(six, 4)), ['mon', 'wed', 'thu', 'sat']);
+  assert.deepEqual(Array.from(spreadPick(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], 6)).length, 6);
+  assert.deepEqual(Array.from(spreadPick(['mon', 'wed'], 3)), ['mon', 'wed']);
+});
+
+test('a plan for 6 chosen days in gentle mode keeps 3, spread over the week', () => {
+  const L = safetyLimits({});
+  const day = d => ({day:d, title:'Full body', exercises:[{id:'squat', sets:2, dose:10}]});
+  const chosen = ['wed', 'thu', 'fri', 'sat', 'sun', 'mon'];
+  const cat = {squat:{name:'Squat', level:1}};
+  const { plan } = validatePlan({days:chosen.map(day)}, L, {days:chosen, catalog:cat});
+  assert.deepEqual(Array.from(plan.days.map(d => d.day)), ['wed', 'fri', 'sun']);
 });

@@ -81,3 +81,15 @@ test('training days start on the sign-up day, with the same rhythm', () => {
     assert.equal(days[0], ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][(0 + d) % 7]);
   }
 });
+
+test('every day is an option, and 5 days keep a day off in the middle', () => {
+  const monday = new Date(2026, 10, 9);
+  assert.deepEqual(Array.from(trainDaysFrom(monday, 7)), ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']);
+  assert.deepEqual(Array.from(trainDaysFrom(monday, 5)), ['mon', 'tue', 'wed', 'fri', 'sat']);
+});
+
+test('week view: days you chose that the plan does not train are active recovery, the rest are rest', () => {
+  const rows = weekPlanning([{day:'mon', title:'Push', exercises:[1]}, {day:'wed', title:'Pull', exercises:[1]}], '18:30', 60, ['mon', 'tue', 'wed', 'thu']);
+  assert.deepEqual(Array.from(rows.map(r => r.type)), ['train', 'recovery', 'train', 'recovery', 'rest', 'rest', 'rest']);
+  assert.deepEqual(weekPlanning([{day:'mon', title:'Push', exercises:[1]}]).map(r => r.type)[1], 'rest');
+});
