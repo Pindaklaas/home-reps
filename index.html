@@ -267,7 +267,7 @@ legend{font-size:13px;font-weight:600;margin-bottom:6px}
 .days button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 
 /* tab bar */
-nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
 nav.tabs .in{max-width:540px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
 nav.tabs button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:10px;color:var(--muted);font-size:11.5px;font-weight:600}
 nav.tabs button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -570,6 +570,25 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .ss-done{align-items:center;text-align:center;padding-top:calc(40px + env(safe-area-inset-top,0px))}
 .done-badge{width:84px;height:84px;border-radius:50%;background:var(--good);color:#fff;font-size:44px;display:grid;place-items:center;animation:pop .6s var(--spring)}
 .ss-kpis{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.sum{gap:12px}
+.sum-hero{width:100%;text-align:left;border-radius:24px;padding:20px 18px;color:var(--arena-ink);background:radial-gradient(circle at 90% 0%,color-mix(in srgb,var(--accent) 34%,transparent),transparent 60%),var(--arena);display:flex;flex-direction:column;gap:4px;animation:rise .45s var(--out)}
+.sum-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:14px;color:var(--accent)}.sum-k .ico{width:18px;height:18px}
+.sum-hero h2{font-size:38px;line-height:1}.sum-d{font-size:14px;opacity:.7}
+.sum-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px}
+.sum-stats span{display:flex;flex-direction:column;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;opacity:.75}
+.sum-stats b{font-family:var(--display);font-size:32px;line-height:1;font-variant-numeric:tabular-nums;opacity:1;letter-spacing:0;color:var(--arena-ink)}
+.sum-stats .pr b{color:var(--accent)}
+.sum h3{align-self:flex-start;margin:6px 0 0}
+.sum-map{width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:12px 16px}
+.mw-pair{display:flex;gap:6px;justify-content:center}.mw-fig{height:170px;width:auto}
+.mw-skin{fill:var(--skin)}.mw{fill:var(--muscle)}.mw.on{fill:var(--accent);fill-opacity:var(--v)}
+.mw-top{display:flex;flex-direction:column;gap:8px;text-align:left}.mw-top span{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.mw-top i{width:12px;height:12px;border-radius:4px;background:var(--accent);opacity:var(--v)}
+.sum-ex{width:100%;display:flex;flex-direction:column;gap:6px}
+.sum-row{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px 12px 8px 8px}
+.sum-row svg{width:44px;height:44px;border-radius:12px;background:var(--bg)}.sum-row b{display:block;font-size:14.5px}.sum-row small{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pr-badge{font-style:normal;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.06em;color:var(--accent-ink);background:linear-gradient(120deg,var(--accent),var(--accent-2));border-radius:999px;padding:3px 9px}
+.sum-acts{width:100%;display:flex;flex-direction:column;gap:8px}
 .streak-big{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 16px;width:100%}
 .streak-big span{display:flex;flex-direction:column}
 .flame{width:30px;height:30px;fill:var(--accent);flex:none}
@@ -605,6 +624,13 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .rec-legend{display:flex;justify-content:center;gap:14px;font-size:12px;color:var(--muted);margin-top:4px}
 .rec-legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 /* ---------- mode picker: Challenge or Training ---------- */
+#splash{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:radial-gradient(circle at 50% 42%,color-mix(in srgb,var(--accent) 26%,transparent),transparent 55%),var(--arena);color:var(--arena-ink);pointer-events:none;transition:opacity .45s var(--out),transform .45s var(--out)}
+#splash.out{opacity:0;transform:scale(1.04)}
+.sp-in{display:flex;flex-direction:column;align-items:center;gap:14px;animation:spIn .7s var(--spring) both}
+.sp-logo{width:104px;height:104px;filter:drop-shadow(0 14px 34px color-mix(in srgb,var(--accent) 55%,transparent))}
+.sp-word{font-family:var(--display);font-weight:700;font-size:40px;letter-spacing:.06em;text-transform:uppercase;line-height:1}.sp-word span{color:var(--accent)}
+.sp-tag{font-size:14px;letter-spacing:.14em;text-transform:uppercase;opacity:.6;animation:fadein .6s .35s both}
+@keyframes spIn{from{opacity:0;transform:scale(.8)}}
 #modepick{position:fixed;inset:0;z-index:65;background:var(--bg);overflow:auto}
 #modepick .mp-in{max-width:540px;min-height:100%;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
 .mp-brand{display:flex;align-items:center;gap:10px;animation:drop .5s var(--spring) both}
@@ -1189,6 +1215,11 @@ p .ico{width:14px;height:14px;vertical-align:-2px}
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
+<div id="splash" aria-hidden="true"><div class="sp-in"><svg class="sp-logo" viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="var(--accent)"/>
+  <g transform="rotate(-28 60 60)"><path d="M8,60 a52,19 0 1,0 104,0 a52,19 0 1,0 -104,0" fill="none" stroke="#151A21" stroke-width="5"/></g>
+  <text x="60" y="88" text-anchor="middle" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="800" font-size="82" fill="#fff">N</text>
+  <g transform="rotate(-28 60 60)"><circle r="7" fill="#fff" stroke="#151A21" stroke-width="2"><animateMotion dur="1.6s" repeatCount="indefinite" path="M8,60 a52,19 0 1,0 104,0 a52,19 0 1,0 -104,0"/></circle></g></svg>
+  <span class="sp-word">Neutr<span>ó</span>n</span><span class="sp-tag">Train every day</span></div></div>
 
 <div class="app">
   <header class="top">
@@ -1590,6 +1621,10 @@ function drawGroupDetail(){
 
 /* ---------- sheets ---------- */
 const RM = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+(function splash(){ const el = document.getElementById('splash'); if (!el) return; let seen = null;
+  try { seen = sessionStorage.getItem('homereps_splash'); sessionStorage.setItem('homereps_splash', '1'); } catch (e){}
+  if (seen || RM()) return el.remove();
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 480); }, 1150); })();
 const buzz = p => { try{ navigator.vibrate && navigator.vibrate(p); }catch(e){} };
 function openSheet(html){
   const root = document.getElementById('sheet-root'); clearTimeout(closeSheet.t);
@@ -3979,6 +4014,76 @@ function toggleSet(i, j){
     if (j < x.sets.length - 1 || i < s.exercises.length - 1) startTimer(restOf(x.id, s.goal, x.restSec), j < x.sets.length - 1 ? `${i}-${j}` : null, 'Rest · next: ' + (j < x.sets.length - 1 ? `set ${j + 2}` : EX[s.exercises[i + 1].id].name));
   }
 }
+// The summary after a workout, like the best training apps: a dark hero with the numbers, the muscles you worked on a body map,
+// every exercise with its best set and records, and a story to share.
+let lastWorkout = null;
+function workedGroups(sess){
+  const g = {}; sess.exercises.forEach(x => { const e = EX[x.id]; if (!e) return; const n = x.sets.length;
+    e.groups.forEach((k, i) => { g[k] = (g[k] || 0) + n * (i === 0 ? 1 : i === 1 ? .6 : .35); }); });
+  return g;
+}
+// colors: plain fills for drawing on a canvas; without them the figure follows the theme through CSS.
+function muscleMapSvg(g, side, colors){
+  const max = Math.max(1, ...Object.values(g)), paths = side === 'front' ? FRONT_PATHS : BACK_PATHS; let m = '';
+  paths.forEach(([k, d, mir]) => { const v = (g[k] || 0) / max, op = (.3 + v * .7).toFixed(2);
+    const a = v ? (colors ? `fill="${colors.on}" fill-opacity="${op}"` : `class="mw on" style="--v:${op}"`) : (colors ? `fill="${colors.off}"` : 'class="mw"');
+    m += `<path ${a} d="${d}"/>`; if (mir) m += `<path ${a} d="${d}" transform="${MIRROR}"/>`; });
+  const sk = colors ? `fill="${colors.skin}"` : 'class="mw-skin"';
+  return `<svg ${colors ? 'xmlns="http://www.w3.org/2000/svg" width="300" height="645"' : `class="mw-fig" role="img" aria-label="${side === 'front' ? 'Front' : 'Back'}: muscles worked"`} viewBox="0 0 200 430"><ellipse ${sk} cx="100" cy="34" rx="16" ry="21"/><path ${sk} d="${SIL}"/><path ${sk} d="${SIL}" transform="${MIRROR}"/>${m}</svg>`;
+}
+function bestSet(x){
+  const sets = x.sets || []; if (!sets.length) return '';
+  const w = sets.filter(y => y.w > 0);
+  if (w.length){ const b = w.reduce((a, y) => e1rm(y.w, y.r) > e1rm(a.w, a.r) ? y : a); return `${b.w} kg × ${b.r}`; }
+  const b = sets.reduce((a, y) => y.r > a.r ? y : a); return EX[x.id] && EX[x.id].unit === 'sec' ? `${b.r} sec` : `${b.r} reps`;
+}
+function summaryHtml(sess, prs, stats, mins, st){
+  const g = workedGroups(sess), top = Object.keys(g).sort((a, b) => g[b] - g[a]).slice(0, 3), prIds = new Set(prs.map(p => p.id)), end = new Date(sess.endedAt);
+  const vol = stats.volume >= 1000 ? [(stats.volume / 1000).toFixed(1), 't lifted'] : [stats.volume, 'kg lifted'];
+  return `<div class="ss-wrap ss-done sum">
+    <div class="sum-hero"><span class="sum-k">${ico('workout')} Workout complete</span><h2>${esc(sess.title)}</h2><span class="sum-d">${end.toLocaleDateString(undefined, {weekday:'long', day:'numeric', month:'long'})}</span>
+      <div class="sum-stats"><span><b>${mins}</b>min</span><span><b>${vol[0]}</b>${vol[1]}</span><span><b>${stats.sets}</b>sets</span><span class="${prs.length ? 'pr' : ''}"><b>${prs.length}</b>${prs.length === 1 ? 'record' : 'records'}</span></div></div>
+    <h3>Muscles worked</h3>
+    <div class="sum-map"><div class="mw-pair">${muscleMapSvg(g, 'front')}${muscleMapSvg(g, 'back')}</div>
+      <div class="mw-top">${top.map((k, i) => `<span><i style="--v:${(1 - i * .25).toFixed(2)}"></i>${GROUPS[k].label}</span>`).join('')}</div></div>
+    <h3>Exercises</h3>
+    <div class="sum-ex">${sess.exercises.map(x => `<div class="sum-row">${animSvg(x.id, 'th', 'data-ar="1"')}<span><b>${esc(EX[x.id] ? EX[x.id].name : x.id)}</b><small>${x.sets.length} set${x.sets.length > 1 ? 's' : ''} · best ${bestSet(x)}</small></span>${prIds.has(x.id) ? '<em class="pr-badge">PR</em>' : ''}</div>`).join('')}</div>
+    <div class="streak-big">${ICON_FLAME}<span><b>${st.current}-day streak</b><span class="small muted">${st.freezesLeft} streak freeze${st.freezesLeft === 1 ? '' : 's'} left this month</span></span></div>
+    <div class="sum-acts"><button class="btn wide share-week" data-sharework="1">${ico('photo')} Share workout</button><button class="btn primary wide" data-ss="close">Done</button></div></div>`;
+}
+// The workout as a phone story (1080 × 1920): numbers, the muscle map and every exercise with its best set.
+async function shareWorkout(){
+  const W0 = lastWorkout; if (!W0) return;
+  try {
+    try { await document.fonts.ready; } catch (e){}
+    const {s:sess, prs, stats, mins} = W0, W = 1080, H = 1920, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d');
+    const A = '#FF6448', B = '#FF4D8A', D = '"Barlow Condensed", "Arial Narrow", sans-serif', T = 'Figtree, sans-serif';
+    let gr = x.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#12151B'); gr.addColorStop(1, '#1B0F18'); x.fillStyle = gr; x.fillRect(0, 0, W, H);
+    gr = x.createRadialGradient(W * .8, 260, 40, W * .8, 260, 700); gr.addColorStop(0, 'rgba(255,100,72,.32)'); gr.addColorStop(1, 'rgba(255,77,138,0)'); x.fillStyle = gr; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#fff'; x.font = `700 64px ${D}`; x.fillText('NEUTR', 72, 132); const w1 = x.measureText('NEUTR').width; x.fillStyle = A; x.fillText('Ó', 72 + w1, 132); x.fillStyle = '#fff'; x.fillText('N', 72 + w1 + x.measureText('Ó').width, 132);
+    x.textAlign = 'right'; x.font = `600 38px ${T}`; x.fillStyle = 'rgba(255,255,255,.7)'; x.fillText(new Date(sess.endedAt).toLocaleDateString(undefined, {day:'numeric', month:'short'}), W - 72, 128);
+    x.textAlign = 'left'; x.fillStyle = A; x.font = `700 44px ${D}`; x.fillText('WORKOUT COMPLETE', 72, 250);
+    x.fillStyle = '#fff'; x.font = `700 132px ${D}`; x.fillText(String(sess.title).toUpperCase().slice(0, 16), 66, 380);
+    const vol = stats.volume >= 1000 ? [(stats.volume / 1000).toFixed(1), 'T LIFTED'] : [String(stats.volume), 'KG LIFTED'];
+    [[String(mins), 'MIN'], vol, [String(stats.sets), 'SETS'], [String(prs.length), prs.length === 1 ? 'RECORD' : 'RECORDS']].forEach(([v, l], i) => { const bx = 72 + i * 240;
+      x.fillStyle = i === 3 && prs.length ? A : '#fff'; x.font = `700 104px ${D}`; x.fillText(v, bx, 530); x.fillStyle = 'rgba(255,255,255,.6)'; x.font = `600 28px ${T}`; x.fillText(l, bx, 575); });
+    // the muscle map, drawn from the same paths as the app
+    const g = workedGroups(sess), cols = {skin:'#2A3039', off:'#3A424D', on:A};
+    const img = svg => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); });
+    const [fi, bi] = await Promise.all([img(muscleMapSvg(g, 'front', cols)), img(muscleMapSvg(g, 'back', cols))]);
+    x.drawImage(fi, 150, 640, 330, 710); x.drawImage(bi, 600, 640, 330, 710);
+    x.fillStyle = 'rgba(255,255,255,.55)'; x.font = `600 30px ${T}`; x.textAlign = 'center'; x.fillText('FRONT', 315, 1385); x.fillText('BACK', 765, 1385); x.textAlign = 'left';
+    const prIds = new Set(prs.map(p => p.id));
+    sess.exercises.slice(0, 5).forEach((e, i) => { const y = 1480 + i * 72;
+      x.fillStyle = '#fff'; x.font = `600 38px ${T}`; let nm = EX[e.id] ? EX[e.id].name : e.id;
+      if (x.measureText(nm).width > 640){ while (nm.length && x.measureText(nm + '…').width > 640) nm = nm.slice(0, -1); nm = nm.trimEnd() + '…'; }
+      x.fillText(nm, 72, y);
+      x.textAlign = 'right'; x.fillStyle = prIds.has(e.id) ? A : 'rgba(255,255,255,.7)'; x.fillText((prIds.has(e.id) ? 'PR  ' : '') + bestSet(e), W - 72, y); x.textAlign = 'left'; });
+    x.fillStyle = 'rgba(255,255,255,.4)'; x.font = `600 30px ${T}`; x.textAlign = 'center'; x.fillText('Made with Neutrón', W / 2, 1870);
+    await shareBlob(await new Promise(res => cv.toBlob(res, 'image/png')), 'neutron-workout.png', 'My workout');
+  } catch (e){ toast('Couldn’t make the image. Try again.'); }
+}
+document.addEventListener('click', ev => { if (ev.target.closest('[data-sharework]')) shareWorkout(); });
 function finishSession(){
   const s = store.get('session', null); if (!s) return;
   const doneSets = s.exercises.reduce((n, x) => n + x.sets.filter(y => y.done).length, 0);
@@ -3996,13 +4101,8 @@ function finishSession(){
   const st = streakNow();
   clearInterval(ssClock); stopTimer();
   const mins = Math.max(1, Math.round((end - new Date(s.startedAt)) / 60000));
-  document.getElementById('session').innerHTML = `<div class="ss-wrap ss-done">
-    <div class="done-badge" aria-hidden="true">✓</div><h2>Workout done</h2><p class="muted">${esc(s.title)} · ${end.toLocaleDateString(undefined, {weekday:'long', day:'numeric', month:'short'})}</p>
-    <div class="kpis ss-kpis"><div class="kpi"><span class="v">${mins}</span><span class="l">minutes</span></div><div class="kpi"><span class="v">${stats.sets}</span><span class="l">sets</span></div>
-      <div class="kpi"><span class="v">${stats.volume >= 1000 ? (stats.volume / 1000).toFixed(1) + 't' : stats.volume}</span><span class="l">${stats.volume >= 1000 ? 'lifted' : 'kg lifted'}</span></div><div class="kpi"><span class="v">${prs.length}</span><span class="l">records</span></div></div>
-    ${prs.length ? `<div class="panel stack"><b>New records</b>${prs.map(p => `<span class="small">${esc(EX[p.id].name)}: ${p.kind === 'e1rm' ? `${p.w} kg × ${p.r} (est. max ${p.v} kg)` : `${p.r} reps`}</span>`).join('')}</div>` : ''}
-    <div class="streak-big">${ICON_FLAME}<span><b>${st.current}-day streak</b><span class="small muted">${st.freezesLeft} streak freeze${st.freezesLeft === 1 ? '' : 's'} left this month</span></span></div>
-    <button class="btn primary wide" data-ss="close">Done</button></div>`;
+  lastWorkout = {s:clean, prs, stats, mins};
+  document.getElementById('session').innerHTML = summaryHtml(clean, prs, stats, mins, st);
   document.getElementById('session').scrollTop = 0;
   celebrate(prs.length ? `${prs.length} new record${prs.length > 1 ? 's' : ''}!` : wxp ? `Workout logged. +${wxp} XP` : 'Workout logged.');
 }
