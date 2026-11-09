@@ -25,17 +25,17 @@
   --amber:#D99A1E; --blue:#4A7BD0;
   --spring:cubic-bezier(.3,1.45,.5,1); --out:cubic-bezier(.2,.8,.2,1);
   --bad:#D63A2F; --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --gold-hi:#FFF3C4; --gold-lo:#A9781A; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
-  --fig:#2B333E; --fig-hl:rgba(255,255,255,.2); --prop:#8D97A4; --prop-soft:#DCE1E7;
+  --fig:#2B333E; --fig-far:#8F99A6; --fig-hl:rgba(255,255,255,.2); --prop:#8D97A4; --prop-soft:#DCE1E7;
   --r:14px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#101318; --surface:#191E25; --ink:#EDF0F3; --muted:#9AA3AE; --line:#2B323C;
   --skin:#2A313A; --muscle:#46505D; --muscle-hover:#5A6574;
-  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}}
+  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-far:#5D6672; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#101318; --surface:#191E25; --ink:#EDF0F3; --muted:#9AA3AE; --line:#2B323C;
   --skin:#2A313A; --muscle:#46505D; --muscle-hover:#5A6574;
-  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}
+  --accent:#FF6448; --accent-2:#FF4D8A; --accent-ink:#1A0A06; --accent-soft:#3B1F18; --good:#43C88A; --good-soft:#163326; --amber:#E8AE3A; --blue:#6E9BE8; --fig:#C3CBD5; --fig-far:#5D6672; --fig-hl:rgba(255,255,255,.5); --prop:#6B7684; --prop-soft:#2E3640; color-scheme:dark}
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--text);font-size:15px;line-height:1.45}
 *{box-sizing:border-box}
@@ -765,18 +765,22 @@ body.mode-challenge .app{padding-bottom:40px}
 
 /* exercise animations */
 svg.anim{display:block;overflow:hidden;--g:0}
-svg.anim .bd{stroke:var(--fig);stroke-linecap:round;fill:none}
+svg.anim .bd{fill:url(#ag-fig);stroke:none}
+svg.anim .bd.far{fill:url(#ag-far)}
+svg.anim .bd.on{fill:url(#ag-on)}svg.anim .bd.on.far{fill:url(#ag-onf)}
+:is(#arena,#alarm) svg.anim :is(.bd,.hd){fill:url(#ag-figA)}:is(#arena,#alarm) svg.anim .bd.far{fill:url(#ag-farA)}
+:is(#arena,#alarm) svg.anim .tor{fill:url(#ag-figA);stroke:url(#ag-figA)}
+:is(#arena,#alarm) svg.anim .bd.on{fill:url(#ag-on)}:is(#arena,#alarm) svg.anim .tor.on{fill:url(#ag-on);stroke:url(#ag-on)}
+svg.anim .halo,svg.anim .haloc{fill:var(--accent);stroke:none;filter:url(#ag-blur);opacity:calc(.06 + var(--g) * .2)}
+svg.anim .tor.halo{stroke:var(--accent);stroke-width:.035;stroke-linejoin:round}
+svg.anim .gnd{stroke:var(--line);stroke-width:.006}
+svg.anim .rom-l{fill:none;stroke:var(--accent);stroke-width:.009;stroke-dasharray:.004 .022;stroke-linecap:round;opacity:.75}
+svg.anim .rom-a{fill:var(--accent);opacity:.75}
 svg.anim .hl{stroke:var(--fig-hl);stroke-linecap:round;fill:none}
-svg.anim .on{stroke:var(--accent)}
-svg.anim .halo{stroke:var(--accent);fill:none;stroke-linecap:round;opacity:calc(.1 + var(--g) * .26)}
-svg.anim .haloc{fill:var(--accent);opacity:calc(.1 + var(--g) * .26)}
-svg.anim .dot{fill:var(--accent);stroke:none}
-svg.anim .tor{fill:var(--fig);stroke:var(--fig);stroke-width:.05;stroke-linejoin:round}
-svg.anim .tor.on{fill:var(--accent);stroke:var(--accent);stroke-width:.035}
-svg.anim .hd{fill:var(--fig)}
-svg.anim .hhl{fill:var(--fig-hl)}
-svg.anim .far{opacity:.4}
-svg.anim .sh{fill:var(--ink);opacity:.1}
+svg.anim .tor{fill:url(#ag-fig);stroke:url(#ag-fig);stroke-width:.03;stroke-linejoin:round}
+svg.anim .tor.on{fill:url(#ag-on);stroke:url(#ag-on);stroke-width:.026}
+svg.anim .hd{fill:url(#ag-fig)}
+svg.anim .sh{fill:url(#ag-sh)}
 svg.anim .pr{fill:var(--prop-soft);stroke:var(--prop);stroke-width:.012}
 svg.anim .wl{opacity:.6}
 svg.anim .pl{fill:var(--prop)}
@@ -4281,8 +4285,16 @@ const jointAt = (P, r) => { if (Array.isArray(r)) return r; const m = /^([a-z]+)
 const LIMB_W = {thigh:.09, shin:.072, foot:.044, upper:.066, fore:.056};
 const STATIC_PROPS = new Set(['bench', 'box', 'wall', 'bar', 'table', 'door', 'stack', 'back', 'incline', 'sled', 'plate', 'cable']);
 // Build the drawing for one pose: a list of [tag, attributes]. Rig y grows up; SVG y grows down.
-function animScene(pose, glow){
+// Limb radii [at the root, at the end]: thighs and upper arms taper towards the knee and elbow, calves towards the ankle.
+const LIMB_R = {thigh:[.06, .04], shin:[.043, .027], foot:[.026, .017], upper:[.04, .03], fore:[.031, .023]};
+function animScene(pose, glow, big){
   const P = solvePose(pose), out = [], f = n => Math.round(n * 1e4) / 1e4, front = P.front;
+  // A tapered capsule from a to b (rig coords): the body is built from these, so limbs read as volumes, not sticks.
+  const CAP = (a, b, r1, r2, cls) => {
+    const ax = a[0], ay = -a[1], bx = b[0], by = -b[1], l = Math.hypot(bx - ax, by - ay) || 1e-6, nx = -(by - ay) / l, ny = (bx - ax) / l;
+    out.push(['path', {d:`M${f(ax + nx * r1)} ${f(ay + ny * r1)}L${f(bx + nx * r2)} ${f(by + ny * r2)}A${f(r2)} ${f(r2)} 0 0 0 ${f(bx - nx * r2)} ${f(by - ny * r2)}L${f(ax - nx * r1)} ${f(ay - ny * r1)}A${f(r1)} ${f(r1)} 0 0 0 ${f(ax + nx * r1)} ${f(ay + ny * r1)}Z`,
+      class:cls, 'data-bb':`${f(ax)} ${f(ay)} ${f(bx)} ${f(by)} ${f(Math.max(r1, r2))}`}]);
+  };
   const L = (a, b, w, c) => out.push(['line', {x1:f(a[0]), y1:f(-a[1]), x2:f(b[0]), y2:f(-b[1]), 'stroke-width':w, class:c}]);
   const C = (c, r, k) => out.push(['circle', {cx:f(c[0]), cy:f(-c[1]), r, class:k}]);
   const E = (c, rx, ry, k) => out.push(['ellipse', {cx:f(c[0]), cy:f(-c[1]), rx, ry, class:k}]);
@@ -4290,13 +4302,17 @@ function animScene(pose, glow){
   const PG = (pts, k) => out.push(['polygon', {points:pts.map(p => f(p[0]) + ',' + f(-p[1])).join(' '), class:k}]);
   const Q = (a, c, b, w, k) => out.push(['path', {d:`M${f(a[0])} ${f(-a[1])}Q${f(c[0])} ${f(-c[1])} ${f(b[0])} ${f(-b[1])}`, 'stroke-width':w, class:k}]);
   const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
-  const seg = (a, b, part, far) => { const on = glow.has(part), w = LIMB_W[part], fc = far ? ' far' : '';
-    if (on) L(a, b, w + .075, 'halo' + fc);
-    L(a, b, w, 'bd' + (on ? ' on' : '') + fc);
-    L([a[0] - .009, a[1] + .011], [b[0] - .009, b[1] + .011], f(w * .28), 'hl' + fc); };
-  const leg = (i, far) => { seg(P.hp[i], P.knee[i], 'thigh', far); seg(P.knee[i], P.ankle[i], 'shin', far); seg(P.ankle[i], P.toe[i], 'foot', far); };
-  const arm = (i, far) => { seg(P.sh[i], P.el[i], 'upper', far); seg(P.el[i], P.hand[i], 'fore', far);
-    if (glow.has('delt')) { C(P.sh[i], .085, 'haloc' + (far ? ' far' : '')); C(P.sh[i], .043, 'dot on' + (far ? ' far' : '')); } };
+  const seg = (a, b, part, far) => { const on = glow.has(part), [r1, r2] = LIMB_R[part], fc = far ? ' far' : '';
+    if (on && big) CAP(a, b, r1 + .03, r2 + .03, 'halo' + fc);
+    CAP(a, b, r1, r2, 'bd' + (on ? ' on' : '') + fc); };
+  const leg = (i, far) => { seg(P.hp[i], P.knee[i], 'thigh', far); seg(P.knee[i], P.ankle[i], 'shin', far);
+    // the foot: heel at the ankle, a shoe shape towards the toes
+    const fc = far ? ' far' : '', on = glow.has('shin'); CAP(addv(P.ankle[i], [0, -.012]), P.toe[i], .026, .017, 'bd ft' + (on ? ' on' : '') + fc); };
+  const arm = (i, far) => { const fc = far ? ' far' : '';
+    if (glow.has('delt') && big) C(P.sh[i], .07, 'haloc' + fc);
+    seg(P.sh[i], P.el[i], 'upper', far); seg(P.el[i], P.hand[i], 'fore', far); C(P.hand[i], .027, 'bd hn' + fc);
+    // the shoulder cap sits over the top of the arm, so a working shoulder reads as one rounded muscle
+    if (glow.has('delt')) CAP(P.sh[i], mix(P.sh[i], P.el[i], .42), .047, .037, 'bd on dl' + fc); };
   // props
   const prop = (p, layer) => {
     const k = p.k, isStatic = STATIC_PROPS.has(k), far = p.far ? 'far' : 'near';
@@ -4329,21 +4345,24 @@ function animScene(pose, glow){
     else if (k === 'rope'){ const a = P.hand[0], b = P.hand[1], my = (a[1] + b[1]) / 2; Q(a, [(a[0] + b[0]) / 2, 2 * p.y - my], b, .012, 'rp'); }
   };
   const props = pose.pr || [], layer = l => props.forEach(p => prop(p, l));
-  E([P.hip[0], 0], .3, .022, 'sh');
+  E([P.hip[0], 0], .34, .03, 'sh');
   layer('back');
   // torso: a rounded polygon, deeper at the chest
   const d = dirv(pose.tr != null ? pose.tr : 90), fw = dirv((pose.tr != null ? pose.tr : 90) - 90), bk = [-fw[0], -fw[1]];
-  const base = addv(P.hip, d, RIG.shoulder - .01);
-  const T = front ? [addv(P.hp[0], fw, .03), addv(P.sh[0], fw, .02), addv(P.sh[1], fw, -.02), addv(P.hp[1], fw, -.03)]
-    : [addv(P.hip, fw, .045), addv(base, fw, .062), addv(base, bk, .05), addv(P.hip, bk, .058)];
+  const base = addv(P.hip, d, RIG.shoulder - .01), at = (h, s) => addv(addv(P.hip, d, h), fw, s);
+  // side: hip, waist, chest and shoulder in front; upper back, lower back and glute behind. front: a V from the shoulders to a narrower waist.
+  const T = front ? [at(0, .1), at(.13, .088), at(.22, .118), at(.29, .108), at(.29, -.108), at(.22, -.118), at(.13, -.088), at(0, -.1)]
+    : [at(-.01, .062), at(.12, .064), at(.22, .088), at(.3, .05), at(.3, -.058), at(.2, -.074), at(.08, -.062), at(-.01, -.08)];
   const torso = () => {
+    if (big && (glow.has('chest') || glow.has('core'))) PG(glow.has('chest') && glow.has('core') ? T : glow.has('chest') ? T.filter((_, i) => front ? i >= 1 && i <= 6 : i >= 1 && i <= 5) : T.filter((_, i) => front ? i <= 1 || i >= 6 : i <= 1 || i >= 5), 'tor halo');
     PG(T, 'tor');
-    const top = [mix(T[0], T[1], .48), T[1], T[2], mix(T[3], T[2], .48)], low = [T[0], mix(T[0], T[1], .52), mix(T[3], T[2], .52), T[3]];
-    if (glow.has('chest')) PG(top, 'tor on');
-    if (glow.has('core')) PG(low, 'tor on');
-    if (glow.has('glute')) { const g = front ? P.hip : addv(P.hip, bk, .03); C(g, .1, 'haloc'); C(g, .055, 'dot on'); }
-    L(P.neck, addv(P.neck, dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0)), .05), .05, 'bd');
-    C(P.head, .07, 'hd'); C([P.head[0] - .02, P.head[1] + .022], .02, 'hhl');
+    const upper = front ? T.slice(1, 7) : T.slice(1, 6), lower = front ? [T[0], T[1], T[6], T[7]] : [T[0], T[1], T[5], T[6], T[7]];
+    if (glow.has('chest')) PG(upper, 'tor on');
+    if (glow.has('core')) PG(lower, 'tor on');
+    if (glow.has('glute')) { const g = front ? P.hip : addv(P.hip, bk, .035); if (big) C(g, .085, 'haloc'); E(g, .058, .058, 'bd on gl'); }
+    const hd = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0));
+    CAP(addv(P.neck, d, -.02), addv(P.neck, hd, .045), .03, .026, 'bd nk');
+    E(P.head, .066, .072, 'hd');
   };
   if (front && pose.lf){ layer('far'); torso(); leg(0); leg(1); arm(0); arm(1); layer('near'); }
   else if (front){ leg(0); leg(1); layer('far'); torso(); arm(0); arm(1); layer('near'); }
@@ -4354,7 +4373,8 @@ function animScene(pose, glow){
 function sceneBounds(items, bb){
   const add = (x, y, r) => { r = r || 0; bb[0] = Math.min(bb[0], x - r); bb[1] = Math.min(bb[1], y - r); bb[2] = Math.max(bb[2], x + r); bb[3] = Math.max(bb[3], y + r); };
   items.forEach(([t, a]) => {
-    if (a.class === 'sh' || / (wl|leg)\b/.test(' ' + a.class)) return;
+    if (a.class === 'sh' || / (wl|leg|halo|haloc)\b/.test(' ' + a.class)) return;
+    if (a['data-bb']){ const n = a['data-bb'].split(' ').map(Number); add(n[0], n[1], n[4]); add(n[2], n[3], n[4]); return; }
     if (t === 'line'){ const w = a['stroke-width'] / 2; add(a.x1, a.y1, w); add(a.x2, a.y2, w); }
     else if (t === 'circle') add(a.cx, a.cy, a.r);
     else if (t === 'ellipse'){ add(a.cx - a.rx, a.cy); add(a.cx + a.rx, a.cy); }
@@ -4366,9 +4386,9 @@ function sceneBounds(items, bb){
   return bb;
 }
 // Fit every frame of the loop into a box of the given aspect (width / height), feet near the bottom.
-function animViewBox(anim, glow, ar){
+function animViewBox(anim, glow, ar, big){
   const bb = [Infinity, Infinity, -Infinity, -Infinity], ks = anim.keys, n = ks.length === 2 ? 2 : ks.length, cyc = n * ((anim.hold != null ? anim.hold : 260) + (anim.move || 850));
-  for (let i = 0; i < 20; i++) sceneBounds(animScene(poseAt(anim, cyc * i / 20).pose, glow), bb);
+  for (let i = 0; i < 20; i++) sceneBounds(animScene(poseAt(anim, cyc * i / 20).pose, glow, big), bb);
   bb[3] = Math.max(bb[3], .02);
   const pad = .07; let x = bb[0] - pad, y = bb[1] - pad, w = bb[2] - bb[0] + pad * 2, h = bb[3] - bb[1] + pad * 2;
   if (w / h > ar){ const nh = w / ar; y -= (nh - h) * .62; h = nh; } else { const nw = h * ar; x -= (nw - w) / 2; w = nw; }
@@ -4389,7 +4409,7 @@ function animApply(st, items){
 function animDraw(st, now){
   if (st.small && now - (st.last || 0) < 30) return; st.last = now;
   const ms = (now - st.t0) + st.ph, r = poseAt(st.anim, ms);
-  animApply(st, animScene(r.pose, st.glow));
+  animApply(st, animScene(r.pose, st.glow, st.big));
   st.svg.style.setProperty('--g', animEffort(st.anim, r.k, r.t, ms).toFixed(2));
 }
 function animTick(now){
@@ -4400,13 +4420,43 @@ function animTick(now){
 const animKick = () => { if (!animRaf && !RM()) animRaf = requestAnimationFrame(animTick); };
 function animMount(svg){
   const id = svg.dataset.anim, anim = animFor(id); svg.dataset.m = '1'; if (!anim) return;
-  const glow = animGlow(id), ar = +svg.dataset.ar || 4 / 3;
-  svg.setAttribute('viewBox', animViewBox(anim, glow, ar));
-  svg.innerHTML = '<g></g>';
-  const st = {svg, anim, glow, g:svg.firstChild, t0:performance.now(), ph:+svg.dataset.ph || 0, small:svg.classList.contains('th'), vis:!animIO};
-  if (RM()){ animApply(st, animScene(animStill(anim), glow)); svg.style.setProperty('--g', '1'); return; }
+  const glow = animGlow(id), ar = +svg.dataset.ar || 4 / 3, big = svg.classList.contains('big'), vb = animViewBox(anim, glow, ar, big);
+  svg.setAttribute('viewBox', vb); animDefs();
+  // Big views get a floor line and a dotted guide for the path of the joint that moves most (the range of motion).
+  svg.innerHTML = big ? `<g class="rom">${animRom(anim, vb, glow)}</g><g></g>` : '<g></g>';
+  const st = {svg, anim, glow, big, g:svg.lastChild, t0:performance.now(), ph:+svg.dataset.ph || 0, small:svg.classList.contains('th'), vis:!animIO};
+  if (RM()){ animApply(st, animScene(animStill(anim), glow, big)); svg.style.setProperty('--g', '1'); return; }
   animDraw(st, st.t0); animReg.add(st);
   if (animIO) animIO.observe(svg); else animKick();
+}
+// Shared gradients and the soft glow, defined once for every animation on the page (colours follow the theme).
+function animDefs(){
+  if (document.getElementById('anim-defs')) return;
+  const g = (id, a, b) => `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:${a}"/><stop offset="1" style="stop-color:${b}"/></linearGradient>`;
+  document.body.insertAdjacentHTML('beforeend', `<svg id="anim-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
+    ${g('ag-fig', 'color-mix(in srgb,var(--fig) 74%,#fff)', 'var(--fig)')}${g('ag-far', 'color-mix(in srgb,var(--fig-far) 82%,#fff)', 'var(--fig-far)')}
+    ${g('ag-figA', '#EEF2F6', '#AFB8C3')}${g('ag-farA', '#6F7884', '#4F5762')}
+    ${g('ag-on', 'var(--accent)', 'var(--accent-2)')}<radialGradient id="ag-sh"><stop offset="0" style="stop-color:var(--ink);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--ink);stop-opacity:0"/></radialGradient>${g('ag-onf', 'color-mix(in srgb,var(--accent) 55%,var(--fig-far))', 'color-mix(in srgb,var(--accent-2) 55%,var(--fig-far))')}
+    <filter id="ag-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".022"/></filter></defs></svg>`);
+}
+// The range of motion of a two-pose move: the path of the joint that travels furthest, dotted, with an arrow at each end.
+function animRom(anim, vb, glow){
+  const [x, y, w] = vb.split(' ').map(Number), floor = `<line class="gnd" x1="${x}" y1="0" x2="${x + w}" y2="0"/>`;
+  if (anim.keys.length !== 2) return floor;
+  const hold = anim.hold != null ? anim.hold : 260, move = anim.move || 850, J = ['hand', 'hip', 'head', 'el', 'knee', 'ankle'];
+  const frames = Array.from({length:17}, (_, i) => solvePose(poseAt(anim, hold + move * i / 16).pose));
+  const pick = (P, j) => Array.isArray(P[j][0]) ? P[j][0] : P[j];
+  // The joint that travels furthest, preferring hands, then hips, then head when they travel about as far (what you'd watch in a coach's video).
+  const paths = J.map(j => { const pts = frames.map(P => pick(P, j)); let len = 0; for (let i = 1; i < pts.length; i++) len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); return {pts, len}; });
+  // Follow what the move trains: hips for legs, hands for chest and arms, head for core; else the next joint in J that travels about as far.
+  const want = ['thigh', 'glute', 'shin'].some(k => glow && glow.has(k)) ? 'hip' : ['chest', 'upper', 'fore', 'delt'].some(k => glow && glow.has(k)) ? 'hand' : glow && glow.has('core') ? 'head' : null;
+  const top = Math.max(...paths.map(p => p.len)), order = want ? [J.indexOf(want), ...J.keys()] : [...J.keys()];
+  const bi = order.find(i => paths[i].len >= top * .75), best = bi != null && paths[bi].pts, bestLen = top;
+  if (!best || bestLen < .12) return floor;
+  const r = n => Math.round(n * 1e3) / 1e3, pts = best.map(p => [r(p[0]), r(-p[1])]);
+  const arrow = (a, b) => { const dx = a[0] - b[0], dy = a[1] - b[1], l = Math.hypot(dx, dy) || 1, ux = dx / l, uy = dy / l, s = .03;
+    return `<path class="rom-a" d="M${r(a[0] + ux * s)} ${r(a[1] + uy * s)}L${r(a[0] - uy * s * .8)} ${r(a[1] + ux * s * .8)}L${r(a[0] + uy * s * .8)} ${r(a[1] - ux * s * .8)}Z"/>`; };
+  return floor + `<polyline class="rom-l" points="${pts.map(p => p.join(',')).join(' ')}"/>` + arrow(pts[0], pts[2]) + arrow(pts[pts.length - 1], pts[pts.length - 3]);
 }
 function animScan(root){ (root || document).querySelectorAll('svg[data-anim]:not([data-m])').forEach(animMount); }
 function animSvg(id, cls, extra){ return animFor(id) ? `<svg class="anim ${cls || ''}" data-anim="${esc(id)}" ${extra || ''} aria-hidden="true" focusable="false"></svg>` : ''; }
