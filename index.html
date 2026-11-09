@@ -424,6 +424,23 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .glass.full{border-color:var(--blue);background:linear-gradient(to top,color-mix(in srgb,var(--blue) 55%,transparent) 78%,transparent 78%)}
 /* ---------- weekly planning ---------- */
 .phase-card{background:radial-gradient(circle at 92% 8%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 58%),var(--arena);color:var(--arena-ink);border:1px solid color-mix(in srgb,var(--arena-ink) 9%,transparent);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.sc-hero{display:flex;gap:12px;align-items:center;margin-bottom:12px}.sc-hero b{display:block;font-family:var(--display);font-size:22px;text-transform:uppercase}.sc-hero span span{font-size:14px;color:var(--muted)}
+.sc-switch{position:relative}
+.sc-switch input{appearance:none;-webkit-appearance:none;flex:none;width:48px;height:28px;border-radius:999px;background:var(--line);position:relative;transition:background-color .2s;margin:0;cursor:pointer}
+.sc-switch input::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .25s var(--spring)}
+.sc-switch input:checked{background:var(--good)}.sc-switch input:checked::after{transform:translateX(20px)}
+.sc-switch input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sc-qs{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.sc-q{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;animation:rise .35s var(--out)}
+.sc-t{display:flex;align-items:center;gap:8px;font-size:16px}.sc-t i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:13px;flex:none}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sc-grid span{font-size:13px;line-height:1.25;padding:9px 10px;border-radius:12px;background:var(--bg);color:var(--ink)}
+.sc-grid .pick{border-radius:12px;font-size:13px;line-height:1.25;padding:9px 10px;text-align:left}
+.sc-yn{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sc-yn .pick{text-align:center;border-radius:14px;min-height:48px;font-size:15px}
+.sc-tip{font-size:12.5px;color:var(--muted);margin:0}
+.sc-done{display:flex;align-items:center;gap:10px;width:100%;border:1px solid color-mix(in srgb,var(--good) 40%,var(--line));background:var(--good-soft);border-radius:16px;padding:12px 14px;color:var(--ink);font-weight:700;font-size:15px;text-align:left;animation:rise .3s var(--out)}
+.sc-done .ico{width:20px;height:20px;color:var(--good)}.sc-done span{flex:1}.sc-done small{font-size:12.5px;color:var(--muted);font-weight:600}
+.sc-ready{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--good);margin:2px 2px 0;animation:rise .3s var(--out)}.sc-ready .ico{width:18px;height:18px}
 .days-note{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:13px;line-height:1.35;color:var(--muted)}
 .days-note .btn{margin-top:6px;display:flex}.days-note .ico{width:18px;height:18px;flex:none;color:var(--accent);margin-top:1px}.days-note b{color:var(--ink)}
 .pl-row.recov .pl-main b{color:var(--good)}
@@ -2819,11 +2836,34 @@ function chips(key, opts, a, o){
     return `<button class="pick" data-fx="pick" data-key="${key}" data-v="${esc(v)}"${o.multi ? ' data-multi="1"' : ''}${o.none ? ` data-none="${o.none}"` : ''} aria-pressed="${on}"${o.disabled ? ' disabled' : ''}>${esc(l)}</button>`; }).join('')}</div>`;
 }
 const block = (label, inner) => `<div class="ob-block"><span class="ob-label">${label}</span>${inner}</div>`;
+// The safety check as three quick taps: a consent switch, then two yes/no questions. "Yes" opens the list to say which.
+const HEALTH_SHORT = {heart:'Heart or blood pressure', chest:'Chest pain', dizzy:'Dizzy spells or fainting', chronic:'Long-term illness or daily meds',
+  joint:'Bone or joint problem', supervised:'Doctor said: only supervised', pregnant:'Pregnant, or birth in last 6 months'};
+// Yes/no answers stay in step with the lists (also for answers loaded from an earlier check).
+function safetyPick(a, k, v){
+  if (k === 'hAny') a.hflags = v === 'no' ? ['none'] : v === 'yes' ? (a.hflags || []).filter(x => x !== 'none') : undefined;
+  if (k === 'iAny') a.injuries = v === 'no' ? ['none'] : v === 'yes' ? (a.injuries || []).filter(x => x !== 'none') : undefined;
+}
 function safetyHtml(a, required){
   const on = !!a.healthConsent;
-  return `<label class="consent"><input type="checkbox" id="ob-consent" ${on ? 'checked' : ''}><span>Use my answers only to keep my training safe.${required ? ' A personal plan needs this.' : ''}<small>In this prototype they stay on this device. Delete them any time in Food.</small></span></label>
-    <div class="ob-stack${on ? '' : ' dim'}">${block('Does any of this apply to you?', chips('hflags', HEALTH_FLAGS, a, {multi:true, none:'none', col:true, disabled:!on, label:'Health'}))}
-    ${block('Any pain or injuries?', chips('injuries', INJ_OPTS, a, {multi:true, none:'none', disabled:!on, label:'Pain or injuries'}))}</div>`;
+  const hAny = a.hAny || (a.hflags && a.hflags.length ? (a.hflags.includes('none') ? 'no' : 'yes') : ''), iAny = a.iAny || (a.injuries && a.injuries.length ? (a.injuries.includes('none') ? 'no' : 'yes') : '');
+  const yn = (key, val) => `<div class="sc-yn"><button class="pick" data-fx="pick" data-key="${key}" data-v="no" aria-pressed="${val === 'no'}">No, none</button><button class="pick" data-fx="pick" data-key="${key}" data-v="yes" aria-pressed="${val === 'yes'}">Yes</button></div>`;
+  const done = (txt, key) => `<button class="sc-done" data-fx="pick" data-key="${key}" data-v="">${ico('shield')}<span>${txt}</span><small>Change</small></button>`;
+  const hList = HEALTH_FLAGS.filter(f => f[0] !== 'none'), iList = INJ_OPTS.filter(f => f[0] !== 'none');
+  const q1 = hAny === 'no' ? done('No health conditions', 'hAny')
+    : `<div class="sc-q"><b class="sc-t"><i>1</i>Do any of these apply to you?</b>
+      <div class="sc-grid${hAny === 'yes' ? ' pickable' : ''}">${hList.map(([k]) => hAny === 'yes'
+        ? `<button class="pick" data-fx="pick" data-key="hflags" data-v="${k}" data-multi="1" data-none="none" aria-pressed="${(a.hflags || []).includes(k)}">${HEALTH_SHORT[k]}</button>`
+        : `<span>${HEALTH_SHORT[k]}</span>`).join('')}</div>
+      ${hAny === 'yes' ? `<p class="sc-tip">Tap the ones that apply. We keep your plan gentle and suggest a doctor’s check.</p>` : ''}${yn('hAny', hAny)}</div>`;
+  const q2 = !hAny || (hAny === 'yes' && !(a.hflags || []).length) ? '' : iAny === 'no' ? done('No pain or injuries', 'iAny')
+    : `<div class="sc-q"><b class="sc-t"><i>2</i>Any pain or injuries?</b>
+      ${iAny === 'yes' ? `<div class="chipset">${iList.map(([k, l]) => `<button class="pick" data-fx="pick" data-key="injuries" data-v="${k}" data-multi="1" data-none="none" aria-pressed="${(a.injuries || []).includes(k)}">${esc(l)}</button>`).join('')}</div>
+        <p class="sc-tip">We leave out the moves that load it.</p>` : ''}${yn('iAny', iAny)}</div>`;
+  const ready = safetyValid(a, required) && on;
+  return `<div class="sc-hero">${tile('shield', 'good')}<span><b>20 seconds</b><span>So your plan never asks too much of you.</span></span></div>
+    <label class="consent sc-switch"><input type="checkbox" role="switch" id="ob-consent" ${on ? 'checked' : ''}><span>Use my answers only to keep my training safe${required ? ' (a personal plan needs this)' : ''}<small>They stay on this phone. Delete them any time in Food.</small></span></label>
+    ${on ? `<div class="sc-qs">${q1}${q2}${ready ? `<p class="sc-ready">${ico('shield')} All set. Your plan fits you.</p>` : ''}</div>` : ''}`;
 }
 const safetyValid = (a, required) => a.healthConsent ? (a.hflags || []).length > 0 && (a.injuries || []).length > 0 : !required;
 const safetyCta = (a, required) => a.healthConsent ? 'Agree and continue' : required ? 'Tick the box to continue' : 'Skip safety check';
@@ -2876,7 +2916,7 @@ FLOWS.gym = {
     {type:'custom', id:'day', when:adultOk, q:'Your day', render:a => block('When do you usually train?', chips('time', TIME_OPTS, a, {col:true, label:'Training time'})) +
       block('When do you wake up?', chips('wake', WAKE_OPTS, a, {label:'Wake-up time'})) +
       block('How long do you usually sleep?', chips('sleepUsual', SLEEP_OPTS.map(x => [x[0], x[1]]), a, {label:'Usual sleep'})), valid:a => !!(a.time && a.wake && a.sleepUsual)},
-    {type:'custom', id:'healthConsent', when:adultOk, q:'Quick safety check', render:a => safetyHtml(a, false), valid:a => safetyValid(a, false), cta:a => a.healthConsent ? 'Build my plan' : 'Skip check and build my plan'}
+    {type:'custom', id:'healthConsent', when:adultOk, q:'Quick safety check', onPick:safetyPick, render:a => safetyHtml(a, false), valid:a => safetyValid(a, false), cta:a => a.healthConsent ? 'Build my plan' : 'Skip check and build my plan'}
   ],
   finish(a){
     syncDerived(a); saveAge(a);
@@ -2901,7 +2941,7 @@ FLOWS.safety = {
   closable: () => true,
   init: () => ({...healthInit(), _hadHealth:false, _age:ageKnown()}),
   steps: [...ageSteps('Needed once, before high-intensity training.'),
-    {type:'custom', id:'healthConsent', when:adultOk, q:'Quick safety check', render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)}],
+    {type:'custom', id:'healthConsent', when:adultOk, q:'Quick safety check', onPick:safetyPick, render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)}],
   finish(a){
     saveAge(a); const prev = store.get('health', null); store.set('health', {...healthRecord(a), eating: prev && prev.eating});
     const P = store.get('plan', null), o = store.get('onboarding', null), oa = o && o.answers;
@@ -2925,7 +2965,7 @@ FLOWS.plan = {
   },
   steps: [
     ...ageSteps(),
-    {type:'custom', id:'healthConsent', when:a => adultOk(a) && !a._hadHealth, q:'Quick safety check', render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)},
+    {type:'custom', id:'healthConsent', when:a => adultOk(a) && !a._hadHealth, q:'Quick safety check', onPick:safetyPick, render:a => safetyHtml(a, true), valid:a => safetyValid(a, true), cta:a => safetyCta(a, true)},
     {type:'custom', id:'cover', when:adultOk, q:'Build your plan', render:a => block('What should it cover?', chips('kind', KIND_OPTS, a, {label:'Plan covers'})) +
       (trn(a) ? block('What do you have at home?', chips('equipment', EQUIP_OPTS, a, {multi:true, none:'none', label:'Equipment'})) : ''),
       valid:a => !!a.kind && (!trn(a) || (a.equipment || []).length > 0)},
@@ -3044,7 +3084,10 @@ document.getElementById('onboard').addEventListener('click', ev => {
       if (v === none) cur = new Set(cur.has(v) ? [] : [v]); else { cur.delete(none); cur.has(v) ? cur.delete(v) : cur.add(v); }
       a[k] = [...cur]; }
     else a[k] = v;
+    if (st.onPick) st.onPick(a, k, v);
     flow.dir = 0; drawFlow(); buzz(8);
+    // A step that grows as you answer (the safety check) brings its newest part into view.
+    if (st.onPick) requestAnimationFrame(() => { const q = [...document.querySelectorAll('#onboard .sc-q, #onboard .sc-ready')].pop(); if (q) q.scrollIntoView({block:'nearest', behavior:RM() ? 'auto' : 'smooth'}); });
     if (st.auto === k) setTimeout(() => { if (flow && flow.a === a && steps()[flow.i] === st) next(); }, 280);
     return;
   }
