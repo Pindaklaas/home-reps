@@ -1352,9 +1352,9 @@ const GROUPS = {
   chest:{label:'Chest'}, shoulders:{label:'Shoulders'}, biceps:{label:'Biceps'}, triceps:{label:'Triceps'},
   forearms:{label:'Forearms'}, abs:{label:'Abs'}, obliques:{label:'Obliques'}, traps:{label:'Traps'},
   upperback:{label:'Upper back'}, lowerback:{label:'Lower back'}, glutes:{label:'Glutes'},
-  quads:{label:'Quads'}, hamstrings:{label:'Hamstrings'}, calves:{label:'Calves'}
+  quads:{label:'Quads'}, adductors:{label:'Adductors'}, hamstrings:{label:'Hamstrings'}, calves:{label:'Calves'}
 };
-const FRONT = ['shoulders','chest','biceps','forearms','abs','obliques','quads','calves'];
+const FRONT = ['shoulders','chest','biceps','forearms','abs','obliques','quads','adductors','calves'];
 const BACK  = ['traps','shoulders','upperback','triceps','forearms','lowerback','glutes','hamstrings','calves'];
 
 /* ---------- exercises: [id, name, groups, equipment, level 1-3, dose, unit, steps] ---------- */
@@ -1412,6 +1412,10 @@ const EX_RAW = [
  ['sl-rdl','Single-leg Romanian deadlift',['hamstrings','glutes'],'Optional backpack',2,10,'reps',['Stand on one leg, knee soft.','Hinge forward as the free leg lifts behind you.','Feel the stretch, then stand tall. Switch legs.']],
  ['towel-curl-leg','Towel slider leg curl',['hamstrings','glutes'],'Towel on smooth floor',2,10,'reps',['Lie on your back, heels on a towel, hips lifted.','Slide heels out until legs are almost straight.','Pull them back in without dropping your hips.']],
  ['bridge-walk','Bridge walkout',['hamstrings','glutes'],'None',3,8,'reps',['Hold a glute bridge.','Walk feet out in small steps, then back in.','Keep hips high the whole time.']],
+ ['sumo-squat','Sumo squat',['adductors','glutes','quads'],'None',1,15,'reps',['Feet wide, toes turned out.','Sit straight down, knees pushing out over your toes.','Stand up squeezing your inner thighs together.']],
+ ['side-adduction','Side-lying inner thigh raise',['adductors'],'None',1,15,'reps',['Lie on your side, head on your arm. Bend the top leg and plant that foot behind the bottom knee.','Keep the bottom leg straight and lift it a hand’s width off the floor.','Lower slowly. Do all reps, then switch sides.']],
+ ['pillow-squeeze','Pillow squeeze',['adductors'],'Cushion or pillow',1,30,'sec',['Lie on your back, knees bent, a cushion between your knees.','Squeeze the cushion as hard as you can and hold.','Keep breathing. Relax for a few seconds and repeat.']],
+ ['copenhagen','Copenhagen plank',['adductors','obliques'],'Chair or bench',3,20,'sec',['Side plank on your forearm, top leg resting on a chair seat at the knee.','Lift your hips and bring the bottom leg up to meet the chair.','Keep a straight line from head to feet. Switch sides.']],
  ['calf-raise','Step calf raise',['calves'],'Stair',1,20,'reps',['Balls of your feet on the edge of a stair.','Lower heels below the step.','Rise as high as you can, pause, lower slowly.']],
  ['sl-calf','Single-leg calf raise',['calves'],'Wall for balance',2,12,'reps',['Stand on one foot, fingertips on a wall.','Rise onto the ball of your foot.','Lower slowly. Switch legs.']],
  ['skip','Jump rope (with or without rope)',['calves'],'Optional rope',1,60,'sec',['Stay on the balls of your feet.','Small, quick hops with soft knees.','Turn your wrists as if swinging a rope.']],
@@ -1438,6 +1442,7 @@ const EX_RAW = [
  ['goblet-squat','Goblet squat',['quads','glutes'],'Dumbbells',1,10,'reps',['Hold a dumbbell at your chest.','Squat between your knees, chest up.','Drive up through your whole foot.']],
  ['back-squat','Barbell back squat',['quads','glutes','lowerback'],'Barbell and rack',2,6,'reps',['Bar on your upper back, feet shoulder width.','Sit down until your thighs are at least parallel.','Stand up, keeping your chest up. Use safety pins.']],
  ['leg-press','Leg press',['quads','glutes'],'Machine',1,12,'reps',['Feet shoulder width on the platform.','Lower until your knees reach 90 degrees.','Press back without locking your knees.']],
+ ['hip-adduction','Hip adduction machine',['adductors'],'Machine',1,12,'reps',['Sit with your back on the pad and the pads on the inside of your knees.','Squeeze your legs together slowly until the pads meet.','Open back out with control; don’t let the weight slam.']],
  ['leg-extension','Leg extension',['quads'],'Machine',1,12,'reps',['Pad on your lower shins, knees in line with the pivot.','Straighten your legs.','Lower slowly.']],
  ['rdl','Romanian deadlift',['hamstrings','glutes','lowerback'],'Barbell',2,8,'reps',['Bar at your hips, knees soft.','Push your hips back, bar close to your legs, back flat.','Stand up when you feel your hamstrings stretch.']],
  ['deadlift','Deadlift',['hamstrings','glutes','lowerback','upperback'],'Barbell',3,5,'reps',['Bar over mid-foot, grip just outside your legs.','Brace, push the floor away, bar close to your body.','Lock out tall, then lower under control.']],
@@ -1469,6 +1474,8 @@ const STRETCH_RAW = [
  ['couch-stretch','Kneeling hip flexor stretch',['quads','glutes'],'45 sec each side',['Kneel on one knee, other foot flat in front.','Squeeze the glute of the back leg and shift your hips forward.','Keep your chest up. Use a cushion under the knee.']],
  ['standing-quad','Standing quad stretch',['quads'],'30 sec each side',['Hold a wall or chair for balance.','Bend one knee and hold the ankle behind you.','Keep knees together and push the hip slightly forward.']],
  ['seated-hamstring','Seated hamstring stretch',['hamstrings','lowerback'],'45 sec each side',['Sit with one leg straight, the other foot against its inner thigh.','Hinge forward from the hips over the straight leg.','Keep your back long rather than reaching for your toes.']],
+ ['butterfly','Butterfly stretch',['adductors'],'45 sec',['Sit tall with the soles of your feet together, knees out to the sides.','Hold your feet and let your knees sink towards the floor.','Lean forward a little from the hips for more. No bouncing.']],
+ ['side-lunge-stretch','Side lunge stretch',['adductors','hamstrings'],'30 sec each side',['Stand with feet very wide, toes forward.','Bend one knee and shift your hips over it, the other leg straight.','Feel the inner thigh of the straight leg. Switch sides.']],
  ['wall-calf','Wall calf stretch',['calves'],'30 sec each side',['Hands on a wall, one foot a big step back.','Keep the back heel down and leg straight.','Lean in until you feel the calf. Bend the back knee slightly to reach lower.']]
 ];
 const STRETCH = {};
@@ -1514,7 +1521,8 @@ const FRONT_PATHS = [
   ['biceps',P.arm,1],['forearms',P.fore,1],
   ['obliques','M69,116 C72,140 73,160 71,190 C76,198 82,200 86,198 L86,124 C80,122 74,120 69,116 Z',1],
   ['abs','M88,120 L112,120 C113,150 113,180 112,200 C106,206 94,206 88,200 C87,180 87,150 88,120 Z',0],
-  ['quads','M70,214 C67,236 67,262 72,296 C80,300 88,300 94,296 C97,272 97,248 96,226 C88,226 78,222 70,214 Z',1],
+  ['quads','M70,214 C67,236 67,262 72,296 C80,300 88,300 94,296 C94,278 92,258 90,236 C84,232 76,226 70,214 Z',1],
+  ['adductors','M91,233 C93,226 95,220 98,216 C99,236 98,258 95,288 C94,270 93,252 91,233 Z',1],
   ['calves','M74,318 C72,340 74,366 78,394 L90,394 C93,368 94,342 92,318 C86,322 80,322 74,318 Z',1]
 ];
 const BACK_PATHS = [
@@ -2035,7 +2043,7 @@ const SCOFF = [
 ];
 const HIGH_IMPACT = ['jump-squat','mountain','skip','wall-hs','decline-pushup','split-squat','hollow','leg-raise','bridge-walk','hip-dips','burpee','jacks'];
 const INJURY_AVOID = {
-  knee:['jump-squat','split-squat','lunge','step-up','skip','wall-sit','mountain','burpee','jacks','back-squat','leg-press','leg-extension'],
+  knee:['jump-squat','split-squat','lunge','step-up','skip','wall-sit','mountain','burpee','jacks','copenhagen','back-squat','leg-press','leg-extension'],
   lowerback:['good-morning','superman','leg-raise','sl-rdl','russian-twist','hollow','backpack-row','situp','deadlift','rdl','barbell-row','back-squat'],
   shoulder:['pike-pushup','wall-hs','decline-pushup','backpack-press','chair-dip','diamond-pushup','backpack-ext','bench-press','ohp','skull-crusher','pull-up'],
   wrist:['pushup','wide-pushup','decline-pushup','diamond-pushup','pike-pushup','wall-hs','shoulder-taps','mountain','bottle-wrist','chair-dip','burpee','bench-press','skull-crusher'],
@@ -2429,7 +2437,7 @@ const REP_RANGE = {strength:[4,6], gain:[8,12], tone:[8,12], lose:[10,15], endur
 const repRange = goal => REP_RANGE[goal] || [8,12];
 // Estimated one-rep max (Epley), capped at 15 reps where the formula stops being useful.
 const e1rm = (w, r) => (w > 0 && r > 0) ? Math.round(w * (1 + Math.min(r, 15) / 30) * 10) / 10 : 0;
-const LOWER_BODY = ['quads','hamstrings','glutes','calves'];
+const LOWER_BODY = ['quads','adductors','hamstrings','glutes','calves'];
 const weightStep = ex => ex && ex.groups && LOWER_BODY.includes(ex.groups[0]) ? 5 : 2.5;
 // Double progression: every set at the top of the rep range means add weight; otherwise aim for one more rep.
 function suggestNext(lastSets, range, step){
@@ -4188,6 +4196,17 @@ const ANIMS = {
   mountain: A([plankK([-.55, .03], [.19, .31], [.19, 0], null, {l:[{h:[-.08, .1], b:1, ft:-60}]}), plankK([-.55, .03], [.19, .31], [.19, 0], null, {l:[undefined, {h:[-.08, .1], b:1, ft:-60}]})], {move:330, hold:40}),
   plank: two(plankK([-.62, .03], [.13, .17], [.13, .01], null, {a:[{u:-90, f:0}, {u:-90, f:-2}]}), {hip:[-.13, .1]}, {move:1600, hold:600}),
   'side-plank': two(sidePlank(.2), {hip:[-.06, .21]}, {move:1600, hold:600}),
+  // Adductors. Machine and sumo squat face you; the side-lying raise and the Copenhagen plank are seen from the front like the side plank.
+  'hip-adduction': two({v:'front', hip:[0, .52], tr:90, a:[{h:[.21, .47], b:1}, {h:[-.21, .47], b:-1}], l:[{h:[.27, .05], b:1, ft:0}, {h:[-.27, .05], b:-1, ft:-180}],
+      pr:[{k:'box', x:-.2, y:.46, w:.4}, {k:'pad', at:'knee0', off:[.05, 0]}, {k:'pad', at:'knee1', off:[-.05, 0]}]},
+    {l:[{h:[.085, .04]}, {h:[-.085, .04]}]}, {move:1100, hold:350}),
+  'sumo-squat': two(mergeP(FR, {a:[{h:[.05, .66], b:1}, {h:[-.05, .66], b:-1}], l:[{h:[.3, 0], b:1, ft:20}, {h:[-.3, 0], b:-1, ft:-200}]}),
+    {hip:[0, .3], a:[{h:[.05, .5]}, {h:[-.05, .5]}]}, {move:1000}),
+  'side-adduction': two({v:'front', hip:[-.04, .1], tr:4, a:[{h:[.31, .12], b:-1}, {h:[.02, .19], b:1}], l:[{h:[-.54, .03], b:1, ft:-90}, {h:[-.22, .02], b:1, ft:-90}], pr:[]},
+    {l:[{h:[-.53, .13]}]}, {move:900, hold:300}),
+  'pillow-squeeze': two(bridgeK(0, {pr:[{k:'pad', at:'knee0', off:[0, .01]}]}), {l:[{h:[-.26, 0]}, {h:[-.29, 0]}]}, {move:1300, hold:1100}),
+  copenhagen: two(sidePlank(.12, {a:[{h:[.25, .02], b:1}, {u:96, f:96}], l:[{h:[-.56, .02], b:1, ft:-90}, {h:[-.62, .33], b:1, ft:-90}], pr:[{k:'bench', x:-.82, y:.3, w:.32}]}),
+    {hip:[-.06, .22], tr:17, l:[{h:[-.6, .27]}, {h:[-.62, .33]}]}, {move:1500, hold:600}),
   'hip-dips': two(sidePlank(.2), sidePlank(.1)),
   crunch: two(SUP({a:[{h:[.37, .16], b:1}, {h:[.35, .16], b:1}]}), {tr:28, a:[{h:[.33, .33]}, {h:[.31, .33]}]}),
   situp: two(SUP({a:[{h:[.2, .14], b:1}, {h:[.18, .14], b:1}]}), {tr:72, a:[{h:[.13, .38]}, {h:[.11, .38]}]}),
@@ -4282,7 +4301,7 @@ ANIMS['lift-far'] = two(mergeP(STA, {hip:[-.17, .46], tr:12, a:[{h:[.46, .06], b
 const ANIM_ALIAS = {};
 
 /* ---------- exercise animation renderer: an SVG mannequin that loops each exercise ---------- */
-const ANIM_GLOW = {chest:'chest', upperback:'chest', traps:'chest', abs:'core', obliques:'core', lowerback:'core', shoulders:'delt', biceps:'upper', triceps:'upper', forearms:'fore', quads:'thigh', hamstrings:'thigh', glutes:'glute', calves:'shin'};
+const ANIM_GLOW = {chest:'chest', upperback:'chest', traps:'chest', abs:'core', obliques:'core', lowerback:'core', shoulders:'delt', biceps:'upper', triceps:'upper', forearms:'fore', quads:'thigh', adductors:'thigh', hamstrings:'thigh', glutes:'glute', calves:'shin'};
 const ANIM_MOVE_GROUPS = {burpee:['chest','quads'], jacks:['shoulders','calves'], situp:['abs']};
 const animFor = id => ANIMS[id] || ANIMS[ANIM_ALIAS[id]] || null;
 function animGlow(id){ const g = (typeof EX !== 'undefined' && EX[id] && EX[id].groups) || ANIM_MOVE_GROUPS[id] || []; return new Set(g.slice(0, 2).map(x => ANIM_GLOW[x]).filter(Boolean)); }
@@ -4422,7 +4441,7 @@ function animScene(pose, glow, big){
     SM(TS.shade, 'shade', true);
     if (glow.has('chest')) SM(TS.upper, 'mus');
     if (glow.has('core')) SM(TS.lower, 'mus');
-    if (glow.has('glute')) { const g = front ? P.hip : at(-.035, -.058); if (big) C(g, .085, 'haloc'); E(g, .052, .056, 'mus gl'); }
+    if (glow.has('glute') && !front) { const g = at(-.035, -.058); if (big) C(g, .085, 'haloc'); E(g, .052, .056, 'mus gl'); }
     // head: hair at the back and top, a face in front, an ear and a nose so you can tell where the person looks
     if (front){ E(addv(P.head, hd, .016), .07, .066, 'hair'); E(P.head, .062, .07, 'pp sk'); [-1, 1].forEach(k => E(addv(P.head, fwh, .062 * k), .012, .02, 'sk ear')); E(addv(P.head, hd, .045), .06, .03, 'hair'); }
     else { E(addv(addv(P.head, hd, .014), fwh, -.016), .07, .068, 'hair'); E(addv(P.head, fwh, .006), .062, .068, 'pp sk');
