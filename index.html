@@ -82,6 +82,11 @@ svg.body .detail{stroke:var(--bg);stroke-width:1.2;fill:none;pointer-events:none
 .list{display:flex;flex-direction:column;gap:8px}
 .ex{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
 .ex .name{font-weight:700;font-size:16px}
+.ex.tap{cursor:pointer;transition:transform .15s var(--out)}.ex.tap:active{transform:scale(.985)}
+.ex-name{border:0;background:none;padding:4px 0;min-height:32px;text-align:left;color:inherit;font:inherit;font-weight:700;font-size:16px}
+.ex-add{width:42px;height:42px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+.ex-add svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+.ex-add:active{transform:scale(.9)}
 .ex .meta{grid-column:1;display:flex;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
 .ex .meta b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 .tag{border:1px solid var(--line);border-radius:6px;padding:1px 6px}
@@ -353,7 +358,7 @@ body.has-timer .app{padding-bottom:180px}
 /* sheets: springy entrance, slide away on close, drag down to dismiss */
 .scrim{animation:fade .2s ease-out}
 @keyframes fade{from{opacity:0}}
-.sheet{animation:up .42s var(--spring)}
+.sheet{animation:up .42s var(--spring)}.sheet:focus{outline:none}
 @keyframes up{from{transform:translateY(60%)}to{transform:none}}
 .scrim.closing{animation:fadeout .2s ease-in forwards}
 .scrim.closing .sheet{animation:down .2s ease-in forwards}
@@ -418,10 +423,10 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .glass{width:30px;height:38px;border:2px solid var(--line);border-top-width:0;border-radius:0 0 9px 9px;background:var(--bg);padding:0}
 .glass.full{border-color:var(--blue);background:linear-gradient(to top,color-mix(in srgb,var(--blue) 55%,transparent) 78%,transparent 78%)}
 /* ---------- weekly planning ---------- */
-.phase-card{background:var(--ink);color:var(--bg);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.phase-card{background:radial-gradient(circle at 92% 8%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 58%),var(--arena);color:var(--arena-ink);border:1px solid color-mix(in srgb,var(--arena-ink) 9%,transparent);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:4px;margin-top:10px}
 .phase-name{font-family:var(--display);font-size:36px;line-height:1;text-transform:uppercase}
 .pips{display:flex;gap:6px;margin-top:8px}
-.pips i{flex:1;height:6px;border-radius:3px;background:color-mix(in srgb,var(--bg) 22%,transparent)}
+.pips i{flex:1;height:6px;border-radius:3px;background:color-mix(in srgb,currentColor 18%,transparent)}
 .pips i.past{background:color-mix(in srgb,var(--accent) 55%,transparent)}.pips i.now{background:var(--accent)}
 .planner{display:flex;flex-direction:column;gap:6px;margin-top:12px}
 .pl-row{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}
@@ -854,7 +859,7 @@ details.steps ol{margin-top:8px}
 .rank-list .rp{font-family:var(--display);font-weight:700;font-size:20px}
 .rank-list .top1 .rp{color:var(--gold)}.rank-list .top2 .rp{color:var(--silver)}.rank-list .top3 .rp{color:var(--bronze)}
 .rank-list .rl{font-size:12px;color:var(--muted)}
-.rank-list .rx{font-weight:700}
+.rank-list .rk-xp{font-weight:700}
 .ch-links{margin-top:12px}
 .cam-cue.warn{background:var(--bad);border-radius:10px;padding:4px 8px;text-shadow:none}
 .master-btn{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 18%,transparent)}
@@ -1174,8 +1179,8 @@ p .ico{width:14px;height:14px;vertical-align:-2px}
       </div>
     </div>
     <div class="figure-wrap">
-      <p class="figure-hint" id="fig-hint">Tap a muscle to see its exercises.</p>
-      <span class="side-tag" id="side-tag">Front</span>
+      <p class="figure-hint" id="fig-hint"></p>
+      <span class="side-tag" id="side-tag" hidden>Front</span>
       <div id="figure"></div><span class="m-label" id="m-label" aria-hidden="true"></span>
     </div>
     <p class="swipe-hint">Swipe the figure to turn it around</p>
@@ -1517,7 +1522,7 @@ function drawFigure(){
   document.getElementById('side-front').setAttribute('aria-pressed', ui.side==='front');
   document.getElementById('side-back').setAttribute('aria-pressed', ui.side==='back');
   const list = ui.side==='front' ? FRONT : BACK;
-  document.getElementById('fig-hint').textContent = ui.recovery ? 'Red: trained in the last 3 days. Give it time to recover.' : 'Tap a muscle to see its exercises.';
+  document.getElementById('fig-hint').textContent = ui.recovery ? 'Red: trained in the last 3 days. Give it time to recover.' : '';
   document.getElementById('rec-legend').innerHTML = ui.recovery ? `<div class="rec-legend"><span><i style="background:var(--muscle)"></i>Fresh</span><span><i style="background:color-mix(in srgb,var(--bad) 45%,var(--muscle))"></i>Recovering</span><span><i style="background:color-mix(in srgb,var(--bad) 95%,var(--muscle))"></i>Just trained</span></div>` : '';
   document.getElementById('group-chips').innerHTML = `<button class="chip" id="rec-toggle" aria-pressed="${!!ui.recovery}">Recovery map</button>` + list.map(g =>
     `<button class="chip" data-g="${g}" aria-pressed="${ui.group===g}">${GROUPS[g].label}</button>`).join('');
@@ -1529,22 +1534,19 @@ function selectGroup(g, scroll){
 }
 function exCard(e){
   const th = animSvg(e.id, 'th', 'data-ar="1"');
-  return `<div class="ex${th ? ' has-th' : ''}">
-    ${th ? `<button class="th-btn" data-info="${e.id}" aria-label="How to do ${esc(e.name)}">${th}</button>` : ''}
-    <div class="name">${esc(e.name)}</div>
+  // One tap opens How to (with Add and Stretch inside); the + adds it straight to your schedule.
+  return `<div class="ex tap${th ? ' has-th' : ''}" data-info="${e.id}">
+    ${th ? `<span class="th-btn" aria-hidden="true">${th}</span>` : ''}
+    <button class="name ex-name" type="button" data-info="${e.id}">${esc(e.name)}</button>
     <div class="meta"><b>${doseText(e.dose,e.unit)}</b><span class="tag">${esc(e.equip)}</span>${lvlBars(e.level)}</div>
-    <div class="actions">
-      <button class="btn sm primary" data-add="${e.id}">+ Schedule</button>
-      <button class="btn sm" data-info="${e.id}">How to</button>
-      <button class="btn sm ghost" data-stretch="${e.id}">Stretch</button>
-    </div>
+    <div class="actions"><button class="ex-add" type="button" data-add="${e.id}" aria-label="Add ${esc(e.name)} to your schedule"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
   </div>`;
 }
 function drawGroupDetail(){
   const el = document.getElementById('group-detail');
   if (!ui.group){ el.innerHTML = ''; return; }
   const exs = exFor(ui.group);
-  el.innerHTML = `<h3>${GROUPS[ui.group].label} · ${exs.length} home exercises</h3><div class="list in">${exs.map((e,i)=>exCard(e).replace('<div class="ex">',`<div class="ex" style="--i:${i}">`)).join('')}</div>`;
+  el.innerHTML = `<h3>${GROUPS[ui.group].label} · ${exs.length} exercises</h3><div class="list in">${exs.map((e,i)=>exCard(e).replace('<div class="ex">',`<div class="ex" style="--i:${i}">`)).join('')}</div>`;
 }
 
 /* ---------- sheets ---------- */
@@ -1552,8 +1554,9 @@ const RM = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const buzz = p => { try{ navigator.vibrate && navigator.vibrate(p); }catch(e){} };
 function openSheet(html){
   const root = document.getElementById('sheet-root'); clearTimeout(closeSheet.t);
-  root.innerHTML = `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true"><div class="grab" title="Drag down to close"></div>${html}</div></div>`;
-  const first = root.querySelector('.sheet button'); if (first) first.focus();
+  root.innerHTML = `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" tabindex="-1"><div class="grab" title="Drag down to close"></div>${html}</div></div>`;
+  // Focus the sheet itself (screen readers announce it) instead of ringing its first button.
+  const sh = root.querySelector('.sheet'); if (sh) sh.focus({preventScroll:true});
 }
 function showSheet(html){
   const sh = document.querySelector('#sheet-root .scrim:not(.closing) .sheet');
@@ -1948,9 +1951,9 @@ function fillForm(){
 function drawSchedule(){
   const total = DAYS.reduce((n,d)=>n+schedule[d].length,0), planned = !!planInfo();
   let h = subTabs('sched') + '<div data-sec="sched:week">' + planCard() + plannerHtml();
-  if (planned) h += `<h3>Extra exercises</h3>` + (total ? '' : `<p class="small muted">Add extras from the Body tab with <b>+ Schedule</b>. They show up on Today next to your plan.</p>`);
+  if (planned && total) h += `<h3>Extra exercises</h3>`;
   if (!total && !planned){
-    h += `<div class="empty"><p><b>Your week is empty.</b></p><p class="small" style="margin-top:4px">Tap a muscle on the body, then <b>+ Schedule</b> on any exercise. Or start from a sample week and edit it.</p>
+    h += `<div class="empty"><p><b>Your week is empty.</b></p><p class="small" style="margin-top:4px">Tap a muscle on the body, then <b>+</b> on any exercise. Or start from a sample week and edit it.</p>
       <div class="row" style="justify-content:center;margin-top:12px"><button class="btn primary" data-goto="body">Pick a muscle</button><button class="btn" id="sample-week">Load sample week</button></div></div>`;
   }
   DAYS.forEach(d => {
@@ -3248,7 +3251,7 @@ function plannerHtml(){
   const now = new Date(), monday = new Date(now); monday.setDate(now.getDate() - DAYS.indexOf(todayKey()));
   let h = `<div class="phase-card"><span class="small" style="opacity:.75">Week ${week} of 4</span><b class="phase-name">${phase.name}</b><p class="small">${phase.tip}</p>
     <div class="pips">${[1,2,3,4].map(i => `<i class="${i < week ? 'past' : i === week ? 'now' : ''}"></i>`).join('')}</div></div>`;
-  h += `<button class="btn sm" data-flow="gym" style="align-self:flex-start;margin-top:10px">Change my answers (goal, days, hours)</button>`;
+  h += `<button class="btn sm" data-flow="gym" style="align-self:flex-start;margin-top:10px">Change my answers</button>`;
   if (currentLimits().mode === 'gentle') h += `<p class="banner" style="margin-top:10px">${store.get('health', null) ? 'Gentle mode: up to 3 easy sessions a week until a doctor clears harder training.' : 'Gentle mode: up to 3 easy sessions a week until you do the safety check.'}${store.get('health', null) ? '' : ' <button class="btn sm" data-flow="safety" style="margin-left:4px">Do it now</button>'}</p>`;
   // The next 7 days starting today, so day one of a new plan is at the top.
   const keyOf = d => ['sun','mon','tue','wed','thu','fri','sat'][d.getDay()];
@@ -4009,7 +4012,7 @@ function drawProgress(){
     <div class="heat" role="img" aria-label="Activity over the last 12 weeks">${cells}</div>
     <div class="legend"><span><i class="hm on"></i>Trained</span><span><i class="hm rest"></i>Rest day</span><span><i class="hm frz"></i>Freeze</span><span><i class="hm miss"></i>Missed</span></div>
     <p class="small" style="opacity:.75">Rest days keep your streak. Two missed training days a month are forgiven automatically.</p></div>`;
-  let h = '', lv = `<div class="panel stack">${profileHtml(false)}<div class="row"><button class="btn sm primary" data-open="ranks">Rankings</button><button class="btn sm" data-open="learn">Tips and A/B</button><button class="btn sm ghost" data-open="profile">Profile</button></div></div>`;
+  let h = '', lv = `<div class="panel stack">${profileHtml(false)}<div class="row"><button class="btn sm primary" data-open="ranks">Rankings</button><button class="btn sm ghost" data-open="profile">Profile</button></div></div>`;
   if (!log.length){
     h += `<div class="empty"><p><b>Your progress starts with your first workout.</b></p><p class="small" style="margin-top:4px">Log your sets in Today and you’ll see your strength, volume and records here.</p>
       <div class="row" style="justify-content:center;margin-top:12px"><button class="btn primary" data-goto="today">Go to Today</button></div></div>`;
@@ -4415,14 +4418,13 @@ function profileHtml(compact){
       <div class="prof-id"><b>${g.nick ? esc(g.nick) : 'No nickname yet'}</b><span class="small muted">${esc(rankFor(L.level))}${gSector() ? ' · ' + esc(sectorName(gSector())) : ''}</span>
         <div class="xpbar prof-bar"><span style="width:${Math.round(L.pct * 100)}%"></span></div><span class="small muted">${L.into} / ${L.need} XP to level ${L.level + 1}</span></div></div>
     <div class="prof-stats"><span>${ICON_FLAME}<b>${st.current}</b><small>day streak</small></span><span><b>${gTotal()}</b><small>total XP</small></span><span><b>${pts}</b><small>points</small></span></div>
-    ${compact ? '' : `<p class="small muted">Points come with every new level. What you can do with them is coming soon.</p>`}
   </div>`;
 }
 function profileSheet(){
   const g = gameS(), m = store.get('master', null);
   const rows = [...g.ledger].reverse().slice(0, 6).map(r => `<li><span>${esc(XP_LABEL[r.kind] || 'Activity')}</span><b>+${r.xp} XP</b></li>`).join('');
   openSheet(`<h2>Your profile</h2>${profileHtml(false)}
-    <div class="row"><button class="btn primary" data-open="ranks">Rankings</button><button class="btn" data-open="learn">Tips and A/B</button><button class="btn" data-open="nick">${g.nick ? 'Edit nickname and sector' : 'Pick a nickname'}</button><button class="btn" data-jump="hero">My hero</button><button class="btn" data-open="help">Help</button>${m ? '<button class="btn master-btn" data-open="master">MÁSTER</button>' : ''}</div>
+    <div class="row"><button class="btn primary" data-open="ranks">Rankings</button><button class="btn" data-open="nick">${g.nick ? 'Edit nickname and sector' : 'Pick a nickname'}</button><button class="btn" data-jump="hero">My hero</button><button class="btn" data-open="help">Help</button>${m ? '<button class="btn master-btn" data-open="master">MÁSTER</button>' : ''}</div>
     ${(() => { const o = store.get('onboarding', null), why = o && o.answers && o.answers.why; return o && o.answers && o.answers.goal ? (why ? `<p class="why-line">“${esc(why)}”</p>` : `<div class="stack" style="gap:6px"><b>Your why</b><input id="why-in" class="why-in" maxlength="140" placeholder="e.g. feel strong again" aria-label="Your why"><button class="btn sm primary" id="why-save" style="align-self:flex-start">Save</button></div>`) : ''; })()}
     ${rows ? `<h3>Latest XP</h3><ul class="xp-list">${rows}</ul>` : ''}
     ${gFlagged() ? '<p class="banner">Some of your sessions looked unusual, so you’re out of the rankings until we check them. Your XP is safe.</p>' : ''}
@@ -4922,7 +4924,7 @@ function rankRows(list){
   if (!rows.length) return '<p class="small muted">Nobody here yet. Earn some XP and you’re first.</p>';
   let last = 0;
   return `<ol class="rank-list">${rows.map(p => { const gap = p.pos > last + 1 ? '<li class="gap">…</li>' : ''; last = p.pos;
-    return `${gap}<li class="${p.uid === me ? 'me' : ''}${p.pos <= 3 ? ' top' + p.pos : ''}"><span class="rp">${p.pos}</span><b>${esc(p.nick || 'Someone')}${p.uid === me ? ' (you)' : ''}</b><span class="rl">Lv ${+p.level || 1}</span><span class="rx">${p.score} XP</span></li>`; }).join('')}</ol>`;
+    return `${gap}<li class="${p.uid === me ? 'me' : ''}${p.pos <= 3 ? ' top' + p.pos : ''}"><span class="rp">${p.pos}</span><b>${esc(p.nick || 'Someone')}${p.uid === me ? ' (you)' : ''}</b><span class="rl">Lv ${+p.level || 1}</span><span class="rk-xp">${p.score} XP</span></li>`; }).join('')}</ol>`;
 }
 function ranksBody(){
   if (!netOn()) return `<p class="small muted">Rankings and leagues need the shared version of the app (open it from your Claude link). Your level and XP are saved on this phone.</p>${profileHtml(true)}`;
@@ -5160,7 +5162,7 @@ const HELP = [
   {id:'battery', icon:'battery', tone:'good', title:'Your battery', line:'How charged you are today. Sleep counts most.',
     steps:['Log sleep, food, water and steps with one tap each.', 'Green with 8 hours of sleep.', 'Red battery: the app makes today’s training easier.'], go:'today'},
   {id:'body', icon:'body', tone:'blue', title:'Body', line:'Pick a muscle, see exercises for it.',
-    steps:['Tap a muscle on the figure, or swipe to turn it around.', 'Recovery map: red is worked in the last 3 days.', 'Add any exercise to your week with + Schedule.'], go:'body'},
+    steps:['Tap a muscle on the figure, or swipe to turn it around.', 'Recovery map: red is worked in the last 3 days.', 'Add any exercise to your week with the + button.'], go:'body'},
   {id:'belly', icon:'flame', tone:'accent', title:'Belly fat', line:'What really works, and how to track it.', anim:'goblet-squat',
     steps:['Fat leaves your whole body at once: crunches alone don’t burn belly fat.', 'Strength 3 times a week, 8,000+ steps and a small calorie gap do.', 'Measure your waist once a week: it shows belly fat going better than the scale.'], go:'waist', goLabel:'Track my waist'},
   {id:'photos', icon:'camera', tone:'blue', title:'Progress photos', line:'Same spot every 4 weeks, then slide to compare.',
@@ -5386,7 +5388,7 @@ function homeMenu(mode){
     help:{icon:'help', tone:'ink', name:'Help', sub:'How it works', a:'data-open="help"'}
   };
   // Only what matters on each screen: Help lives behind the ? in the header, meals in Food.
-  const keys = mode === 'challenge' ? ['battery', 'quests', 'duels', 'ranks'] : ['quests', 'battery', 'hero', 'ab', 'ranks', 'alarm'];
+  const keys = mode === 'challenge' ? ['battery', 'quests', ...(duel.db ? ['duels'] : []), 'ranks'] : ['quests', 'battery', 'hero', 'ab', 'ranks', 'alarm'];
   return `<nav class="home-menu" style="--n:${keys.length}" aria-label="Menu">${keys.map(k => { const t = T[k];
     return `<button class="mtile t-${t.tone}${t.off ? ' off' : ''}" ${t.a} aria-label="${esc(t.name === t.sub ? t.name : (k === 'alarm' ? t.sub : t.name + ': ' + t.sub))}"${t.rc ? ` style="--rc:var(--${t.rc === 'accent' ? 'accent' : t.rc})"` : ''}><span class="mt-ico">${t.ring != null ? ringSvg(t.ring) : ''}${ico(t.icon)}${t.dot ? '<i class="mt-dot"></i>' : ''}</span><b>${esc(t.name)}</b></button>`; }).join('')}</nav>`;
 }
