@@ -776,7 +776,10 @@ svg.anim .hair{fill:var(--p-hair)}
 svg.anim .mus{fill:url(#ag-on);opacity:.84}svg.anim .mus.far{opacity:.6}
 svg.anim .tor.mus{stroke:url(#ag-on);stroke-width:.02;stroke-linejoin:round}
 svg.anim .halo,svg.anim .haloc{fill:var(--accent);stroke:none;filter:url(#ag-blur);opacity:calc(.06 + var(--g) * .2)}
-svg.anim .tor.halo{stroke:var(--accent);stroke-width:.035;stroke-linejoin:round}
+svg.anim .tor.halo{stroke:var(--accent);stroke-width:.03;stroke-linejoin:round}
+svg.anim .kcap{fill:var(--p-skin-hi);opacity:.55}svg.anim .kcap.far{opacity:.25}
+svg.anim .mline{fill:none;stroke:var(--p-skin-lo);stroke-linecap:round;opacity:.7}
+svg.anim .shade{fill:#000;opacity:.16}
 svg.anim .gnd{stroke:var(--line);stroke-width:.006}
 svg.anim .rom-l{fill:none;stroke:var(--accent);stroke-width:.009;stroke-dasharray:.004 .022;stroke-linecap:round;opacity:.75}
 svg.anim .rom-a{fill:var(--accent);opacity:.75}
@@ -4289,17 +4292,33 @@ const STATIC_PROPS = new Set(['bench', 'box', 'wall', 'bar', 'table', 'door', 's
 // Build the drawing for one pose: a list of [tag, attributes]. Rig y grows up; SVG y grows down.
 // Limb radii [at the root, at the end]: thighs and upper arms taper towards the knee and elbow, calves towards the ankle.
 // Limb shapes [radius at the root, widest radius, radius at the end, where the widest point sits]: thigh, calf, biceps and forearm bulge like real muscle.
-const LIMB_R = {thigh:[.062, .067, .043, .35], shin:[.043, .05, .026, .3], upper:[.038, .042, .031, .5], fore:[.034, .035, .022, .28]};
+const LIMB_R = {thigh:[.064, .068, .042, .38], shin:[.042, .05, .025, .3], upper:[.038, .042, .031, .5], fore:[.034, .035, .022, .28]};
+// Legs from the side are not symmetric: [widest, where] for the front and the back of each.
+const LEG_SHAPE = {thigh:{front:[.071, .42], back:[.068, .28]}, shin:{front:[.041, .2], back:[.059, .3]}};
 function animScene(pose, glow, big){
   const P = solvePose(pose), out = [], f = n => Math.round(n * 1e4) / 1e4, front = P.front;
   // A tapered capsule from a to b (rig coords): the body is built from these, so limbs read as volumes, not sticks.
   // A limb with a muscle bulge: two curved sides through the widest point, rounded ends.
-  const LIMB = (a, b, r1, rm, r2, t, cls) => {
-    const ax = a[0], ay = -a[1], bx = b[0], by = -b[1], dx = bx - ax, dy = by - ay, l = Math.hypot(dx, dy) || 1e-6, nx = -dy / l, ny = dx / l, mx = ax + dx * t, my = ay + dy * t;
-    const sd = k => { const p0 = [ax + nx * r1 * k, ay + ny * r1 * k], p1 = [mx + nx * rm * k, my + ny * rm * k], p2 = [bx + nx * r2 * k, by + ny * r2 * k];
+  const LIMB = (a, b, r1, rm, r2, t, cls, rmB, tB) => {
+    const ax = a[0], ay = -a[1], bx = b[0], by = -b[1], dx = bx - ax, dy = by - ay, l = Math.hypot(dx, dy) || 1e-6, nx = -dy / l, ny = dx / l;
+    if (rmB == null){ rmB = rm; tB = t; }
+    const sd = k => { const rr = k > 0 ? rm : rmB, tt = k > 0 ? t : tB, mx = ax + dx * tt, my = ay + dy * tt;
+      const p0 = [ax + nx * r1 * k, ay + ny * r1 * k], p1 = [mx + nx * rr * k, my + ny * rr * k], p2 = [bx + nx * r2 * k, by + ny * r2 * k];
       return [p0, [2 * p1[0] - (p0[0] + p2[0]) / 2, 2 * p1[1] - (p0[1] + p2[1]) / 2], p2].map(q => f(q[0]) + ' ' + f(q[1])); };
     const A = sd(1), B = sd(-1);
-    out.push(['path', {d:`M${A[0]}Q${A[1]} ${A[2]}A${f(r2)} ${f(r2)} 0 0 0 ${B[2]}Q${B[1]} ${B[0]}A${f(r1)} ${f(r1)} 0 0 0 ${A[0]}Z`, class:cls, 'data-bb':`${f(ax)} ${f(ay)} ${f(bx)} ${f(by)} ${f(Math.max(r1, rm, r2) + .02)}`}]);
+    out.push(['path', {d:`M${A[0]}Q${A[1]} ${A[2]}A${f(r2)} ${f(r2)} 0 0 0 ${B[2]}Q${B[1]} ${B[0]}A${f(r1)} ${f(r1)} 0 0 0 ${A[0]}Z`, class:cls, 'data-bb':`${f(ax)} ${f(ay)} ${f(bx)} ${f(by)} ${f(Math.max(r1, rm, rmB, r2) + .02)}`}]);
+  };
+  // Which side of the line a→b a point lies on (+1 / -1 in LIMB's terms), 0 when it's about on the line.
+  const sideOf = (a, b, q) => { const dx = b[0] - a[0], dy = -(b[1] - a[1]), l = Math.hypot(dx, dy) || 1, v = (q[0] - a[0]) * (-dy / l) + (-(q[1]) + a[1]) * (dx / l); return Math.abs(v) < .012 ? 0 : Math.sign(v); };
+  const nRig = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1; return [dy / l, -dx / l]; };
+  // A smooth outline through points (Catmull-Rom). open = true closes with a straight edge (a shirt hem).
+  const SM = (pts, cls, open) => {
+    const S = pts.map(q => [q[0], -q[1]]), n = S.length, at = i => open ? S[Math.max(0, Math.min(n - 1, i))] : S[(i + n) % n];
+    let d = `M${f(S[0][0])} ${f(S[0][1])}`;
+    for (let i = 0; i < (open ? n - 1 : n); i++){ const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+      d += `C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`; }
+    const xs = S.map(q => q[0]), ys = S.map(q => q[1]);
+    out.push(['path', {d:d + 'Z', class:cls, 'data-bb':`${f(Math.min(...xs))} ${f(Math.min(...ys))} ${f(Math.max(...xs))} ${f(Math.max(...ys))} .01`}]);
   };
   const CAP = (a, b, r1, r2, cls) => {
     const ax = a[0], ay = -a[1], bx = b[0], by = -b[1], l = Math.hypot(bx - ax, by - ay) || 1e-6, nx = -(by - ay) / l, ny = (bx - ax) / l;
@@ -4314,13 +4333,26 @@ function animScene(pose, glow, big){
   const Q = (a, c, b, w, k) => out.push(['path', {d:`M${f(a[0])} ${f(-a[1])}Q${f(c[0])} ${f(-c[1])} ${f(b[0])} ${f(-b[1])}`, 'stroke-width':w, class:k}]);
   const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
   // A person in training kit: skin, t-shirt sleeves, shorts and trainers; the working muscle shows on top as an accent overlay.
-  const seg = (a, b, part, far) => { const on = glow.has(part), [r1, rm, r2, t] = LIMB_R[part], fc = far ? ' far' : '';
-    if (on && big) LIMB(a, b, r1 + .028, rm + .028, r2 + .028, t, 'halo' + fc);
-    LIMB(a, b, r1, rm, r2, t, 'pp sk' + fc);
+  // fs: which side of the limb is its front (+1 / -1), for the legs; 0 keeps it symmetric.
+  const seg = (a, b, part, far, fs) => { const on = glow.has(part), [r1, r2] = [LIMB_R[part][0], LIMB_R[part][2]], fc = far ? ' far' : '', L = LEG_SHAPE[part];
+    let [rm, t] = [LIMB_R[part][1], LIMB_R[part][3]], rmB = rm, tB = t;
+    if (L && fs){ const F = L.front, B = L.back; [rm, t, rmB, tB] = fs > 0 ? [F[0], F[1], B[0], B[1]] : [B[0], B[1], F[0], F[1]]; }
+    else if (L && front){ rm = rmB = (L.front[0] + L.back[0]) / 2; }
+    if (on && big) LIMB(a, b, r1 + .028, rm + .028, r2 + .028, t, 'halo' + fc, rmB + .028, tB);
+    LIMB(a, b, r1, rm, r2, t, 'pp sk' + fc, rmB, tB);
     if (part === 'thigh') LIMB(a, mix(a, b, .4), r1 + .005, r1 + .006, r1 * .96, .5, 'pp ks' + fc);
     if (part === 'upper') LIMB(a, mix(a, b, .4), r1 + .006, r1 + .007, r1 * .98, .5, 'pp kt' + fc);
-    if (on) LIMB(a, b, r1, rm, r2, t, 'mus' + fc); };
-  const leg = (i, far) => { const fc = far ? ' far' : ''; seg(P.hp[i], P.knee[i], 'thigh', far); seg(P.knee[i], P.ankle[i], 'shin', far);
+    if (on) LIMB(a, b, r1, rm, r2, t, 'mus' + fc, rmB, tB); };
+  const leg = (i, far) => { const fc = far ? ' far' : '', H = P.hp[i], K = P.knee[i], A = P.ankle[i];
+    // The quads face away from where the shin folds; the calf faces the thigh. A straight leg takes the body's front.
+    const bodyFront = (a, b) => { const q = addv(a, fw, .2); return sideOf(a, b, q) || 1; };
+    const qs = front ? 0 : (-sideOf(H, K, A) || bodyFront(H, K)), cs = front ? 0 : (sideOf(K, A, H) || -bodyFront(K, A));
+    seg(H, K, 'thigh', far, qs); seg(K, A, 'shin', far, cs ? -cs : 0);
+    if (!front){ const nk = nRig(H, K); E(addv(K, nk, qs * .03), .016, .019, 'kcap' + fc);
+      // muscle lines: where the quads meet above the knee, and the top of the calf
+      if (big && !far){ const nt = nRig(H, K), ns = nRig(K, A);
+        Q(addv(mix(H, K, .5), nt, qs * .03), addv(mix(H, K, .72), nt, qs * .045), addv(mix(H, K, .9), nt, qs * .028), .005, 'mline');
+        Q(addv(mix(K, A, .1), ns, cs * .03), addv(mix(K, A, .28), ns, cs * .05), addv(mix(K, A, .5), ns, cs * .034), .005, 'mline'); } }
     // trainers: heel at the ankle, toe forward, a light sole
     // the sole runs under the foot, on the side away from the shin, whatever angle the foot is at
     const sv = [P.ankle[i][0] - P.knee[i][0], P.ankle[i][1] - P.knee[i][1]], sl = Math.hypot(sv[0], sv[1]) || 1, su = [sv[0] / sl, sv[1] / sl];
@@ -4367,20 +4399,30 @@ function animScene(pose, glow, big){
   // torso: a rounded polygon, deeper at the chest
   const d = dirv(pose.tr != null ? pose.tr : 90), fw = dirv((pose.tr != null ? pose.tr : 90) - 90), bk = [-fw[0], -fw[1]];
   const base = addv(P.hip, d, RIG.shoulder - .01), at = (h, s) => addv(addv(P.hip, d, h), fw, s);
-  // side: hip, waist, chest and shoulder in front; upper back, lower back and glute behind. front: a V from the shoulders to a narrower waist.
-  const T = front ? [at(0, .1), at(.13, .088), at(.22, .118), at(.29, .108), at(.29, -.108), at(.22, -.118), at(.13, -.088), at(0, -.1)]
-    : [at(-.01, .062), at(.12, .064), at(.22, .088), at(.3, .05), at(.3, -.058), at(.2, -.074), at(.08, -.062), at(-.01, -.08)];
+  // The torso as a person: from the side chest, a flat belly, the curve of the lower back and the glutes; from the front a V from the shoulders to the waist.
+  const TS = front
+    ? {shorts:[at(.08, .1), at(-.02, .106), at(-.075, .06), at(-.075, -.06), at(-.02, -.106), at(.08, -.1)],
+       shirt:[at(.075, .098), at(.12, .094), at(.18, .104), at(.25, .122), at(.3, .118), at(.315, .055), at(.315, -.055), at(.3, -.118), at(.25, -.122), at(.18, -.104), at(.12, -.094), at(.075, -.098)],
+       shade:[at(.075, -.098), at(.12, -.094), at(.18, -.104), at(.25, -.122), at(.3, -.118), at(.3, -.08), at(.2, -.07), at(.1, -.066)],
+       upper:[at(.14, .096), at(.18, .104), at(.25, .122), at(.3, .118), at(.315, .055), at(.315, -.055), at(.3, -.118), at(.25, -.122), at(.18, -.104), at(.14, -.096)],
+       lower:[at(-.02, .1), at(.06, .098), at(.14, .095), at(.14, -.095), at(.06, -.098), at(-.02, -.1)]}
+    : {shorts:[at(-.07, .045), at(-.01, .058), at(.08, .058), at(.08, -.05), at(.03, -.066), at(-.03, -.083), at(-.078, -.05)],
+       shirt:[at(.075, .057), at(.13, .055), at(.19, .073), at(.235, .087), at(.28, .07), at(.318, .028), at(.318, -.04), at(.26, -.07), at(.18, -.064), at(.1, -.049), at(.075, -.051)],
+       shade:[at(.075, -.051), at(.1, -.049), at(.18, -.064), at(.26, -.07), at(.31, -.045), at(.29, -.02), at(.2, -.03), at(.1, -.022), at(.075, -.02)],
+       upper:[at(.14, .056), at(.19, .073), at(.235, .087), at(.28, .07), at(.318, .028), at(.318, -.04), at(.26, -.07), at(.18, -.064), at(.14, -.056)],
+       lower:[at(0, .058), at(.06, .057), at(.14, .056), at(.14, -.056), at(.1, -.049), at(.03, -.066), at(0, -.072)]};
   const torso = () => {
-    if (big && (glow.has('chest') || glow.has('core'))) PG(glow.has('chest') && glow.has('core') ? T : glow.has('chest') ? T.filter((_, i) => front ? i >= 1 && i <= 6 : i >= 1 && i <= 5) : T.filter((_, i) => front ? i <= 1 || i >= 6 : i <= 1 || i >= 5), 'tor halo');
+    if (big && glow.has('chest')) SM(TS.upper, 'tor halo');
+    if (big && glow.has('core')) SM(TS.lower, 'tor halo');
     // neck and head first, so the t-shirt collar sits over the neck
     const hd = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0)), fwh = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0) - 90);
     CAP(addv(P.neck, d, -.03), addv(P.neck, hd, .045), .03, .027, 'pp sk');
-    PG(T, 'pp tor kt');
-    PG(front ? [T[0], at(.07, .1), at(.07, -.1), T[7]] : [T[0], at(.07, .062), at(.07, -.064), T[7]], 'pp tor ks');
-    const upper = front ? T.slice(1, 7) : T.slice(1, 6), lower = front ? [T[0], T[1], T[6], T[7]] : [T[0], T[1], T[5], T[6], T[7]];
-    if (glow.has('chest')) PG(upper, 'tor mus');
-    if (glow.has('core')) PG(lower, 'tor mus');
-    if (glow.has('glute')) { const g = front ? P.hip : addv(P.hip, bk, .035); if (big) C(g, .085, 'haloc'); E(g, .058, .058, 'mus gl'); }
+    SM(TS.shorts, 'pp ks');
+    SM(TS.shirt, 'pp kt', true);
+    SM(TS.shade, 'shade', true);
+    if (glow.has('chest')) SM(TS.upper, 'mus');
+    if (glow.has('core')) SM(TS.lower, 'mus');
+    if (glow.has('glute')) { const g = front ? P.hip : at(-.035, -.058); if (big) C(g, .085, 'haloc'); E(g, .052, .056, 'mus gl'); }
     // head: hair at the back and top, a face in front, an ear and a nose so you can tell where the person looks
     if (front){ E(addv(P.head, hd, .016), .07, .066, 'hair'); E(P.head, .062, .07, 'pp sk'); [-1, 1].forEach(k => E(addv(P.head, fwh, .062 * k), .012, .02, 'sk ear')); E(addv(P.head, hd, .045), .06, .03, 'hair'); }
     else { E(addv(addv(P.head, hd, .014), fwh, -.016), .07, .068, 'hair'); E(addv(P.head, fwh, .006), .062, .068, 'pp sk');
