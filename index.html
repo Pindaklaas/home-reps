@@ -793,6 +793,7 @@ svg.anim .pll{stroke:var(--prop);stroke-linecap:round;fill:none}
 svg.anim .rim{fill:none;stroke:var(--prop-soft);stroke-width:.01}
 svg.anim .hub{fill:var(--prop-soft)}
 svg.anim .cb{stroke:var(--prop);fill:none}
+svg.anim .mpad{fill:var(--prop);stroke:color-mix(in srgb,var(--prop) 70%,#000);stroke-width:.008}
 svg.anim .bag{fill:var(--blue);stroke:none}
 svg.anim .bagp{fill:none;stroke:var(--surface);stroke-width:.01;opacity:.5}
 svg.anim .jug{fill:var(--blue);opacity:.85}
@@ -1443,6 +1444,7 @@ const EX_RAW = [
  ['back-squat','Barbell back squat',['quads','glutes','lowerback'],'Barbell and rack',2,6,'reps',['Bar on your upper back, feet shoulder width.','Sit down until your thighs are at least parallel.','Stand up, keeping your chest up. Use safety pins.']],
  ['leg-press','Leg press',['quads','glutes'],'Machine',1,12,'reps',['Feet shoulder width on the platform.','Lower until your knees reach 90 degrees.','Press back without locking your knees.']],
  ['hip-adduction','Hip adduction machine',['adductors'],'Machine',1,12,'reps',['Sit with your back on the pad and the pads on the inside of your knees.','Squeeze your legs together slowly until the pads meet.','Open back out with control; don’t let the weight slam.']],
+ ['hip-abduction','Hip abduction machine',['glutes'],'Machine',1,12,'reps',['Sit back with the pads on the outside of your knees.','Push your knees out as wide as is comfortable.','Come back in slowly; don’t let the plates touch.']],
  ['leg-extension','Leg extension',['quads'],'Machine',1,12,'reps',['Pad on your lower shins, knees in line with the pivot.','Straighten your legs.','Lower slowly.']],
  ['rdl','Romanian deadlift',['hamstrings','glutes','lowerback'],'Barbell',2,8,'reps',['Bar at your hips, knees soft.','Push your hips back, bar close to your legs, back flat.','Stand up when you feel your hamstrings stretch.']],
  ['deadlift','Deadlift',['hamstrings','glutes','lowerback','upperback'],'Barbell',3,5,'reps',['Bar over mid-foot, grip just outside your legs.','Brace, push the floor away, bar close to your body.','Lock out tall, then lower under control.']],
@@ -4183,6 +4185,9 @@ const curl = (props, x) => A([mergeP(STA, mergeP({a:[{u:-92, f:-90}, {u:-88, f:-
 const DB = [{k:'db', at:'hand0'}, {k:'db', at:'hand1', far:1}];
 const press = (props, lowH, highH) => two(mergeP(STA, {a:[{h:lowH, b:-1}, {h:[lowH[0] - .02, lowH[1]], b:-1}], pr:props}), {a:[{h:highH}, {h:[highH[0] - .02, highH[1]]}]});
 const LIE_PRONE = (o) => mergeP({v:'side', hip:[0, .07], tr:0, a:[{u:2, f:2}, {u:1, f:1}], l:[{u:181, f:181, ft:-92}, {u:180, f:180, ft:-92}], pr:[]}, o || {});
+// Seated on the hip machine, facing you. w: how far apart the feet are; pads -1 inside the knees (adductor), +1 outside (abductor).
+const hipMach = (w, pads) => ({v:'front', hip:[0, .53], tr:90, a:[{h:[.22, .46], b:1}, {h:[-.22, .46], b:-1}], l:[{h:[w, .06], b:1, ft:0}, {h:[-w, .06], b:-1, ft:-180}],
+  pr:[{k:'hipmach'}, {k:'kpad', at:'knee0', off:[.06 * pads, 0], piv:[.04, .2]}, {k:'kpad', at:'knee1', off:[-.06 * pads, 0], piv:[-.04, .2]}, {k:'handle', at:'hand0'}, {k:'handle', at:'hand1'}]});
 const sidePlank = (hipY, x) => mergeP({v:'front', hip:[-.06, hipY], tr:hipY > .15 ? 17 : 8, a:[{u:-92, f:-70}, {u:96, f:96}], l:[{h:[-.56, .03], b:1, ft:-90}, {h:[-.56, .1], b:1, ft:-90}], pr:[]}, x || {});
 const ANIMS = {
   pushup: A(pushupA()),
@@ -4197,9 +4202,8 @@ const ANIMS = {
   plank: two(plankK([-.62, .03], [.13, .17], [.13, .01], null, {a:[{u:-90, f:0}, {u:-90, f:-2}]}), {hip:[-.13, .1]}, {move:1600, hold:600}),
   'side-plank': two(sidePlank(.2), {hip:[-.06, .21]}, {move:1600, hold:600}),
   // Adductors. Machine and sumo squat face you; the side-lying raise and the Copenhagen plank are seen from the front like the side plank.
-  'hip-adduction': two({v:'front', hip:[0, .52], tr:90, a:[{h:[.21, .47], b:1}, {h:[-.21, .47], b:-1}], l:[{h:[.27, .05], b:1, ft:0}, {h:[-.27, .05], b:-1, ft:-180}],
-      pr:[{k:'box', x:-.2, y:.46, w:.4}, {k:'pad', at:'knee0', off:[.05, 0]}, {k:'pad', at:'knee1', off:[-.05, 0]}]},
-    {l:[{h:[.085, .04]}, {h:[-.085, .04]}]}, {move:1100, hold:350}),
+  'hip-adduction': two(hipMach(.27, -1), hipMach(.085, -1), {move:1100, hold:350}),
+  'hip-abduction': two(hipMach(.085, 1), hipMach(.29, 1), {move:1100, hold:350}),
   'sumo-squat': two(mergeP(FR, {a:[{h:[.05, .66], b:1}, {h:[-.05, .66], b:-1}], l:[{h:[.3, 0], b:1, ft:20}, {h:[-.3, 0], b:-1, ft:-200}]}),
     {hip:[0, .3], a:[{h:[.05, .5]}, {h:[-.05, .5]}]}, {move:1000}),
   'side-adduction': two({v:'front', hip:[-.04, .1], tr:4, a:[{h:[.31, .12], b:-1}, {h:[.02, .19], b:1}], l:[{h:[-.54, .03], b:1, ft:-90}, {h:[-.22, .02], b:1, ft:-90}], pr:[]},
@@ -4307,7 +4311,7 @@ const animFor = id => ANIMS[id] || ANIMS[ANIM_ALIAS[id]] || null;
 function animGlow(id){ const g = (typeof EX !== 'undefined' && EX[id] && EX[id].groups) || ANIM_MOVE_GROUPS[id] || []; return new Set(g.slice(0, 2).map(x => ANIM_GLOW[x]).filter(Boolean)); }
 const jointAt = (P, r) => { if (Array.isArray(r)) return r; const m = /^([a-z]+)(\d)?$/.exec(r || '') || []; const v = P[m[1]]; return v && m[2] != null ? v[+m[2]] : v; };
 const LIMB_W = {thigh:.09, shin:.072, foot:.044, upper:.066, fore:.056};
-const STATIC_PROPS = new Set(['bench', 'box', 'wall', 'bar', 'table', 'door', 'stack', 'back', 'incline', 'sled', 'plate', 'cable']);
+const STATIC_PROPS = new Set(['bench', 'box', 'wall', 'bar', 'table', 'door', 'stack', 'back', 'incline', 'sled', 'plate', 'cable', 'hipmach']);
 // Build the drawing for one pose: a list of [tag, attributes]. Rig y grows up; SVG y grows down.
 // Limb radii [at the root, at the end]: thighs and upper arms taper towards the knee and elbow, calves towards the ankle.
 // Limb shapes [radius at the root, widest radius, radius at the end, where the widest point sits]: thigh, calf, biceps and forearm bulge like real muscle.
@@ -4409,6 +4413,12 @@ function animScene(pose, glow, big){
     else if (k === 'bottle'){ R(c[0] - .018, c[1] - .05, .036, .1, 'jug' + fc, .012); R(c[0] - .01, c[1] + .05, .02, .02, 'pl' + fc, .004); }
     else if (k === 'handle') L([c[0] - .04, c[1] + .005], [c[0] + .04, c[1] - .005], .022, 'pll');
     else if (k === 'pad'){ C(c, .042, 'pl'); C(c, .014, 'hub'); }
+    // Seated hip machine seen from the front (adductor / abductor): stack tower, base, seat post, seat, backrest and headrest.
+    else if (k === 'hipmach'){ R(.3, 0, .15, 1.08, 'pr wl', .03); for (let i = 0; i < 7; i++) R(.32, .06 + i * .07, .11, .055, 'pl', .006);
+      R(-.4, 0, .85, .035, 'pr', .012); R(-.035, .035, .07, .36, 'pr', .01); R(-.2, .39, .4, .075, 'mpad', .035);
+      R(-.16, .47, .32, .5, 'mpad', .05); R(-.1, .99, .2, .13, 'mpad', .045); }
+    // A tall knee pad on its lever: the lever swings from a pivot under the seat as the knees open and close.
+    else if (k === 'kpad'){ L(p.piv, [c[0], c[1] - .06], .026, 'pll'); R(c[0] - .028, c[1] - .075, .056, .15, 'mpad', .026); }
     else if (k === 'towel'){ const a = jointAt(P, p.from), b = jointAt(P, p.to), m = mix(a, b, .5); Q(a, [m[0], m[1] - (p.wide ? .03 : .07)], b, .026, 'tw'); }
     else if (k === 'rope'){ const a = P.hand[0], b = P.hand[1], my = (a[1] + b[1]) / 2; Q(a, [(a[0] + b[0]) / 2, 2 * p.y - my], b, .012, 'rp'); }
   };
@@ -4441,7 +4451,8 @@ function animScene(pose, glow, big){
     SM(TS.shade, 'shade', true);
     if (glow.has('chest')) SM(TS.upper, 'mus');
     if (glow.has('core')) SM(TS.lower, 'mus');
-    if (glow.has('glute') && !front) { const g = at(-.035, -.058); if (big) C(g, .085, 'haloc'); E(g, .052, .056, 'mus gl'); }
+    if (glow.has('glute')){ const gs = front ? [at(.03, .118), at(.03, -.118)] : [at(-.035, -.058)];
+      gs.forEach(g => { if (big) C(g, front ? .06 : .085, 'haloc'); E(g, front ? .032 : .052, front ? .048 : .056, 'mus gl'); }); }
     // head: hair at the back and top, a face in front, an ear and a nose so you can tell where the person looks
     if (front){ E(addv(P.head, hd, .016), .07, .066, 'hair'); E(P.head, .062, .07, 'pp sk'); [-1, 1].forEach(k => E(addv(P.head, fwh, .062 * k), .012, .02, 'sk ear')); E(addv(P.head, hd, .045), .06, .03, 'hair'); }
     else { E(addv(addv(P.head, hd, .014), fwh, -.016), .07, .068, 'hair'); E(addv(P.head, fwh, .006), .062, .068, 'pp sk');
