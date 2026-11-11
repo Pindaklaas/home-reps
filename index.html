@@ -25,7 +25,7 @@
   --amber:#D99A1E; --blue:#4A7BD0;
   --spring:cubic-bezier(.3,1.45,.5,1); --out:cubic-bezier(.2,.8,.2,1);
   --bad:#D63A2F; --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --gold-hi:#FFF3C4; --gold-lo:#A9781A; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
-  --p-skin-hi:#F2C6A6; --p-skin-lo:#C7865F; --p-skin-far-hi:#C08A6B; --p-skin-far-lo:#97634A; --p-hair:#2B1F19; --kit-top-hi:#4D5B70; --kit-top-lo:#2E3846; --kit-bot-hi:#30363F; --kit-bot-lo:#1B1F25; --shoe-hi:#FFFFFF; --shoe-lo:#CDD4DD;
+  --p-skin-hi:#F2C6A6; --p-skin-lo:#C7865F; --p-skin-far-hi:#C08A6B; --p-skin-far-lo:#97634A; --p-hair:#24170F; --p-hair-hi:#6E4A33; --kit-top-hi:#4D5B70; --kit-top-lo:#2E3846; --kit-bot-hi:#30363F; --kit-bot-lo:#1B1F25; --shoe-hi:#FFFFFF; --shoe-lo:#CDD4DD;
   --fig:#2B333E; --fig-far:#8F99A6; --fig-hl:rgba(255,255,255,.2); --prop:#8D97A4; --prop-soft:#DCE1E7;
   --r:14px;
 }
@@ -798,7 +798,7 @@ svg.anim .kt{fill:url(#ag-kt)}svg.anim .kt.far{fill:url(#ag-ktf)}
 svg.anim .ks{fill:url(#ag-ks)}svg.anim .ks.far{fill:url(#ag-ksf)}
 svg.anim .sho{fill:url(#ag-sho)}svg.anim .sho.far{fill:url(#ag-shof)}
 svg.anim .sole{fill:var(--accent)}svg.anim .sole.far{opacity:.55}
-svg.anim .hair{fill:var(--p-hair)}
+svg.anim .hair{fill:url(#ag-hair)}svg.anim .htie{fill:var(--accent)}
 svg.anim .mus{fill:url(#ag-on);opacity:.84}svg.anim .mus.far{opacity:.6}
 svg.anim .tor.mus{stroke:url(#ag-on);stroke-width:.02;stroke-linejoin:round}
 svg.anim .halo,svg.anim .haloc{fill:var(--accent);stroke:none;filter:url(#ag-blur);opacity:calc(.06 + var(--g) * .2)}
@@ -4418,9 +4418,9 @@ const STATIC_PROPS = new Set(['bench', 'box', 'wall', 'bar', 'table', 'door', 's
 // Build the drawing for one pose: a list of [tag, attributes]. Rig y grows up; SVG y grows down.
 // Limb radii [at the root, at the end]: thighs and upper arms taper towards the knee and elbow, calves towards the ankle.
 // Limb shapes [radius at the root, widest radius, radius at the end, where the widest point sits]: thigh, calf, biceps and forearm bulge like real muscle.
-const LIMB_R = {thigh:[.064, .068, .042, .38], shin:[.042, .05, .025, .3], upper:[.038, .042, .031, .5], fore:[.034, .035, .022, .28]};
+const LIMB_R = {thigh:[.052, .056, .034, .38], shin:[.034, .04, .021, .3], upper:[.03, .033, .025, .5], fore:[.027, .028, .019, .28]};
 // Legs from the side are not symmetric: [widest, where] for the front and the back of each.
-const LEG_SHAPE = {thigh:{front:[.071, .42], back:[.068, .28]}, shin:{front:[.041, .2], back:[.059, .3]}};
+const LEG_SHAPE = {thigh:{front:[.058, .42], back:[.055, .28]}, shin:{front:[.033, .2], back:[.047, .3]}};
 function animScene(pose, glow, big){
   const P = solvePose(pose), out = [], f = n => Math.round(n * 1e4) / 1e4, front = P.front;
   // A tapered capsule from a to b (rig coords): the body is built from these, so limbs read as volumes, not sticks.
@@ -4474,20 +4474,20 @@ function animScene(pose, glow, big){
     const bodyFront = (a, b) => { const q = addv(a, fw, .2); return sideOf(a, b, q) || 1; };
     const qs = front ? 0 : (-sideOf(H, K, A) || bodyFront(H, K)), cs = front ? 0 : (sideOf(K, A, H) || -bodyFront(K, A));
     seg(H, K, 'thigh', far, qs); seg(K, A, 'shin', far, cs ? -cs : 0);
-    if (!front){ const nk = nRig(H, K); E(addv(K, nk, qs * .03), .016, .019, 'kcap' + fc);
+    if (!front){ const nk = nRig(H, K); E(addv(K, nk, qs * .024), .013, .016, 'kcap' + fc);
       // muscle lines: where the quads meet above the knee, and the top of the calf
       if (big && !far){ const nt = nRig(H, K), ns = nRig(K, A);
-        Q(addv(mix(H, K, .5), nt, qs * .03), addv(mix(H, K, .72), nt, qs * .045), addv(mix(H, K, .9), nt, qs * .028), .005, 'mline');
-        Q(addv(mix(K, A, .1), ns, cs * .03), addv(mix(K, A, .28), ns, cs * .05), addv(mix(K, A, .5), ns, cs * .034), .005, 'mline'); } }
+        Q(addv(mix(H, K, .5), nt, qs * .024), addv(mix(H, K, .72), nt, qs * .036), addv(mix(H, K, .9), nt, qs * .022), .004, 'mline');
+        Q(addv(mix(K, A, .1), ns, cs * .024), addv(mix(K, A, .28), ns, cs * .04), addv(mix(K, A, .5), ns, cs * .027), .004, 'mline'); } }
     // trainers: heel at the ankle, toe forward, a light sole
     // the sole runs under the foot, on the side away from the shin, whatever angle the foot is at
     const sv = [P.ankle[i][0] - P.knee[i][0], P.ankle[i][1] - P.knee[i][1]], sl = Math.hypot(sv[0], sv[1]) || 1, su = [sv[0] / sl, sv[1] / sl];
-    const heel = addv(P.ankle[i], su, .012); CAP(heel, P.toe[i], .029, .021, 'pp sho' + fc); CAP(addv(heel, su, .022), addv(P.toe[i], su, .016), .009, .007, 'sole' + fc); };
+    const heel = addv(P.ankle[i], su, .012); CAP(heel, P.toe[i], .025, .018, 'pp sho' + fc); CAP(addv(heel, su, .022), addv(P.toe[i], su, .016), .008, .006, 'sole' + fc); };
   const arm = (i, far) => { const fc = far ? ' far' : '';
     if (glow.has('delt') && big) C(P.sh[i], .07, 'haloc' + fc);
-    seg(P.sh[i], P.el[i], 'upper', far); seg(P.el[i], P.hand[i], 'fore', far); C(P.hand[i], .029, 'pp sk' + fc);
+    seg(P.sh[i], P.el[i], 'upper', far); seg(P.el[i], P.hand[i], 'fore', far); C(P.hand[i], .024, 'pp sk' + fc);
     // the shoulder cap sits over the top of the arm, so a working shoulder reads as one rounded muscle
-    if (glow.has('delt')) CAP(P.sh[i], mix(P.sh[i], P.el[i], .42), .047, .037, 'mus dl' + fc); };
+    if (glow.has('delt')) CAP(P.sh[i], mix(P.sh[i], P.el[i], .42), .039, .031, 'mus dl' + fc); };
   // props
   const prop = (p, layer) => {
     const k = p.k, isStatic = STATIC_PROPS.has(k), far = p.far ? 'far' : 'near';
@@ -4532,34 +4532,42 @@ function animScene(pose, glow, big){
   const d = dirv(pose.tr != null ? pose.tr : 90), fw = dirv((pose.tr != null ? pose.tr : 90) - 90), bk = [-fw[0], -fw[1]];
   const base = addv(P.hip, d, RIG.shoulder - .01), at = (h, s) => addv(addv(P.hip, d, h), fw, s);
   // The torso as a person: from the side chest, a flat belly, the curve of the lower back and the glutes; from the front a V from the shoulders to the waist.
+  // Slim build: the torso outline sits closer to the spine.
+  const ts = (h, w) => at(h, w * (front ? .86 : .84));
   const TS = front
-    ? {shorts:[at(.08, .1), at(-.02, .106), at(-.075, .06), at(-.075, -.06), at(-.02, -.106), at(.08, -.1)],
-       shirt:[at(.075, .098), at(.12, .094), at(.18, .104), at(.25, .122), at(.3, .118), at(.315, .055), at(.315, -.055), at(.3, -.118), at(.25, -.122), at(.18, -.104), at(.12, -.094), at(.075, -.098)],
-       shade:[at(.075, -.098), at(.12, -.094), at(.18, -.104), at(.25, -.122), at(.3, -.118), at(.3, -.08), at(.2, -.07), at(.1, -.066)],
-       upper:[at(.14, .096), at(.18, .104), at(.25, .122), at(.3, .118), at(.315, .055), at(.315, -.055), at(.3, -.118), at(.25, -.122), at(.18, -.104), at(.14, -.096)],
-       lower:[at(-.02, .1), at(.06, .098), at(.14, .095), at(.14, -.095), at(.06, -.098), at(-.02, -.1)]}
-    : {shorts:[at(-.07, .045), at(-.01, .058), at(.08, .058), at(.08, -.05), at(.03, -.066), at(-.03, -.083), at(-.078, -.05)],
-       shirt:[at(.075, .057), at(.13, .055), at(.19, .073), at(.235, .087), at(.28, .07), at(.318, .028), at(.318, -.04), at(.26, -.07), at(.18, -.064), at(.1, -.049), at(.075, -.051)],
-       shade:[at(.075, -.051), at(.1, -.049), at(.18, -.064), at(.26, -.07), at(.31, -.045), at(.29, -.02), at(.2, -.03), at(.1, -.022), at(.075, -.02)],
-       upper:[at(.14, .056), at(.19, .073), at(.235, .087), at(.28, .07), at(.318, .028), at(.318, -.04), at(.26, -.07), at(.18, -.064), at(.14, -.056)],
-       lower:[at(0, .058), at(.06, .057), at(.14, .056), at(.14, -.056), at(.1, -.049), at(.03, -.066), at(0, -.072)]};
+    ? {shorts:[ts(.08, .1), ts(-.02, .106), ts(-.075, .06), ts(-.075, -.06), ts(-.02, -.106), ts(.08, -.1)],
+       shirt:[ts(.075, .098), ts(.12, .094), ts(.18, .104), ts(.25, .122), ts(.3, .118), ts(.315, .055), ts(.315, -.055), ts(.3, -.118), ts(.25, -.122), ts(.18, -.104), ts(.12, -.094), ts(.075, -.098)],
+       shade:[ts(.075, -.098), ts(.12, -.094), ts(.18, -.104), ts(.25, -.122), ts(.3, -.118), ts(.3, -.08), ts(.2, -.07), ts(.1, -.066)],
+       upper:[ts(.14, .096), ts(.18, .104), ts(.25, .122), ts(.3, .118), ts(.315, .055), ts(.315, -.055), ts(.3, -.118), ts(.25, -.122), ts(.18, -.104), ts(.14, -.096)],
+       lower:[ts(-.02, .1), ts(.06, .098), ts(.14, .095), ts(.14, -.095), ts(.06, -.098), ts(-.02, -.1)]}
+    : {shorts:[ts(-.07, .045), ts(-.01, .058), ts(.08, .058), ts(.08, -.05), ts(.03, -.066), ts(-.03, -.083), ts(-.078, -.05)],
+       shirt:[ts(.075, .057), ts(.13, .055), ts(.19, .073), ts(.235, .087), ts(.28, .07), ts(.318, .028), ts(.318, -.04), ts(.26, -.07), ts(.18, -.064), ts(.1, -.049), ts(.075, -.051)],
+       shade:[ts(.075, -.051), ts(.1, -.049), ts(.18, -.064), ts(.26, -.07), ts(.31, -.045), ts(.29, -.02), ts(.2, -.03), ts(.1, -.022), ts(.075, -.02)],
+       upper:[ts(.14, .056), ts(.19, .073), ts(.235, .087), ts(.28, .07), ts(.318, .028), ts(.318, -.04), ts(.26, -.07), ts(.18, -.064), ts(.14, -.056)],
+       lower:[ts(0, .058), ts(.06, .057), ts(.14, .056), ts(.14, -.056), ts(.1, -.049), ts(.03, -.066), ts(0, -.072)]};
   const torso = () => {
     if (big && glow.has('chest')) SM(TS.upper, 'tor halo');
     if (big && glow.has('core')) SM(TS.lower, 'tor halo');
     // neck and head first, so the t-shirt collar sits over the neck
     const hd = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0)), fwh = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0) - 90);
-    CAP(addv(P.neck, d, -.03), addv(P.neck, hd, .045), .03, .027, 'pp sk');
+    CAP(addv(P.neck, d, -.03), addv(P.neck, hd, .045), .025, .022, 'pp sk');
     SM(TS.shorts, 'pp ks');
     SM(TS.shirt, 'pp kt', true);
     SM(TS.shade, 'shade', true);
     if (glow.has('chest')) SM(TS.upper, 'mus');
     if (glow.has('core')) SM(TS.lower, 'mus');
-    if (glow.has('glute')){ const gs = front ? [at(.03, .118), at(.03, -.118)] : [at(-.035, -.058)];
-      gs.forEach(g => { if (big) C(g, front ? .06 : .085, 'haloc'); E(g, front ? .032 : .052, front ? .048 : .056, 'mus gl'); }); }
+    if (glow.has('glute')){ const gs = front ? [at(.03, .1), at(.03, -.1)] : [at(-.035, -.05)];
+      gs.forEach(g => { if (big) C(g, front ? .06 : .085, 'haloc'); E(g, front ? .028 : .045, front ? .042 : .05, 'mus gl'); }); }
     // head: hair at the back and top, a face in front, an ear and a nose so you can tell where the person looks
-    if (front){ E(addv(P.head, hd, .016), .07, .066, 'hair'); E(P.head, .062, .07, 'pp sk'); [-1, 1].forEach(k => E(addv(P.head, fwh, .062 * k), .012, .02, 'sk ear')); E(addv(P.head, hd, .045), .06, .03, 'hair'); }
-    else { E(addv(addv(P.head, hd, .014), fwh, -.016), .07, .068, 'hair'); E(addv(P.head, fwh, .006), .062, .068, 'pp sk');
-      E(addv(P.head, fwh, -.008), .013, .02, 'sk ear'); E(addv(addv(P.head, fwh, .064), hd, -.006), .012, .01, 'sk'); E(addv(addv(P.head, hd, .03), fwh, -.01), .056, .034, 'hair'); }
+    // Hair: volume at the back and top, a fringe, and a ponytail tied at the back that always hangs with gravity.
+    if (front){ E(addv(P.head, hd, .012), .066, .07, 'pp hair'); E(P.head, .055, .063, 'pp sk'); [-1, 1].forEach(k => E(addv(P.head, fwh, .055 * k), .01, .017, 'sk ear'));
+      E(addv(P.head, hd, .04), .056, .03, 'hair'); [-1, 1].forEach(k => E(addv(addv(P.head, hd, .028), fwh, .042 * k), .016, .03, 'hair')); }
+    else { // the ponytail falls along the back of the neck and with gravity, never across the face
+      const tie = addv(addv(P.head, hd, .03), fwh, -.058), pv = [-hd[0] * .6 - fwh[0] * .3, -hd[1] * .6 - fwh[1] * .3 - .4], pl = Math.hypot(pv[0], pv[1]) || 1, tail = addv(tie, [pv[0] / pl, pv[1] / pl], .13);
+      LIMB(tie, tail, .024, .026, .007, .3, 'pp hair');
+      E(addv(addv(P.head, hd, .012), fwh, -.016), .064, .066, 'pp hair'); E(addv(P.head, fwh, .006), .055, .062, 'pp sk');
+      E(addv(P.head, fwh, -.006), .011, .017, 'sk ear'); E(addv(addv(P.head, fwh, .058), hd, -.006), .011, .009, 'sk');
+      E(addv(addv(P.head, hd, .034), fwh, -.004), .052, .03, 'hair'); E(addv(addv(P.head, hd, .03), fwh, .036), .02, .014, 'hair'); C(tie, .012, 'htie'); }
   };
   if (front && pose.lf){ layer('far'); torso(); leg(0); leg(1); arm(0); arm(1); layer('near'); }
   else if (front){ leg(0); leg(1); layer('far'); torso(); arm(0); arm(1); layer('near'); }
@@ -4653,7 +4661,7 @@ function animDefs(){
     ${g('ag-kt', 'var(--kit-top-hi)', 'var(--kit-top-lo)')}${g('ag-ktf', 'color-mix(in srgb,var(--kit-top-hi) 72%,#000)', 'color-mix(in srgb,var(--kit-top-lo) 72%,#000)')}
     ${g('ag-ks', 'var(--kit-bot-hi)', 'var(--kit-bot-lo)')}${g('ag-ksf', 'color-mix(in srgb,var(--kit-bot-hi) 75%,#000)', 'color-mix(in srgb,var(--kit-bot-lo) 75%,#000)')}
     ${g('ag-sho', 'var(--shoe-hi)', 'var(--shoe-lo)')}${g('ag-shof', 'color-mix(in srgb,var(--shoe-hi) 78%,#555)', 'color-mix(in srgb,var(--shoe-lo) 78%,#555)')}
-    ${g('ag-on', 'var(--accent)', 'var(--accent-2)')}<radialGradient id="ag-sh"><stop offset="0" style="stop-color:var(--ink);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--ink);stop-opacity:0"/></radialGradient>${g('ag-onf', 'color-mix(in srgb,var(--accent) 55%,var(--fig-far))', 'color-mix(in srgb,var(--accent-2) 55%,var(--fig-far))')}
+    ${g('ag-on', 'var(--accent)', 'var(--accent-2)')}${g('ag-hair', 'var(--p-hair-hi)', 'var(--p-hair)')}<radialGradient id="ag-sh"><stop offset="0" style="stop-color:var(--ink);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--ink);stop-opacity:0"/></radialGradient>${g('ag-onf', 'color-mix(in srgb,var(--accent) 55%,var(--fig-far))', 'color-mix(in srgb,var(--accent-2) 55%,var(--fig-far))')}
     <filter id="ag-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".022"/></filter></defs></svg>`);
 }
 // The range of motion of a two-pose move: the path of the joint that travels furthest, dotted, with an arrow at each end.
