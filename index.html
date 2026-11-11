@@ -830,12 +830,14 @@ svg.anim .rp{stroke:var(--prop);fill:none}
 .anim-stage svg{width:100%;height:100%}
 .th-btn{border:0;padding:0;background:var(--bg);border-radius:12px;overflow:hidden;flex:none}
 .th-btn svg{width:100%;height:100%}
+svg.anim.th{background:radial-gradient(120% 90% at 50% 30%,var(--surface) 0,color-mix(in srgb,var(--bg) 88%,var(--ink)) 100%)}
+svg.anim.th .mus{opacity:.5}svg.anim.th .pp{stroke-width:.008}
 .ex.has-th{grid-template-columns:64px minmax(0,1fr) auto;padding-left:10px}
 .ex.has-th .name{overflow-wrap:anywhere;line-height:1.2}
-.ex.has-th .th-btn{grid-row:1/span 2;grid-column:1;width:64px;height:64px}
+.ex.has-th .th-btn{grid-row:1/span 2;grid-column:1;width:72px;height:72px;border-radius:16px}
 .ex.has-th .name{grid-column:2;grid-row:1}.ex.has-th .meta{grid-column:2;grid-row:2}.ex.has-th .actions{grid-column:3}
 .check.has-th{grid-template-columns:auto 52px 1fr auto;gap:10px}
-.check .th-btn{width:52px;height:52px}
+.check .th-btn{width:60px;height:60px;border-radius:14px}
 .ss-h .th-btn{width:56px;height:56px}
 .ss-h .ss-n2{flex:1;min-width:0}
 .ex-head{display:flex;flex-direction:column;gap:6px}
@@ -4503,7 +4505,7 @@ function animScene(pose, glow, big){
     else if (k === 'incline'){ const d = dirv(p.a); L([p.x, p.y], [p.x + d[0] * .55, p.y + d[1] * .55], .055, 'pll'); }
     else if (k === 'sled'){ const a = jointAt(P, p.at), d = dirv(135); L([a[0] - d[0] * .15, a[1] - d[1] * .15], [a[0] + d[0] * .15, a[1] + d[1] * .15], .045, 'pll'); }
     else if (k === 'plate'){ C([p.x, p.y], .075, 'pl'); C([p.x, p.y], .022, 'hub'); }
-    else if (k === 'cable'){ const to = jointAt(P, p.to); L(p.from, to, .009, 'cb'); C(p.from, .026, 'pl'); }
+    else if (k === 'cable'){ const to = jointAt(P, p.to); L(p.from, to, .009, 'cb'); C(p.from, .026, 'pl cbo'); }
     else if (k === 'barbell'){ if (front){ L([c[0] - .4, c[1]], [c[0] + .4, c[1]], .02, 'pll'); [-.36, .36].forEach(x => R(c[0] + x - .02, c[1] - .1, .04, .2, 'pl', .01)); }
       else { const r = p.small ? .06 : .112; C(c, r, 'pl' + fc); C(c, r * .55, 'rim' + fc); C(c, .018, 'hub' + fc); } }
     else if (k === 'db'){ if (p.front) { R(c[0] - .055, c[1] - .02, .11, .04, 'pl' + fc, .01); R(c[0] - .065, c[1] - .03, .028, .06, 'pl' + fc, .008); R(c[0] + .037, c[1] - .03, .028, .06, 'pl' + fc, .008); }
@@ -4568,11 +4570,11 @@ function animScene(pose, glow, big){
 function sceneBounds(items, bb){
   const add = (x, y, r) => { r = r || 0; bb[0] = Math.min(bb[0], x - r); bb[1] = Math.min(bb[1], y - r); bb[2] = Math.max(bb[2], x + r); bb[3] = Math.max(bb[3], y + r); };
   items.forEach(([t, a]) => {
-    if (a.class === 'sh' || / (wl|leg|halo|haloc)\b/.test(' ' + a.class)) return;
+    if (a.class === 'sh' || / (wl|leg|halo|haloc)\b/.test(' ' + a.class) || (bb.tight && /\b(cb|cbo|gnd)\b/.test(a.class || ''))) return;
     if (a['data-bb']){ const n = a['data-bb'].split(' ').map(Number); add(n[0], n[1], n[4]); add(n[2], n[3], n[4]); return; }
     if (t === 'line'){ const w = a['stroke-width'] / 2; add(a.x1, a.y1, w); add(a.x2, a.y2, w); }
     else if (t === 'circle') add(a.cx, a.cy, a.r);
-    else if (t === 'ellipse'){ add(a.cx - a.rx, a.cy); add(a.cx + a.rx, a.cy); }
+    else if (t === 'ellipse'){ add(a.cx - a.rx, a.cy); add(a.cx + a.rx, a.cy); add(a.cx, a.cy - a.ry); add(a.cx, a.cy + a.ry); }
     else if (t === 'rect'){ add(a.x, a.y); add(a.x + a.width, a.y + a.height); }
     else { const n = String(a.points || a.d).match(/-?[\d.]+/g).map(Number);
       if (t === 'path'){ add(n[0], n[1], .02); add(n[4], n[5], .02); add(.25 * n[0] + .5 * n[2] + .25 * n[4], .25 * n[1] + .5 * n[3] + .25 * n[5], .02); }
@@ -4587,6 +4589,14 @@ function animViewBox(anim, glow, ar, big){
   bb[3] = Math.max(bb[3], .02);
   const pad = .07; let x = bb[0] - pad, y = bb[1] - pad, w = bb[2] - bb[0] + pad * 2, h = bb[3] - bb[1] + pad * 2;
   if (w / h > ar){ const nh = w / ar; y -= (nh - h) * .62; h = nh; } else { const nw = h * ar; x -= (nw - w) / 2; w = nw; }
+  return [x, y, w, h].map(v => Math.round(v * 1e3) / 1e3).join(' ');
+}
+// A thumbnail is a still of the key moment, framed tight on the person (props may be cropped), like a photo in a list.
+function animThumbBox(anim, glow, ar){
+  const bb = [Infinity, Infinity, -Infinity, -Infinity]; bb.tight = true;
+  sceneBounds(animScene(animStill(anim), glow, false), bb); bb[3] = Math.max(bb[3], .01);
+  const pad = .045; let x = bb[0] - pad, y = bb[1] - pad, w = bb[2] - bb[0] + pad * 2, h = bb[3] - bb[1] + pad * 2;
+  if (w / h > ar){ const nh = w / ar; y -= (nh - h) * .55; h = nh; } else { const nw = h * ar; x -= (nw - w) / 2; w = nw; }
   return [x, y, w, h].map(v => Math.round(v * 1e3) / 1e3).join(' ');
 }
 // The pose that shows the work best (the end of the first move).
@@ -4624,12 +4634,13 @@ function animTick(now){
 const animKick = () => { if (!animRaf && !RM()) animRaf = requestAnimationFrame(animTick); };
 function animMount(svg){
   const id = svg.dataset.anim, anim = animFor(id); svg.dataset.m = '1'; if (!anim) return;
-  const glow = animGlow(id), ar = +svg.dataset.ar || 4 / 3, big = svg.classList.contains('big'), vb = animViewBox(anim, glow, ar, big);
+  const glow = animGlow(id), ar = +svg.dataset.ar || 4 / 3, big = svg.classList.contains('big'), thumb = svg.classList.contains('th');
+  const vb = thumb ? animThumbBox(anim, glow, ar) : animViewBox(anim, glow, ar, big);
   svg.setAttribute('viewBox', vb); animDefs();
   // Big views get a floor line and a dotted guide for the path of the joint that moves most (the range of motion).
   svg.innerHTML = big ? `<g class="rom">${animRom(anim, vb, glow)}</g>${animGhost(anim)}<g></g>` : '<g></g>';
   const st = {svg, anim, glow, big, g:svg.lastChild, t0:performance.now(), ph:+svg.dataset.ph || 0, small:svg.classList.contains('th'), vis:!animIO};
-  if (RM()){ animApply(st, animScene(animStill(anim), glow, big)); svg.style.setProperty('--g', '1'); return; }
+  if (RM() || thumb){ animApply(st, animScene(animStill(anim), glow, big)); svg.style.setProperty('--g', '1'); return; }
   animDraw(st, st.t0); animReg.add(st);
   if (animIO) animIO.observe(svg); else animKick();
 }
