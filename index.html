@@ -476,6 +476,7 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 #alarm .ar-row button{flex:1;height:52px;border-radius:16px;border:0;background:color-mix(in srgb,var(--arena-ink) 12%,transparent);color:inherit;font-weight:700;font-size:15px}
 #alarm .ar-row button.primary{background:var(--accent);color:var(--accent-ink)}
 .al-in{justify-content:center}
+.al-fig{flex:1 1 0;min-height:96px;max-height:250px;margin:4px 0;border-radius:22px;background:radial-gradient(110% 80% at 50% 100%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 72%);overflow:hidden}.al-fig svg{display:block;width:100%;height:100%}.al-fig + .ar-go{margin-top:8px}
 .al-time{font-family:var(--display);font-size:96px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums;animation:pulse 1.2s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.55}}
 .al-task{display:flex;flex-direction:column;gap:2px;background:color-mix(in srgb,var(--arena-ink) 8%,transparent);border-radius:18px;padding:16px}
@@ -702,12 +703,13 @@ body.mode-challenge .app{padding-bottom:40px}
 .lock-i{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 .ch-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ch-grid.in>*{animation:rise .42s var(--out) both;animation-delay:calc(min(var(--i,0),12) * 40ms)}
-.ch-tile{position:relative;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:13px;display:flex;flex-direction:column;gap:4px;min-height:138px;min-width:0;transition:transform .15s var(--out),border-color .2s}
+.ch-tile{position:relative;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:13px;display:flex;flex-direction:column;gap:4px;min-height:148px;min-width:0;transition:transform .15s var(--out),border-color .2s}
 .ch-tile:active{transform:scale(.96)}
 @media (hover:hover){.ch-tile:hover{border-color:var(--accent)}}
 .ch-tile .fmt{font-size:11.5px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
 .ch-tile b{font-family:var(--display);font-size:24px;line-height:1;text-transform:uppercase;padding-right:26px}
-.ch-tile .pb{margin-top:auto;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ch-tile .pb{margin-top:auto;font-size:12.5px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;padding-right:66px}.ch-tile .pb i{display:block;font-style:normal;font-weight:400;color:var(--muted)}
+.ch-fig{position:absolute;right:6px;bottom:6px;width:64px;height:64px;pointer-events:none;stroke:none;stroke-width:initial}.ch-fig svg{width:100%;height:100%}.ch-fig svg.anim.th{background:none}
 .ch-tile.locked{opacity:.6}
 .ch-tile.locked .fmt{color:var(--muted)}
 .ch-tile.shake{animation:shake .4s}
@@ -1547,7 +1549,12 @@ function toast(msg){
 }
 
 /* ---------- body figure ---------- */
-const SIL = 'M100,58 L91,58 L90,64 C84,67 76,68 70,68 C58,69 50,78 50,92 C49,108 47,128 47,148 C42,168 37,190 36,212 C33,222 30,232 32,242 C34,248 42,248 43,240 C44,232 45,224 46,216 C50,196 57,176 61,156 C64,142 66,128 67,114 L68,112 C70,140 72,170 69,200 C66,220 66,250 68,280 C70,292 72,302 73,312 C71,340 73,372 77,398 C74,408 70,416 72,420 L92,420 C93,410 92,404 92,398 C95,370 96,340 94,312 C96,290 98,260 98,232 L100,228 Z';
+// The body map has the same big build as the exercise figure: the paths below are drawn slim and widened here about the centre line
+// (wide shoulders and arms, a narrow waist, strong legs). BUILD is [y, how much wider]; arms keep one factor so they stay straight.
+const BUILD = [[0, 1], [54, 1.1], [68, 1.22], [112, 1.22], [150, 1.12], [200, 1], [215, 1.04], [250, 1.1], [300, 1.06], [340, 1.1], [400, 1], [430, 1]];
+const buildAt = y => { for (let i = 1; i < BUILD.length; i++) if (y <= BUILD[i][0]){ const a = BUILD[i - 1], b = BUILD[i]; return a[1] + (b[1] - a[1]) * (y - a[0]) / (b[0] - a[0]); } return 1; };
+const bulk = d => d.replace(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g, (m, x, y) => { const dx = x - 100, arm = y > 112 && Math.abs(dx) > (y > 200 ? 40 : 33); return +(100 + dx * (arm ? 1.22 : buildAt(+y))).toFixed(1) + ',' + y; });
+const SIL = bulk('M100,58 L91,58 L90,64 C84,67 76,68 70,68 C58,69 50,78 50,92 C49,108 47,128 47,148 C42,168 37,190 36,212 C33,222 30,232 32,242 C34,248 42,248 43,240 C44,232 45,224 46,216 C50,196 57,176 61,156 C64,142 66,128 67,114 L68,112 C70,140 72,170 69,200 C66,220 66,250 68,280 C70,292 72,302 73,312 C71,340 73,372 77,398 C74,408 70,416 72,420 L92,420 C93,410 92,404 92,398 C95,370 96,340 94,312 C96,290 98,260 98,232 L100,228 Z');
 const P = {
   delt:'M70,69 C59,70 51,78 51,92 C51,100 52,106 53,112 C58,106 64,96 66,88 C68,80 72,74 77,70 Z',
   arm:'M53,116 C50,128 49,140 49,148 L60,152 C63,140 65,128 66,112 C62,108 58,110 53,116 Z',
@@ -1571,6 +1578,7 @@ const BACK_PATHS = [
   ['hamstrings','M72,254 C70,270 71,288 74,302 L93,302 C96,286 97,268 96,252 C90,256 80,257 72,254 Z',1],
   ['calves','M74,316 C70,332 72,350 78,368 L91,368 C94,350 94,332 92,316 C86,320 80,320 74,316 Z',1]
 ];
+[FRONT_PATHS, BACK_PATHS].forEach(list => list.forEach(row => { row[1] = bulk(row[1]); }));
 const MIRROR = 'matrix(-1 0 0 1 200 0)';
 function drawFigure(){
   const paths = ui.side==='front' ? FRONT_PATHS : BACK_PATHS;
@@ -2570,7 +2578,7 @@ function restFor(equip, goal){
 
 /* anim-core:start — exercise animation rig: pose solving (2-bone IK) and interpolation, pure (no DOM). Tested in tests/anim.test.mjs */
 // Units: a standing person is 1.0 tall, feet on y = 0, x grows forward (the figure faces right in side view).
-const RIG = {shin:.25, thigh:.25, torso:.30, shoulder:.27, neck:.035, head:.065, upper:.16, fore:.15, foot:.075, shW:.118, hipW:.065};
+const RIG = {shin:.25, thigh:.25, torso:.30, shoulder:.27, neck:.035, head:.065, upper:.16, fore:.15, foot:.075, shW:.126, hipW:.065};
 const rad = d => d * Math.PI / 180;
 const dirv = d => [Math.cos(rad(d)), Math.sin(rad(d))];
 const addv = (a, b, k) => [a[0] + b[0] * (k == null ? 1 : k), a[1] + b[1] * (k == null ? 1 : k)];
@@ -3542,7 +3550,8 @@ function drawAlarm(){
   if (alarmRun.phase === 'ring'){
     el.innerHTML = `<div class="ar-in al-in"><span class="al-time">${pad2(now.getHours())}:${pad2(now.getMinutes())}</span>
       <h2 class="ar-name">Good morning</h2>${why ? `<p class="ar-blurb">“${esc(why)}”</p>` : ''}
-      <div class="al-task${reps ? ' has-th' : ''}"><span><span class="small" style="opacity:.7;display:block">To switch it off</span><b>${taskTxt}</b></span>${reps ? `<span class="mv-th">${animSvg(M.ex, '', 'data-ar="1.33"')}</span>` : ''}</div>
+      <div class="al-task"><span class="small" style="opacity:.7;display:block">To switch it off</span><b>${taskTxt}</b></div>
+      ${reps ? `<div class="al-fig">${animSvg(M.ex, 'big', 'data-ar="1.7"')}</div>` : ''}
       <button class="ar-go" data-al="start">Let’s do it</button>
       <button class="al-hold" data-al="hold"><span class="al-fill"></span><span class="al-lbl">Emergency stop: hold 3 seconds</span></button>
       ${cfg.mode === 'commit' ? `<p class="ar-note">Commitment mode: if you leave the task, it rings again in ${cfg.rearm} minutes.</p>` : ''}</div>`;
@@ -3970,9 +3979,9 @@ function drawSession(){
     <div class="ss-top"><button class="btn sm ghost" data-ss="hide">Hide</button><span class="ss-title"><b>${esc(s.title)}</b><span id="ss-clock">${fmtClock((Date.now() - new Date(s.startedAt)) / 1000)}</span></span><button class="btn sm primary" data-ss="finish">Finish</button></div>
     <div class="ss-prog"><span style="width:${total ? Math.round(done / total * 100) : 0}%"></span></div>
     ${s.exercises.length ? '' : '<p class="empty">Nothing planned today. Add exercises from the Body tab, or take the rest day.</p>'}
-    ${s.exercises.map((x, i) => { const e = EX[x.id], w = isWeighted(e), unit = e.unit === 'sec' ? 'sec' : 'reps';
+    ${s.exercises.map((x, i) => { const e = EX[x.id], w = isWeighted(e), unit = e.unit === 'sec' ? 'sec' : 'reps', firstNew = s.exercises.findIndex(y => !y.sug && isWeighted(EX[y.id])) === i;
       const target = `${x.sets.length} × ${x.lo === x.hi ? x.lo : x.lo + '–' + x.hi} ${unit}`;
-      const sug = x.sug ? (x.sug.why === 'up' && w ? `Last time you hit the top of the range. Try <b>${x.sug.w} kg × ${x.sug.r}</b>.` : w ? `Aim for <b>${x.sug.w} kg × ${x.sug.r}</b> today.` : `Aim for <b>${x.sug.r} ${unit}</b> today.`) : (w ? 'First time: pick a weight you could lift 2 or 3 more times.' : '');
+      const sug = x.sug ? (x.sug.why === 'up' && w ? `Last time you hit the top of the range. Try <b>${x.sug.w} kg × ${x.sug.r}</b>.` : w ? `Aim for <b>${x.sug.w} kg × ${x.sug.r}</b> today.` : `Aim for <b>${x.sug.r} ${unit}</b> today.`) : (w && firstNew ? 'First time: pick a weight you could lift 2 or 3 more times.' : '');
       const bar = /barbell/i.test(e.equip), work = x.sug ? x.sug.w : (x.last ? Math.max(...x.last.map(y => y.w || 0)) : 0);
       const plates = bar && work ? platesFor(work) : null, warm = bar && !x.sets.some(y => y.done) ? warmupSets(work) : [];
       return `<section class="ss-ex">
@@ -4419,7 +4428,7 @@ const STATIC_PROPS = new Set(['bench', 'box', 'wall', 'bar', 'table', 'door', 's
 // Build the drawing for one pose: a list of [tag, attributes]. Rig y grows up; SVG y grows down.
 // Limb radii [at the root, at the end]: thighs and upper arms taper towards the knee and elbow, calves towards the ankle.
 // Limb shapes [radius at the root, widest radius, radius at the end, where the widest point sits]: thigh, calf, biceps and forearm bulge like real muscle.
-const LIMB_R = {thigh:[.066, .072, .043, .38], shin:[.043, .05, .026, .3], upper:[.043, .054, .034, .45], fore:[.037, .041, .024, .28]};
+const LIMB_R = {thigh:[.066, .072, .043, .38], shin:[.043, .05, .026, .3], upper:[.045, .058, .035, .45], fore:[.037, .041, .024, .28]};
 // Legs from the side are not symmetric: [widest, where] for the front and the back of each.
 const LEG_SHAPE = {thigh:{front:[.077, .42], back:[.072, .28]}, shin:{front:[.042, .2], back:[.063, .3]}};
 function animScene(pose, glow, big){
@@ -4538,9 +4547,9 @@ function animScene(pose, glow, big){
   // Muscular build: a deep chest and a thick upper back over a narrow waist; from the front a strong V from wide shoulders, with the traps rising to the neck.
   const TS = front
     ? {shorts:[at(.08, .09), at(-.02, .102), at(-.075, .058), at(-.075, -.058), at(-.02, -.102), at(.08, -.09)],
-       shirt:[at(.075, .086), at(.12, .084), at(.19, .108), at(.255, .142), at(.305, .14), at(.326, .07), at(.345, .034), at(.345, -.034), at(.326, -.07), at(.305, -.14), at(.255, -.142), at(.19, -.108), at(.12, -.084), at(.075, -.086)],
-       shade:[at(.075, -.086), at(.12, -.084), at(.19, -.108), at(.255, -.142), at(.305, -.14), at(.305, -.095), at(.2, -.07), at(.1, -.056)],
-       upper:[at(.15, .09), at(.19, .108), at(.255, .142), at(.305, .14), at(.326, .07), at(.326, -.07), at(.305, -.14), at(.255, -.142), at(.19, -.108), at(.15, -.09)],
+       shirt:[at(.075, .086), at(.12, .084), at(.19, .112), at(.255, .152), at(.305, .15), at(.326, .07), at(.345, .034), at(.345, -.034), at(.326, -.07), at(.305, -.15), at(.255, -.152), at(.19, -.112), at(.12, -.084), at(.075, -.086)],
+       shade:[at(.075, -.086), at(.12, -.084), at(.19, -.112), at(.255, -.152), at(.305, -.15), at(.305, -.095), at(.2, -.07), at(.1, -.056)],
+       upper:[at(.15, .09), at(.19, .112), at(.255, .152), at(.305, .15), at(.326, .07), at(.326, -.07), at(.305, -.15), at(.255, -.152), at(.19, -.112), at(.15, -.09)],
        lower:[at(-.02, .096), at(.06, .086), at(.15, .089), at(.15, -.089), at(.06, -.086), at(-.02, -.096)]}
     : {shorts:[at(-.07, .045), at(-.01, .056), at(.08, .053), at(.08, -.048), at(.03, -.064), at(-.03, -.084), at(-.078, -.05)],
        shirt:[at(.075, .051), at(.13, .055), at(.19, .09), at(.24, .118), at(.288, .098), at(.324, .038), at(.33, -.045), at(.275, -.1), at(.19, -.088), at(.11, -.056), at(.075, -.049)],
@@ -4564,12 +4573,12 @@ function animScene(pose, glow, big){
     // head: a strong square jaw, short hair swept up at the front, a beard along the jaw, heavy brows; nose and jaw show where he looks
     const hp = (u, v) => addv(addv(P.head, fwh, u), hd, v), poly = pts => pts.map(q => hp(q[0], q[1]));
     if (front){ [-1, 1].forEach(k => E(hp(.06 * k, -.002), .01, .018, 'sk ear'));
-      SM(poly([[0, .074], [.04, .064], [.058, .03], [.058, -.012], [.053, -.05], [.032, -.078], [0, -.084], [-.032, -.078], [-.053, -.05], [-.058, -.012], [-.058, .03], [-.04, .064]]), 'pp sk');
-      SM(poly([[-.057, -.008], [-.053, -.05], [-.032, -.08], [0, -.087], [.032, -.08], [.053, -.05], [.057, -.008], [.042, -.03], [.022, -.042], [0, -.038], [-.022, -.042], [-.042, -.03]]), 'beard');
+      SM(poly([[0, .074], [.04, .064], [.058, .03], [.059, -.012], [.057, -.052], [.037, -.08], [0, -.086], [-.037, -.08], [-.057, -.052], [-.059, -.012], [-.058, .03], [-.04, .064]]), 'pp sk');
+      SM(poly([[-.058, -.008], [-.057, -.052], [-.037, -.082], [0, -.089], [.037, -.082], [.057, -.052], [.058, -.008], [.042, -.03], [.022, -.042], [0, -.038], [-.022, -.042], [-.042, -.03]]), 'beard');
       SM(poly([[-.06, .026], [-.063, .058], [-.036, .088], [0, .096], [.036, .088], [.063, .058], [.06, .026], [.046, .048], [.016, .054], [-.016, .052], [-.046, .048]]), 'pp hair');
       [-1, 1].forEach(k => { Q(hp(.012 * k, .02), hp(.03 * k, .03), hp(.05 * k, .02), .009, 'brow'); E(hp(.03 * k, .006), .007, .0045, 'eye'); }); }
-    else { SM(poly([[0, .074], [.04, .064], [.058, .04], [.064, .018], [.079, -.004], [.066, -.022], [.071, -.05], [.059, -.08], [.02, -.084], [-.012, -.06], [-.03, -.03], [-.062, -.01], [-.066, .03], [-.04, .064]]), 'pp sk');
-      SM(poly([[.063, -.03], [.073, -.052], [.059, -.083], [.02, -.087], [-.013, -.063], [-.022, -.03], [-.006, -.038], [.02, -.054], [.046, -.042]]), 'beard');
+    else { SM(poly([[0, .074], [.04, .064], [.058, .04], [.064, .018], [.079, -.004], [.066, -.022], [.074, -.052], [.064, -.083], [.02, -.086], [-.012, -.06], [-.03, -.03], [-.062, -.01], [-.066, .03], [-.04, .064]]), 'pp sk');
+      SM(poly([[.063, -.03], [.076, -.054], [.064, -.086], [.02, -.089], [-.013, -.063], [-.022, -.03], [-.006, -.038], [.02, -.054], [.046, -.042]]), 'beard');
       SM(poly([[.055, .044], [.061, .064], [.05, .081], [.022, .088], [-.012, .084], [-.04, .069], [-.06, .042], [-.065, .012], [-.057, -.012], [-.046, -.006], [-.04, .014], [-.024, .03], [0, .036], [.028, .038]]), 'pp hair');
       E(hp(-.014, -.004), .011, .017, 'sk ear'); Q(hp(.04, .026), hp(.056, .031), hp(.069, .02), .009, 'brow'); E(hp(.053, .006), .006, .0045, 'eye'); }
   };
@@ -5993,7 +6002,8 @@ function drawChallenges(anim){
       return `<button class="ch-tile${a.ok ? '' : ' locked'}" data-ch="${c.id}" style="--i:${i++}">
         ${m ? `<span class="medal-pin m-${m}">${MEDAL_SVG}</span>` : (a.ok ? '' : `<span class="medal-pin">${ICON_LOCK}</span>`)}
         <span class="fmt">${chShort(c)}</span><b>${esc(c.name)}</b>
-        <span class="pb">${a.ok ? (best != null ? `Best ${chVal(c, best)} · next ${chVal(c, nt.value)}` : `Target ${chVal(c, nt.value)}`) : esc(a.why)}</span></button>`; }).join('');
+        <span class="pb">${a.ok ? (best != null ? `Best ${chVal(c, best)}<i>Next ${chVal(c, nt.value)}</i>` : `Target ${chVal(c, nt.value)}`) : esc(a.why)}</span>
+        ${a.ok && animFor(c.moves[0]) ? `<span class="ch-fig">${animSvg(c.moves[0], 'th', 'data-ar="1"')}</span>` : ''}</button>`; }).join('');
     h += `</div>`;
   }
   h += '</div><div data-sec="challenge:recent">';
