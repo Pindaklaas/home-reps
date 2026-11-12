@@ -25,7 +25,7 @@
   --amber:#D99A1E; --blue:#4A7BD0;
   --spring:cubic-bezier(.3,1.45,.5,1); --out:cubic-bezier(.2,.8,.2,1);
   --bad:#D63A2F; --bronze:#C27A3A; --silver:#A9B3BD; --gold:#E9B62E; --gold-hi:#FFF3C4; --gold-lo:#A9781A; --legend:#8C6BFF; --arena:#0F1217; --arena-ink:#F4F5F7;
-  --p-skin-hi:#F2C6A6; --p-skin-lo:#C7865F; --p-skin-far-hi:#C08A6B; --p-skin-far-lo:#97634A; --p-hair:#17100B; --p-hair-hi:#4B3524; --p-hairf:#24170F; --p-hairf-hi:#6E4A33; --kit-top-hi:#4D5B70; --kit-top-lo:#2E3846; --kit-bot-hi:#30363F; --kit-bot-lo:#1B1F25; --shoe-hi:#FFFFFF; --shoe-lo:#CDD4DD;
+  --p-skin-hi:#F2C6A6; --p-skin-lo:#C7865F; --p-skin-far-hi:#C08A6B; --p-skin-far-lo:#97634A; --p-hair:#0F0C0A; --p-hair-hi:#3D2E24; --p-hairf:#24170F; --p-hairf-hi:#6E4A33; --kit-top-hi:#4D5B70; --kit-top-lo:#2E3846; --kit-bot-hi:#30363F; --kit-bot-lo:#1B1F25; --shoe-hi:#FFFFFF; --shoe-lo:#CDD4DD;
   --fig:#2B333E; --fig-far:#8F99A6; --fig-hl:rgba(255,255,255,.2); --prop:#8D97A4; --prop-soft:#DCE1E7;
   --r:14px;
 }
@@ -65,7 +65,7 @@ p{margin:0}
 /* body figure */
 .figure-wrap{display:grid;grid-template-columns:1fr;justify-items:center;position:relative;margin-top:6px}
 svg.body{width:auto;max-width:min(100%,250px);height:clamp(260px,calc(100vh - 330px),538px);height:clamp(260px,calc(100svh - 330px),538px);display:block;touch-action:pan-y}
-svg.body .skin{fill:var(--skin)}
+svg.body .skin{fill:var(--skin)}.mhair{fill:color-mix(in srgb,var(--skin) 45%,var(--ink))}
 svg.body .m{fill:var(--muscle);stroke:var(--bg);stroke-width:1.2;cursor:pointer;transition:fill .15s}
 svg.body .m:hover{fill:var(--muscle-hover)}
 svg.body .m.on{fill:var(--accent)}
@@ -577,6 +577,7 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .sum{gap:12px}
 .sum-hero{width:100%;text-align:left;border-radius:24px;padding:20px 18px;color:var(--arena-ink);background:radial-gradient(circle at 90% 0%,color-mix(in srgb,var(--accent) 34%,transparent),transparent 60%),var(--arena);display:flex;flex-direction:column;gap:4px;animation:rise .45s var(--out)}
 .sum-k{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:14px;color:var(--accent)}.sum-k .ico{width:18px;height:18px}
+.sum-hero{position:relative;overflow:hidden}.sum-fig{position:absolute;right:2px;top:6px;width:104px;height:124px;pointer-events:none}.sum-fig svg{display:block;width:100%;height:100%}.sum-hero h2{padding-right:100px}
 .sum-hero h2{font-size:38px;line-height:1}.sum-d{font-size:14px;opacity:.7}
 .sum-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px}
 .sum-stats span{display:flex;flex-direction:column;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;opacity:.75}
@@ -649,6 +650,8 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .mp-t{font-family:var(--display);font-weight:700;font-size:62px;line-height:.85;text-transform:uppercase}
 .mp-s{font-size:15px;opacity:.9;max-width:30ch}
 .mp-tag{margin-top:6px;font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:999px;background:color-mix(in srgb,currentColor 16%,transparent)}
+.mp-fig{position:absolute;right:4px;bottom:0;width:46%;height:92%;pointer-events:none}.mp-fig svg{display:block;width:100%;height:100%}
+.mp-card>:not(.mp-fig){position:relative}.mp-fig{z-index:1}.mp-fig + .mp-ico{display:none}.mp-fig ~ .mp-t{font-size:clamp(40px,12.4vw,50px)}.mp-fig ~ .mp-s{max-width:56%}
 .mp-ico{position:absolute;top:20px;right:20px;width:96px;height:96px;display:grid;place-items:center;border-radius:50%;background:color-mix(in srgb,currentColor 14%,transparent);animation:float 3.4s ease-in-out infinite}
 .mp-ico svg{width:54px;height:54px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mp-ch .mp-ico svg{fill:currentColor;stroke:none}
@@ -803,7 +806,7 @@ svg.anim .kt{fill:url(#ag-kt)}svg.anim .kt.far{fill:url(#ag-ktf)}
 svg.anim .ks{fill:url(#ag-ks)}svg.anim .ks.far{fill:url(#ag-ksf)}
 svg.anim .sho{fill:url(#ag-sho)}svg.anim .sho.far{fill:url(#ag-shof)}
 svg.anim .sole{fill:var(--accent)}svg.anim .sole.far{opacity:.55}
-svg.anim .hair{fill:url(#ag-hair)}svg.anim .hairf{fill:url(#ag-hairf)}svg.anim .htie{fill:var(--accent)}svg.anim .beard,svg.anim .eye{fill:var(--p-hair)}svg.anim .beard{opacity:.93}
+svg.anim .hair{fill:url(#ag-hair)}svg.anim .hairf{fill:url(#ag-hairf)}svg.anim .htie{fill:var(--accent)}svg.anim .beard,svg.anim .eye{fill:var(--p-hair)}svg.anim .beard{opacity:.5}
 svg.anim .brow{fill:none;stroke:var(--p-hair);stroke-linecap:round}svg.anim .fold{fill:none;stroke:#000;stroke-linecap:round;opacity:.22}
 svg.anim .mus{fill:url(#ag-on);opacity:.84}svg.anim .mus.far{opacity:.6}
 svg.anim .tor.mus{stroke:url(#ag-on);stroke-width:.02;stroke-linejoin:round}
@@ -873,6 +876,7 @@ details.steps ol{margin-top:8px}
 #lvlup{position:fixed;inset:0;z-index:130;display:grid;place-items:center;padding:24px;background:color-mix(in srgb,var(--arena) 78%,transparent)}
 .lu-card{background:var(--surface);border-radius:24px;padding:24px 22px;width:min(340px,100%);display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;animation:lupop .6s var(--spring)}
 .lu-k{font-family:var(--display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lu-fig{width:132px;height:140px;margin-top:-6px}.lu-fig svg{display:block;width:100%;height:100%}
 .lu-n{font-family:var(--display);font-size:96px;line-height:.95;color:var(--accent);animation:lunum .9s var(--spring) .1s both}
 .lu-r{font-weight:700;font-size:18px}
 .lu-p{background:var(--accent-soft);border-radius:999px;padding:4px 12px;font-weight:700;margin:6px 0 12px}
@@ -1554,9 +1558,9 @@ function toast(msg){
 /* ---------- body figure ---------- */
 // The body map has the same build as the exercise figure: the paths below are drawn slim (the woman) and widened for the man about the centre line
 // (wide shoulders and arms, a narrow waist, strong legs). BUILD is [y, how much wider]; arms keep one factor so they stay straight.
-const BUILD = [[0, 1], [54, 1.1], [68, 1.22], [112, 1.22], [150, 1.12], [200, 1], [215, 1.04], [250, 1.1], [300, 1.06], [340, 1.1], [400, 1], [430, 1]];
+const BUILD = [[0, 1], [54, 1.14], [68, 1.3], [112, 1.3], [150, 1.16], [200, 1], [215, 1.05], [250, 1.12], [300, 1.07], [340, 1.12], [400, 1], [430, 1]];
 const buildAt = y => { for (let i = 1; i < BUILD.length; i++) if (y <= BUILD[i][0]){ const a = BUILD[i - 1], b = BUILD[i]; return a[1] + (b[1] - a[1]) * (y - a[0]) / (b[0] - a[0]); } return 1; };
-const bulk = d => d.replace(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g, (m, x, y) => { const dx = x - 100, arm = y > 112 && Math.abs(dx) > (y > 200 ? 40 : 33); return +(100 + dx * (arm ? 1.22 : buildAt(+y))).toFixed(1) + ',' + y; });
+const bulk = d => d.replace(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g, (m, x, y) => { const dx = x - 100, arm = y > 112 && Math.abs(dx) > (y > 200 ? 40 : 33); return +(100 + dx * (arm ? 1.3 : buildAt(+y))).toFixed(1) + ',' + y; });
 let FIGK = 'm';   // the avatar on screen: 'm' or 'f' (see figApply)
 const SIL_SLIM = 'M100,58 L91,58 L90,64 C84,67 76,68 70,68 C58,69 50,78 50,92 C49,108 47,128 47,148 C42,168 37,190 36,212 C33,222 30,232 32,242 C34,248 42,248 43,240 C44,232 45,224 46,216 C50,196 57,176 61,156 C64,142 66,128 67,114 L68,112 C70,140 72,170 69,200 C66,220 66,250 68,280 C70,292 72,302 73,312 C71,340 73,372 77,398 C74,408 70,416 72,420 L92,420 C93,410 92,404 92,398 C95,370 96,340 94,312 C96,290 98,260 98,232 L100,228 Z', SIL_BIG = bulk(SIL_SLIM), silPath = () => FIGK === 'm' ? SIL_BIG : SIL_SLIM;
 const P = {
@@ -1585,6 +1589,18 @@ const BACK_PATHS = [
 const BIG_PATHS = {front:FRONT_PATHS.map(r => [r[0], bulk(r[1]), r[2]]), back:BACK_PATHS.map(r => [r[0], bulk(r[1]), r[2]])};
 const bodyPaths = side => FIGK === 'm' ? BIG_PATHS[side === 'front' ? 'front' : 'back'] : side === 'front' ? FRONT_PATHS : BACK_PATHS;
 const MIRROR = 'matrix(-1 0 0 1 200 0)';
+// The head of the body map is the avatar's: a wide jaw, short hair and stubble for the man; hair and a ponytail for the woman.
+// sk and hair are the attributes for skin and hair (classes in the app, plain fills in the shared pictures).
+function mapHead(side, sk, hair){
+  const skull = `<path ${sk} d="M100,11 L107,12 L113,17 L116,25 L117,36 L115.5,46 L109,55 L100,57 L91,55 L84.5,46 L83,36 L84,25 L87,17 L93,12 Z"/>`;
+  if (FIGK === 'm') return side === 'front'
+    ? `${skull}<path ${hair} opacity=".45" d="M83.2,37 L84.5,46 L91,55 L100,57 L109,55 L115.5,46 L116.8,37 L112,43 L106,45.5 L100,44.5 L94,45.5 L88,43 Z"/><path ${hair} d="M83,31 C81,19 87,7 100,6.5 C113,7 119,19 117,31 C115,24 110,20 104,20 L100,22 L96,20 C90,20 85,24 83,31 Z"/>`
+    : `${skull}<path ${hair} d="M83,36 C81,19 87,7 100,6.5 C113,7 119,19 117,36 L115,45 C108,48 92,48 85,45 Z"/>`;
+  const head = `<ellipse ${sk} cx="100" cy="34" rx="16" ry="21"/>`;
+  return side === 'front'
+    ? `${head}<path ${hair} d="M84,35 C81,18 90,10 100,10 C110,10 119,18 116,35 C113,27 108,21 100,21 C92,21 87,27 84,35 Z"/>`
+    : `<path ${hair} d="M96,46 C94,62 96,80 100,92 C104,80 106,62 104,46 Z"/>${head}<path ${hair} d="M84,36 C82,18 90,10 100,10 C110,10 118,18 116,36 C116,46 110,53 100,53 C90,53 84,46 84,36 Z"/>`;
+}
 function drawFigure(){
   const paths = bodyPaths(ui.side);
   let m = '', k = 0;
@@ -1600,7 +1616,7 @@ function drawFigure(){
     : '<path class="detail" d="M100,124 V200"/>';
   document.getElementById('figure').innerHTML =
     `<svg class="body${drawFigure.intro ? '' : ' intro'}" viewBox="0 0 200 430" role="group" aria-label="${ui.side} of body">
-      <ellipse class="skin" cx="100" cy="34" rx="16" ry="21"/>
+      ${mapHead(ui.side, 'class="skin"', 'class="mhair"')}
       <path class="skin" d="${silPath()}"/><path class="skin" d="${silPath()}" transform="${MIRROR}"/>
       ${m}${detail}
     </svg>`;
@@ -2583,7 +2599,7 @@ function restFor(equip, goal){
 
 /* anim-core:start — exercise animation rig: pose solving (2-bone IK) and interpolation, pure (no DOM). Tested in tests/anim.test.mjs */
 // Units: a standing person is 1.0 tall, feet on y = 0, x grows forward (the figure faces right in side view).
-const RIG = {shin:.25, thigh:.25, torso:.30, shoulder:.27, neck:.035, head:.065, upper:.16, fore:.15, foot:.075, shW:.126, hipW:.065};
+const RIG = {shin:.25, thigh:.25, torso:.30, shoulder:.27, neck:.035, head:.065, upper:.16, fore:.15, foot:.075, shW:.14, hipW:.065};
 const rad = d => d * Math.PI / 180;
 const dirv = d => [Math.cos(rad(d)), Math.sin(rad(d))];
 const addv = (a, b, k) => [a[0] + b[0] * (k == null ? 1 : k), a[1] + b[1] * (k == null ? 1 : k)];
@@ -4048,7 +4064,7 @@ function muscleMapSvg(g, side, colors){
     const a = v ? (colors ? `fill="${colors.on}" fill-opacity="${op}"` : `class="mw on" style="--v:${op}"`) : (colors ? `fill="${colors.off}"` : 'class="mw"');
     m += `<path ${a} d="${d}"/>`; if (mir) m += `<path ${a} d="${d}" transform="${MIRROR}"/>`; });
   const sk = colors ? `fill="${colors.skin}"` : 'class="mw-skin"';
-  return `<svg ${colors ? 'xmlns="http://www.w3.org/2000/svg" width="300" height="645"' : `class="mw-fig" role="img" aria-label="${side === 'front' ? 'Front' : 'Back'}: muscles worked"`} viewBox="0 0 200 430"><ellipse ${sk} cx="100" cy="34" rx="16" ry="21"/><path ${sk} d="${silPath()}"/><path ${sk} d="${silPath()}" transform="${MIRROR}"/>${m}</svg>`;
+  return `<svg ${colors ? 'xmlns="http://www.w3.org/2000/svg" width="300" height="645"' : `class="mw-fig" role="img" aria-label="${side === 'front' ? 'Front' : 'Back'}: muscles worked"`} viewBox="0 0 200 430">${mapHead(side, sk, colors ? `fill="${colors.hair || colors.off}"` : 'class="mhair"')}<path ${sk} d="${silPath()}"/><path ${sk} d="${silPath()}" transform="${MIRROR}"/>${m}</svg>`;
 }
 function bestSet(x){
   const sets = x.sets || []; if (!sets.length) return '';
@@ -4060,7 +4076,7 @@ function summaryHtml(sess, prs, stats, mins, st){
   const g = workedGroups(sess), top = Object.keys(g).sort((a, b) => g[b] - g[a]).slice(0, 3), prIds = new Set(prs.map(p => p.id)), end = new Date(sess.endedAt);
   const vol = stats.volume >= 1000 ? [(stats.volume / 1000).toFixed(1), 't lifted'] : [stats.volume, 'kg lifted'];
   return `<div class="ss-wrap ss-done sum">
-    <div class="sum-hero"><span class="sum-k">${ico('workout')} Workout complete</span><h2>${esc(sess.title)}</h2><span class="sum-d">${end.toLocaleDateString(undefined, {weekday:'long', day:'numeric', month:'long'})}</span>
+    <div class="sum-hero"><span class="sum-fig">${animSvg('flex', '', 'data-ar=".8"')}</span><span class="sum-k">${ico('workout')} Workout complete</span><h2>${esc(sess.title)}</h2><span class="sum-d">${end.toLocaleDateString(undefined, {weekday:'long', day:'numeric', month:'long'})}</span>
       <div class="sum-stats"><span><b>${mins}</b>min</span><span><b>${vol[0]}</b>${vol[1]}</span><span><b>${stats.sets}</b>sets</span><span class="${prs.length ? 'pr' : ''}"><b>${prs.length}</b>${prs.length === 1 ? 'record' : 'records'}</span></div></div>
     <h3>Muscles worked</h3>
     <div class="sum-map"><div class="mw-pair">${muscleMapSvg(g, 'front')}${muscleMapSvg(g, 'back')}</div>
@@ -4087,7 +4103,7 @@ async function shareWorkout(){
     [[String(mins), 'MIN'], vol, [String(stats.sets), 'SETS'], [String(prs.length), prs.length === 1 ? 'RECORD' : 'RECORDS']].forEach(([v, l], i) => { const bx = 72 + i * 240;
       x.fillStyle = i === 3 && prs.length ? A : '#fff'; x.font = `700 104px ${D}`; x.fillText(v, bx, 530); x.fillStyle = 'rgba(255,255,255,.6)'; x.font = `600 28px ${T}`; x.fillText(l, bx, 575); });
     // the muscle map, drawn from the same paths as the app
-    const g = workedGroups(sess), cols = {skin:'#2A3039', off:'#3A424D', on:A};
+    const g = workedGroups(sess), cols = {skin:'#2A3039', off:'#3A424D', hair:'#4D5764', on:A};
     const img = svg => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); });
     const [fi, bi] = await Promise.all([img(muscleMapSvg(g, 'front', cols)), img(muscleMapSvg(g, 'back', cols))]);
     x.drawImage(fi, 150, 640, 330, 710); x.drawImage(bi, 600, 640, 330, 710);
@@ -4407,6 +4423,7 @@ const ANIMS = {
   'cable-crunch': two({v:'side', hip:[0, .27], tr:84, a:[{h:[.12, .62], b:1}, {h:[.1, .62], b:1}], l:[{h:[-.25, .02], b:1, ft:180}, {h:[-.27, .02], b:1, ft:180}], pr:[{k:'cable', from:[.2, 1.18], to:'hand0'}]}, {tr:28, a:[{h:[.32, .4]}, {h:[.3, .4]}]}),
   'wall-hs': two({v:'side', hip:[.01, .58], tr:-90, a:[{h:[.04, 0], b:1}, {h:[.02, 0], b:1}], l:[{h:[-.07, 1.06], ft:90}, {h:[-.09, 1.06], ft:90}], pr:[{k:'wall', x:-.14}]}, {hip:[.015, .585]}, {move:1500, hold:500}),
   burpee: A([ST, squatK({hip:[-.12, .3], tr:35, a:[{h:[.24, 0]}, {h:[.22, 0]}]}), plankK([-.55, .03], [.21, .31], [.21, 0]), plankK([-.55, .03], [.23, .11], [.21, 0]), plankK([-.55, .03], [.21, .31], [.21, 0]), squatK({hip:[-.12, .3], tr:35, a:[{h:[.24, 0]}, {h:[.22, 0]}]}), mergeP(ST, {hip:[0, .63], a:[{h:[.05, 1.08]}, {h:[.03, 1.08]}], l:[{h:[.03, .13], ft:-45}, {h:[-.03, .13], ft:-45}]})], {move:330, hold:60}),
+  flex: two(mergeP(FR, {a:[{h:[.27, .5], b:1}, {h:[-.27, .5], b:-1}]}), {a:[{h:[.23, 1], b:-1}, {h:[-.23, 1], b:1}]}, {move:520, hold:650}),
   jacks: two(FR, {hip:[0, .52], a:[{h:[.24, 1.1], b:-1}, {h:[-.24, 1.1], b:1}], l:[{h:[.26, .01]}, {h:[-.26, .01]}]}, {move:300, hold:60}),
 };
 // Bend a straight body at the hips while the shoulders stay put: dy > 0 sags the hips, dy < 0 lifts them (for A/B form checks).
@@ -4425,7 +4442,7 @@ const ANIM_ALIAS = {avatar:'jacks'};   // the avatar preview: the jumping jack w
 
 /* ---------- exercise animation renderer: an SVG mannequin that loops each exercise ---------- */
 const ANIM_GLOW = {chest:'chest', upperback:'chest', traps:'chest', abs:'core', obliques:'core', lowerback:'core', shoulders:'delt', biceps:'upper', triceps:'upper', forearms:'fore', quads:'thigh', adductors:'thigh', hamstrings:'thigh', glutes:'glute', calves:'shin'};
-const ANIM_MOVE_GROUPS = {burpee:['chest','quads'], jacks:['shoulders','calves'], situp:['abs']};
+const ANIM_MOVE_GROUPS = {burpee:['chest','quads'], jacks:['shoulders','calves'], situp:['abs'], flex:['biceps']};
 const animFor = id => ANIMS[id] || ANIMS[ANIM_ALIAS[id]] || null;
 // Moves done lying on your back: the chest and the face point up, away from the floor (`sup`). Everything else faces the way the spine leans.
 ['pillow-squeeze', 'crunch', 'situp', 'leg-raise', 'hollow', 'dead-bug', 'bicycle', 'glute-bridge', 'sl-bridge', 'bridge-walk', 'towel-curl-leg', 'couch-thrust', 'hip-thrust',
@@ -4440,9 +4457,9 @@ const STATIC_PROPS = new Set(['bench', 'box', 'wall', 'bar', 'table', 'door', 's
 // Two avatars share the rig. 'm': a big build with a beard and a tank top. 'f': a slim build with a ponytail and a t-shirt.
 // limb: [root, widest, end, where the widest point is]; leg: the asymmetric sides seen from the side.
 const FIG = {
-  m:{limb:{thigh:[.066, .072, .043, .38], shin:[.043, .05, .026, .3], upper:[.045, .058, .035, .45], fore:[.037, .041, .024, .28]},
-     leg:{thigh:{front:[.077, .42], back:[.072, .28]}, shin:{front:[.042, .2], back:[.063, .3]}},
-     shW:.126, hand:.03, shoe:[.03, .021, .009, .007], neck:[.036, .031], delt:[.3, .052, .046], knee:[.03, .016, .019]},
+  m:{limb:{thigh:[.068, .076, .045, .38], shin:[.044, .052, .027, .3], upper:[.047, .064, .037, .42], fore:[.039, .045, .025, .28]},
+     leg:{thigh:{front:[.082, .42], back:[.075, .28]}, shin:{front:[.043, .2], back:[.067, .3]}},
+     shW:.14, hand:.032, shoe:[.031, .022, .009, .007], neck:[.044, .038], delt:[.32, .06, .05], knee:[.031, .017, .02]},
   f:{limb:{thigh:[.052, .056, .034, .38], shin:[.034, .04, .021, .3], upper:[.03, .033, .025, .5], fore:[.027, .028, .019, .28]},
      leg:{thigh:{front:[.058, .42], back:[.055, .28]}, shin:{front:[.033, .2], back:[.047, .3]}},
      shW:.1, hand:.024, shoe:[.025, .018, .008, .006], neck:[.025, .022], delt:[.42, .039, .031], knee:[.024, .013, .016]}
@@ -4475,6 +4492,9 @@ function animScene(pose, glow, big, o){
     const xs = S.map(q => q[0]), ys = S.map(q => q[1]);
     out.push(['path', {d:d + 'Z', class:cls, 'data-bb':`${f(Math.min(...xs))} ${f(Math.min(...ys))} ${f(Math.max(...xs))} ${f(Math.max(...ys))} .01`}]);
   };
+  // A shape with straight edges (rig coords): the chiselled jaw.
+  const PL = (pts, cls) => { const S = pts.map(q => [q[0], -q[1]]), xs = S.map(q => q[0]), ys = S.map(q => q[1]);
+    out.push(['path', {d:'M' + S.map(q => f(q[0]) + ' ' + f(q[1])).join('L') + 'Z', class:cls, 'data-bb':`${f(Math.min(...xs))} ${f(Math.min(...ys))} ${f(Math.max(...xs))} ${f(Math.max(...ys))} .01`}]); };
   const CAP = (a, b, r1, r2, cls) => {
     const ax = a[0], ay = -a[1], bx = b[0], by = -b[1], l = Math.hypot(bx - ax, by - ay) || 1e-6, nx = -(by - ay) / l, ny = (bx - ax) / l;
     out.push(['path', {d:`M${f(ax + nx * r1)} ${f(ay + ny * r1)}L${f(bx + nx * r2)} ${f(by + ny * r2)}A${f(r2)} ${f(r2)} 0 0 0 ${f(bx - nx * r2)} ${f(by - ny * r2)}L${f(ax - nx * r1)} ${f(ay - ny * r1)}A${f(r1)} ${f(r1)} 0 0 0 ${f(ax + nx * r1)} ${f(ay + ny * r1)}Z`,
@@ -4517,7 +4537,7 @@ function animScene(pose, glow, big, o){
     if (glow.has('delt') && big) C(P.sh[i], .07, 'haloc' + fc);
     seg(P.sh[i], P.el[i], 'upper', far); seg(P.el[i], P.hand[i], 'fore', far); C(P.hand[i], F.hand, 'pp sk' + fc);
     // the man: a round, bare shoulder over the top of the arm, and the line under the biceps in big views
-    if (man) CAP(P.sh[i], mix(P.sh[i], P.el[i], .3), .052, .046, 'pp sk' + fc);
+    if (man) CAP(P.sh[i], mix(P.sh[i], P.el[i], F.delt[0]), F.delt[1], F.delt[2], 'pp sk' + fc);
     if (man && big && !far){ const na = nRig(P.sh[i], P.el[i]); Q(addv(mix(P.sh[i], P.el[i], .32), na, .02), addv(mix(P.sh[i], P.el[i], .55), na, .036), addv(mix(P.sh[i], P.el[i], .8), na, .016), .005, 'mline'); }
     // the shoulder cap sits over the top of the arm, so a working shoulder reads as one rounded muscle
     if (glow.has('delt')) CAP(P.sh[i], mix(P.sh[i], P.el[i], F.delt[0]), F.delt[1], F.delt[2], 'mus dl' + fc); };
@@ -4569,16 +4589,16 @@ function animScene(pose, glow, big, o){
   // The woman: a slim build, the outline closer to the spine.
   const ts = (h, w) => at(h, w * (front ? .86 : .84));
   const TS = man ? (front
-    ? {shorts:[at(.08, .09), at(-.02, .102), at(-.075, .058), at(-.075, -.058), at(-.02, -.102), at(.08, -.09)],
-       shirt:[at(.075, .086), at(.12, .084), at(.19, .112), at(.255, .152), at(.305, .15), at(.326, .07), at(.345, .034), at(.345, -.034), at(.326, -.07), at(.305, -.15), at(.255, -.152), at(.19, -.112), at(.12, -.084), at(.075, -.086)],
-       shade:[at(.075, -.086), at(.12, -.084), at(.19, -.112), at(.255, -.152), at(.305, -.15), at(.305, -.095), at(.2, -.07), at(.1, -.056)],
-       upper:[at(.15, .09), at(.19, .112), at(.255, .152), at(.305, .15), at(.326, .07), at(.326, -.07), at(.305, -.15), at(.255, -.152), at(.19, -.112), at(.15, -.09)],
-       lower:[at(-.02, .096), at(.06, .086), at(.15, .089), at(.15, -.089), at(.06, -.086), at(-.02, -.096)]}
-    : {shorts:[at(-.07, .045), at(-.01, .056), at(.08, .053), at(.08, -.048), at(.03, -.064), at(-.03, -.084), at(-.078, -.05)],
-       shirt:[at(.075, .051), at(.13, .055), at(.19, .09), at(.24, .118), at(.288, .098), at(.324, .038), at(.33, -.045), at(.275, -.1), at(.19, -.088), at(.11, -.056), at(.075, -.049)],
-       shade:[at(.075, -.049), at(.11, -.056), at(.19, -.088), at(.275, -.1), at(.318, -.055), at(.296, -.025), at(.2, -.04), at(.1, -.024), at(.075, -.02)],
-       upper:[at(.145, .062), at(.19, .09), at(.24, .118), at(.288, .098), at(.324, .038), at(.33, -.045), at(.275, -.1), at(.19, -.088), at(.145, -.068)],
-       lower:[at(0, .056), at(.06, .053), at(.145, .062), at(.145, -.068), at(.11, -.056), at(.03, -.064), at(0, -.07)]}) : (front
+    ? {shorts:[at(.085, .094), at(-.02, .106), at(-.075, .06), at(-.075, -.06), at(-.02, -.106), at(.085, -.094)],
+       shirt:[at(.06, .09), at(.13, .084), at(.2, .118), at(.262, .168), at(.308, .165), at(.33, .085), at(.352, .04), at(.352, -.04), at(.33, -.085), at(.308, -.165), at(.262, -.168), at(.2, -.118), at(.13, -.084), at(.06, -.09)],
+       shade:[at(.06, -.09), at(.13, -.084), at(.2, -.118), at(.262, -.168), at(.308, -.165), at(.308, -.115), at(.2, -.078), at(.1, -.06)],
+       upper:[at(.198, 0), at(.2, .1), at(.225, .136), at(.262, .166), at(.306, .162), at(.328, .085), at(.328, -.085), at(.306, -.162), at(.262, -.166), at(.225, -.136), at(.2, -.1)],
+       lower:[at(-.02, .098), at(.06, .088), at(.13, .083), at(.195, .1), at(.195, -.1), at(.13, -.083), at(.06, -.088), at(-.02, -.098)]}
+    : {shorts:[at(-.07, .045), at(-.01, .056), at(.085, .054), at(.085, -.05), at(.03, -.064), at(-.03, -.086), at(-.078, -.05)],
+       shirt:[at(.06, .05), at(.13, .052), at(.19, .094), at(.24, .13), at(.29, .11), at(.326, .046), at(.335, -.05), at(.28, -.114), at(.19, -.098), at(.11, -.056), at(.06, -.048)],
+       shade:[at(.06, -.048), at(.11, -.056), at(.19, -.098), at(.28, -.114), at(.322, -.06), at(.298, -.03), at(.2, -.046), at(.1, -.024), at(.06, -.02)],
+       upper:[at(.165, .072), at(.19, .094), at(.24, .13), at(.29, .11), at(.326, .046), at(.335, -.05), at(.28, -.114), at(.19, -.098), at(.165, -.082)],
+       lower:[at(0, .056), at(.06, .052), at(.13, .052), at(.165, .072), at(.165, -.082), at(.11, -.056), at(.03, -.064), at(0, -.07)]}) : (front
     ? {shorts:[ts(.08, .1), ts(-.02, .106), ts(-.075, .06), ts(-.075, -.06), ts(-.02, -.106), ts(.08, -.1)],
        shirt:[ts(.075, .098), ts(.12, .094), ts(.18, .104), ts(.25, .122), ts(.3, .118), ts(.315, .055), ts(.315, -.055), ts(.3, -.118), ts(.25, -.122), ts(.18, -.104), ts(.12, -.094), ts(.075, -.098)],
        shade:[ts(.075, -.098), ts(.12, -.094), ts(.18, -.104), ts(.25, -.122), ts(.3, -.118), ts(.3, -.08), ts(.2, -.07), ts(.1, -.066)],
@@ -4595,26 +4615,38 @@ function animScene(pose, glow, big, o){
     // neck and head first, so the t-shirt collar sits over the neck
     const hd = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0)), fwh = dirv((pose.tr != null ? pose.tr : 90) + (pose.hd || 0) + fside);
     CAP(addv(P.neck, d, -.03), addv(P.neck, hd, .045), F.neck[0], F.neck[1], 'pp sk');
-    SM(TS.shorts, 'pp ks');
-    SM(TS.shirt, 'pp kt', true);
-    SM(TS.shade, 'shade', true);
-    if (man && big && !front) Q(at(.185, .09), at(.198, .046), at(.235, .014), .005, 'fold');
+    if (man){
+      // bare torso: skin, then the lines that cut the muscle (pecs, abs, the V at the hips), then the shorts over the waist
+      SM(TS.shirt, 'pp sk', true); SM(TS.shade, 'shade', true);
+      if (front){ [-1, 1].forEach(k => { Q(at(.236, .006 * k), at(.194, .078 * k), at(.24, .152 * k), .006, 'fold');
+          if (big){ Q(at(.19, .056 * k), at(.14, .064 * k), at(.092, .05 * k), .004, 'fold'); Q(at(.11, .084 * k), at(.088, .056 * k), at(.082, .03 * k), .004, 'fold'); Q(at(.336, .02 * k), at(.332, .07 * k), at(.322, .125 * k), .004, 'fold'); } });
+        Q(at(.3, 0), at(.2, 0), at(.09, 0), .0045, 'fold'); [.164, .13, .098].forEach(h => Q(at(h, -.05), at(h - .006, 0), at(h, .05), .0045, 'fold')); }
+      else { Q(at(.19, .096), at(.2, .05), at(.236, .018), .006, 'fold');
+        [[.164, .07], [.13, .053], [.098, .051]].forEach(([h, e]) => Q(at(h, e), at(h - .005, e - .02), at(h, e - .042), .0045, 'fold'));
+        if (big){ Q(at(.186, .03), at(.14, .01), at(.09, .01), .004, 'fold'); Q(at(.25, -.012), at(.19, .002), at(.14, -.012), .004, 'fold'); } }
+      SM(TS.shorts, 'pp ks');
+    } else { SM(TS.shorts, 'pp ks'); SM(TS.shirt, 'pp kt', true); SM(TS.shade, 'shade', true); }
     if (glow.has('chest')) SM(TS.upper, 'mus');
     if (glow.has('core')) SM(TS.lower, 'mus');
-    if (glow.has('glute')){ const gs = man ? (front ? [at(.03, .108), at(.03, -.108)] : [at(-.035, -.058)]) : (front ? [at(.03, .1), at(.03, -.1)] : [at(-.035, -.05)]), gm = man ? 1.12 : 1;
+    if (glow.has('glute')){ const gs = man ? (front ? [at(.03, .112), at(.03, -.112)] : [at(-.035, -.06)]) : (front ? [at(.03, .1), at(.03, -.1)] : [at(-.035, -.05)]), gm = man ? 1.12 : 1;
       gs.forEach(g => { if (big) C(g, front ? .06 : .085, 'haloc'); E(g, (front ? .028 : .045) * gm, (front ? .042 : .05) * gm, 'mus gl'); }); }
-    // head: a strong square jaw, short hair swept up at the front, a beard along the jaw, heavy brows; nose and jaw show where he looks
+    // head. The man: a long, wide, chiselled jaw (straight edges), cheekbones, heavy brows, short hair swept back and a few days of beard (two layers: stubble, darker round the mouth and chin)
     const hp = (u, v) => addv(addv(P.head, fwh, u), hd, v), poly = pts => pts.map(q => hp(q[0], q[1]));
     if (!man){ /* drawn below */ }
-    else if (front){ [-1, 1].forEach(k => E(hp(.06 * k, -.002), .01, .018, 'sk ear'));
-      SM(poly([[0, .074], [.04, .064], [.058, .03], [.059, -.012], [.057, -.052], [.037, -.08], [0, -.086], [-.037, -.08], [-.057, -.052], [-.059, -.012], [-.058, .03], [-.04, .064]]), 'pp sk');
-      SM(poly([[-.058, -.008], [-.057, -.052], [-.037, -.082], [0, -.089], [.037, -.082], [.057, -.052], [.058, -.008], [.042, -.03], [.022, -.042], [0, -.038], [-.022, -.042], [-.042, -.03]]), 'beard');
-      SM(poly([[-.06, .026], [-.063, .058], [-.036, .088], [0, .096], [.036, .088], [.063, .058], [.06, .026], [.046, .048], [.016, .054], [-.016, .052], [-.046, .048]]), 'pp hair');
-      [-1, 1].forEach(k => { Q(hp(.012 * k, .02), hp(.03 * k, .03), hp(.05 * k, .02), .009, 'brow'); E(hp(.03 * k, .006), .007, .0045, 'eye'); }); }
-    else { SM(poly([[0, .074], [.04, .064], [.058, .04], [.064, .018], [.079, -.004], [.066, -.022], [.074, -.052], [.064, -.083], [.02, -.086], [-.012, -.06], [-.03, -.03], [-.062, -.01], [-.066, .03], [-.04, .064]]), 'pp sk');
-      SM(poly([[.063, -.03], [.076, -.054], [.064, -.086], [.02, -.089], [-.013, -.063], [-.022, -.03], [-.006, -.038], [.02, -.054], [.046, -.042]]), 'beard');
-      SM(poly([[.055, .044], [.061, .064], [.05, .081], [.022, .088], [-.012, .084], [-.04, .069], [-.06, .042], [-.065, .012], [-.057, -.012], [-.046, -.006], [-.04, .014], [-.024, .03], [0, .036], [.028, .038]]), 'pp hair');
-      E(hp(-.014, -.004), .011, .017, 'sk ear'); Q(hp(.04, .026), hp(.056, .031), hp(.069, .02), .009, 'brow'); E(hp(.053, .006), .006, .0045, 'eye'); }
+    else if (front){ [-1, 1].forEach(k => E(hp(.067 * k, 0), .011, .02, 'sk ear'));
+      PL(poly([[0, .08], [.024, .077], [.044, .066], [.058, .046], [.063, .02], [.065, -.008], [.061, -.052], [.036, -.09], [0, -.096], [-.036, -.09], [-.061, -.052], [-.065, -.008], [-.063, .02], [-.058, .046], [-.044, .066], [-.024, .077]]), 'pp sk');
+      PL(poly([[-.064, -.002], [-.061, -.052], [-.036, -.09], [0, -.096], [.036, -.09], [.061, -.052], [.064, -.002], [.05, -.03], [.03, -.038], [.016, -.028], [0, -.03], [-.016, -.028], [-.03, -.038], [-.05, -.03]]), 'beard');
+      PL(poly([[-.026, -.03], [0, -.026], [.026, -.03], [.031, -.06], [.023, -.088], [0, -.095], [-.023, -.088], [-.031, -.06]]), 'beard');
+      SM(poly([[-.064, .03], [-.07, .06], [-.044, .094], [0, .104], [.044, .094], [.07, .06], [.064, .03], [.05, .052], [.024, .06], [0, .053], [-.024, .06], [-.05, .052]]), 'pp hair');
+      Q(hp(-.011, -.014), hp(0, -.021), hp(.011, -.014), .004, 'fold');
+      [-1, 1].forEach(k => { Q(hp(.012 * k, .017), hp(.03 * k, .03), hp(.054 * k, .028), .011, 'brow'); E(hp(.032 * k, .006), .0075, .0045, 'eye'); Q(hp(.059 * k, -.004), hp(.047 * k, -.02), hp(.041 * k, -.034), .004, 'fold'); }); }
+    else { const arc = [15, 35, 55, 75, 95, 115, 135, 155, 175, 195, 215].map(a => [-.004 + .067 * Math.cos(a * Math.PI / 180), .014 + .066 * Math.sin(a * Math.PI / 180)]);
+      PL(poly([...arc, [-.046, -.042], [-.02, -.074], [.05, -.096], [.077, -.086], [.083, -.06], [.071, -.048], [.075, -.036], [.068, -.024], [.088, -.008], [.068, .014], [.073, .026]]), 'pp sk');
+      PL(poly([[-.004, .014], [-.012, -.03], [-.02, -.074], [.05, -.096], [.077, -.086], [.083, -.06], [.071, -.048], [.05, -.042], [.03, -.03], [.014, -.008]]), 'beard');
+      PL(poly([[.066, -.026], [.077, -.036], [.071, -.048], [.083, -.06], [.077, -.086], [.05, -.095], [.046, -.06], [.054, -.034]]), 'beard');
+      SM(poly([[.06, .04], [.066, .06], [.054, .082], [.028, .095], [-.004, .098], [-.036, .09], [-.06, .072], [-.076, .046], [-.08, .018], [-.074, -.008], [-.062, -.026], [-.05, -.014], [-.042, .008], [-.026, .028], [0, .034], [.03, .036]]), 'pp hair');
+      E(hp(-.016, -.006), .011, .018, 'sk ear'); Q(hp(.038, .03), hp(.058, .03), hp(.074, .02), .011, 'brow'); E(hp(.054, .008), .0065, .0045, 'eye');
+      Q(hp(.056, -.006), hp(.036, -.012), hp(.018, -.03), .004, 'fold'); }
     // The woman: hair with volume at the back and top, a fringe, and a ponytail that falls along the back of the neck and with gravity, never across the face.
     if (!man && front){ E(addv(P.head, hd, .012), .066, .07, 'pp hairf'); E(P.head, .055, .063, 'pp sk'); [-1, 1].forEach(k => E(addv(P.head, fwh, .055 * k), .01, .017, 'sk ear'));
       E(addv(P.head, hd, .04), .056, .03, 'hairf'); [-1, 1].forEach(k => E(addv(addv(P.head, hd, .028), fwh, .042 * k), .016, .03, 'hairf'));
@@ -4742,9 +4774,9 @@ function animRom(anim, vb, glow){
 }
 function animScan(root){ (root || document).querySelectorAll('svg[data-anim]:not([data-m])').forEach(animMount); }
 /* ---------- avatar: who shows you the exercises ---------- */
-// Picked in the questionnaire or in the profile (`avatar` key: 'f' or 'm'). Without a pick it follows the sex given for meals; the man by default.
+// Picked in the questionnaire or in the profile (`avatar` key: 'f' or 'm'). Without a pick it is the man.
 const AVATARS = [['f', 'Woman'], ['m', 'Man']];
-const avatarKind = () => { const v = store.get('avatar', null); return v === 'f' || v === 'm' ? v : (profile && profile.sex === 'f' ? 'f' : 'm'); };
+const avatarKind = () => store.get('avatar', null) === 'f' ? 'f' : 'm';
 // Switch every figure on the page (animations, body map, hero) to the chosen avatar. Cheap when nothing changed, so render() calls it every time.
 function figApply(){
   const k = avatarKind(); if (k === FIGK) return; FIGK = k; RIG.shW = FIG[k].shW;
@@ -4810,7 +4842,7 @@ function xpPop(n){
 function levelUpShow(level, pts){
   document.getElementById('lvlup')?.remove();
   const el = document.createElement('div'); el.id = 'lvlup'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', `Level ${level}`);
-  el.innerHTML = `<div class="lu-card"><span class="lu-k">Level up</span><b class="lu-n">${level}</b><span class="lu-r">${esc(rankFor(level))}</span>
+  el.innerHTML = `<div class="lu-card"><span class="lu-fig">${animSvg('flex', '', 'data-ar=".9"')}</span><span class="lu-k">Level up</span><b class="lu-n">${level}</b><span class="lu-r">${esc(rankFor(level))}</span>
     <span class="lu-p">+${pts} points</span><button class="btn primary wide" data-lu="ok">Let’s go</button></div>`;
   document.body.appendChild(el); buzz([40, 60, 40, 60, 120]); [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .16), i * 120));
   if (!RM()) celebrate(`Level ${level}!`);
@@ -5674,7 +5706,7 @@ function heroFig(h, side){
   paths.forEach(([g, d, mir]) => { const M = h.muscles[g], s = (1 + Math.min(M.level - 1, 20) * .007).toFixed(3);
     const a = `class="hm2 tier-${M.tier}" data-hero="${g}" style="--s:${s}" role="button" aria-label="${GROUPS[g].label}, level ${M.level}"`;
     m += `<path ${a} tabindex="0" d="${d}"/>`; if (mir) m += `<g transform="${MIRROR}"><path ${a} tabindex="-1" d="${d}"/></g>`; });
-  return `<svg class="hero-fig" viewBox="0 0 200 430" role="group" aria-label="${side} of your hero"><ellipse class="skin" cx="100" cy="34" rx="16" ry="21"/><path class="skin" d="${silPath()}"/><path class="skin" d="${silPath()}" transform="${MIRROR}"/>${m}</svg>`;
+  return `<svg class="hero-fig" viewBox="0 0 200 430" role="group" aria-label="${side} of your hero">${mapHead(side, 'class="skin"', 'class="mhair"')}<path class="skin" d="${silPath()}"/><path class="skin" d="${silPath()}" transform="${MIRROR}"/>${m}</svg>`;
 }
 function radarSvg(stats){
   const ks = STAT_NAMES.map(s => s[0]), max = Math.max(10, ...ks.map(k => stats[k].level)), cx = 120, cy = 104, R = 74;
@@ -5959,14 +5991,15 @@ function logoMark(){
     <g transform="rotate(-28 60 60)"><circle r="7" class="mpl-p" ${RM() ? 'cx="27" cy="72"' : ''}>${RM() ? '' : `<animateMotion dur="2.6s" repeatCount="indefinite" path="${orbit}"/>`}</circle></g></svg>`;
 }
 function openModePicker(){
+  figApply();
   const el = document.getElementById('modepick'), S = chState(), lvl = gLevel().level, hr = new Date().getHours();
   const hello = hr < 12 ? 'Morning' : hr < 19 ? 'Afternoon' : 'Evening', o = store.get('onboarding', null), setUp = !!(o && o.answers && o.answers.goal);
   const today = setUp && o.answers.time ? 'Today: ' + recommend(todayKey()).plan.title : 'Your plan in 5 taps';
   el.className = '';
   el.innerHTML = `<div class="mp-in"><div class="mp-brand">${logoMark()}<span class="brand">Neutr<span>ó</span>n</span></div><p class="mp-hi">${hello}. What’s it today?</p>
-    <button class="mp-card mp-ch" data-mode="challenge"><span class="mp-ico">${ICON_BOLT}</span><span class="mp-t">Challenge</span>
+    <button class="mp-card mp-ch" data-mode="challenge"><span class="mp-fig">${animSvg('avatar', '', 'data-ar=".8"')}</span><span class="mp-ico">${ICON_BOLT}</span><span class="mp-t">Challenge</span>
       <span class="mp-s">3 and 5 minute battles. Beat your best, win medals.</span><span class="mp-tag">${rankFor(lvl)} · Level ${lvl}</span></button>
-    <button class="mp-card mp-tr" data-mode="train"><span class="mp-ico">${ICON_DUMB}</span><span class="mp-t">Training</span>
+    <button class="mp-card mp-tr" data-mode="train"><span class="mp-fig">${animSvg('flex', '', 'data-ar=".8"')}</span><span class="mp-ico">${ICON_DUMB}</span><span class="mp-t">Training</span>
       <span class="mp-s">Your gym week, built around you.</span><span class="mp-tag">${esc(today)}</span></button>
     <button class="mp-demo" type="button" data-mpdemo="1">${ico('photo')}<span>${demoOn() ? 'Demo on · open controls' : 'Load the demo for videos'}</span></button></div>`;
   el.hidden = false; document.body.style.overflow = 'hidden';
