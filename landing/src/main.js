@@ -69,7 +69,7 @@
     el.setAttribute('aria-label', 'Aviso de cookies');
     el.innerHTML =
       '<p>Usamos cookies de Meta y TikTok para medir si nuestros anuncios funcionan. Solo se activan si aceptas. ' +
-      '<a href="privacidad.html#cookies">Más información</a></p>' +
+      '<a href="privacidad.html#cookies">Más información sobre cookies</a></p>' +
       '<div class="cookies-actions">' +
       '<button type="button" class="btn btn-ghost" data-consent="denied">Rechazar</button>' +
       '<button type="button" class="btn btn-dark" data-consent="granted">Aceptar</button>' +
@@ -127,6 +127,23 @@
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(new FormData(form)).toString()
       }).then(function (res) { res.ok ? done() : fail(); }).catch(fail);
+    });
+  }
+
+  /* ---------- Aparición al hacer scroll ---------- */
+  var items = document.querySelectorAll('.card, .plan, .work, .faq details, .form, .checks li');
+  if (items.length && 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    items.forEach(function (el, i) {
+      el.classList.add('reveal');
+      el.style.transitionDelay = (i % 3) * 70 + 'ms';
+      io.observe(el);
     });
   }
 

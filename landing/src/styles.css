@@ -259,3 +259,53 @@ h3 { font-size: 1.15rem; font-weight: 750; letter-spacing: -0.015em; line-height
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+/* ---------- Movimiento ---------- */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .5s ease, transform .5s cubic-bezier(.2, .7, .2, 1); }
+.reveal.is-in { opacity: 1; transform: none; }
+
+@keyframes float { 0%, 100% { transform: translateX(-50%) rotate(-4deg) translateY(0); } 50% { transform: translateX(-50%) rotate(-2.5deg) translateY(-8px); } }
+@keyframes wobble { 0%, 100% { transform: rotate(10deg) scale(1); } 50% { transform: rotate(-4deg) scale(1.05); } }
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.phone { animation: float 6s ease-in-out infinite; }
+.sticker { animation: wobble 5s ease-in-out infinite; }
+.m-line, .m-btn { transform-origin: left; animation: grow .6s cubic-bezier(.2, .7, .2, 1) both; }
+.m-line:nth-child(2) { animation-delay: .12s; } .m-line:nth-child(3) { animation-delay: .24s; } .m-line:nth-child(4) { animation-delay: .32s; }
+.m-btn { animation-delay: .45s; }
+.m-cards i { animation: pop .5s cubic-bezier(.2, .7, .2, 1) both; }
+.m-cards i:nth-child(1) { animation-delay: .55s; } .m-cards i:nth-child(2) { animation-delay: .65s; }
+.m-cards i:nth-child(3) { animation-delay: .75s; } .m-cards i:nth-child(4) { animation-delay: .85s; }
+
+/* Cinta de tipos de negocio */
+.marquee { overflow: hidden; background: var(--ink); color: var(--on-dark); border-block: 2px solid var(--ink); }
+.marquee-track { background: var(--ink); display: flex; width: max-content; animation: slide 26s linear infinite; }
+.marquee span { display: flex; align-items: center; padding: 12px 0; font-weight: 750; font-size: .95rem; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.marquee span::after { content: ""; width: 8px; height: 8px; margin: 0 18px; border-radius: 50%; background: var(--accent); }
+@keyframes slide { to { transform: translateX(-50%); } }
+
+/* Mini demos de cada nivel */
+.demo { height: 64px; margin-bottom: 18px; display: flex; align-items: flex-end; gap: 6px; }
+.demo-simple { flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; }
+.demo-simple i { display: block; height: 9px; border-radius: 9px; background: var(--on-dark); opacity: .85; }
+.demo-simple i:nth-child(1) { width: 70%; } .demo-simple i:nth-child(2) { width: 45%; opacity: .5; }
+.demo-simple i:nth-child(3) { width: 30%; height: 16px; background: var(--sun); opacity: 1; }
+.demo-motion i { flex: 1; height: 100%; border-radius: 8px 8px 0 0; background: var(--cedar); transform-origin: bottom; animation: bars 1.6s ease-in-out infinite alternate; }
+.demo-motion i:nth-child(2) { background: var(--accent); animation-delay: -.4s; }
+.demo-motion i:nth-child(3) { background: var(--sun); animation-delay: -.8s; }
+.demo-motion i:nth-child(4) { animation-delay: -1.2s; }
+@keyframes bars { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
+.demo-3d { align-items: center; padding-left: 14px; perspective: 400px; }
+.cube { position: relative; width: 40px; height: 40px; transform-style: preserve-3d; animation: spin 7s linear infinite; }
+.cube b { position: absolute; inset: 0; border: 2px solid var(--cedar-deep); background: var(--sun); opacity: .92; }
+.cube b:nth-child(1) { transform: translateZ(20px); }
+.cube b:nth-child(2) { transform: rotateY(180deg) translateZ(20px); }
+.cube b:nth-child(3) { transform: rotateY(90deg) translateZ(20px); background: var(--accent); }
+.cube b:nth-child(4) { transform: rotateY(-90deg) translateZ(20px); background: var(--accent); }
+.cube b:nth-child(5) { transform: rotateX(90deg) translateZ(20px); background: var(--on-dark); }
+.cube b:nth-child(6) { transform: rotateX(-90deg) translateZ(20px); background: var(--on-dark); }
+@keyframes spin { from { transform: rotateX(-22deg) rotateY(0); } to { transform: rotateX(-22deg) rotateY(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; }
+}

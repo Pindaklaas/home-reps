@@ -30,6 +30,8 @@ for (const name of readdirSync(src)) {
   const to = join(dist, name);
   if (['.html', '.js'].includes(extname(name))) {
     let text = readFileSync(from, 'utf8');
+    // Sin dirección pública no se pueden escribir URLs absolutas: se quitan esas etiquetas.
+    if (!values.__SITE_URL__) text = text.split('\n').filter((l) => !l.includes('__SITE_URL__')).join('\n');
     for (const [token, value] of Object.entries(values)) text = text.split(token).join(value);
     writeFileSync(to, text);
   } else {
