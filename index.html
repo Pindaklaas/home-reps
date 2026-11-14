@@ -394,6 +394,7 @@ nav.tabs button[aria-selected="true"] svg,nav.tabs button.bump svg{animation:hop
 .pick{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 16px;font-weight:700;font-size:14.5px;text-align:left;transition:transform .14s var(--out),background-color .2s,border-color .2s,color .2s}
 .chipset.col .pick{border-radius:14px;padding:13px 14px}
 .pick[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);animation:pop .3s var(--spring)}
+.goal-pick{display:flex;justify-content:space-between;align-items:center;gap:10px}.goal-pick em{font-style:normal;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.9}
 .av-set{display:grid;grid-template-columns:1fr 1fr;gap:12px}.av-pick{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 8px 14px;border-radius:22px;text-align:center;font-size:16px}
 .av-pick svg{display:block;width:100%;height:230px}.sheet .av-pick svg{height:150px}
 .av-pick[aria-pressed="true"]{background:color-mix(in srgb,var(--accent) 9%,var(--surface));color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--accent)}
@@ -837,6 +838,9 @@ svg.anim .tw{stroke:var(--amber);fill:none;stroke-linecap:round}
 svg.anim .rp{stroke:var(--prop);fill:none}
 .anim-stage{position:relative;height:clamp(200px,56vw,250px);border-radius:18px;overflow:hidden;background:radial-gradient(110% 80% at 50% 100%,var(--accent-soft),var(--bg) 72%)}
 .anim-stage svg{width:100%;height:100%}
+.anim-stage.real{background:var(--arena)}.anim-stage.real video,.anim-stage.real img{display:block;width:100%;height:100%;object-fit:cover}
+.anim-stage.photos img{position:absolute;inset:0}.anim-stage.photos img + img{animation:photoflip 2.8s ease-in-out infinite}.anim-stage.photos.still img + img{animation:none;opacity:0}
+@keyframes photoflip{0%,40%{opacity:0}50%,90%{opacity:1}100%{opacity:0}}
 .th-btn{border:0;padding:0;background:var(--bg);border-radius:12px;overflow:hidden;flex:none}
 .th-btn svg{width:100%;height:100%}
 svg.anim.th{background:radial-gradient(120% 90% at 50% 30%,var(--surface) 0,color-mix(in srgb,var(--bg) 88%,var(--ink)) 100%)}
@@ -1695,10 +1699,20 @@ function closeSheet(){
   };
   document.addEventListener('pointerup', end); document.addEventListener('pointercancel', end);
 })();
+/* ---------- real people: a video or two photos of someone doing the move ---------- */
+// EX_MEDIA: exercise id → {video:'media/ex/<id>'} (an .mp4 and a .webm with a .jpg poster) or {photos:['media/ex/<id>-1.jpg', 'media/ex/<id>-2.jpg']} (start and end position).
+// An exercise that has one shows the real person in How to; the drawn avatar stays as the small picture in lists and does the demo for everything else.
+const EX_MEDIA = {};
+function realStage(id){
+  const m = EX_MEDIA[id]; if (!m) return '';
+  if (m.video) return `<div class="anim-stage real"><video muted loop playsinline autoplay preload="metadata" poster="${esc(m.video)}.jpg"><source src="${esc(m.video)}.mp4" type="video/mp4"><source src="${esc(m.video)}.webm" type="video/webm"></video></div>`;
+  if (m.photos) return `<div class="anim-stage real photos${RM() ? ' still' : ''}">${m.photos.slice(0, 2).map((src, i) => `<img src="${esc(src)}" alt="${i ? 'End' : 'Start'} position">`).join('')}</div>`;
+  return '';
+}
 function infoSheet(id){
   const e = EX[id];
-  const big = animSvg(e.id, 'big', 'data-ar="1.5"');
-  openSheet(`${big ? `<div class="anim-stage">${big}</div>` : ''}<div class="ex-head"><h2>${esc(e.name)}</h2>
+  const real = realStage(e.id), big = real || animSvg(e.id, 'big', 'data-ar="1.5"');
+  openSheet(`${real || (big ? `<div class="anim-stage">${big}</div>` : '')}<div class="ex-head"><h2>${esc(e.name)}</h2>
     <div class="row small muted"><b style="color:var(--ink)">${doseText(e.dose,e.unit)}</b> per set · ${esc(e.equip)} · ${lvlBars(e.level)}</div>
     <div class="row">${e.groups.map((g,i)=>`<span class="tag small"${i<2&&big?' style="border-color:var(--accent);color:var(--accent)"':''}>${GROUPS[g].label}</span>`).join('')}</div></div>
     ${big ? `<details class="steps"><summary>Steps</summary><ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></details>` : `<ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`}
@@ -2173,6 +2187,17 @@ function calorieBounds(L, c){
 }
 // Checks and repairs any draft (from the AI or the local generator) against the limits. Never trust the draft.
 // Keep n of these days, spread evenly (never the first n in a row, which would leave a long run of rest).
+// Several goals at once: how a session of n exercises is shared between them. The main goal (the first) gets at least half,
+// every other goal gets a share when there is room, and the order inside the session is heavy work first, high reps last.
+const GOAL_ORDER = ['strength', 'gain', 'tone', 'lose', 'endure'];
+function goalMix(goals, n){
+  const g = [...new Set((goals || []).filter(Boolean).map(x => x === 'belly' ? 'lose' : x))].slice(0, 3);
+  if (!g.length || !(n > 0)) return [];
+  const others = g.slice(1, n), base = others.length ? Math.max(Math.floor((n - Math.ceil(n / 2)) / others.length), 1) : 0;
+  const out = Array(n - base * others.length).fill(g[0]); others.forEach(x => { for (let i = 0; i < base; i++) out.push(x); });
+  const rank = x => { const i = GOAL_ORDER.indexOf(x); return i < 0 ? 2 : i; };
+  return out.map((x, i) => [x, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(x => x[0]);
+}
 function spreadPick(list, n){
   if (!Array.isArray(list) || list.length <= n) return (list || []).slice();
   return Array.from({length:Math.max(0, n)}, (_, i) => list[Math.round(i * list.length / n)]);
@@ -2975,6 +3000,13 @@ const WAKE_OPTS = [['06:00','6:00'],['06:30','6:30'],['07:00','7:00'],['07:30','
 // Equipment for the plan from where and with what you train.
 const kitEquip = a => a.kit === 'gym' ? GYM_KIT : [...(a.kit === 'db' ? ['weights','bands','furniture'] : ['furniture']), ...(a.sector === 'calisthenics' ? ['bar'] : [])];
 const TIME_OPTS = [['07:00','Morning · 7:00'],['13:00','Midday · 13:00'],['18:30','After work · 18:30'],['20:30','Late · 20:30']];
+// Goals are multiple choice: the picks keep the order you tapped them in, the first one is the main goal.
+const goalChips = a => `<div class="chipset col" role="group" aria-label="Goals">${GYM_GOALS.map(([v, l]) => { const i = (a.goals || []).indexOf(v);
+  return `<button class="pick goal-pick" data-fx="pick" data-key="goals" data-v="${v}" data-multi="1" aria-pressed="${i >= 0}"><span>${esc(l)}</span>${i === 0 ? '<em>Main goal</em>' : i > 0 ? '<em>Also</em>' : ''}</button>`; }).join('')}</div>`;
+// For the eating check, wanting to lose fat counts even when it is a second goal.
+const eatGoal = a => (a.goals || []).some(g => g === 'lose' || g === 'belly') || a.focus === 'belly' ? 'lose' : a.goal;
+function goalPick(a, k){ if (k !== 'goals') return; if (a.goals.length > 3){ a.goals.pop(); toast('Up to 3 goals. Tap one to remove it.'); } a.goal = a.goals[0]; }
+const goalNames = list => { const n = [...new Set((list || []).map(g => g === 'belly' ? 'lose' : g))].map(g => (GYM_GOALS.find(x => x[0] === g) || [g, g])[1].toLowerCase()); return n; };
 const ageKnown = () => { const o = store.get('onboarding', null), g = o && o.answers && o.answers.age; return g && g !== 'u18' ? g : null; };
 function saveAge(a){
   if (!a.age || a.age === 'u18' || a._age) return;
@@ -2990,13 +3022,15 @@ FLOWS.gym = {
   closable: () => true,
   init(){
     const o = store.get('onboarding', null), oa = (o && o.answers) || {};
-    return {_age:ageKnown(), avatar:store.get('avatar', null) || undefined, goal:oa.focus === 'belly' ? 'belly' : ['gain','strength','lose','endure'].includes(oa.goal) ? oa.goal : undefined, level:oa.level, dpw:String(oa.dpw || 3),
+    const one = oa.focus === 'belly' && !Array.isArray(oa.goals) ? 'belly' : ['gain','strength','lose','endure'].includes(oa.goal) ? oa.goal : undefined;
+    const goals = Array.isArray(oa.goals) && oa.goals.length ? oa.goals.filter(g => GYM_GOALS.some(x => x[0] === g)).slice(0, 3) : (one ? [one] : []);
+    return {_age:ageKnown(), avatar:store.get('avatar', null) || undefined, goals, goal:goals[0], level:oa.level, dpw:String(oa.dpw || 3),
       minutes:String(oa.minutes >= 30 ? oa.minutes : 60), time:oa.time, sleepUsual:oa.sleepUsual, sector:oa.sector, kit:oa.kit, wake:oa.wake, ...healthInit()};
   },
   steps: [
     ...ageSteps('A few taps and your week is ready.'),
     {type:'custom', id:'avatar', auto:'avatar', when:adultOk, q:'Pick your avatar', hint:'It shows you every exercise. You can change it in your profile.', render:a => avatarPick(a.avatar, v => `data-fx="pick" data-key="avatar" data-v="${v}"`), valid:a => !!a.avatar},
-    {type:'custom', id:'goal', auto:'goal', when:adultOk, q:'What’s your goal?', render:a => chips('goal', GYM_GOALS, a, {col:true, label:'Goal'}), valid:a => !!a.goal},
+    {type:'custom', id:'goal', when:adultOk, q:'What are your goals?', hint:'Pick up to 3. The first one you pick leads your plan.', onPick:goalPick, render:a => goalChips(a), valid:a => (a.goals || []).length > 0},
     {type:'custom', id:'sector', when:adultOk, q:'How do you train today?', render:a => block('Where', chips('sector', SECTORS, a, {col:true, label:'How you train'})) +
       block('What do you have?', chips('kit', KIT_OPTS, a, {label:'Equipment'})), valid:a => !!(a.sector && a.kit)},
     {type:'custom', id:'routine', when:adultOk, q:'Your training', render:a => block(a.kit === 'gym' ? 'Gym experience' : 'Training experience', chips('level', a.kit === 'gym' ? GYM_EXP : EXP_ANY, a, {label:'Experience'})) +
@@ -3012,8 +3046,8 @@ FLOWS.gym = {
     if (a.healthConsent) store.set('health', {...healthRecord(a), eating: prev && prev.eating});
     const o = store.get('onboarding', null) || {v:3, at:iso, answers:{}};
     const track = a.kit === 'gym' ? 'gym' : 'home';
-    o.v = 3; const belly = a.goal === 'belly'; if (belly) a.goal = 'lose'; a.focus = belly ? 'belly' : null;
-    o.answers = {...o.answers, track, sector:a.sector, kit:a.kit, wake:a.wake, goal:a.goal, focus:a.focus, level:a.level, dpw:+a.dpw, days:trainDaysFrom(now, +a.dpw), minutes:+a.minutes, time:a.time, sleepUsual:a.sleepUsual};
+    o.v = 3; const picks = (a.goals && a.goals.length) ? a.goals.slice(0, 3) : [a.goal], belly = picks.includes('belly'); a.goals = picks; a.goal = picks[0] === 'belly' ? 'lose' : picks[0]; a.focus = belly ? 'belly' : null;
+    o.answers = {...o.answers, track, sector:a.sector, kit:a.kit, wake:a.wake, goal:a.goal, goals:picks, focus:a.focus, level:a.level, dpw:+a.dpw, days:trainDaysFrom(now, +a.dpw), minutes:+a.minutes, time:a.time, sleepUsual:a.sleepUsual};
     store.set('onboarding', o);
     if (a.wake && !alarmCfg().on) store.set('alarm', {...alarmCfg(), time:a.wake});
     const pa = {...a, kind:'training', track, days:o.answers.days, minutes:+a.minutes, equipment:kitEquip(a), injuries:a.healthConsent ? (a.injuries || []) : []};
@@ -3048,7 +3082,7 @@ FLOWS.plan = {
   init(){
     const _age = ageKnown();
     const o = store.get('onboarding', null), oa = (o && o.answers) || {}, p = profile || {};
-    return {...healthInit(), _age, goal: oa.goal || p.goal, level: oa.level, days: oa.days || DPW_DAYS[3], minutes: oa.minutes || 45, track:userTrack(), equipment: userTrack() === 'gym' ? GYM_KIT : undefined,
+    return {...healthInit(), _age, goal: oa.goal || p.goal, goals: oa.goals, focus: oa.focus, level: oa.level, days: oa.days || DPW_DAYS[3], minutes: oa.minutes || 45, track:userTrack(), equipment: userTrack() === 'gym' ? GYM_KIT : undefined,
       sex: p.sex, age: p.age, height: p.height, weight: p.weight, activity: p.activity || '1.375', diet: p.diet, meals: p.meals || '4', pace:'steady'};
   },
   steps: [
@@ -3065,13 +3099,13 @@ FLOWS.plan = {
       valid:a => (a.sex === 'f' || a.sex === 'm') && +a.age >= 18 && +a.age <= 90 && +a.height >= 120 && +a.height <= 230 && +a.weight >= 35 && +a.weight <= 250 && !!a.diet && (a.allergies || []).length > 0},
     {type:'custom', id:'food', when:nut, q:'You and food', hint:'Tap any that are true for you lately. It keeps your plan safe; there are no wrong answers.',
       render:a => chips('eflags', EAT_FLAGS, a, {multi:true, none:'none', col:true, label:'You and food'}), valid:a => (a.eflags || []).length > 0},
-    {type:'info', id:'edRefer', when:a => nut(a) && screenEating({scoff:toScoff(a.eflags), weight:a.weight, height:a.height, goal:a.goal}).refer, title:'Let’s look after you first',
+    {type:'info', id:'edRefer', when:a => nut(a) && screenEating({scoff:toScoff(a.eflags), weight:a.weight, height:a.height, goal:eatGoal(a)}).refer, title:'Let’s look after you first',
       body:a => 'Some of your answers suggest food may be taking up a lot of headspace right now. That’s more common than people think, and you deserve proper support. We won’t make a nutrition plan for now. Please consider talking to your doctor or an eating disorder support service in your country.' + (a.kind === 'both' ? ' We can still build you a gentle training plan.' : ''),
       cta:a => a.kind === 'both' ? 'Continue with training only' : 'Close',
       onNext(a){
         syncDerived(a);
         const hl = store.get('health', null) || (a.healthConsent ? healthRecord(a) : null);
-        if (hl){ hl.eating = {scoff:a.scoff, weight:+a.weight, height:+a.height, goal:a.goal, refer:true, at:new Date().toISOString()}; store.set('health', hl); }
+        if (hl){ hl.eating = {scoff:a.scoff, weight:+a.weight, height:+a.height, goal:eatGoal(a), refer:true, at:new Date().toISOString()}; store.set('health', hl); }
         if (a.kind === 'both'){ a.kind = 'training'; return 'goto:aiConsent'; }
         return 'close';
       }},
@@ -3224,7 +3258,7 @@ const SPLITS = {push:['Push',['chest','shoulders','triceps']], legs:['Legs',['qu
   core:['Core',['abs','obliques','lowerback']], full:['Full body',['chest','quads','upperback','abs','glutes']]};
 const HOME_SPLITS = {4:[SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.full], 5:[SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full], 6:[SPLITS.push, SPLITS.legs, SPLITS.pull, SPLITS.core, SPLITS.full, SPLITS.legs]};
 function planContext(a){
-  const eating = nut(a) ? {scoff:a.scoff || {}, weight:+a.weight, height:+a.height, goal:a.goal} : null;
+  const eating = nut(a) ? {scoff:a.scoff || {}, weight:+a.weight, height:+a.height, goal:eatGoal(a)} : null;
   const L = safetyLimits({health:{parq:a.parq || {}}, healthChecked:!!a.healthConsent, injuries:(a.injuries || []).filter(x => x !== 'none'), level:levelOf(a.level, a.track), eating});
   const wantsNut = nut(a) && L.nutrition !== 'blocked';
   let tdee = null, bmr = null;
@@ -3237,7 +3271,7 @@ function planContext(a){
 }
 function buildPlanPrompt(a, c){
   const L = c.L, b = calorieBounds(L, c);
-  const user = {planCovers: c.tr && c.nut ? 'training and nutrition' : c.tr ? 'training' : 'nutrition', goal:GOAL_LABEL[a.goal], experience:a.level, trainingStyle:a.track};
+  const user = {planCovers: c.tr && c.nut ? 'training and nutrition' : c.tr ? 'training' : 'nutrition', goal:GOAL_LABEL[a.goal], otherGoals:goalNames(a.goals).slice(1), experience:a.level, trainingStyle:a.track};
   if (c.tr) Object.assign(user, {trainingDays:a.days, minutesPerWorkout:+a.minutes, equipment:a.equipment, painOrInjuries:(a.injuries || []).filter(x => x !== 'none'), notesForCoach:String(a.injNote || '').slice(0, 200)});
   if (c.nut) Object.assign(user, {sex:a.sex, age:+a.age, heightCm:+a.height, weightKg:+a.weight, maintenanceKcal:c.tdee, desiredPace:a.goal === 'lose' ? a.pace : undefined, diet:a.diet, allergies:a.allergies, mealsPerDay:+a.meals});
   const limits = {mode:L.mode, maxTrainingDays:L.maxDays, maxMinutesPerWorkout:L.maxMinutes, maxSetsPerExercise:L.maxSets, maxExerciseLevel:L.maxLevel, avoidExerciseIds:L.avoid};
@@ -3268,9 +3302,11 @@ function localDraft(a, c){
         const core = [...exFor('abs'), ...exFor('obliques')].find(e => allowed.has(e.id) && !picked.includes(e.id));
         if (core){ if (picked.length >= per) picked.pop(); picked.push(core.id); }
       }
-      return {day:d, title: L.mode === 'gentle' ? 'Gentle strength' : title, exercises: picked.map(id => ({id, sets:L.maxSets, dose:goalDose(EX[id], a.goal, L.mode === 'gentle'), restSec:EX[id].unit === 'sec' ? 45 : restFor(EX[id].equip, a.goal)}))};
+      const mix = goalMix(a.goals && a.goals.length ? a.goals : [a.goal], picked.length);
+      return {day:d, title: L.mode === 'gentle' ? 'Gentle strength' : title, exercises: picked.map((id, k) => { const g = mix[k] || a.goal; return {id, sets:L.maxSets, dose:goalDose(EX[id], g, L.mode === 'gentle'), restSec:EX[id].unit === 'sec' ? 45 : restFor(EX[id].equip, g)}; })};
     });
     out.summary = L.mode === 'gentle' ? `A gentle plan with ${days.length} short sessions a week to build the habit safely.` : gym ? `${days.length} gym sessions a week, about ${a.minutes} minutes each. Start light and add weight when the last reps feel easy.` : `${days.length} workouts a week, about ${a.minutes} minutes each, with what you have at home.`;
+    const gn = goalNames(a.goals); if (gn.length > 1 && L.mode !== 'gentle') out.summary += ` Built around ${gn[0]}, with ${gn.slice(1).join(' and ')} worked into every session.`;
   }
   if (c.nut && c.tdee){
     const b = calorieBounds(L, c), want = c.tdee - (a.goal === 'lose' ? c.paceKg * 1100 : 0) + (a.goal === 'gain' ? c.tdee * 0.1 : 0);
@@ -3308,7 +3344,7 @@ async function runGeneration(a){
   if (source === 'auto' && !raw) res = validatePlan(localDraft(a, c), c.L, c);
   const now = new Date().toISOString();
   if (!a._hadHealth && a.healthConsent) store.set('health', healthRecord(a));
-  if (nut(a)){ const hl = store.get('health', null); if (hl){ hl.eating = {scoff:a.scoff, weight:+a.weight, height:+a.height, goal:a.goal, refer:false, at:now}; store.set('health', hl); } }
+  if (nut(a)){ const hl = store.get('health', null); if (hl){ hl.eating = {scoff:a.scoff, weight:+a.weight, height:+a.height, goal:eatGoal(a), refer:false, at:now}; store.set('health', hl); } }
   if (c.nut){ profile = {goal:GOAL_FOR_FOOD[a.goal] || 'tone', sex:a.sex, age:String(a.age), height:String(a.height), weight:String(a.weight), activity:a.activity, level:String(levelOf(a.level, a.track)), diet:a.diet || 'any', meals:String(a.meals || 4)}; store.set('profile', profile); fillForm(); }
   store.set('plan', {v:1, at:now, status:'pending_review', source, kind:a.kind, note, issues:res.issues, plan:res.plan});
   closeFlow(); planSheet();
@@ -5894,7 +5930,7 @@ function demoEnter(){
     Object.keys(localStorage).filter(k => k.startsWith('homereps.')).forEach(k => localStorage.removeItem(k));
   } catch (e){ return toast('This browser blocks saving, so the demo can’t start.'); }
   const now = new Date(), day = n => { const d = new Date(now); d.setDate(d.getDate() - n); d.setHours(18, 40, 0, 0); return d; };
-  const ans = {age:'25-34', track:'gym', sector:'gym', kit:'gym', goal:'gain', level:'some', dpw:4, days:trainDaysFrom(new Date(), 4), minutes:60, time:'18:30', wake:'07:00', sleepUsual:'7-8', why:'Feel strong every single day'};
+  const ans = {age:'25-34', track:'gym', sector:'gym', kit:'gym', goal:'gain', goals:['gain', 'strength'], level:'some', dpw:4, days:trainDaysFrom(new Date(), 4), minutes:60, time:'18:30', wake:'07:00', sleepUsual:'7-8', why:'Feel strong every single day'};
   store.set('onboarding', {v:3, at:day(30).toISOString(), answers:ans}); if (av0) store.set('avatar', av0);
   store.set('health', {v:1, at:day(30).toISOString(), consent:{granted:true, at:day(30).toISOString(), version:CONSENT_V}, parq:{heart:false, chest:false, dizzy:false, chronic:false, meds:false, joint:false, supervised:false, pregnant:false}, injuries:[]});
   try {

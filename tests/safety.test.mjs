@@ -8,8 +8,8 @@ import vm from 'node:vm';
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const core = html.split('/* safety-core:start')[1].split('/* safety-core:end */')[0].replace(/^[^\n]*\n/, '');
 const ctx = {};
-vm.runInNewContext(core + '\nObject.assign(this, {PARQ, SCOFF, HIGH_IMPACT, INJURY_AVOID, assessHealth, screenEating, kcalFloor, safetyLimits, calorieBounds, validatePlan, spreadPick});', ctx);
-const { assessHealth, screenEating, kcalFloor, safetyLimits, calorieBounds, validatePlan, HIGH_IMPACT, spreadPick } = ctx;
+vm.runInNewContext(core + '\nObject.assign(this, {PARQ, SCOFF, HIGH_IMPACT, INJURY_AVOID, assessHealth, screenEating, kcalFloor, safetyLimits, calorieBounds, validatePlan, spreadPick, goalMix});', ctx);
+const { assessHealth, screenEating, kcalFloor, safetyLimits, calorieBounds, validatePlan, HIGH_IMPACT, spreadPick, goalMix } = ctx;
 
 const allNo = keys => Object.fromEntries(keys.map(k => [k, false]));
 const PARQ_NO = allNo(ctx.PARQ.map(q => q[0]));
@@ -151,4 +151,25 @@ test('a plan for 6 chosen days in gentle mode keeps 3, spread over the week', ()
   const cat = {squat:{name:'Squat', level:1}};
   const { plan } = validatePlan({days:chosen.map(day)}, L, {days:chosen, catalog:cat});
   assert.deepEqual(Array.from(plan.days.map(d => d.day)), ['wed', 'fri', 'sun']);
+});
+
+test('several goals: the main goal gets at least half of the session', () => {
+  assert.deepEqual(Array.from(goalMix(['gain'], 5)), ['gain', 'gain', 'gain', 'gain', 'gain']);
+  for (const n of [3, 4, 5, 6, 7]) for (const goals of [['gain', 'lose'], ['lose', 'gain', 'endure'], ['endure', 'strength']]){
+    const mix = Array.from(goalMix(goals, n));
+    assert.equal(mix.length, n);
+    const main = mix.filter(g => g === goals[0]).length;
+    assert.ok(main >= Math.ceil(n / goals.length), `${goals} x${n}: main goal has ${main}`);
+    goals.forEach(g => assert.ok(mix.includes(g), `${goals} x${n}: ${g} is in the session`));
+    goals.slice(1).forEach(g => assert.ok(mix.filter(x => x === g).length <= main, `${goals} x${n}: ${g} never beats the main goal`));
+  }
+});
+test('several goals: heavy work first, high reps last; belly counts as fat loss; at most three goals', () => {
+  assert.deepEqual(Array.from(goalMix(['lose', 'strength'], 4)), ['strength', 'strength', 'lose', 'lose']);
+  assert.deepEqual(Array.from(goalMix(['gain', 'lose'], 5)), ['gain', 'gain', 'gain', 'lose', 'lose']);
+  assert.equal(goalMix(['gain', 'strength'], 6)[0], 'strength');
+  assert.deepEqual(Array.from(goalMix(['belly', 'lose'], 3)), ['lose', 'lose', 'lose']);
+  assert.equal(new Set(goalMix(['gain', 'lose', 'endure', 'strength'], 8)).has('strength'), false);
+  assert.deepEqual(Array.from(goalMix([], 4)), []);
+  assert.deepEqual(Array.from(goalMix(['gain', 'lose', 'endure'], 2)), ['gain', 'lose']);
 });
