@@ -89,6 +89,8 @@ npm test                    # Vitest: validación, fechas/zonas horarias, propue
 npm run test:db             # pgTAP: RLS (propietario, intruso con cuenta, anónimo) e integridad
 ```
 
+La CI (`.github/workflows/ci.yml`) ejecuta todo esto, la compilación de producción y la prueba de extremo a extremo en cada push.
+
 Prueba de extremo a extremo (26 pasos a 400 px, incluido el flujo de IA con aprobación). Usa una **API de Anthropic simulada** que también rechaza historiales inválidos, así que no gasta dinero ni necesita clave. **Borra la base de datos local.**
 
 ```bash
@@ -98,7 +100,27 @@ npm i -D playwright && npx playwright install chromium   # una vez
 npm run test:e2e                                   # terminal 3
 ```
 
-## Despliegue (Supabase + Vercel)
+## Despliegue rápido (≈10 minutos)
+
+1. **Supabase:** crea un proyecto gratuito en [supabase.com](https://supabase.com) (región Frankfurt, por ejemplo). Guarda la contraseña de la base de datos.
+2. **Base de datos y cuenta, con un solo comando** desde esta carpeta. El script está probado: aplica el esquema, autoriza tu email en RLS, crea tu cuenta y comprueba que puedes entrar. Puedes repetirlo sin riesgo.
+   ```bash
+   npm install
+   DATABASE_URL='<Connect → Session pooler>' SUPABASE_URL='https://<ref>.supabase.co' \
+   SUPABASE_PUBLISHABLE_KEY='sb_publishable_…' SUPABASE_SECRET_KEY='sb_secret_…' \
+   OWNER_EMAIL='tu@email.com' ./scripts/setup-production.sh
+   ```
+3. **Vercel:** este botón crea **un repositorio nuevo en tu GitHub solo con GOALS** y lo despliega. Te pedirá las 3 variables que imprime el script:
+
+   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPindaklaas%2Fhome-reps%2Ftree%2Fccr-67ad940b-2udifo%2Fgoals&project-name=goals&repository-name=goals&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,OWNER_EMAIL&envDescription=URL%20y%20publishable%20key%20de%20tu%20proyecto%20Supabase%2C%20y%20el%20email%20del%20propietario&envLink=https%3A%2F%2Fgithub.com%2FPindaklaas%2Fhome-reps%2Fblob%2Fccr-67ad940b-2udifo%2Fgoals%2F.env.example)
+
+   Después añade `ANTHROPIC_API_KEY` en Project Settings → Environment Variables y vuelve a desplegar.
+4. **Supabase → Authentication:** desactiva el registro de usuarios nuevos, pon la URL de Vercel como *Site URL* y añade `<url>/auth/callback` a *Redirect URLs*.
+5. Abre la URL en el móvil → «Añadir a pantalla de inicio».
+
+El paso a paso manual equivalente está en la sección siguiente.
+
+## Despliegue paso a paso (Supabase + Vercel)
 
 1. **Supabase:** crea un proyecto en supabase.com (región cercana, p. ej. Frankfurt). Luego:
    ```bash

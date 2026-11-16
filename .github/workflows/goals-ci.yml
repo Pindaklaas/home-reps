@@ -1,0 +1,89 @@
+# Copy of goals/.github/workflows/ci.yml for while GOALS lives inside home-reps.
+# Delete this file once GOALS has its own repository.
+# GOALS CI: types, lint, unit tests, RLS tests, production build and the
+# end-to-end browser test (against local Supabase and the mock Claude API).
+name: GOALS CI
+
+on:
+  push:
+    paths: ["goals/**", ".github/workflows/goals-ci.yml"]
+  pull_request:
+    paths: ["goals/**", ".github/workflows/goals-ci.yml"]
+
+concurrency:
+  group: goals-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: goals
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: goals/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder_value
+          OWNER_EMAIL: owner@goals.local
+
+  database-and-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: goals/package-lock.json
+      - run: npm ci
+      - name: Start local Supabase
+        run: npm run db:start
+      - name: RLS and integrity tests (pgTAP)
+        run: npm run test:db
+      - name: Configure the app for local Supabase and the mock Claude API
+        run: |
+          eval "$(npx supabase status -o env | grep -E '^(API_URL|PUBLISHABLE_KEY)=')"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
+            echo "OWNER_EMAIL=owner@goals.local"
+            echo "ANTHROPIC_API_KEY=test-key-not-real"
+            echo "ANTHROPIC_BASE_URL=http://127.0.0.1:4010"
+          } > .env.local
+      - run: npm run build
+      - name: Start the mock Claude API and the app
+        run: |
+          nohup node tests/e2e/mock-anthropic.mjs > mock.log 2>&1 &
+          nohup npm start > app.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://localhost:3000/login > /dev/null && break; sleep 1; done
+          curl -sf http://localhost:3000/login > /dev/null
+      - name: Install Playwright
+        run: npm i --no-save playwright && npx playwright install --with-deps chromium
+      - name: End-to-end test
+        run: npm run test:e2e
+        env:
+          SHOTS_DIR: test-results
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-screenshots
+          path: |
+            goals/test-results
+            goals/app.log
+            goals/mock.log
+          if-no-files-found: ignore
