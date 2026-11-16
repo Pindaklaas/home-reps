@@ -5,9 +5,11 @@ import { z } from "zod";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { aiErrorMessage, aiModel, anthropic, AiNotConfiguredError, FALLBACK_BETA } from "@/lib/ai/client";
 import { buildContext } from "@/lib/ai/context";
-import { ANALYST_SYSTEM, DAILY_RECOMMENDATION_PROMPT, DAY_PLAN_PROMPT, IDEA_EVALUATION_PROMPT, WEEKLY_REVIEW_PROMPT } from "@/lib/ai/prompts";
+import { SYSTEM_PROMPT, ANALYST_SYSTEM, DAILY_RECOMMENDATION_PROMPT, DAY_PLAN_PROMPT, IDEA_EVALUATION_PROMPT, WEEKLY_REVIEW_PROMPT } from "@/lib/ai/prompts";
 import { dailyRecommendationSchema, dayPlanSchema, ideaEvaluationSchema, weeklyReviewSchema } from "@/lib/ai/schemas";
 import { applyProposal, ProposalError } from "@/lib/ai/proposals";
+import { PROPOSAL_TOOLS } from "@/lib/ai/tools";
+import { closeDanglingToolUses } from "@/lib/ai/history";
 import type { ServerSupabase } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 import { todayIn } from "@/lib/dates";
@@ -189,6 +191,54 @@ export async function discardDayPlan(_: ActionState, formData: FormData): Promis
     if (!date.success) throw new ActionError("Fecha no válida");
     check(await supabase.from("daily_logs").update({ ai_plan: null, ai_plan_at: null }).eq("log_date", date.data));
     return { ok: true };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Connection check: the same request shapes the app uses, kept tiny.
+// ---------------------------------------------------------------------------
+export async function checkClaude(_: ActionState): Promise<ActionState> {
+  return runAction(async () => {
+    const started = Date.now();
+    // 1. Structured output (ideas, recommendation, plan, weekly review use this path).
+    const probe = await structured({
+      schema: z.object({ ok: z.boolean(), reply: z.string() }),
+      context: "Prueba de conexión de GOALS. No hay datos del usuario.",
+      instruction: "Devuelve ok=true y reply con la palabra «listo».",
+      effort: "low",
+    });
+    if (!probe.ok) throw new ActionError("Claude respondió, pero la respuesta estructurada no fue la esperada.");
+
+    // 2. Chat turn: streaming, propose_* tools and the context as a mid-conversation system message.
+    let stop: string | null = null;
+    let served = aiModel();
+    try {
+      const stream = anthropic().beta.messages.stream({
+        model: aiModel(),
+        max_tokens: 2000,
+        betas: [FALLBACK_BETA],
+        fallbacks: "default",
+        cache_control: { type: "ephemeral" },
+        system: [{ type: "text", text: SYSTEM_PROMPT }],
+        output_config: { effort: "low" },
+        tools: PROPOSAL_TOOLS,
+        messages: [
+          { role: "user", content: "Prueba de conexión: responde solo «listo», sin usar herramientas." },
+          { role: "system", content: "<contexto_goals>Prueba de conexión; sin datos.</contexto_goals>" },
+        ],
+      });
+      const msg = await stream.finalMessage();
+      stop = msg.stop_reason;
+      served = msg.model;
+      // Nothing is stored; this only keeps the shape identical to the real chat loop.
+      closeDanglingToolUses([{ role: "assistant", content: msg.content as never }]);
+    } catch (e) {
+      console.error("[ai.check]", e);
+      throw new ActionError(`El chat falló: ${aiErrorMessage(e)}`);
+    }
+    if (stop === "refusal") throw new ActionError("Claude declinó la prueba de chat.");
+    const seconds = ((Date.now() - started) / 1000).toFixed(1);
+    return { ok: true, message: `Claude funciona (${served}, ${seconds} s): respuestas estructuradas y chat con herramientas correctos.` };
   });
 }
 

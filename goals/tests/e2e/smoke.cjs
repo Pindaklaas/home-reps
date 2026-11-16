@@ -263,6 +263,14 @@ async function check(name, fn) {
       await shot("10-analytics");
     });
 
+    if (WITH_AI) {
+      await check("settings: the Claude connection check passes", async () => {
+        await go("/settings");
+        await page.getByRole("button", { name: "Probar conexión con Claude" }).click();
+        await page.getByText("Claude funciona").waitFor({ timeout: 20000 });
+      });
+    }
+
     await check("settings: switch to light theme", async () => {
       await go("/settings");
       await page.getByRole("radio", { name: "Claro" }).click();

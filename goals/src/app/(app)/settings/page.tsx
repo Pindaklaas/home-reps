@@ -6,6 +6,8 @@ import { serverEnv } from "@/lib/env";
 import { aiConfigured, aiModel } from "@/lib/ai/client";
 import { Badge, ListSkeleton, PageHeader } from "@/components/ui/primitives";
 import { AccountForms, AiSettingsForm, ProfileForm, ThemePicker } from "./forms";
+import { AiButton } from "@/components/brain/ai-button";
+import { checkClaude } from "@/lib/actions/ai";
 
 export const metadata: Metadata = { title: "Ajustes" };
 
@@ -53,6 +55,12 @@ async function Settings() {
           {ai ? <Badge tone="success">Conectado</Badge> : <Badge tone="warning">Sin configurar</Badge>}
           <span className="text-faint">· modelo {aiModel()}</span>
         </div>
+        {ai ? (
+          <div className="mb-5">
+            <AiButton action={checkClaude} label="Probar conexión con Claude" pendingLabel="Probando…" />
+            <p className="mt-1.5 text-xs text-faint">Hace dos peticiones mínimas con la misma forma que usa la app (coste de céntimos).</p>
+          </div>
+        ) : null}
         {!ai ? (
           <p className="mb-5 rounded-lg bg-warning-soft px-3 py-2 text-[13px] text-warning">
             Para activar Claude, añade <code>ANTHROPIC_API_KEY</code> a las variables de entorno del servidor (en local, en <code>.env.local</code>; en Vercel, en Project Settings → Environment Variables) y vuelve a desplegar. La clave nunca llega al navegador.

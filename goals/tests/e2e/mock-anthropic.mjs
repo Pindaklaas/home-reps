@@ -50,6 +50,7 @@ function structured(body) {
   const props = Object.keys(body.output_config?.format?.schema?.properties ?? {});
   const ctx = contextText(body);
   const tasks = idsOf(ctx, "task");
+  if (props.includes("reply")) return { ok: true, reply: "listo" };
   if (props.includes("verdict")) {
     return { verdict: "explore", score: 68, summary: "Idea prometedora pero sin validar con clientes reales.", fit_with_goals: "Encaja con el objetivo principal de ingresos.", strengths: ["Coste bajo"], risks: ["Demanda sin validar"], next_steps: ["Hablar con 5 clientes potenciales"], confidence: "medium", missing_information: ["Precio objetivo"] };
   }
