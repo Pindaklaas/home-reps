@@ -1,0 +1,10 @@
+# Never upload local secrets, dependencies or build output.
+.env*
+!.env.example
+node_modules
+.next
+test-results
+app.log
+mock.log
+supabase/.temp
+supabase/.branches
