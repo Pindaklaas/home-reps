@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/*
+ * GOALS design tokens. Dark is the default; [data-theme="light"] overrides.
+ * Components use only these tokens (bg-surface, text-muted, border-line...).
+ */
+:root {
+  color-scheme: dark;
+  --bg: #0a0a0c;
+  --surface: #111114;
+  --elevated: #17171b;
+  --subtle: #1d1d22;
+  --hover: #222228;
+  --line: #ffffff12;
+  --line-strong: #ffffff21;
+  --fg: #ececef;
+  --muted: #9b9ba6;
+  --faint: #67676f;
+  --accent: #8e8cf5;
+  --accent-fg: #0a0a0c;
+  --accent-soft: #8e8cf51f;
+  --success: #4fc591;
+  --success-soft: #4fc5911c;
+  --warning: #e2a74f;
+  --warning-soft: #e2a74f1c;
+  --danger: #ee6f6f;
+  --danger-soft: #ee6f6f1c;
+  --ring: #8e8cf580;
+  --shadow: 0 1px 0 #ffffff08 inset, 0 12px 32px -12px #00000099;
+  --chart-1: #8381ef;
+  --chart-2: #2fa673;
+  --chart-3: #e2a74f;
+  --chart-grid: #ffffff0d;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fafafb;
+  --surface: #ffffff;
+  --elevated: #ffffff;
+  --subtle: #f3f3f5;
+  --hover: #ececef;
+  --line: #0a0a0c14;
+  --line-strong: #0a0a0c24;
+  --fg: #141418;
+  --muted: #62626d;
+  --faint: #9a9aa3;
+  --accent: #5a57d8;
+  --accent-fg: #ffffff;
+  --accent-soft: #5a57d817;
+  --success: #1f8f5c;
+  --success-soft: #1f8f5c14;
+  --warning: #a8670f;
+  --warning-soft: #a8670f14;
+  --danger: #c93c3c;
+  --danger-soft: #c93c3c12;
+  --ring: #5a57d866;
+  --shadow: 0 1px 2px #0a0a0c0d, 0 12px 32px -16px #0a0a0c2e;
+  --chart-1: #5a57d8;
+  --chart-2: #1f8f5c;
+  --chart-3: #a8670f;
+  --chart-grid: #0a0a0c0f;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-subtle: var(--subtle);
+  --color-hover: var(--hover);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  --shadow-panel: var(--shadow);
+  --animate-fade-in: fade-in 180ms ease-out both;
+  --animate-rise: rise 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  letter-spacing: -0.006em;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Native <dialog> used by components/ui/dialog.tsx */
+dialog::backdrop {
+  background: #00000080;
+  backdrop-filter: blur(2px);
+}
+dialog[open] {
+  animation: rise 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.55;
+  cursor: pointer;
+}
+:root:not([data-theme="light"]) input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Scrollbars that stay out of the way */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Rendered Markdown-ish text from Claude */
+.prose-ai p { margin: 0.5em 0; }
+.prose-ai p:first-child { margin-top: 0; }
+.prose-ai ul, .prose-ai ol { margin: 0.5em 0; padding-left: 1.25em; }
+.prose-ai ul { list-style: disc; }
+.prose-ai ol { list-style: decimal; }
+.prose-ai li { margin: 0.2em 0; }
+.prose-ai h3, .prose-ai h4 { font-weight: 600; margin: 0.9em 0 0.3em; }
+.prose-ai strong { font-weight: 600; color: var(--fg); }
+.prose-ai code { font-family: var(--font-mono); font-size: 0.88em; background: var(--subtle); padding: 0.1em 0.35em; border-radius: 4px; }
