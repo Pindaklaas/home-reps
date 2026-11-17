@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Flame, Sparkles } from "lucide-react";
 import { getAppContext, getDay, listActivity, listGoals, listPendingProposals, listProjectOptions, listProjects, listTasks } from "@/lib/data";
 import { EmptyState, ListSkeleton, ProgressBar, Section, Skeleton, Stat } from "@/components/ui/primitives";
 import { PrimaryGoal } from "@/components/goals/goal-bits";
@@ -88,6 +88,8 @@ async function Dashboard() {
   let streak = 0;
   for (let d = daysWithDone.has(today) ? today : addDays(today, -1); daysWithDone.has(d); d = addDays(d, -1)) streak++;
 
+  const todayTotal = day.scheduled.filter((t) => t.status !== "cancelled").length;
+  const todayDone = day.scheduled.filter((t) => t.status === "completed").length;
   const rec = dailyRecommendationSchema.safeParse(day.log?.ai_recommendation);
   const recTasks = rec.success ? openTasks.filter((t) => rec.data.focus_task_ids.includes(t.id)) : [];
   const ai = aiConfigured();
@@ -100,6 +102,7 @@ async function Dashboard() {
           {greeting(tz)}
           {profile?.display_name ? `, ${profile.display_name}` : ""}.
         </h1>
+        <TodayMeter done={todayDone} total={todayTotal} streak={streak} />
         <p className="mt-1 text-sm text-muted">
           {focus.length
             ? `Tienes ${focus.length} ${focus.length === 1 ? "prioridad" : "prioridades"} para hoy${overdue.length ? ` y ${overdue.length} ${overdue.length === 1 ? "tarea atrasada" : "tareas atrasadas"}` : ""}.`
@@ -296,6 +299,29 @@ async function Dashboard() {
           </Section>
         </aside>
       </div>
+    </div>
+  );
+}
+
+function TodayMeter({ done, total, streak }: { done: number; total: number; streak: number }) {
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  return (
+    <div className="mt-3 flex items-center gap-3">
+      <div className="min-w-0 flex-1 sm:max-w-xs">
+        <div className="mb-1 flex justify-between text-xs">
+          <span className="text-muted">Hoy</span>
+          <span className="tabular-nums text-fg">
+            {done}/{total} {total === 1 ? "tarea" : "tareas"}
+          </span>
+        </div>
+        <ProgressBar value={pct} className="h-2" label={`Hoy: ${done} de ${total} tareas`} />
+      </div>
+      <span
+        className={streak ? "inline-flex shrink-0 items-center gap-1 rounded-full bg-warning-soft px-2.5 py-1 text-xs font-medium text-warning" : "inline-flex shrink-0 items-center gap-1 rounded-full border border-line px-2.5 py-1 text-xs text-faint"}
+        title="Días seguidos completando al menos una tarea"
+      >
+        <Flame className="h-3.5 w-3.5" aria-hidden /> {streak} {streak === 1 ? "día" : "días"}
+      </span>
     </div>
   );
 }

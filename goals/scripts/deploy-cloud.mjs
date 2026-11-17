@@ -3,7 +3,8 @@
  * Creates or updates the whole GOALS cloud setup through the Supabase
  * Management API and the Vercel API. Idempotent: safe to run again.
  *
- *   OWNER_EMAIL=you@example.com node scripts/deploy-cloud.mjs
+ *   OWNER_EMAIL=you@example.com node scripts/deploy-cloud.mjs   # first time
+ *   node scripts/deploy-cloud.mjs                              # later: owner read from the DB
  *
  * Authentication: SUPABASE_ACCESS_TOKEN (sbp_…) and VERCEL_TOKEN, sent as
  * Bearer tokens. In a Claude cloud environment the network proxy injects them
@@ -23,11 +24,11 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NAME = process.env.PROJECT_NAME ?? "goals";
 const REGION = process.env.SUPABASE_REGION ?? "eu-central-1";
-const OWNER_EMAIL = (process.env.OWNER_EMAIL ?? "").trim().toLowerCase();
+let OWNER_EMAIL = (process.env.OWNER_EMAIL ?? "").trim().toLowerCase();
 const VERCEL_CLI = "vercel@65.14.0";
 
-if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(OWNER_EMAIL)) {
-  console.error("Falta OWNER_EMAIL válido.");
+if (OWNER_EMAIL && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(OWNER_EMAIL)) {
+  console.error("OWNER_EMAIL no es un email válido.");
   process.exit(1);
 }
 
@@ -212,6 +213,12 @@ async function productionUrl(project, fallback) {
 // ---------------------------------------------------------------------------
 const { ref } = await supabaseProject();
 await applySchema(ref);
+if (!OWNER_EMAIL) {
+  // Redeploys don't need the email: use the single owner already authorized.
+  const rows = await sql(ref, "select email from app_private.authorized_users");
+  if (rows.length !== 1) throw new Error("Pasa OWNER_EMAIL: no hay exactamente un propietario autorizado.");
+  OWNER_EMAIL = rows[0].email;
+}
 await createOwner(ref);
 const supabaseUrl = `https://${ref}.supabase.co`;
 const key = await publicKey(ref);

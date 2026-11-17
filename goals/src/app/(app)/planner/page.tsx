@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { Fragment, Suspense } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Target } from "lucide-react";
 import { z } from "zod";
@@ -122,7 +122,20 @@ async function Planner({ searchParams }: { searchParams: PageProps<"/planner">["
           <Section title={`Programadas · ${open.length}`}>
             <QuickAddTask scheduledDate={date} placeholder="Añadir tarea a este día…" />
             {open.length ? (
-              <ul>{open.map((t) => <TaskRow key={t.id} task={t} projects={projects} today={today} focusDate={date} />)}</ul>
+              <ul>
+                {open.map((t, i) => {
+                  const nowHm = isToday ? nowInZone(tz) : null;
+                  const prev = open[i - 1]?.scheduled_time?.slice(0, 5);
+                  const cur = t.scheduled_time?.slice(0, 5);
+                  const marker = nowHm && cur && cur > nowHm && (!prev || prev <= nowHm);
+                  return (
+                    <Fragment key={t.id}>
+                      {marker ? <NowMarker time={nowHm} /> : null}
+                      <TaskRow task={t} projects={projects} today={today} focusDate={date} />
+                    </Fragment>
+                  );
+                })}
+              </ul>
             ) : (
               <p className="px-1 text-sm text-faint">No hay más tareas programadas para este día.</p>
             )}
@@ -175,5 +188,19 @@ async function Planner({ searchParams }: { searchParams: PageProps<"/planner">["
         </aside>
       </div>
     </>
+  );
+}
+
+function nowInZone(tz: string) {
+  return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: tz }).format(new Date());
+}
+
+function NowMarker({ time }: { time: string }) {
+  return (
+    <li className="flex items-center gap-2 py-1" aria-label={`Ahora, ${time}`}>
+      <span className="h-2 w-2 rounded-full bg-danger" aria-hidden />
+      <span className="font-mono text-[11px] tabular-nums text-danger">{time}</span>
+      <span className="h-px flex-1 bg-danger/40" aria-hidden />
+    </li>
   );
 }

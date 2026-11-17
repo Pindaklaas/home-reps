@@ -47,8 +47,39 @@ export function GoalRow({ goal, today }: { goal: GoalWithProgress; today: string
 }
 
 /** The current primary goal, shown large. */
+/** Circular meter for a single value (progress of the primary goal). */
+export function Ring({ value, size = 92, label }: { value: number; size?: number; label: string }) {
+  const v = Math.max(0, Math.min(100, value));
+  const r = (size - 10) / 2;
+  const c = 2 * Math.PI * r;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={label} className="shrink-0 -rotate-90">
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--subtle)" strokeWidth={8} />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke={v >= 100 ? "var(--success)" : "var(--accent)"}
+        strokeWidth={8}
+        strokeLinecap="round"
+        strokeDasharray={`${(v / 100) * c} ${c}`}
+        className="transition-[stroke-dasharray] duration-700"
+      />
+    </svg>
+  );
+}
+
+const fmt = (n: number) => n.toLocaleString("es-ES", { maximumFractionDigits: 0 });
+
+/** The current primary goal, shown large. Metric goals get a ring and milestones. */
 export function PrimaryGoal({ goal, today }: { goal: GoalWithProgress; today: string }) {
   const dl = deadlineText(goal.target_date, today);
+  const target = goal.metric_target !== null ? Number(goal.metric_target) : null;
+  const current = Number(goal.metric_current);
+  const unit = goal.metric_unit ?? "";
+  const milestones = target ? [0.2, 0.5, 1].map((f) => Math.round(target * f)) : [];
+  const next = milestones.find((m) => current < m);
   return (
     <Link
       href={`/goals/${goal.id}`}
@@ -59,22 +90,51 @@ export function PrimaryGoal({ goal, today }: { goal: GoalWithProgress; today: st
         className="pointer-events-none absolute inset-0 opacity-70"
         style={{ background: "radial-gradient(500px circle at 100% 0%, var(--accent-soft), transparent 60%)" }}
       />
-      <div className="relative">
-        <div className="mb-2 text-xs font-medium uppercase tracking-wider text-accent">Objetivo principal</div>
-        <div className="flex items-end justify-between gap-4">
-          <h2 className="text-lg font-semibold tracking-tight text-fg sm:text-xl">{goal.title}</h2>
-          <span className="shrink-0 text-3xl font-semibold tabular-nums tracking-tight text-fg">{goal.progress}%</span>
-        </div>
-        {goal.description ? <p className="mt-1 line-clamp-2 max-w-2xl text-sm text-muted">{goal.description}</p> : null}
-        <ProgressBar value={goal.progress} className="mt-4 h-2" label="Progreso del objetivo principal" />
-        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-faint">
-          {goal.metric_name && goal.metric_target !== null ? (
-            <span className="tabular-nums">
-              {goal.metric_name}: {Number(goal.metric_current).toLocaleString("es-ES")} / {Number(goal.metric_target).toLocaleString("es-ES")} {goal.metric_unit ?? ""}
-            </span>
+      <div className="relative flex items-center gap-5">
+        {target ? (
+          <div className="relative">
+            <Ring value={goal.progress} label={`${goal.progress}% del objetivo`} />
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-lg font-semibold tabular-nums tracking-tight text-fg">{goal.progress}%</span>
+            </div>
+          </div>
+        ) : null}
+        <div className="min-w-0 flex-1">
+          <div className="mb-1 text-xs font-medium uppercase tracking-wider text-accent">Objetivo principal</div>
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-lg font-semibold tracking-tight text-fg sm:text-xl">{goal.title}</h2>
+            {!target ? <span className="shrink-0 text-3xl font-semibold tabular-nums tracking-tight text-fg">{goal.progress}%</span> : null}
+          </div>
+          {target ? (
+            <p className="mt-1 text-sm tabular-nums text-muted">
+              <span className="text-xl font-semibold text-fg">{fmt(current)}</span> / {fmt(target)} {unit}
+              {next ? <span className="ml-2 text-xs text-faint">· próximo hito {fmt(next)} {unit}</span> : null}
+            </p>
+          ) : goal.description ? (
+            <p className="mt-1 line-clamp-2 max-w-2xl text-sm text-muted">{goal.description}</p>
           ) : null}
-          {dl ? <span className={dl.late ? "text-danger" : undefined}>{dl.text}</span> : null}
-          <span>{goal.projectCount === 1 ? "1 proyecto vinculado" : `${goal.projectCount} proyectos vinculados`}</span>
+          {!target ? <ProgressBar value={goal.progress} className="mt-4 h-2" label="Progreso del objetivo principal" /> : null}
+          {target ? (
+            <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Hitos">
+              {milestones.map((m) => (
+                <span
+                  key={m}
+                  className={
+                    current >= m
+                      ? "rounded-full bg-success-soft px-2 py-0.5 text-[11px] font-medium text-success tabular-nums"
+                      : "rounded-full border border-line px-2 py-0.5 text-[11px] text-faint tabular-nums"
+                  }
+                >
+                  {current >= m ? "✓ " : ""}
+                  {fmt(m)} {unit}
+                </span>
+              ))}
+            </div>
+          ) : null}
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-faint">
+            {dl ? <span className={dl.late ? "text-danger" : undefined}>{dl.text}</span> : null}
+            <span>{goal.projectCount === 1 ? "1 proyecto vinculado" : `${goal.projectCount} proyectos vinculados`}</span>
+          </div>
         </div>
       </div>
     </Link>

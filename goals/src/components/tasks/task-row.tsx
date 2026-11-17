@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Check, Clock, CalendarPlus, CalendarX, Pencil, Play, Star, Trash2 } from "lucide-react";
+import { Clock, CalendarPlus, CalendarX, Pencil, Play, Star, Trash2 } from "lucide-react";
 import { InlineAction, ActionForm, Modal, SubmitButton } from "@/components/ui/forms";
 import { Menu, menuItemClass } from "@/components/ui/menu";
 import { Dot } from "@/components/ui/primitives";
 import { Field, Input } from "@/components/ui/field";
 import { TaskDialog } from "@/components/forms/entity-forms";
-import { deleteTask, logTime, scheduleTask, setFocus, setTaskStatus, toggleTask } from "@/lib/actions/tasks";
+import { deleteTask, logTime, scheduleTask, setFocus, setTaskStatus } from "@/lib/actions/tasks";
+import { TaskToggle } from "./task-toggle";
 import { PRIORITY_LABEL, PRIORITY_TONE } from "@/lib/constants";
 import { addDays, formatMinutes, relativeDay } from "@/lib/dates";
 import type { TaskWithProject } from "@/lib/data";
@@ -38,17 +39,7 @@ export function TaskRow({
 
   return (
     <li className="group flex items-start gap-3 border-b border-line px-1 py-2.5 last:border-b-0">
-      <InlineAction
-        action={toggleTask}
-        fields={{ id: task.id }}
-        title={done ? "Marcar como pendiente" : "Marcar como completada"}
-        className={cn(
-          "mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border transition-colors",
-          done ? "border-success bg-success text-bg" : "border-line-strong hover:border-accent",
-        )}
-      >
-        {done ? <Check className="h-3 w-3" strokeWidth={3} /> : null}
-      </InlineAction>
+      <TaskToggle id={task.id} title={task.title} done={done} />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">

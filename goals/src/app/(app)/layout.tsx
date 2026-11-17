@@ -6,6 +6,7 @@ import { MobileNav, MobileNavView, SidebarNav, SidebarNavView } from "@/componen
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/actions/session";
+import { CelebrationHost } from "@/components/ui/celebrate";
 
 async function PendingProposalsBadge() {
   const user = await getCurrentUser();
@@ -132,6 +133,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         {children}
       </main>
 
+      <CelebrationHost />
       <Suspense fallback={<MobileNavView pathname="" />}>
         <MobileNav
           footer={
