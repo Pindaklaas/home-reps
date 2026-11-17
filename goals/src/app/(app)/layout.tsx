@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { LogOut } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import { MobileNav, MobileNavView, SidebarNav, SidebarNavView } from "@/components/layout/nav";
 import { getCurrentUser } from "@/lib/auth";
@@ -23,6 +23,31 @@ async function PendingProposalsBadge() {
     >
       {count}
     </span>
+  );
+}
+
+async function BellLink() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .is("read_at", null)
+    .lte("scheduled_for", new Date().toISOString());
+  return (
+    <Link
+      href="/notifications"
+      className="relative flex h-8 w-8 items-center justify-center rounded-md text-faint transition-colors hover:bg-hover hover:text-fg"
+      aria-label={count ? `Avisos: ${count} sin leer` : "Avisos"}
+    >
+      <Bell className="h-4 w-4" />
+      {count ? (
+        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-accent-fg tabular-nums">
+          {count > 99 ? "99+" : count}
+        </span>
+      ) : null}
+    </Link>
   );
 }
 
@@ -62,9 +87,14 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
       </a>
 
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[232px] flex-col border-r border-line bg-bg px-3 py-4 lg:flex">
-        <Link href="/" className="mb-6 px-2.5 py-1" aria-label="GOALS, inicio">
-          <Logo />
-        </Link>
+        <div className="mb-6 flex items-center justify-between pl-2.5">
+          <Link href="/" className="py-1" aria-label="GOALS, inicio">
+            <Logo />
+          </Link>
+          <Suspense fallback={null}>
+            <BellLink />
+          </Suspense>
+        </div>
         <div className="flex-1 overflow-y-auto">
           {/* The active link depends on the URL (request data), so it streams in. */}
           <Suspense fallback={<SidebarNavView pathname="" />}>
@@ -91,6 +121,11 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         <Link href="/" aria-label="GOALS, inicio">
           <Logo />
         </Link>
+        <div className="ml-auto">
+          <Suspense fallback={null}>
+            <BellLink />
+          </Suspense>
+        </div>
       </header>
 
       <main id="main" className="mx-auto w-full max-w-[1120px] px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10">

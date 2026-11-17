@@ -271,6 +271,21 @@ async function check(name, fn) {
       });
     }
 
+    await check("settings: save notification preferences and busy hours", async () => {
+      await go("/settings");
+      await page.uncheck("input[name=notify_inactivity]");
+      await page.fill("#b-start", "08:15");
+      await page.fill("#b-end", "14:10");
+      for (const d of ["1", "2", "3", "4", "5"]) await page.locator(`input[name=busy_days][value="${d}"]`).check({ force: true });
+      await page.getByRole("button", { name: "Guardar avisos" }).click();
+      await page.getByText("Preferencias de avisos guardadas").waitFor();
+    });
+
+    await check("notification center opens from the bell", async () => {
+      await page.locator('a[href="/notifications"]').filter({ visible: true }).first().click();
+      await page.getByRole("heading", { name: "Avisos", exact: true }).waitFor();
+    });
+
     await check("settings: switch to light theme", async () => {
       await go("/settings");
       await page.getByRole("radio", { name: "Claro" }).click();

@@ -7,6 +7,7 @@ import { aiConfigured, aiModel } from "@/lib/ai/client";
 import { Badge, ListSkeleton, PageHeader } from "@/components/ui/primitives";
 import { AccountForms, AiSettingsForm, ProfileForm, ThemePicker } from "./forms";
 import { NotificationSettings } from "./notifications";
+import { NotificationPrefs } from "./notification-prefs";
 import { publicEnv } from "@/lib/env";
 import { pushConfigured } from "@/lib/push";
 import { AiButton } from "@/components/brain/ai-button";
@@ -48,8 +49,9 @@ async function Settings() {
         <ProfileForm profile={profile} />
       </Block>
 
-      <Block id="notifications" title="Notificaciones" description="Avisos en el móvil a la hora de cada tarea.">
+      <Block id="notifications" title="Notificaciones" description="Avisos en el móvil: tareas con hora y avisos automáticos de lo que se te escapa.">
         <NotificationSettings publicKey={pushConfigured() ? publicEnv.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null : null} />
+        <NotificationPrefs profile={profile} />
       </Block>
 
       <Block id="theme" title="Tema" description="Se guarda en este dispositivo y en tu perfil.">

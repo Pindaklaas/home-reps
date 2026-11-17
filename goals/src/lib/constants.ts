@@ -146,3 +146,6 @@ export const PROPOSAL_STATUS_LABEL: Record<ProposalStatus, string> = {
   applied: "Aplicada",
   failed: "Error al aplicar",
 };
+
+/** Smart notification kinds the owner can turn off (profiles.notify_prefs). */
+export const NOTIFY_KINDS = ["briefing", "overdue", "deadline", "proposals", "goal", "inactivity", "evening"] as const;

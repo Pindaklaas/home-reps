@@ -261,14 +261,14 @@ isOneToOne: false
                   ]
                 },"notifications": {
                   Row: {
-                    "body": string | null,"channel": string,"created_at": string,"id": string,"kind": string,"link": string | null,"read_at": string | null,"scheduled_for": string | null,"sent_at": string | null,"task_id": string | null,"title": string,"user_id": string
+                    "body": string | null,"channel": string,"created_at": string,"dedupe_key": string | null,"id": string,"kind": string,"link": string | null,"read_at": string | null,"scheduled_for": string | null,"sent_at": string | null,"task_id": string | null,"title": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "body"?: string | null,"channel"?: string,"created_at"?: string,"id"?: string,"kind": string,"link"?: string | null,"read_at"?: string | null,"scheduled_for"?: string | null,"sent_at"?: string | null,"task_id"?: string | null,"title": string,"user_id"?: string
+                    "body"?: string | null,"channel"?: string,"created_at"?: string,"dedupe_key"?: string | null,"id"?: string,"kind": string,"link"?: string | null,"read_at"?: string | null,"scheduled_for"?: string | null,"sent_at"?: string | null,"task_id"?: string | null,"title": string,"user_id"?: string
                   }
                   Update: {
-                    "body"?: string | null,"channel"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"link"?: string | null,"read_at"?: string | null,"scheduled_for"?: string | null,"sent_at"?: string | null,"task_id"?: string | null,"title"?: string,"user_id"?: string
+                    "body"?: string | null,"channel"?: string,"created_at"?: string,"dedupe_key"?: string | null,"id"?: string,"kind"?: string,"link"?: string | null,"read_at"?: string | null,"scheduled_for"?: string | null,"sent_at"?: string | null,"task_id"?: string | null,"title"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -281,14 +281,14 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "ai_effort": string,"ai_enabled": boolean,"ai_include_context": boolean,"ai_instructions": string | null,"created_at": string,"daily_capacity_minutes": number,"display_name": string | null,"id": string,"locale": string,"theme": string,"timezone": string,"updated_at": string,"week_starts_on": number
+                    "ai_effort": string,"ai_enabled": boolean,"ai_include_context": boolean,"ai_instructions": string | null,"busy_blocks": NonNullable<Json>,"created_at": string,"daily_capacity_minutes": number,"display_name": string | null,"id": string,"locale": string,"notify_prefs": NonNullable<Json>,"quiet_end": string,"quiet_start": string,"theme": string,"timezone": string,"updated_at": string,"week_starts_on": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "ai_effort"?: string,"ai_enabled"?: boolean,"ai_include_context"?: boolean,"ai_instructions"?: string | null,"created_at"?: string,"daily_capacity_minutes"?: number,"display_name"?: string | null,"id": string,"locale"?: string,"theme"?: string,"timezone"?: string,"updated_at"?: string,"week_starts_on"?: number
+                    "ai_effort"?: string,"ai_enabled"?: boolean,"ai_include_context"?: boolean,"ai_instructions"?: string | null,"busy_blocks"?: NonNullable<Json>,"created_at"?: string,"daily_capacity_minutes"?: number,"display_name"?: string | null,"id": string,"locale"?: string,"notify_prefs"?: NonNullable<Json>,"quiet_end"?: string,"quiet_start"?: string,"theme"?: string,"timezone"?: string,"updated_at"?: string,"week_starts_on"?: number
                   }
                   Update: {
-                    "ai_effort"?: string,"ai_enabled"?: boolean,"ai_include_context"?: boolean,"ai_instructions"?: string | null,"created_at"?: string,"daily_capacity_minutes"?: number,"display_name"?: string | null,"id"?: string,"locale"?: string,"theme"?: string,"timezone"?: string,"updated_at"?: string,"week_starts_on"?: number
+                    "ai_effort"?: string,"ai_enabled"?: boolean,"ai_include_context"?: boolean,"ai_instructions"?: string | null,"busy_blocks"?: NonNullable<Json>,"created_at"?: string,"daily_capacity_minutes"?: number,"display_name"?: string | null,"id"?: string,"locale"?: string,"notify_prefs"?: NonNullable<Json>,"quiet_end"?: string,"quiet_start"?: string,"theme"?: string,"timezone"?: string,"updated_at"?: string,"week_starts_on"?: number
                   }
                   Relationships: [
                     

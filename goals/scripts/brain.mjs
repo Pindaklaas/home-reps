@@ -103,7 +103,7 @@ switch (cmd) {
       q(`select kind, content, confirmed, pinned from ai_memory where user_id = :uid order by pinned desc, created_at desc limit 40`),
       q(`select action, summary, status from ai_proposals where user_id = :uid and status = 'pending'`),
       q(`select intention, available_minutes, energy, summary from daily_logs where user_id = :uid and log_date = ${lit(owner.today)}`),
-      q(`select display_name, timezone, daily_capacity_minutes, ai_instructions from profiles where id = :uid`),
+      q(`select display_name, timezone, daily_capacity_minutes, ai_instructions, busy_blocks, quiet_start, quiet_end from profiles where id = :uid`),
     ]);
     out({ today: owner.today, timezone: owner.tz, profile: profile[0] ?? null, goals, projects, open_tasks: tasks, completed_last_7_days: done, ideas, decisions, memory, pending_proposals: proposals, today_log: log[0] ?? null });
     break;
