@@ -17,6 +17,7 @@
  *   node scripts/brain.mjs task-time <task-id> HH:MM [remind-min]   # set a time the owner asked for (sends a reminder)
  *   node scripts/brain.mjs remember   < fact.json   # store a fact/preference the owner stated ({kind, content})
  *   node scripts/brain.mjs goal       < goal.json   # create a goal the owner explicitly stated (optionally primary)
+ *   node scripts/brain.mjs project    < proj.json   # create a project the owner explicitly approved (can link the idea it comes from)
  *   node scripts/brain.mjs propose    < proposals.json   # [{action,target_id?,payload,summary,rationale}]
  *   node scripts/brain.mjs log        < turn.json   # {user, assistant}: keeps the chat in the app's AI Brain
  *
@@ -163,8 +164,8 @@ switch (cmd) {
     const est = Number.isInteger(t.estimated_minutes) ? t.estimated_minutes : null;
     if (t.scheduled_time && (!t.scheduled_date || !/^([01]\d|2[0-3]):[0-5]\d$/.test(t.scheduled_time))) throw new Error("scheduled_time necesita día y formato HH:MM.");
     const remind = Number.isInteger(t.remind_before_minutes) ? t.remind_before_minutes : 0;
-    const [row] = await sql(`insert into tasks (user_id, title, description, priority, scheduled_date, scheduled_time, remind_before_minutes, estimated_minutes)
-      values (${uid}, ${lit(String(t.title).trim())}, ${t.description ? lit(String(t.description).slice(0, 5000)) : "null"}, ${lit(prio)},
+    const [row] = await sql(`insert into tasks (user_id, project_id, title, description, priority, scheduled_date, scheduled_time, remind_before_minutes, estimated_minutes)
+      values (${uid}, ${t.project_id ? `${lit(t.project_id)}::uuid` : "null"}, ${lit(String(t.title).trim())}, ${t.description ? lit(String(t.description).slice(0, 5000)) : "null"}, ${lit(prio)},
       ${t.scheduled_date ? `${lit(t.scheduled_date)}::date` : "null"}, ${t.scheduled_time ? `${lit(t.scheduled_time)}::time` : "null"}, ${remind}, ${est ?? "null"}) returning id, title, scheduled_date, scheduled_time`);
     out(row);
     break;
@@ -180,6 +181,24 @@ switch (cmd) {
     if (!rows.length) throw new Error("Tarea no encontrada o sin día planificado.");
     const [n] = await sql(`select count(*)::int as n from notifications where task_id = ${lit(arg)} and sent_at is null`);
     out({ ...rows[0], avisos_programados: n.n });
+    break;
+  }
+  case "project": {
+    // Only for a project the owner explicitly asked for or approved in chat.
+    const pr = stdinJson();
+    if (!pr.title || String(pr.title).length > 160) throw new Error("El proyecto necesita un título (máx. 160).");
+    const status = ["idea", "planned", "active", "paused"].includes(pr.status) ? pr.status : "active";
+    const prio = ["low", "medium", "high", "critical"].includes(pr.priority) ? pr.priority : "medium";
+    if (pr.due_date && !/^\d{4}-\d{2}-\d{2}$/.test(pr.due_date)) throw new Error("due_date debe ser YYYY-MM-DD.");
+    const [row] = await sql(`insert into projects (user_id, goal_id, title, description, status, priority, due_date)
+      values (${uid}, ${pr.goal_id ? `${lit(pr.goal_id)}::uuid` : "null"}, ${lit(String(pr.title).trim())},
+        ${pr.description ? lit(String(pr.description).slice(0, 5000)) : "null"}, ${lit(status)}, ${lit(prio)},
+        ${pr.due_date ? `${lit(pr.due_date)}::date` : "null"}) returning id, title`);
+    if (pr.from_idea) {
+      await sql(`update ideas set status = 'converted', converted_project_id = ${lit(row.id)}::uuid
+        where id = ${lit(pr.from_idea)} and user_id = ${uid} and converted_project_id is null`);
+    }
+    out(row);
     break;
   }
   case "goal": {
@@ -201,7 +220,7 @@ switch (cmd) {
   case "remember": {
     // Facts or preferences the owner stated in chat: confirmed by definition.
     const m = stdinJson();
-    if (!["fact", "preference"].includes(m.kind) || !m.content) throw new Error("Esperaba {kind: fact|preference, content}.");
+    if (!["fact", "preference", "decision"].includes(m.kind) || !m.content) throw new Error("Esperaba {kind: fact|preference|decision, content}.");
     await sql(`insert into ai_memory (user_id, kind, content, confirmed, source, pinned)
       values (${uid}, ${lit(m.kind)}, ${lit(String(m.content).slice(0, 4000))}, true, 'user', ${m.pinned ? "true" : "false"})`);
     out("Guardado en la memoria como dato confirmado.");
