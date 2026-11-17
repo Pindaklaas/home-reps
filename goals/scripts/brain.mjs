@@ -16,6 +16,7 @@
  *   node scripts/brain.mjs withdraw <proposal-id>   # withdraw one of Claude's own pending proposals
  *   node scripts/brain.mjs task-time <task-id> HH:MM [remind-min]   # set a time the owner asked for (sends a reminder)
  *   node scripts/brain.mjs remember   < fact.json   # store a fact/preference the owner stated ({kind, content})
+ *   node scripts/brain.mjs goal       < goal.json   # create a goal the owner explicitly stated (optionally primary)
  *   node scripts/brain.mjs propose    < proposals.json   # [{action,target_id?,payload,summary,rationale}]
  *   node scripts/brain.mjs log        < turn.json   # {user, assistant}: keeps the chat in the app's AI Brain
  *
@@ -181,6 +182,22 @@ switch (cmd) {
     out({ ...rows[0], avisos_programados: n.n });
     break;
   }
+  case "goal": {
+    // Only for a goal the owner stated explicitly in chat.
+    const g = stdinJson();
+    if (!g.title || String(g.title).length > 160) throw new Error("El objetivo necesita un título (máx. 160).");
+    if (g.target_date && !/^\d{4}-\d{2}-\d{2}$/.test(g.target_date)) throw new Error("target_date debe ser YYYY-MM-DD.");
+    const metric = g.metric_target !== undefined && g.metric_target !== null;
+    if (g.is_primary) await sql(`update goals set is_primary = false where user_id = ${uid} and is_primary`);
+    const [row] = await sql(`insert into goals (user_id, title, description, category, target_date, priority, status, is_primary, progress_mode, metric_name, metric_unit, metric_start, metric_target, metric_current)
+      values (${uid}, ${lit(String(g.title).trim())}, ${g.description ? lit(String(g.description).slice(0, 5000)) : "null"}, ${lit(String(g.category ?? "personal").slice(0, 40))},
+        ${g.target_date ? `${lit(g.target_date)}::date` : "null"}, ${lit(["low", "medium", "high", "critical"].includes(g.priority) ? g.priority : "high")}, 'active',
+        ${g.is_primary ? "true" : "false"}, ${lit(metric ? "metric" : "projects")}, ${g.metric_name ? lit(g.metric_name) : "null"}, ${g.metric_unit ? lit(g.metric_unit) : "null"},
+        ${Number(g.metric_start ?? 0)}, ${metric ? Number(g.metric_target) : "null"}, ${Number(g.metric_start ?? 0)})
+      returning id, title, is_primary`);
+    out(row);
+    break;
+  }
   case "remember": {
     // Facts or preferences the owner stated in chat: confirmed by definition.
     const m = stdinJson();
@@ -229,6 +246,6 @@ switch (cmd) {
     break;
   }
   default:
-    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | ideas | task | task-time <id> HH:MM [min] | remember | withdraw <id> | propose | log");
+    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | ideas | task | task-time <id> HH:MM [min] | remember | goal | withdraw <id> | propose | log");
     process.exitCode = 1;
 }
