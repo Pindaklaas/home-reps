@@ -91,7 +91,7 @@ export function DayPlanPanel({
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 text-accent" />}
           {pending ? "Planificando…" : plan ? "Rehacer plan" : "Proponer plan"}
         </button>
-        {!aiEnabled ? <span className="text-xs text-faint">Claude no está configurado.</span> : null}
+        {!aiEnabled ? <span className="text-xs text-faint">Sin clave: pídeselo a Claude Code («actúa como el cerebro de GOALS»).</span> : null}
         {state && !state.ok ? <span className="text-xs text-danger">{state.error}</span> : null}
       </form>
     </Section>

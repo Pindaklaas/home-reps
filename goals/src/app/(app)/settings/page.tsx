@@ -62,9 +62,14 @@ async function Settings() {
           </div>
         ) : null}
         {!ai ? (
-          <p className="mb-5 rounded-lg bg-warning-soft px-3 py-2 text-[13px] text-warning">
-            Para activar Claude, añade <code>ANTHROPIC_API_KEY</code> a las variables de entorno del servidor (en local, en <code>.env.local</code>; en Vercel, en Project Settings → Environment Variables) y vuelve a desplegar. La clave nunca llega al navegador.
+          <>
+          <p className="mb-3 rounded-lg bg-accent-soft px-3 py-2 text-[13px] text-accent">
+            Modo cerebro con Claude Code: sin clave, Claude Code puede leer tus datos y escribir aquí recomendaciones, planes, evaluaciones y propuestas (que apruebas tú). Abre una sesión en el entorno «goals» y pídele «actúa como el cerebro de GOALS».
           </p>
+          <p className="mb-5 rounded-lg bg-warning-soft px-3 py-2 text-[13px] text-warning">
+            Para activar el chat integrado, añade <code>ANTHROPIC_API_KEY</code> a las variables de entorno del servidor (en local, en <code>.env.local</code>; en Vercel, en Project Settings → Environment Variables) y vuelve a desplegar. La clave nunca llega al navegador.
+          </p>
+          </>
         ) : null}
         <AiSettingsForm profile={profile} />
       </Block>

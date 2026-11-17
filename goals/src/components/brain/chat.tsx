@@ -167,7 +167,7 @@ export function Chat({
               </div>
             ) : (
               <p className="mt-6 rounded-lg bg-warning-soft px-3 py-2 text-[13px] text-warning">
-                Claude no está configurado. Añade <code>ANTHROPIC_API_KEY</code> en el servidor (ver README) para activar el AI Brain.
+                El chat integrado necesita <code>ANTHROPIC_API_KEY</code>. Mientras tanto, Claude Code es tu cerebro: en una sesión del entorno «goals» pídele «actúa como el cerebro de GOALS». Sus respuestas y propuestas aparecen aquí, en la conversación «Claude Code», y las apruebas tú.
               </p>
             )}
           </div>
@@ -225,7 +225,7 @@ export function Chat({
             rows={1}
             maxLength={8000}
             disabled={!aiEnabled}
-            placeholder={aiEnabled ? "Escribe con naturalidad…" : "Claude no está configurado"}
+            placeholder={aiEnabled ? "Escribe con naturalidad…" : "Chat integrado sin clave: usa Claude Code como cerebro"}
             title="Enter para enviar · Mayús+Enter para nueva línea"
             className="max-h-[220px] min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2 text-[14.5px] text-fg placeholder:text-faint focus:outline-none"
           />

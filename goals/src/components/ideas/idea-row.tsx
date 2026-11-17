@@ -156,7 +156,7 @@ export function IdeaRow({ idea, tz, aiEnabled }: { idea: Tables<"ideas">; tz: st
               {evaluating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 text-accent" />}
               {evaluating ? "Evaluando…" : evaluation ? "Reevaluar con Claude" : "Evaluar con Claude"}
             </button>
-            {!aiEnabled ? <span className="text-xs text-faint">Claude no está configurado.</span> : null}
+            {!aiEnabled ? <span className="text-xs text-faint">Sin clave: pídeselo a Claude Code («actúa como el cerebro de GOALS»).</span> : null}
             {evalState && !evalState.ok ? <span className="text-xs text-danger">{evalState.error}</span> : null}
           </form>
         </div>

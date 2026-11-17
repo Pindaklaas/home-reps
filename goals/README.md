@@ -140,6 +140,10 @@ El paso a paso manual equivalente está en la sección siguiente.
 
 > El chat usa `maxDuration = 300` s; en el plan Hobby de Vercel el máximo efectivo puede ser menor.
 
+## Claude Code como cerebro (sin clave de Anthropic)
+
+Mientras no haya `ANTHROPIC_API_KEY`, una sesión de Claude Code en el entorno «goals» hace de cerebro: pídele «actúa como el cerebro de GOALS» (skill `.claude/skills/goals-brain`). Usa `scripts/brain.mjs` para leer tus datos y escribir en la app la recomendación del día, planes, evaluaciones de ideas, revisiones semanales y **propuestas** que apruebas tú en AI Brain → conversación «Claude Code». Valida con los mismos esquemas que la app y nunca cambia tus datos directamente.
+
 ## Integraciones (preparadas, no activas)
 
 Nada de esto está conectado ni simulado; Ajustes muestra su estado real.

@@ -29,5 +29,11 @@ Private single-user productivity app. Read README.md for the module map and arch
 - Prefer lists and sections over cards. Test at ~400 px width.
 - Charts are single-series SVG (`components/charts`), one axis, hover tooltip and a hidden data table.
 
+## Production
+- Deployed on Vercel (project `goals`) with a Supabase project named «GOALS». Account details live only in the owner's accounts and the «goals» cloud environment, never in this public repo.
+- The cloud environment «goals» injects the Supabase and Vercel tokens. Node's fetch needs `NODE_USE_ENV_PROXY=1` there.
+- Redeploy / apply new migrations: `NODE_USE_ENV_PROXY=1 OWNER_EMAIL=<owner email> node scripts/deploy-cloud.mjs` (idempotent; ask the owner for the email, do not write it to files).
+- Without `ANTHROPIC_API_KEY` the in-app AI is off and **Claude Code acts as the brain** through `scripts/brain.mjs` (skill `goals-brain`). Same rules: read context first, only propose, the owner approves in the app.
+
 ## Checks before committing
 `npm run typecheck && npm run lint && npm test && npm run test:db && npm run build`, and `npm run test:e2e` for UI or AI changes (see README; it wipes the local DB).

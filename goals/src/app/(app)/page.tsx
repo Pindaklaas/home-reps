@@ -155,7 +155,7 @@ async function Dashboard() {
           <p className="text-sm text-muted">
             {ai
               ? "Pide a Claude que analice tus objetivos, tareas y tiempo, y te diga en qué centrarte hoy."
-              : "Configura ANTHROPIC_API_KEY en el servidor para recibir recomendaciones diarias."}
+              : "Sin clave de Anthropic: pide la recomendación a Claude Code («actúa como el cerebro de GOALS») y aparecerá aquí."}
           </p>
         )}
       </section>
