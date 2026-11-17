@@ -73,9 +73,10 @@ async function supabaseProject() {
   if (!org) throw new Error(`No encuentro la organización ${process.env.SUPABASE_ORG}`);
 
   const projects = await sb("GET", "/v1/projects");
-  let project = projects.find((p) => p.name === NAME && (p.organization_id === org.id || p.organization_slug === org.slug));
+  // Reuse a project with the same name (any case, any region), e.g. one created in the dashboard.
+  let project = projects.find((p) => p.name?.toLowerCase() === NAME.toLowerCase());
   if (project) {
-    log(`Supabase: uso el proyecto existente «${NAME}» (${project.id}).`);
+    log(`Supabase: uso el proyecto existente «${project.name}» (${project.id}, ${project.region}).`);
   } else {
     log(`Supabase: creando el proyecto «${NAME}» en ${REGION} (organización «${org.name}»)…`);
     // The database password is random and not shown: GOALS never uses it
@@ -131,7 +132,7 @@ async function applySchema(ref) {
 
 async function createOwner(ref) {
   const template = readFileSync(path.join(ROOT, "scripts", "sql", "create-owner.sql"), "utf8");
-  await sql(ref, template.replace(":owner_email", literal(OWNER_EMAIL)));
+  await sql(ref, template.replaceAll(":owner_email", literal(OWNER_EMAIL)));
   const check = await sql(ref, `select (select count(*) from auth.users where email = ${literal(OWNER_EMAIL)})::int as users, (select count(*) from app_private.authorized_users where email = ${literal(OWNER_EMAIL)})::int as allowed`);
   if (check[0]?.users !== 1 || check[0]?.allowed !== 1) throw new Error(`No se pudo crear o autorizar al propietario: ${JSON.stringify(check)}`);
   log(`Supabase: propietario ${OWNER_EMAIL} creado y autorizado.`);
@@ -187,7 +188,7 @@ function deploy(project) {
   log("Vercel: subiendo y compilando (unos minutos)…");
   const out = execFileSync(
     "npx",
-    ["--yes", VERCEL_CLI, "deploy", "--prod", "--yes", "--token", process.env.VERCEL_TOKEN || "proxy-injected"],
+    ["--yes", VERCEL_CLI, "deploy", "--prod", "--yes", "--token", process.env.VERCEL_TOKEN || "proxyinjectedplaceholder0000"],
     {
       cwd: ROOT,
       env: { ...process.env, VERCEL_ORG_ID: project.accountId, VERCEL_PROJECT_ID: project.id, VERCEL_TELEMETRY_DISABLED: "1" },
