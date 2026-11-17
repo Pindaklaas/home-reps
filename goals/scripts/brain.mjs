@@ -12,6 +12,8 @@
  *   node scripts/brain.mjs evaluate <idea-id> < eval.json
  *   node scripts/brain.mjs review     < text.txt    # weekly review → memory (summary)
  *   node scripts/brain.mjs ideas      < ideas.json  # save ideas the owner explicitly asked to add (Ideas Vault only)
+ *   node scripts/brain.mjs task       < task.json   # schedule a task the owner explicitly asked to add
+ *   node scripts/brain.mjs withdraw <proposal-id>   # withdraw one of Claude's own pending proposals
  *   node scripts/brain.mjs propose    < proposals.json   # [{action,target_id?,payload,summary,rationale}]
  *   node scripts/brain.mjs log        < turn.json   # {user, assistant}: keeps the chat in the app's AI Brain
  *
@@ -149,6 +151,27 @@ switch (cmd) {
     out(rows);
     break;
   }
+  case "task": {
+    // Only for a task the owner explicitly asked, in chat, to schedule.
+    const t = stdinJson();
+    if (!t.title || String(t.title).length > 200) throw new Error("La tarea necesita un título (máx. 200).");
+    if (t.scheduled_date && !/^\d{4}-\d{2}-\d{2}$/.test(t.scheduled_date)) throw new Error("scheduled_date debe ser YYYY-MM-DD.");
+    const prio = ["low", "medium", "high", "critical"].includes(t.priority) ? t.priority : "medium";
+    const est = Number.isInteger(t.estimated_minutes) ? t.estimated_minutes : null;
+    const [row] = await sql(`insert into tasks (user_id, title, description, priority, scheduled_date, estimated_minutes)
+      values (${uid}, ${lit(String(t.title).trim())}, ${t.description ? lit(String(t.description).slice(0, 5000)) : "null"}, ${lit(prio)},
+      ${t.scheduled_date ? `${lit(t.scheduled_date)}::date` : "null"}, ${est ?? "null"}) returning id, title, scheduled_date`);
+    out(row);
+    break;
+  }
+  case "withdraw": {
+    // Withdraws a pending proposal (never touches applied data).
+    const rows = await sql(`update ai_proposals set status = 'rejected', decided_at = now(), error = 'Retirada a petición del propietario'
+      where id = ${lit(arg)} and user_id = ${uid} and status = 'pending' returning summary`);
+    if (!rows.length) throw new Error("Propuesta no encontrada o ya decidida.");
+    out(`Retirada: ${rows[0].summary}`);
+    break;
+  }
   case "propose": {
     const items = stdinJson();
     if (!Array.isArray(items) || !items.length || items.length > 20) throw new Error("Esperaba una lista de 1 a 20 propuestas.");
@@ -180,6 +203,6 @@ switch (cmd) {
     break;
   }
   default:
-    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | ideas | propose | log");
+    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | ideas | task | withdraw <id> | propose | log");
     process.exitCode = 1;
 }
