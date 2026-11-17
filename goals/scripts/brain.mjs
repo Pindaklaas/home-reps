@@ -164,9 +164,10 @@ switch (cmd) {
     const est = Number.isInteger(t.estimated_minutes) ? t.estimated_minutes : null;
     if (t.scheduled_time && (!t.scheduled_date || !/^([01]\d|2[0-3]):[0-5]\d$/.test(t.scheduled_time))) throw new Error("scheduled_time necesita día y formato HH:MM.");
     const remind = Number.isInteger(t.remind_before_minutes) ? t.remind_before_minutes : 0;
-    const [row] = await sql(`insert into tasks (user_id, project_id, title, description, priority, scheduled_date, scheduled_time, remind_before_minutes, estimated_minutes)
+    if (t.due_date && !/^\d{4}-\d{2}-\d{2}$/.test(t.due_date)) throw new Error("due_date debe ser YYYY-MM-DD.");
+    const [row] = await sql(`insert into tasks (user_id, project_id, title, description, priority, due_date, scheduled_date, scheduled_time, remind_before_minutes, estimated_minutes)
       values (${uid}, ${t.project_id ? `${lit(t.project_id)}::uuid` : "null"}, ${lit(String(t.title).trim())}, ${t.description ? lit(String(t.description).slice(0, 5000)) : "null"}, ${lit(prio)},
-      ${t.scheduled_date ? `${lit(t.scheduled_date)}::date` : "null"}, ${t.scheduled_time ? `${lit(t.scheduled_time)}::time` : "null"}, ${remind}, ${est ?? "null"}) returning id, title, scheduled_date, scheduled_time`);
+      ${t.due_date ? `${lit(t.due_date)}::date` : "null"}, ${t.scheduled_date ? `${lit(t.scheduled_date)}::date` : "null"}, ${t.scheduled_time ? `${lit(t.scheduled_time)}::time` : "null"}, ${remind}, ${est ?? "null"}) returning id, title, due_date, scheduled_date, scheduled_time`);
     out(row);
     break;
   }
