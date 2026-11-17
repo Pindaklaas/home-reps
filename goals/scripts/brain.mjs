@@ -11,6 +11,7 @@
  *   node scripts/brain.mjs plan 2026-11-18 < plan.json   # day plan proposal
  *   node scripts/brain.mjs evaluate <idea-id> < eval.json
  *   node scripts/brain.mjs review     < text.txt    # weekly review → memory (summary)
+ *   node scripts/brain.mjs ideas      < ideas.json  # save ideas the owner explicitly asked to add (Ideas Vault only)
  *   node scripts/brain.mjs propose    < proposals.json   # [{action,target_id?,payload,summary,rationale}]
  *   node scripts/brain.mjs log        < turn.json   # {user, assistant}: keeps the chat in the app's AI Brain
  *
@@ -135,6 +136,19 @@ switch (cmd) {
     out("Revisión guardada en la memoria (como resumen de Claude, no como hecho).");
     break;
   }
+  case "ideas": {
+    // Only for ideas the owner explicitly asked, in chat, to save. Adding to the
+    // vault changes nothing that exists; everything else goes through proposals.
+    const items = stdinJson();
+    if (!Array.isArray(items) || !items.length || items.length > 20) throw new Error("Esperaba una lista de 1 a 20 ideas.");
+    for (const i of items) if (!i.title || String(i.title).length > 160) throw new Error("Cada idea necesita un título (máx. 160).");
+    const values = items
+      .map((i) => `(${uid}, ${lit(String(i.title).trim())}, ${i.description ? lit(String(i.description).slice(0, 10000)) : "null"}, ${lit(String(i.category ?? "general").slice(0, 40))})`)
+      .join(",\n");
+    const rows = await sql(`insert into ideas (user_id, title, description, category) values ${values} returning id, title`);
+    out(rows);
+    break;
+  }
   case "propose": {
     const items = stdinJson();
     if (!Array.isArray(items) || !items.length || items.length > 20) throw new Error("Esperaba una lista de 1 a 20 propuestas.");
@@ -166,6 +180,6 @@ switch (cmd) {
     break;
   }
   default:
-    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | propose | log");
+    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | ideas | propose | log");
     process.exitCode = 1;
 }
