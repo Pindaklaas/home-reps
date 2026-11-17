@@ -14,6 +14,8 @@
  *   node scripts/brain.mjs ideas      < ideas.json  # save ideas the owner explicitly asked to add (Ideas Vault only)
  *   node scripts/brain.mjs task       < task.json   # schedule a task the owner explicitly asked to add
  *   node scripts/brain.mjs withdraw <proposal-id>   # withdraw one of Claude's own pending proposals
+ *   node scripts/brain.mjs task-time <task-id> HH:MM [remind-min]   # set a time the owner asked for (sends a reminder)
+ *   node scripts/brain.mjs remember   < fact.json   # store a fact/preference the owner stated ({kind, content})
  *   node scripts/brain.mjs propose    < proposals.json   # [{action,target_id?,payload,summary,rationale}]
  *   node scripts/brain.mjs log        < turn.json   # {user, assistant}: keeps the chat in the app's AI Brain
  *
@@ -93,7 +95,7 @@ switch (cmd) {
          from goals g join goal_progress gp on gp.goal_id = g.id where g.user_id = :uid and g.status in ('active','paused') order by g.is_primary desc`),
       q(`select p.id, p.title, p.status, p.priority, p.due_date, p.goal_id, pp.progress, pp.completed_tasks, pp.total_tasks, pp.spent_minutes
          from projects p join project_progress pp on pp.project_id = p.id where p.user_id = :uid and p.status not in ('completed','cancelled')`),
-      q(`select id, title, status, priority, project_id, due_date, scheduled_date, focus_rank, estimated_minutes, spent_minutes
+      q(`select id, title, status, priority, project_id, due_date, scheduled_date, scheduled_time, remind_before_minutes, focus_rank, estimated_minutes, spent_minutes
          from tasks where user_id = :uid and status in ('pending','in_progress') order by due_date nulls last limit 100`),
       q(`select title, completed_at from tasks where user_id = :uid and status = 'completed' and completed_at > now() - interval '7 days'`),
       q(`select id, title, status, category, potential, difficulty, estimated_cost, ai_evaluation is not null as evaluated from ideas where user_id = :uid and status <> 'discarded'`),
@@ -158,10 +160,34 @@ switch (cmd) {
     if (t.scheduled_date && !/^\d{4}-\d{2}-\d{2}$/.test(t.scheduled_date)) throw new Error("scheduled_date debe ser YYYY-MM-DD.");
     const prio = ["low", "medium", "high", "critical"].includes(t.priority) ? t.priority : "medium";
     const est = Number.isInteger(t.estimated_minutes) ? t.estimated_minutes : null;
-    const [row] = await sql(`insert into tasks (user_id, title, description, priority, scheduled_date, estimated_minutes)
+    if (t.scheduled_time && (!t.scheduled_date || !/^([01]\d|2[0-3]):[0-5]\d$/.test(t.scheduled_time))) throw new Error("scheduled_time necesita día y formato HH:MM.");
+    const remind = Number.isInteger(t.remind_before_minutes) ? t.remind_before_minutes : 0;
+    const [row] = await sql(`insert into tasks (user_id, title, description, priority, scheduled_date, scheduled_time, remind_before_minutes, estimated_minutes)
       values (${uid}, ${lit(String(t.title).trim())}, ${t.description ? lit(String(t.description).slice(0, 5000)) : "null"}, ${lit(prio)},
-      ${t.scheduled_date ? `${lit(t.scheduled_date)}::date` : "null"}, ${est ?? "null"}) returning id, title, scheduled_date`);
+      ${t.scheduled_date ? `${lit(t.scheduled_date)}::date` : "null"}, ${t.scheduled_time ? `${lit(t.scheduled_time)}::time` : "null"}, ${remind}, ${est ?? "null"}) returning id, title, scheduled_date, scheduled_time`);
     out(row);
+    break;
+  }
+  case "task-time": {
+    // Only when the owner explicitly asked for this time. The reminder follows automatically.
+    const [time, remind] = process.argv.slice(4);
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time ?? "")) throw new Error("Uso: task-time <id> HH:MM [minutos-antes]");
+    const before = remind ? Number(remind) : 0;
+    if (!Number.isInteger(before) || before < 0 || before > 1440) throw new Error("Minutos antes no válidos.");
+    const rows = await sql(`update tasks set scheduled_time = ${lit(time)}::time, remind_before_minutes = ${before}
+      where id = ${lit(arg)} and user_id = ${uid} and scheduled_date is not null returning title, scheduled_date, scheduled_time`);
+    if (!rows.length) throw new Error("Tarea no encontrada o sin día planificado.");
+    const [n] = await sql(`select count(*)::int as n from notifications where task_id = ${lit(arg)} and sent_at is null`);
+    out({ ...rows[0], avisos_programados: n.n });
+    break;
+  }
+  case "remember": {
+    // Facts or preferences the owner stated in chat: confirmed by definition.
+    const m = stdinJson();
+    if (!["fact", "preference"].includes(m.kind) || !m.content) throw new Error("Esperaba {kind: fact|preference, content}.");
+    await sql(`insert into ai_memory (user_id, kind, content, confirmed, source, pinned)
+      values (${uid}, ${lit(m.kind)}, ${lit(String(m.content).slice(0, 4000))}, true, 'user', ${m.pinned ? "true" : "false"})`);
+    out("Guardado en la memoria como dato confirmado.");
     break;
   }
   case "withdraw": {
@@ -203,6 +229,6 @@ switch (cmd) {
     break;
   }
   default:
-    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | ideas | task | withdraw <id> | propose | log");
+    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | ideas | task | task-time <id> HH:MM [min] | remember | withdraw <id> | propose | log");
     process.exitCode = 1;
 }
