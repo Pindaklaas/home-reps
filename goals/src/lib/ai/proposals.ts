@@ -101,6 +101,8 @@ const updateChanges = {
     priority: z.enum(PRIORITIES).optional(),
     due_date: z.iso.date().optional(),
     scheduled_date: z.iso.date().optional(),
+    scheduled_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).optional(),
+    remind_before_minutes: z.number().int().min(0).max(1440).optional(),
   }),
 };
 

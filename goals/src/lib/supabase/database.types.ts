@@ -261,17 +261,23 @@ isOneToOne: false
                   ]
                 },"notifications": {
                   Row: {
-                    "body": string | null,"channel": string,"created_at": string,"id": string,"kind": string,"link": string | null,"read_at": string | null,"scheduled_for": string | null,"title": string,"user_id": string
+                    "body": string | null,"channel": string,"created_at": string,"id": string,"kind": string,"link": string | null,"read_at": string | null,"scheduled_for": string | null,"sent_at": string | null,"task_id": string | null,"title": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "body"?: string | null,"channel"?: string,"created_at"?: string,"id"?: string,"kind": string,"link"?: string | null,"read_at"?: string | null,"scheduled_for"?: string | null,"title": string,"user_id"?: string
+                    "body"?: string | null,"channel"?: string,"created_at"?: string,"id"?: string,"kind": string,"link"?: string | null,"read_at"?: string | null,"scheduled_for"?: string | null,"sent_at"?: string | null,"task_id"?: string | null,"title": string,"user_id"?: string
                   }
                   Update: {
-                    "body"?: string | null,"channel"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"link"?: string | null,"read_at"?: string | null,"scheduled_for"?: string | null,"title"?: string,"user_id"?: string
+                    "body"?: string | null,"channel"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"link"?: string | null,"read_at"?: string | null,"scheduled_for"?: string | null,"sent_at"?: string | null,"task_id"?: string | null,"title"?: string,"user_id"?: string
                   }
                   Relationships: [
-                    
+                    {
+      foreignKeyName: "notifications_task_fk"
+      columns: ["task_id","user_id"]
+isOneToOne: false
+      referencedRelation: "tasks"
+      referencedColumns: ["id","user_id"]
+    }
                   ]
                 },"profiles": {
                   Row: {
@@ -313,16 +319,30 @@ isOneToOne: false
       referencedColumns: ["id","user_id"]
     }
                   ]
-                },"tasks": {
+                },"push_subscriptions": {
                   Row: {
-                    "completed_at": string | null,"created_at": string,"description": string | null,"due_date": string | null,"estimated_minutes": number | null,"focus_rank": number | null,"id": string,"priority": Database["public"]['Enums']["priority_level"],"project_id": string | null,"scheduled_date": string | null,"spent_minutes": number,"status": Database["public"]['Enums']["task_status"],"title": string,"updated_at": string,"user_id": string
+                    "auth": string,"created_at": string,"endpoint": string,"id": string,"last_used_at": string | null,"p256dh": string,"user_agent": string | null,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "completed_at"?: string | null,"created_at"?: string,"description"?: string | null,"due_date"?: string | null,"estimated_minutes"?: number | null,"focus_rank"?: number | null,"id"?: string,"priority"?: Database["public"]['Enums']["priority_level"],"project_id"?: string | null,"scheduled_date"?: string | null,"spent_minutes"?: number,"status"?: Database["public"]['Enums']["task_status"],"title": string,"updated_at"?: string,"user_id"?: string
+                    "auth": string,"created_at"?: string,"endpoint": string,"id"?: string,"last_used_at"?: string | null,"p256dh": string,"user_agent"?: string | null,"user_id"?: string
                   }
                   Update: {
-                    "completed_at"?: string | null,"created_at"?: string,"description"?: string | null,"due_date"?: string | null,"estimated_minutes"?: number | null,"focus_rank"?: number | null,"id"?: string,"priority"?: Database["public"]['Enums']["priority_level"],"project_id"?: string | null,"scheduled_date"?: string | null,"spent_minutes"?: number,"status"?: Database["public"]['Enums']["task_status"],"title"?: string,"updated_at"?: string,"user_id"?: string
+                    "auth"?: string,"created_at"?: string,"endpoint"?: string,"id"?: string,"last_used_at"?: string | null,"p256dh"?: string,"user_agent"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"tasks": {
+                  Row: {
+                    "completed_at": string | null,"created_at": string,"description": string | null,"due_date": string | null,"estimated_minutes": number | null,"focus_rank": number | null,"id": string,"priority": Database["public"]['Enums']["priority_level"],"project_id": string | null,"remind_before_minutes": number,"scheduled_date": string | null,"scheduled_time": string | null,"spent_minutes": number,"status": Database["public"]['Enums']["task_status"],"title": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "completed_at"?: string | null,"created_at"?: string,"description"?: string | null,"due_date"?: string | null,"estimated_minutes"?: number | null,"focus_rank"?: number | null,"id"?: string,"priority"?: Database["public"]['Enums']["priority_level"],"project_id"?: string | null,"remind_before_minutes"?: number,"scheduled_date"?: string | null,"scheduled_time"?: string | null,"spent_minutes"?: number,"status"?: Database["public"]['Enums']["task_status"],"title": string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Update: {
+                    "completed_at"?: string | null,"created_at"?: string,"description"?: string | null,"due_date"?: string | null,"estimated_minutes"?: number | null,"focus_rank"?: number | null,"id"?: string,"priority"?: Database["public"]['Enums']["priority_level"],"project_id"?: string | null,"remind_before_minutes"?: number,"scheduled_date"?: string | null,"scheduled_time"?: string | null,"spent_minutes"?: number,"status"?: Database["public"]['Enums']["task_status"],"title"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {

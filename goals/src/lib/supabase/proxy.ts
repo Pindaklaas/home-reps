@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { publicEnv } from "@/lib/env";
 import type { Database } from "./database.types";
 
-const PUBLIC_PATHS = ["/login", "/auth/callback", "/auth/confirm", "/offline"];
+// /api/notifications/dispatch is called by the database with a shared secret, not a session.
+const PUBLIC_PATHS = ["/login", "/auth/callback", "/auth/confirm", "/offline", "/api/notifications/dispatch"];
 
 export function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));

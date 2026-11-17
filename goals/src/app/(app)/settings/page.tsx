@@ -6,6 +6,9 @@ import { serverEnv } from "@/lib/env";
 import { aiConfigured, aiModel } from "@/lib/ai/client";
 import { Badge, ListSkeleton, PageHeader } from "@/components/ui/primitives";
 import { AccountForms, AiSettingsForm, ProfileForm, ThemePicker } from "./forms";
+import { NotificationSettings } from "./notifications";
+import { publicEnv } from "@/lib/env";
+import { pushConfigured } from "@/lib/push";
 import { AiButton } from "@/components/brain/ai-button";
 import { checkClaude } from "@/lib/actions/ai";
 
@@ -43,6 +46,10 @@ async function Settings() {
     <div className="max-w-4xl">
       <Block id="profile" title="Perfil y preferencias" description="Tu nombre, zona horaria y la capacidad que Claude usa para planificar.">
         <ProfileForm profile={profile} />
+      </Block>
+
+      <Block id="notifications" title="Notificaciones" description="Avisos en el móvil a la hora de cada tarea.">
+        <NotificationSettings publicKey={pushConfigured() ? publicEnv.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null : null} />
       </Block>
 
       <Block id="theme" title="Tema" description="Se guarda en este dispositivo y en tu perfil.">

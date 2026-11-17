@@ -157,7 +157,7 @@ export async function getDay(supabase: ServerSupabase, date: string, tz: string)
   const bounds = dayBoundsUtc(date, tz);
   const [log, scheduled, completedToday, overdue, time] = await Promise.all([
     supabase.from("daily_logs").select("*").eq("log_date", date).maybeSingle(),
-    supabase.from("tasks").select("*, projects(title)").eq("scheduled_date", date).order("focus_rank", { ascending: true, nullsFirst: false }).order("priority", { ascending: false }),
+    supabase.from("tasks").select("*, projects(title)").eq("scheduled_date", date).order("scheduled_time", { ascending: true, nullsFirst: false }).order("focus_rank", { ascending: true, nullsFirst: false }).order("priority", { ascending: false }),
     supabase.from("tasks").select("id").eq("status", "completed").gte("completed_at", bounds.start).lt("completed_at", bounds.end),
     supabase.from("tasks").select("*, projects(title)").in("status", ["pending", "in_progress"]).lt("scheduled_date", date).order("scheduled_date"),
     supabase.from("time_entries").select("minutes").eq("logged_on", date),

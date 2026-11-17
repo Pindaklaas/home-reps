@@ -52,6 +52,11 @@ export function TaskRow({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
+          {task.scheduled_time ? (
+            <span className="shrink-0 font-mono text-[11px] tabular-nums text-accent" title="Hora (con aviso)">
+              {task.scheduled_time.slice(0, 5)}
+            </span>
+          ) : null}
           {task.focus_rank && showFocusBadge ? (
             <span className="flex h-4 min-w-4 items-center justify-center rounded bg-accent-soft px-1 text-[10px] font-semibold text-accent" title="Prioridad del día">
               {task.focus_rank}

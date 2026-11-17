@@ -29,6 +29,14 @@ describe("validation", () => {
     expect(goalSchema.safeParse({ title: "Ahorrar", progress_mode: "metric", metric_start: "0", metric_target: "10000" }).success).toBe(true);
   });
 
+  it("accepts a task time only with a day, and normalizes it to HH:MM", () => {
+    expect(taskSchema.parse({ title: "Jorge", scheduled_date: "2026-11-19", scheduled_time: "16:00:00", remind_before_minutes: "30" }))
+      .toMatchObject({ scheduled_time: "16:00", remind_before_minutes: 30 });
+    expect(taskSchema.safeParse({ title: "Jorge", scheduled_time: "16:00" }).success).toBe(false);
+    expect(taskSchema.safeParse({ title: "Jorge", scheduled_date: "2026-11-19", scheduled_time: "25:00" }).success).toBe(false);
+    expect(taskSchema.parse({ title: "Sin hora" })).toMatchObject({ scheduled_time: null, remind_before_minutes: 0 });
+  });
+
   it("parses checkboxes", () => {
     expect(goalSchema.parse({ title: "A", is_primary: "on" }).is_primary).toBe(true);
     expect(goalSchema.parse({ title: "A" }).is_primary).toBe(false);

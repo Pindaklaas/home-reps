@@ -339,6 +339,20 @@ export function TaskDialog({
               <Input id="t-due" name="due_date" type="date" defaultValue={task?.due_date ?? ""} />
             </Field>
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Hora" htmlFor="t-time" error={err(s, "scheduled_time")} hint="Con hora, te llega un aviso al móvil.">
+              <Input id="t-time" name="scheduled_time" type="time" defaultValue={task?.scheduled_time?.slice(0, 5) ?? ""} />
+            </Field>
+            <Field label="Avisar también antes" htmlFor="t-remind">
+              <Select id="t-remind" name="remind_before_minutes" defaultValue={String(task?.remind_before_minutes ?? 0)}>
+                <option value="0">Solo a la hora</option>
+                <option value="10">10 min antes</option>
+                <option value="15">15 min antes</option>
+                <option value="30">30 min antes</option>
+                <option value="60">1 h antes</option>
+              </Select>
+            </Field>
+          </div>
           {task ? (
             <Field label="Tiempo estimado (min)" htmlFor="t-est" error={err(s, "estimated_minutes")}>
               <Input id="t-est" name="estimated_minutes" type="number" min={0} step={5} inputMode="numeric" defaultValue={task.estimated_minutes ?? ""} />

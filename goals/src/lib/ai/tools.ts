@@ -46,6 +46,8 @@ export const toolInputSchemas = {
           priority: z.enum(PRIORITIES),
           due_date: date.nullable(),
           scheduled_date: date.nullable(),
+          scheduled_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
+          remind_before_minutes: z.number().int().min(0).max(1440).nullable().optional(),
           estimated_minutes: z.number().int().min(0).max(10000).nullable(),
         }),
       )
@@ -63,6 +65,7 @@ export const toolInputSchemas = {
       priority: z.enum(PRIORITIES).nullable(),
       due_date: date.nullable(),
       scheduled_date: date.nullable(),
+      scheduled_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).nullable().optional(),
     }),
     rationale,
   }),

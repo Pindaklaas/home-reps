@@ -169,6 +169,14 @@ export async function applyDayPlan(_: ActionState, formData: FormData): Promise<
     // Free the day's priority slots, then assign them in plan order.
     check(await supabase.from("tasks").update({ focus_rank: null }).eq("scheduled_date", date.data).not("focus_rank", "is", null));
     if (scheduleIds.length) check(await supabase.from("tasks").update({ scheduled_date: date.data }).in("id", scheduleIds));
+    // Each task gets the start time of its first block (and so a reminder).
+    const firstStart = new Map<string, string>();
+    for (const b of plan.data.blocks) {
+      if (b.task_id && /^\d{2}:\d{2}$/.test(b.start) && !firstStart.has(b.task_id)) firstStart.set(b.task_id, b.start);
+    }
+    for (const [taskId, start] of firstStart) {
+      check(await supabase.from("tasks").update({ scheduled_date: date.data, scheduled_time: start }).eq("id", taskId));
+    }
     for (const [i, p] of plan.data.priorities.slice(0, 3).entries()) {
       check(await supabase.from("tasks").update({ scheduled_date: date.data, focus_rank: i + 1 }).eq("id", p.task_id));
     }

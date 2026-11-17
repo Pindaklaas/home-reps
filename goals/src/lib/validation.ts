@@ -26,6 +26,11 @@ const isoDate = z.preprocess(
 const optionalInt = (min: number, max: number) =>
   z.preprocess(blank, z.coerce.number().int().min(min).max(max).nullable());
 const optionalNumber = z.preprocess(blank, z.coerce.number().finite().nullable());
+/** "HH:MM" (24 h) or null. */
+const timeOfDay = z.preprocess(
+  blank,
+  z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(:00)?$/, "Hora no válida (HH:MM)").transform((v) => v.slice(0, 5)).nullable(),
+);
 const uuidOrNull = z.preprocess(blank, z.uuid().nullable());
 const checkbox = z.preprocess((v) => v === "on" || v === "true" || v === true, z.boolean());
 
@@ -82,7 +87,12 @@ export const taskSchema = z.object({
   status: z.enum(TASK_STATUSES).default("pending"),
   due_date: isoDate,
   scheduled_date: isoDate,
+  scheduled_time: timeOfDay,
+  remind_before_minutes: z.preprocess(blank, z.coerce.number().int().min(0).max(1440).nullable()).transform((v) => v ?? 0),
   estimated_minutes: optionalInt(0, 10000),
+}).refine((t) => !t.scheduled_time || t.scheduled_date, {
+  message: "Para poner hora, elige también el día",
+  path: ["scheduled_time"],
 });
 export type TaskInput = z.infer<typeof taskSchema>;
 

@@ -7,6 +7,8 @@ import { z } from "zod";
 const publicSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.url(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(20),
+  // Web Push public key (safe in the browser). Optional: without it push is off.
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().min(20).optional(),
 });
 
 export const publicEnv = publicSchema.parse({
@@ -14,6 +16,7 @@ export const publicEnv = publicSchema.parse({
   // The legacy anon key works the same way (some Supabase integrations set only that name).
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || undefined,
 });
 
 const serverSchema = z.object({
@@ -25,6 +28,11 @@ const serverSchema = z.object({
   MAKE_WEBHOOK_URL: z.url().optional(),
   GOOGLE_CLIENT_ID: z.string().min(1).optional(),
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+  // Web Push (server only).
+  VAPID_PRIVATE_KEY: z.string().min(20).optional(),
+  VAPID_SUBJECT: z.string().min(5).optional(),
+  // Shared with the database dispatcher (app_private.settings.dispatch_secret).
+  PUSH_DISPATCH_SECRET: z.string().min(32).optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;
@@ -45,6 +53,9 @@ export function serverEnv(): ServerEnv {
       MAKE_WEBHOOK_URL: blankToUndefined(process.env.MAKE_WEBHOOK_URL),
       GOOGLE_CLIENT_ID: blankToUndefined(process.env.GOOGLE_CLIENT_ID),
       GOOGLE_CLIENT_SECRET: blankToUndefined(process.env.GOOGLE_CLIENT_SECRET),
+      VAPID_PRIVATE_KEY: blankToUndefined(process.env.VAPID_PRIVATE_KEY),
+      VAPID_SUBJECT: blankToUndefined(process.env.VAPID_SUBJECT),
+      PUSH_DISPATCH_SECRET: blankToUndefined(process.env.PUSH_DISPATCH_SECRET),
     });
   }
   return cached;
