@@ -97,8 +97,8 @@ export function Section({
       {title ? (
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-[13px] font-semibold uppercase tracking-wider text-faint">{title}</h2>
-            {description ? <p className="mt-0.5 text-xs text-faint">{description}</p> : null}
+            <h2 className="text-base font-semibold text-fg">{title}</h2>
+            {description ? <p className="mt-0.5 text-[13px] text-muted">{description}</p> : null}
           </div>
           {action}
         </div>

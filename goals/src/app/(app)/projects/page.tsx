@@ -21,7 +21,7 @@ const ORDER: Record<ProjectStatus, number> = { active: 0, planned: 1, paused: 2,
 export default function ProjectsPage({ searchParams }: PageProps<"/projects">) {
   return (
     <>
-      <PageHeader title="Proyectos" description="Iniciativas concretas con tareas. Cada uno debería servir a un objetivo." />
+      <PageHeader title="Proyectos" description="Iniciativas concretas con tareas. Cada uno debería servir a una meta." />
       <Suspense fallback={<ListSkeleton rows={5} />}>
         <ProjectsContent searchParams={searchParams} />
       </Suspense>

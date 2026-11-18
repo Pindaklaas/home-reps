@@ -15,7 +15,7 @@ import {
 // ---------------------------------------------------------------------------
 const blank = (v: unknown) => (v === undefined || (typeof v === "string" && v.trim() === "") ? null : v);
 
-const text = (max: number) =>
+export const text = (max: number) =>
   z.preprocess(blank, z.string().trim().max(max, `Máximo ${max} caracteres`).nullable());
 const requiredText = (max: number, label = "Este campo") =>
   z.string().trim().min(1, `${label} es obligatorio`).max(max, `Máximo ${max} caracteres`);

@@ -10,7 +10,7 @@ const KINDS: { key: string; label: string; hint: string }[] = [
   { key: "overdue", label: "¿Lo hiciste?", hint: "Si una tarea con hora lleva 30 min sin marcarse." },
   { key: "deadline", label: "Fechas límite", hint: "Lo que vence mañana y lo que ya está vencido." },
   { key: "proposals", label: "Propuestas de Claude", hint: "Si llevan horas sin revisar." },
-  { key: "goal", label: "Objetivo principal", hint: "Actualizar tus ingresos y el ritmo semanal (domingos)." },
+  { key: "goal", label: "Meta principal", hint: "Actualizar tus ingresos y el ritmo semanal (domingos)." },
   { key: "inactivity", label: "Sin avanzar", hint: "Si pasas 2 días sin completar nada." },
   { key: "evening", label: "Cierre del día", hint: "A las 21:00: hechas, pendientes y qué toca mañana." },
 ];

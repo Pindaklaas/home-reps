@@ -8,11 +8,11 @@ import {
   CalendarCheck2,
   CheckSquare,
   FolderKanban,
-  LayoutDashboard,
+  House,
   Lightbulb,
   Menu,
+  MessageCircle,
   Settings,
-  Sparkles,
   Target,
   X,
 } from "lucide-react";
@@ -22,27 +22,27 @@ type Item = { href: string; label: string; icon: typeof Target };
 
 export const NAV: Item[][] = [
   [
-    { href: "/", label: "Inicio", icon: LayoutDashboard },
-    { href: "/planner", label: "Hoy", icon: CalendarCheck2 },
+    { href: "/", label: "Inicio", icon: House },
+    { href: "/planner", label: "Mi día", icon: CalendarCheck2 },
+    { href: "/brain", label: "Claude", icon: MessageCircle },
     { href: "/tasks", label: "Tareas", icon: CheckSquare },
   ],
   [
-    { href: "/goals", label: "Objetivos", icon: Target },
+    { href: "/goals", label: "Metas", icon: Target },
     { href: "/projects", label: "Proyectos", icon: FolderKanban },
     { href: "/ideas", label: "Ideas", icon: Lightbulb },
   ],
   [
-    { href: "/brain", label: "AI Brain", icon: Sparkles },
-    { href: "/analytics", label: "Análisis", icon: BarChart3 },
+    { href: "/analytics", label: "Números", icon: BarChart3 },
     { href: "/settings", label: "Ajustes", icon: Settings },
   ],
 ];
 
 const MOBILE_TABS: Item[] = [
-  { href: "/", label: "Inicio", icon: LayoutDashboard },
-  { href: "/planner", label: "Hoy", icon: CalendarCheck2 },
-  { href: "/tasks", label: "Tareas", icon: CheckSquare },
-  { href: "/brain", label: "Brain", icon: Sparkles },
+  { href: "/", label: "Inicio", icon: House },
+  { href: "/planner", label: "Mi día", icon: CalendarCheck2 },
+  { href: "/brain", label: "Claude", icon: MessageCircle },
+  { href: "/goals", label: "Metas", icon: Target },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -115,11 +115,13 @@ export function MobileNavView({ pathname, footer }: { pathname: string; footer?:
                   href={href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex h-14 flex-col items-center justify-center gap-1 text-[10.5px] font-medium",
-                    active ? "text-fg" : "text-faint",
+                    "flex h-16 flex-col items-center justify-center gap-1 text-xs font-semibold",
+                    active ? "text-accent" : "text-muted",
                   )}
                 >
-                  <Icon className={cn("h-[18px] w-[18px]", active && "text-accent")} aria-hidden />
+                  <span className={cn("flex h-7 w-12 items-center justify-center rounded-full transition-colors", active && "bg-accent-soft")}>
+                    <Icon className="h-[22px] w-[22px]" aria-hidden />
+                  </span>
                   {label}
                 </Link>
               </li>
@@ -129,10 +131,12 @@ export function MobileNavView({ pathname, footer }: { pathname: string; footer?:
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="flex h-14 w-full flex-col items-center justify-center gap-1 text-[10.5px] font-medium text-faint"
+              className="flex h-16 w-full flex-col items-center justify-center gap-1 text-xs font-semibold text-muted"
               aria-haspopup="dialog"
             >
-              <Menu className="h-[18px] w-[18px]" aria-hidden />
+              <span className="flex h-7 w-12 items-center justify-center">
+                <Menu className="h-[22px] w-[22px]" aria-hidden />
+              </span>
               Más
             </button>
           </li>
@@ -148,7 +152,7 @@ export function MobileNavView({ pathname, footer }: { pathname: string; footer?:
       >
         <div className="px-4 pb-6 pt-3" style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 24px)" }}>
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-faint">Navegación</span>
+            <span className="text-base font-semibold text-fg">¿Adónde quieres ir?</span>
             <button type="button" onClick={() => setOpen(false)} className="rounded-md p-1.5 text-faint hover:bg-hover" aria-label="Cerrar">
               <X className="h-4 w-4" />
             </button>
@@ -160,11 +164,11 @@ export function MobileNavView({ pathname, footer }: { pathname: string; footer?:
                   href={href}
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "flex flex-col items-center gap-2 rounded-xl border border-line px-2 py-3.5 text-xs",
+                    "flex flex-col items-center gap-2 rounded-xl border border-line px-2 py-4 text-sm font-medium",
                     isActive(pathname, href) ? "bg-hover text-fg" : "text-muted",
                   )}
                 >
-                  <Icon className="h-5 w-5" aria-hidden />
+                  <Icon className="h-6 w-6" aria-hidden />
                   {label}
                 </Link>
               </li>

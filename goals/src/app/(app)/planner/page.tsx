@@ -21,7 +21,7 @@ export default function PlannerPage({ searchParams }: PageProps<"/planner">) {
     <Suspense
       fallback={
         <>
-          <PageHeader title="Planificador" />
+          <PageHeader title="Mi día" />
           <ListSkeleton rows={6} />
         </>
       }
@@ -165,7 +165,7 @@ async function Planner({ searchParams }: { searchParams: PageProps<"/planner">["
             />
           </div>
 
-          <Section title="Objetivos del día">
+          <Section title="Metas de hoy">
             {goals.length ? (
               <ul className="flex flex-col gap-1.5">
                 {goals.map((g) => (
@@ -178,7 +178,7 @@ async function Planner({ searchParams }: { searchParams: PageProps<"/planner">["
                 ))}
               </ul>
             ) : (
-              <EmptyState className="py-6" title="Ningún objetivo conectado" description="Las tareas de hoy no pertenecen a proyectos con objetivo." />
+              <EmptyState className="py-6" title="Ninguna meta conectada" description="Las tareas de hoy no son de proyectos con meta." />
             )}
           </Section>
 

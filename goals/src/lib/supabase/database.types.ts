@@ -407,8 +407,17 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "is_authorized":
+            "brain_status":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"is_authorized":
 { Args: Record<PropertyKey, never>; Returns: boolean
+                           },
+"request_brain_reply":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
+"set_brain_token":
+{ Args: { "p_token": string }; Returns: undefined
                            }
           }
           Enums: {

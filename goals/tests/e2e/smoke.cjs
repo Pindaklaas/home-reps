@@ -75,12 +75,12 @@ async function check(name, fn) {
       await page.fill("#password", PASSWORD);
       await page.click("button[type=submit]");
       await page.waitForURL(/\/goals$/);
-      await page.getByRole("heading", { name: "Objetivos", exact: true }).waitFor();
+      await page.getByRole("heading", { name: "Metas", exact: true }).waitFor();
     });
 
     const goalTitle = `Ingresos extra ${stamp}`;
     await check("create a primary goal measured by a metric", async () => {
-      await page.getByRole("button", { name: "Nuevo objetivo" }).first().click();
+      await page.getByRole("button", { name: "Nueva meta" }).first().click();
       await page.fill("#g-title", goalTitle);
       await page.fill("#g-desc", "Conseguir 1.000 € al mes fuera del trabajo.");
       await page.selectOption("#g-prio", "high");
@@ -90,7 +90,7 @@ async function check(name, fn) {
       await page.fill("#g-mtarget", "1000");
       await page.check("input[name=is_primary]");
       await submitDialog();
-      await page.getByText("Objetivo principal").first().waitFor();
+      await page.getByText("Meta principal").first().waitFor();
       await shot("02-goals");
     });
 
@@ -198,7 +198,7 @@ async function check(name, fn) {
     if (WITH_AI) {
       await check("dashboard: Claude's daily recommendation", async () => {
         await go("/");
-        await page.getByRole("button", { name: "Pedir recomendación" }).click();
+        await page.getByRole("button", { name: "Pedir consejo" }).click();
         await page.getByText("Cierra hoy la tarea más importante").waitFor({ timeout: 20000 });
         await shot("07-dashboard");
       });

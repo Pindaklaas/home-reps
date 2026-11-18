@@ -189,3 +189,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   animation: spark 600ms 80ms ease-out both;
 }
 .celebrate-spark:nth-child(odd) { background: var(--accent); }
+
+/* "Claude is thinking" dots (bridge chat). */
+@keyframes dot-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40% { transform: translateY(-3px); opacity: 1; }
+}
+.thinking-dots span { width: 6px; height: 6px; border-radius: 9999px; background: var(--accent); animation: dot-bounce 1.2s infinite ease-in-out; }
+.thinking-dots span:nth-child(2) { animation-delay: 0.15s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.3s; }

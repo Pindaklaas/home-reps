@@ -21,6 +21,12 @@
  *   node scripts/brain.mjs propose    < proposals.json   # [{action,target_id?,payload,summary,rationale}]
  *   node scripts/brain.mjs log        < turn.json   # {user, assistant}: keeps the chat in the app's AI Brain
  *
+ * Chat bridge (the app's chat wakes a scheduled task when there is no API key):
+ *   node scripts/brain.mjs inbox                   # conversations waiting for a reply, with recent messages
+ *   node scripts/brain.mjs propose <conv-id> < proposals.json   # proposals shown under that reply
+ *   node scripts/brain.mjs reply <conv-id> < answer.md          # answer in that conversation + push notification
+ *   node scripts/brain.mjs done                    # session finished; prints how many are still waiting
+ *
  * Needs the Supabase Management API (token injected by the "goals" cloud
  * environment, or SUPABASE_ACCESS_TOKEN) and runs with NODE_USE_ENV_PROXY=1 there.
  * Config: GOALS_PROJECT_REF (default: the project named "goals"). The owner is the
@@ -84,6 +90,14 @@ async function conversationId() {
   if (c) return c.id;
   const [n] = await sql(`insert into public.ai_conversations (user_id, title) values (${uid}, ${lit(CONVERSATION_TITLE)}) returning id`);
   return n.id;
+}
+
+/** A conversation id from the command line, checked to be the owner's. */
+async function ownConversation(id) {
+  if (!/^[0-9a-f-]{36}$/i.test(id ?? "")) throw new Error("Falta el id de la conversación.");
+  const [c] = await sql(`select id from public.ai_conversations where id = ${lit(id)}::uuid and user_id = ${uid}`);
+  if (!c) throw new Error("Conversación no encontrada.");
+  return c.id;
 }
 
 const [cmd, arg] = process.argv.slice(2);
@@ -243,7 +257,7 @@ switch (cmd) {
       if (!p.summary || !p.payload || typeof p.payload !== "object") throw new Error("Cada propuesta necesita summary y payload.");
       if (p.action.startsWith("update_") && !p.target_id) throw new Error("Las actualizaciones necesitan target_id.");
     }
-    const conv = await conversationId();
+    const conv = arg ? await ownConversation(arg) : await conversationId();
     // Attach to the latest logged user message, so the app shows them under that reply.
     const [last] = await sql(`select id from ai_messages where conversation_id = ${lit(conv)} and role = 'user' order by created_at desc limit 1`);
     const msg = last ? `${lit(last.id)}::uuid` : "null";
@@ -265,7 +279,42 @@ switch (cmd) {
     out("Conversación guardada en el AI Brain de la app.");
     break;
   }
+  case "inbox": {
+    // Heartbeat: keeps other fires away while this session works.
+    await sql(`select app_private.put_setting('brain_busy_until', (now() + interval '15 minutes')::text)`);
+    const rows = await sql(`select c.id, c.title,
+        (select json_agg(x order by x.created_at) from (
+           select m.role, m.content, to_char(m.created_at at time zone ${lit(owner.tz)}, 'YYYY-MM-DD HH24:MI') as created_at
+           from ai_messages m where m.conversation_id = c.id order by m.created_at desc limit 12) x) as messages
+      from ai_conversations c
+      where c.user_id = ${uid} and (select m.role from ai_messages m where m.conversation_id = c.id
+        order by m.created_at desc, m.id desc limit 1) = 'user'
+        and (select max(m.created_at) from ai_messages m where m.conversation_id = c.id) > now() - interval '48 hours'
+      order by c.updated_at`);
+    out(rows.length ? rows : "Nada pendiente: no hay mensajes sin responder.");
+    break;
+  }
+  case "reply": {
+    const conv = await ownConversation(arg);
+    const text = stdin().trim();
+    if (!text) throw new Error("La respuesta está vacía.");
+    await sql(`insert into ai_messages (user_id, conversation_id, role, content) values
+      (${uid}, ${lit(conv)}::uuid, 'assistant', ${lit(text.slice(0, 200000))})`);
+    const preview = text.replace(/[#*_`>]/g, "").replace(/\s+/g, " ").trim().slice(0, 140);
+    await sql(`insert into notifications (user_id, kind, channel, title, body, link, scheduled_for) values
+      (${uid}, 'ai', 'push', 'Claude te ha respondido', ${lit(preview)}, ${lit(`/brain/${conv}`)}, now())`);
+    out("Respuesta publicada en la app y aviso enviado.");
+    break;
+  }
+  case "done": {
+    const [r] = await sql(`delete from app_private.settings where key = 'brain_busy_until';
+      select app_private.brain_waiting(${uid}::uuid) as waiting`);
+    const waiting = r?.waiting ?? 0;
+    if (waiting) await sql(`select app_private.put_setting('brain_busy_until', (now() + interval '15 minutes')::text)`);
+    out(waiting ? `Quedan ${waiting} conversación(es) sin responder: vuelve a ejecutar inbox.` : "Listo: no queda nada pendiente.");
+    break;
+  }
   default:
-    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | ideas | task | task-time <id> HH:MM [min] | remember | goal | withdraw <id> | propose | log");
+    out("Comandos: context | recommend | plan <fecha> | evaluate <idea-id> | review | ideas | task | task-time <id> HH:MM [min] | remember | goal | withdraw <id> | propose [conv-id] | log | inbox | reply <conv-id> | done");
     process.exitCode = 1;
 }

@@ -130,7 +130,7 @@ export function IdeaRow({ idea, tz, aiEnabled }: { idea: Tables<"ideas">; tz: st
               </div>
               <p className="text-fg">{evaluation.summary}</p>
               <p className="mt-2 text-muted">
-                <span className="text-faint">Encaje con tus objetivos: </span>
+                <span className="text-faint">Encaje con tus metas: </span>
                 {evaluation.fit_with_goals}
               </p>
               <div className="mt-3 grid gap-4 sm:grid-cols-3">

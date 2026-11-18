@@ -144,6 +144,8 @@ El paso a paso manual equivalente está en la sección siguiente.
 
 Mientras no haya `ANTHROPIC_API_KEY`, una sesión de Claude Code en el entorno «goals» hace de cerebro: pídele «actúa como el cerebro de GOALS» (skill `.claude/skills/goals-brain`). Usa `scripts/brain.mjs` para leer tus datos y escribir en la app la recomendación del día, planes, evaluaciones de ideas, revisiones semanales y **propuestas** que apruebas tú en AI Brain → conversación «Claude Code». Valida con los mismos esquemas que la app y nunca cambia tus datos directamente.
 
+**Chat de la app sin clave («Chat con Claude»).** Sin `ANTHROPIC_API_KEY`, el chat guarda tu mensaje y despierta una tarea programada de Claude Code («GOALS: responder en el chat», con disparador API) a través de `pg_net` (`public.request_brain_reply()` → `app_private.fire_brain()`). Esa sesión lee los mensajes pendientes con `brain.mjs inbox`, contesta con `brain.mjs reply` (con aviso push) y termina con `brain.mjs done`. Solo hay una sesión a la vez (15 min como máximo) y un reintento acotado cada 5 min si algo falla (`app_private.brain_retry()`). La URL de disparo se guarda en `app_private.settings` (`brain_fire_url`); el código de la tarea lo pega el propietario en Ajustes → Chat con Claude y nunca se vuelve a leer desde la app.
+
 ## Integraciones (preparadas, no activas)
 
 Nada de esto está conectado ni simulado; Ajustes muestra su estado real.

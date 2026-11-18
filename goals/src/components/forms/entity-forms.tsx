@@ -118,11 +118,11 @@ export function GoalDialog({
   const [mode, setMode] = useState(goal?.progress_mode ?? "projects");
   return (
     <EntityModal
-      title={goal ? "Editar objetivo" : "Nuevo objetivo"}
-      description={goal ? undefined : "Un objetivo es un resultado que quieres conseguir. Los proyectos lo hacen avanzar."}
+      title={goal ? "Editar meta" : "Nueva meta"}
+      description={goal ? undefined : "Una meta es algo que quieres conseguir. Los proyectos la hacen avanzar."}
       action={goal ? updateGoal : createGoal}
-      submit={goal ? "Guardar" : "Crear objetivo"}
-      trigger={trigger ?? ((open) => <NewButton label="Nuevo objetivo" onClick={open} />)}
+      submit={goal ? "Guardar" : "Crear meta"}
+      trigger={trigger ?? ((open) => <NewButton label="Nueva meta" onClick={open} />)}
       wide
     >
       {(s) => (
@@ -147,7 +147,7 @@ export function GoalDialog({
             <Field label="Prioridad" htmlFor="g-prio">
               <PrioritySelect id="g-prio" defaultValue={goal?.priority} />
             </Field>
-            <Field label="Fecha objetivo" htmlFor="g-date" error={err(s, "target_date")}>
+            <Field label="Fecha límite" htmlFor="g-date" error={err(s, "target_date")}>
               <Input id="g-date" name="target_date" type="date" defaultValue={goal?.target_date ?? ""} />
             </Field>
           </div>
@@ -192,7 +192,7 @@ export function GoalDialog({
               <Input id="g-mtarget" name="metric_target" type="number" step="any" defaultValue={goal?.metric_target ?? ""} />
             </Field>
           </fieldset>
-          <Checkbox name="is_primary" defaultChecked={goal?.is_primary ?? false} label="Es mi objetivo principal ahora mismo" />
+          <Checkbox name="is_primary" defaultChecked={goal?.is_primary ?? false} label="Es mi meta principal ahora mismo" />
         </>
       )}
     </EntityModal>
@@ -236,9 +236,9 @@ export function ProjectDialog({
           <Field label="Descripción" htmlFor="p-desc" error={err(s, "description")}>
             <Textarea id="p-desc" name="description" defaultValue={project?.description ?? ""} placeholder="Qué vas a construir o conseguir" />
           </Field>
-          <Field label="Objetivo relacionado" htmlFor="p-goal" hint={goals.length ? undefined : "Aún no tienes objetivos activos."}>
+          <Field label="Meta relacionada" htmlFor="p-goal" hint={goals.length ? undefined : "Aún no tienes metas activas."}>
             <Select id="p-goal" name="goal_id" defaultValue={project?.goal_id ?? defaultGoalId ?? ""}>
-              <option value="">Sin objetivo</option>
+              <option value="">Sin meta</option>
               {goals.map((g) => (
                 <option key={g.id} value={g.id}>
                   {g.title}

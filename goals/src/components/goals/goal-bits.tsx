@@ -4,6 +4,7 @@ import { Badge, Dot, ProgressBar } from "@/components/ui/primitives";
 import { GOAL_STATUS_LABEL, GOAL_STATUS_TONE, PRIORITY_LABEL, PRIORITY_TONE } from "@/lib/constants";
 import type { GoalWithProgress } from "@/lib/data";
 import { daysBetween, formatDate } from "@/lib/dates";
+import { formatNumber } from "@/lib/format";
 
 export function deadlineText(target: string | null, today: string) {
   if (!target) return null;
@@ -70,7 +71,7 @@ export function Ring({ value, size = 92, label }: { value: number; size?: number
   );
 }
 
-const fmt = (n: number) => n.toLocaleString("es-ES", { maximumFractionDigits: 0 });
+const fmt = (n: number) => formatNumber(n);
 
 /** The current primary goal, shown large. Metric goals get a ring and milestones. */
 export function PrimaryGoal({ goal, today }: { goal: GoalWithProgress; today: string }) {
@@ -100,7 +101,7 @@ export function PrimaryGoal({ goal, today }: { goal: GoalWithProgress; today: st
           </div>
         ) : null}
         <div className="min-w-0 flex-1">
-          <div className="mb-1 text-xs font-medium uppercase tracking-wider text-accent">Objetivo principal</div>
+          <div className="mb-1 text-xs font-medium uppercase tracking-wider text-accent">Meta principal</div>
           <div className="flex items-end justify-between gap-4">
             <h2 className="text-lg font-semibold tracking-tight text-fg sm:text-xl">{goal.title}</h2>
             {!target ? <span className="shrink-0 text-3xl font-semibold tabular-nums tracking-tight text-fg">{goal.progress}%</span> : null}
@@ -113,7 +114,7 @@ export function PrimaryGoal({ goal, today }: { goal: GoalWithProgress; today: st
           ) : goal.description ? (
             <p className="mt-1 line-clamp-2 max-w-2xl text-sm text-muted">{goal.description}</p>
           ) : null}
-          {!target ? <ProgressBar value={goal.progress} className="mt-4 h-2" label="Progreso del objetivo principal" /> : null}
+          {!target ? <ProgressBar value={goal.progress} className="mt-4 h-2" label="Progreso de la meta principal" /> : null}
           {target ? (
             <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Hitos">
               {milestones.map((m) => (

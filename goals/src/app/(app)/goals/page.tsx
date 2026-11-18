@@ -6,12 +6,12 @@ import { EmptyState, ListSkeleton, PageHeader, Section } from "@/components/ui/p
 import { GoalDialog } from "@/components/forms/entity-forms";
 import { GoalRow, PrimaryGoal } from "@/components/goals/goal-bits";
 
-export const metadata: Metadata = { title: "Objetivos" };
+export const metadata: Metadata = { title: "Metas" };
 
 export default function GoalsPage() {
   return (
     <>
-      <PageHeader title="Objetivos" description="Los resultados que persigues. Todo lo demás debería empujar alguno de ellos." />
+      <PageHeader title="Metas" description="Lo que quieres conseguir. Todo lo demás sirve para llegar aquí." />
       <Suspense fallback={<ListSkeleton rows={4} />}>
         <GoalsContent />
       </Suspense>
@@ -31,8 +31,8 @@ async function GoalsContent() {
     return (
       <EmptyState
         icon={<Target className="h-5 w-5" />}
-        title="Define tu primer objetivo"
-        description="Empieza por uno o dos. Un buen objetivo tiene un resultado medible y una fecha."
+        title="Define tu primera meta"
+        description="Empieza por una o dos. Una buena meta tiene un número y una fecha."
         action={<GoalDialog />}
       />
     );
@@ -45,7 +45,7 @@ async function GoalsContent() {
       </div>
       {primary ? <PrimaryGoal goal={primary} today={today} /> : null}
       {active.length ? (
-        <Section title={primary ? "Otros objetivos activos" : "Activos"}>
+        <Section title={primary ? "Otras metas activas" : "Activos"}>
           <ul>{active.map((g) => <GoalRow key={g.id} goal={g} today={today} />)}</ul>
         </Section>
       ) : null}

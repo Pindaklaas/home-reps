@@ -61,7 +61,7 @@ async function ProjectContent({ params }: { params: PageProps<"/projects/[id]">[
               · Objetivo: {goal.title}
             </Link>
           ) : (
-            <span className="text-xs text-warning">· Sin objetivo vinculado</span>
+            <span className="text-xs text-warning">· Sin meta</span>
           )}
         </div>
         <h1 className="text-2xl font-semibold tracking-tight">{project.title}</h1>

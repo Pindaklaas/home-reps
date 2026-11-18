@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, Flame, Sparkles } from "lucide-react";
+import { AlertTriangle, ArrowRight, Sparkles } from "lucide-react";
 import { getAppContext, getDay, listActivity, listGoals, listPendingProposals, listProjectOptions, listProjects, listTasks } from "@/lib/data";
 import { EmptyState, ListSkeleton, ProgressBar, Section, Skeleton, Stat } from "@/components/ui/primitives";
 import { PrimaryGoal } from "@/components/goals/goal-bits";
@@ -13,6 +13,9 @@ import { dailyRecommendationSchema } from "@/lib/ai/schemas";
 import { PRIORITY_WEIGHT } from "@/lib/constants";
 import { addDays, dateOf, dayBoundsUtc, formatDateTime, formatLongDate, formatMinutes, relativeTime, weekRange } from "@/lib/dates";
 import { GoalDialog } from "@/components/forms/entity-forms";
+import { HomeTiles, MoneyCard, NowCard } from "@/components/home/home-cards";
+import { getBrainStatus } from "@/lib/brain";
+import { pickNow } from "@/lib/now";
 
 export default function DashboardPage() {
   return (
@@ -38,7 +41,7 @@ function greeting(tz: string) {
 }
 
 const ENTITY: Record<string, { label: string; href: (id: string) => string }> = {
-  goals: { label: "Objetivo", href: (id) => `/goals/${id}` },
+  goals: { label: "Meta", href: (id) => `/goals/${id}` },
   projects: { label: "Proyecto", href: (id) => `/projects/${id}` },
   tasks: { label: "Tarea", href: () => "/tasks" },
   ideas: { label: "Idea", href: () => "/ideas" },
@@ -61,7 +64,7 @@ async function Dashboard() {
     listProjects(supabase),
     listTasks(supabase, { status: "open" }),
     getDay(supabase, today, tz),
-    listActivity(supabase, 10),
+    listActivity(supabase, 5),
     listPendingProposals(supabase),
     listProjectOptions(supabase),
     supabase.from("tasks").select("completed_at").eq("status", "completed").gte("completed_at", dayBoundsUtc(addDays(today, -30), tz).start),
@@ -93,48 +96,64 @@ async function Dashboard() {
   const rec = dailyRecommendationSchema.safeParse(day.log?.ai_recommendation);
   const recTasks = rec.success ? openTasks.filter((t) => rec.data.focus_task_ids.includes(t.id)) : [];
   const ai = aiConfigured();
+  const brain = ai ? null : await getBrainStatus(supabase);
+  const canAskClaude = ai || Boolean(brain?.connected);
+  const nowHm = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: tz }).format(new Date());
+  const pick = pickNow(openTasks, today, nowHm);
+  const moneyGoal = primary && primary.progress_mode === "metric" && Number(primary.metric_target) > 0 ? primary : null;
 
   return (
     <div className="flex flex-col gap-10">
       <header>
-        <div className="text-xs font-medium uppercase tracking-wider text-faint">{formatLongDate(today)}</div>
-        <h1 className="mt-1.5 text-[22px] font-semibold tracking-tight sm:text-2xl">
+        <div className="text-sm text-muted first-letter:uppercase">{formatLongDate(today)}</div>
+        <h1 className="mt-1 text-[26px] font-bold tracking-tight sm:text-3xl">
           {greeting(tz)}
-          {profile?.display_name ? `, ${profile.display_name}` : ""}.
+          {profile?.display_name ? `, ${profile.display_name}` : ""}
         </h1>
-        <TodayMeter done={todayDone} total={todayTotal} streak={streak} />
-        <p className="mt-1 text-sm text-muted">
-          {focus.length
-            ? `Tienes ${focus.length} ${focus.length === 1 ? "prioridad" : "prioridades"} para hoy${overdue.length ? ` y ${overdue.length} ${overdue.length === 1 ? "tarea atrasada" : "tareas atrasadas"}` : ""}.`
-            : "Aún no has elegido las prioridades de hoy."}{" "}
-          <Link href="/planner" className="text-accent hover:underline">
-            Abrir el día
-          </Link>
-        </p>
       </header>
 
+      <div className="flex flex-col gap-4">
+        <NowCard pick={pick} today={today} nowHm={nowHm} done={todayDone} total={todayTotal} streak={streak} canAskClaude={canAskClaude} />
+        {moneyGoal ? <MoneyCard goal={moneyGoal} today={today} /> : null}
+        <HomeTiles waiting={proposals.length} />
+      </div>
+
+      {proposals.length ? (
+        <Link href="/brain/memory" className="flex items-center justify-between gap-3 rounded-2xl border border-accent/40 bg-accent-soft px-4 py-3.5 hover:border-accent">
+          <span className="flex items-center gap-2.5 text-[15px] text-fg">
+            <Sparkles className="h-4 w-4 shrink-0 text-accent" />
+            <span>
+              Claude te propone <b>{proposals.length}</b> {proposals.length === 1 ? "cambio" : "cambios"}. Tócalo para decir sí o no.
+            </span>
+          </span>
+          <ArrowRight className="h-4 w-4 shrink-0 text-accent" />
+        </Link>
+      ) : null}
+
       {/* Claude's recommendation */}
-      <section aria-labelledby="rec-title" className="rounded-xl border border-line bg-surface p-5">
+      {rec.success || ai ? (
+      <section aria-labelledby="rec-title" className="rounded-2xl border border-line bg-surface p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h2 id="rec-title" className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-faint">
-            <Sparkles className="h-3.5 w-3.5 text-accent" /> Recomendación de Claude
+          <h2 id="rec-title" className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-fg">
+            <Sparkles className="h-4 w-4 text-accent" /> El consejo de Claude para hoy
           </h2>
-          <AiButton
-            action={generateRecommendation}
-            disabled={!ai}
-            variant="ghost"
-            label={rec.success ? "Actualizar" : "Pedir recomendación"}
-            pendingLabel="Analizando tu día…"
-          />
+          {ai ? (
+            <AiButton
+              action={generateRecommendation}
+              variant="ghost"
+              label={rec.success ? "Actualizar" : "Pedir consejo"}
+              pendingLabel="Pensando…"
+            />
+          ) : null}
         </div>
         {rec.success ? (
           <div className="animate-fade-in">
-            <p className="text-[15px] font-medium leading-snug text-fg">{rec.data.headline}</p>
-            <p className="mt-1.5 text-sm text-muted">{rec.data.why}</p>
+            <p className="text-[17px] font-semibold leading-snug text-fg">{rec.data.headline}</p>
+            <p className="mt-1.5 text-[15px] text-muted">{rec.data.why}</p>
             {recTasks.length ? (
               <ul className="mt-3 flex flex-wrap gap-2">
                 {recTasks.map((t) => (
-                  <li key={t.id} className="rounded-md border border-line bg-bg px-2.5 py-1 text-[13px] text-fg">
+                  <li key={t.id} className="rounded-lg border border-line bg-bg px-2.5 py-1 text-sm text-fg">
                     {t.title}
                   </li>
                 ))}
@@ -143,40 +162,37 @@ async function Dashboard() {
             {rec.data.warnings.length ? (
               <ul className="mt-3 flex flex-col gap-1">
                 {rec.data.warnings.map((w, i) => (
-                  <li key={i} className="flex items-start gap-1.5 text-[13px] text-warning">
+                  <li key={i} className="flex items-start gap-1.5 text-sm text-warning">
                     <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {w}
                   </li>
                 ))}
               </ul>
             ) : null}
-            {rec.data.avoid ? <p className="mt-2 text-[13px] text-faint">Evita hoy: {rec.data.avoid}</p> : null}
+            {rec.data.avoid ? <p className="mt-2 text-sm text-faint">Hoy mejor evita: {rec.data.avoid}</p> : null}
             {day.log?.ai_recommendation_at ? (
-              <p className="mt-3 text-[11px] text-faint">Recomendación generada {formatDateTime(day.log.ai_recommendation_at, tz)} · es un consejo, no un dato</p>
+              <p className="mt-3 text-xs text-faint">Escrito {formatDateTime(day.log.ai_recommendation_at, tz)} · es un consejo, tú decides</p>
             ) : null}
           </div>
         ) : (
-          <p className="text-sm text-muted">
-            {ai
-              ? "Pide a Claude que analice tus objetivos, tareas y tiempo, y te diga en qué centrarte hoy."
-              : "Sin clave de Anthropic: pide la recomendación a Claude Code («actúa como el cerebro de GOALS») y aparecerá aquí."}
-          </p>
+          <p className="text-[15px] text-muted">Pide a Claude que mire tus metas y tareas y te diga en qué centrarte hoy.</p>
         )}
       </section>
+      ) : null}
 
-      {primary ? (
-        <PrimaryGoal goal={primary} today={today} />
-      ) : (
+      {!primary ? (
         <EmptyState
-          title={activeGoals.length ? "No hay un objetivo principal" : "Empieza por un objetivo"}
-          description={activeGoals.length ? "Marca uno de tus objetivos como principal para que todo lo demás se ordene a su alrededor." : "Todo en GOALS gira alrededor de tus objetivos."}
-          action={activeGoals.length ? <Link className="text-sm text-accent hover:underline" href="/goals">Elegir objetivo principal</Link> : <GoalDialog />}
+          title={activeGoals.length ? "No hay una meta principal" : "Empieza por una meta"}
+          description={activeGoals.length ? "Marca una de tus metas como principal para que todo lo demás se ordene a su alrededor." : "Todo en GOALS gira alrededor de lo que quieres conseguir."}
+          action={activeGoals.length ? <Link className="text-sm text-accent hover:underline" href="/goals">Elegir meta principal</Link> : <GoalDialog />}
         />
-      )}
+      ) : !moneyGoal ? (
+        <PrimaryGoal goal={primary} today={today} />
+      ) : null}
 
       <div className="grid gap-10 lg:grid-cols-[1fr_280px]">
         <div className="flex min-w-0 flex-col gap-10">
           <Section
-            title="Prioridades de hoy"
+            title="Lo más importante de hoy"
             action={
               <Link href="/planner" className="inline-flex items-center gap-1 text-xs text-muted hover:text-fg">
                 Planificar <ArrowRight className="h-3 w-3" />
@@ -186,12 +202,12 @@ async function Dashboard() {
             {focus.length ? (
               <ul>{focus.map((t) => <TaskRow key={t.id} task={t} projects={projectOptions} today={today} focusDate={today} />)}</ul>
             ) : (
-              <p className="text-sm text-faint">Sin prioridades elegidas. Abre el planificador o pide a Claude un plan.</p>
+              <p className="text-sm text-faint">Aún no has elegido. En «Mi día», toca el menú de una tarea → «Prioridad del día».</p>
             )}
           </Section>
 
           <Section
-            title={`Pendiente ahora${overdue.length ? ` · ${overdue.length} atrasadas` : ""}`}
+            title={`Para estos días${overdue.length ? ` · ${overdue.length} ${overdue.length === 1 ? "atrasada" : "atrasadas"}` : ""}`}
             action={
               <Link href="/tasks" className="inline-flex items-center gap-1 text-xs text-muted hover:text-fg">
                 Todas <ArrowRight className="h-3 w-3" />
@@ -206,7 +222,7 @@ async function Dashboard() {
           </Section>
 
           <Section
-            title={`Proyectos activos · ${activeProjects.length}`}
+            title={`Mis proyectos · ${activeProjects.length}`}
             action={
               <Link href="/projects" className="inline-flex items-center gap-1 text-xs text-muted hover:text-fg">
                 Ver todos <ArrowRight className="h-3 w-3" />
@@ -235,17 +251,7 @@ async function Dashboard() {
             </div>
           </Section>
 
-          {proposals.length ? (
-            <Link href="/brain/memory" className="flex items-center justify-between rounded-lg border border-line bg-surface px-3.5 py-3 text-sm hover:border-line-strong">
-              <span>
-                <span className="font-medium text-fg">{proposals.length}</span>
-                <span className="text-muted"> {proposals.length === 1 ? "propuesta de Claude pendiente" : "propuestas de Claude pendientes"}</span>
-              </span>
-              <ArrowRight className="h-4 w-4 text-faint" />
-            </Link>
-          ) : null}
-
-          <Section title="Objetivos">
+          <Section title="Mis metas">
             {activeGoals.length ? (
               <ul className="flex flex-col gap-3.5">
                 {activeGoals.slice(0, 6).map((g) => (
@@ -261,11 +267,11 @@ async function Dashboard() {
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-faint">Sin objetivos activos.</p>
+              <p className="text-sm text-faint">Sin metas activas.</p>
             )}
           </Section>
 
-          <Section title="Actividad reciente">
+          <Section title="Lo último que ha pasado">
             {activity.length ? (
               <ul className="flex flex-col gap-2.5">
                 {activity.map((a) => {
@@ -299,29 +305,6 @@ async function Dashboard() {
           </Section>
         </aside>
       </div>
-    </div>
-  );
-}
-
-function TodayMeter({ done, total, streak }: { done: number; total: number; streak: number }) {
-  const pct = total ? Math.round((done / total) * 100) : 0;
-  return (
-    <div className="mt-3 flex items-center gap-3">
-      <div className="min-w-0 flex-1 sm:max-w-xs">
-        <div className="mb-1 flex justify-between text-xs">
-          <span className="text-muted">Hoy</span>
-          <span className="tabular-nums text-fg">
-            {done}/{total} {total === 1 ? "tarea" : "tareas"}
-          </span>
-        </div>
-        <ProgressBar value={pct} className="h-2" label={`Hoy: ${done} de ${total} tareas`} />
-      </div>
-      <span
-        className={streak ? "inline-flex shrink-0 items-center gap-1 rounded-full bg-warning-soft px-2.5 py-1 text-xs font-medium text-warning" : "inline-flex shrink-0 items-center gap-1 rounded-full border border-line px-2.5 py-1 text-xs text-faint"}
-        title="Días seguidos completando al menos una tarea"
-      >
-        <Flame className="h-3.5 w-3.5" aria-hidden /> {streak} {streak === 1 ? "día" : "días"}
-      </span>
     </div>
   );
 }

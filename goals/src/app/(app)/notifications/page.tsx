@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Avisos" };
 export default function NotificationsPage() {
   return (
     <>
-      <PageHeader title="Avisos" description="Todo lo que GOALS te ha avisado: tareas, fechas, objetivo y propuestas de Claude." />
+      <PageHeader title="Avisos" description="Todo lo que GOALS te ha avisado: tareas, fechas, metas y propuestas de Claude." />
       <Suspense fallback={<ListSkeleton rows={6} />}>
         <Content />
       </Suspense>

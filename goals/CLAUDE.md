@@ -25,6 +25,7 @@ Private single-user productivity app. Read README.md for the module map and arch
 - Calendar dates are `YYYY-MM-DD` strings in the profile's time zone (`lib/dates.ts`); use `dayBoundsUtc` to compare timestamps with a local day.
 
 ## Design
+- The owner asked for "so clear a 7-year-old understands it": plain Spanish words (Metas, Mi día, Claude, Números), big touch targets, one obvious next action. Inicio opens with «Ahora toca» (`lib/now.ts`) and the money goal with «He ganado dinero».
 - Dark first. Use the CSS tokens in `globals.css` via Tailwind (`bg-surface`, `text-muted`, `border-line`, `text-accent`…), never literal colors. Check light mode too.
 - Prefer lists and sections over cards. Test at ~400 px width.
 - Charts are single-series SVG (`components/charts`), one axis, hover tooltip and a hidden data table.
@@ -33,7 +34,7 @@ Private single-user productivity app. Read README.md for the module map and arch
 - Deployed on Vercel (project `goals`) with a Supabase project named «GOALS». Account details live only in the owner's accounts and the «goals» cloud environment, never in this public repo.
 - The cloud environment «goals» injects the Supabase and Vercel tokens. Node's fetch needs `NODE_USE_ENV_PROXY=1` there.
 - Redeploy / apply new migrations: `NODE_USE_ENV_PROXY=1 OWNER_EMAIL=<owner email> node scripts/deploy-cloud.mjs` (idempotent; ask the owner for the email, do not write it to files).
-- Without `ANTHROPIC_API_KEY` the in-app AI is off and **Claude Code acts as the brain** through `scripts/brain.mjs` (skill `goals-brain`). Same rules: read context first, only propose, the owner approves in the app.
+- Without `ANTHROPIC_API_KEY` the in-app chat still works through the **chat bridge** (`supabase/migrations/20261118000000_brain_bridge.sql`, `lib/actions/brain.ts`): it wakes a Claude Code scheduled task that answers with `brain.mjs inbox/reply/done`. The rest of the in-app AI is off and **Claude Code acts as the brain** through `scripts/brain.mjs` (skill `goals-brain`). Same rules: read context first, only propose, the owner approves in the app.
 
 ## Checks before committing
 `npm run typecheck && npm run lint && npm test && npm run test:db && npm run build`, and `npm run test:e2e` for UI or AI changes (see README; it wipes the local DB).

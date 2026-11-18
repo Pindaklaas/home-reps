@@ -15,12 +15,13 @@ import { GOAL_PROGRESS_MODE_LABEL, GOAL_STATUS_LABEL, GOAL_STATUS_TONE, PRIORITY
 import { formatDate, formatDateTime } from "@/lib/dates";
 import { deadlineText } from "@/components/goals/goal-bits";
 import { z } from "zod";
+import { formatNumber } from "@/lib/format";
 
 export default function GoalPage({ params }: PageProps<"/goals/[id]">) {
   return (
     <>
       <Link href="/goals" className="mb-5 inline-flex items-center gap-1.5 text-[13px] text-faint hover:text-muted">
-        <ArrowLeft className="h-3.5 w-3.5" /> Objetivos
+        <ArrowLeft className="h-3.5 w-3.5" /> Metas
       </Link>
       <Suspense fallback={<ListSkeleton rows={5} />}>
         <GoalContent params={params} />
@@ -80,7 +81,7 @@ async function GoalContent({ params }: { params: PageProps<"/goals/[id]">["param
             <InlineAction
               action={setGoalStatus}
               fields={{ id: goal.id, status: "completed" }}
-              confirm="¿Marcar este objetivo como completado?"
+              confirm="¿Marcar esta meta como conseguida?"
               className={iconBtn}
             >
               <CheckCircle2 className="h-3.5 w-3.5" /> Completar
@@ -103,12 +104,12 @@ async function GoalContent({ params }: { params: PageProps<"/goals/[id]">["param
           {hasMetric ? (
             <Stat
               label={goal.metric_name!}
-              value={`${Number(goal.metric_current).toLocaleString("es-ES")} ${goal.metric_unit ?? ""}`}
-              hint={`Meta: ${Number(goal.metric_target).toLocaleString("es-ES")} ${goal.metric_unit ?? ""} · inicio ${Number(goal.metric_start).toLocaleString("es-ES")}`}
+              value={`${formatNumber(Number(goal.metric_current), 2)} ${goal.metric_unit ?? ""}`}
+              hint={`Meta: ${formatNumber(Number(goal.metric_target), 2)} ${goal.metric_unit ?? ""} · inicio ${formatNumber(Number(goal.metric_start), 2)}`}
             />
           ) : null}
           <Stat
-            label="Fecha objetivo"
+            label="Fecha límite"
             value={goal.target_date ? formatDate(goal.target_date, { day: "numeric", month: "short", year: "numeric" }) : "—"}
             hint={dl ? <span className={dl.late ? "text-danger" : undefined}>{dl.text}</span> : "Sin fecha"}
           />
@@ -140,7 +141,7 @@ async function GoalContent({ params }: { params: PageProps<"/goals/[id]">["param
                 <li key={c.id} className="flex items-baseline justify-between gap-4 py-2">
                   <span className="text-muted">{formatDateTime(c.recorded_at, tz)}{c.note ? ` · ${c.note}` : ""}</span>
                   <span className="tabular-nums text-fg">
-                    {Number(c.value).toLocaleString("es-ES")} {goal.metric_unit ?? ""}
+                    {formatNumber(Number(c.value), 2)} {goal.metric_unit ?? ""}
                   </span>
                 </li>
               ))}
@@ -157,8 +158,8 @@ async function GoalContent({ params }: { params: PageProps<"/goals/[id]">["param
           <ul>{projects.map((p) => <ProjectRow key={p.id} project={p} today={today} showGoal={false} />)}</ul>
         ) : (
           <EmptyState
-            title="Ningún proyecto empuja este objetivo todavía"
-            description="Un objetivo sin proyectos es un deseo. Crea el primero o pide a Claude que lo divida en proyectos."
+            title="Ningún proyecto empuja esta meta todavía"
+            description="Una meta sin proyectos es solo un deseo. Crea el primero o pide a Claude que la divida en proyectos."
           />
         )}
       </Section>

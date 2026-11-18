@@ -28,7 +28,7 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
             <Field label="Zona horaria" htmlFor="s-tz" error={fieldErr(s, "timezone")} hint={<button type="button" className="text-accent hover:underline" onClick={() => setTz(Intl.DateTimeFormat().resolvedOptions().timeZone)}>Usar la de este dispositivo</button>}>
               <Input id="s-tz" name="timezone" value={tz} onChange={(e) => setTz(e.target.value)} placeholder="Europe/Madrid" />
             </Field>
-            <Field label="Capacidad diaria (min)" htmlFor="s-cap" hint="Tiempo real que puedes dedicar a tus objetivos un día normal." error={fieldErr(s, "daily_capacity_minutes")}>
+            <Field label="Capacidad diaria (min)" htmlFor="s-cap" hint="Tiempo que puedes dedicar a tus metas un día normal." error={fieldErr(s, "daily_capacity_minutes")}>
               <Input id="s-cap" name="daily_capacity_minutes" type="number" min={0} max={1440} step={15} defaultValue={profile?.daily_capacity_minutes ?? 360} />
             </Field>
             <Field label="La semana empieza en" htmlFor="s-week">

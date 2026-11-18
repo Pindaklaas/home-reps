@@ -42,7 +42,7 @@ export function CelebrationHost() {
       key={toast.id}
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 bottom-[calc(76px+env(safe-area-inset-bottom))] z-50 flex justify-center px-4 lg:bottom-8"
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(84px+env(safe-area-inset-bottom))] z-50 flex justify-center px-4 lg:bottom-8"
     >
       <div className="celebrate-pop relative flex max-w-sm items-center gap-3 rounded-full border border-success/30 bg-elevated py-2 pl-2 pr-4 shadow-panel">
         <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-success text-bg">

@@ -2,7 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { goalCheckinSchema, goalSchema, type ActionState } from "@/lib/validation";
+import { formatNumber } from "@/lib/format";
+import { goalCheckinSchema, goalSchema, text, type ActionState } from "@/lib/validation";
 import { GOAL_STATUSES } from "@/lib/constants";
 import { check, getId, parseForm, runAction, ActionError } from "./helpers";
 import type { ServerSupabase } from "@/lib/supabase/server";
@@ -74,5 +75,26 @@ export async function addGoalCheckin(_: ActionState, formData: FormData): Promis
     if (error) return error;
     check(await supabase.from("goal_checkins").insert(data));
     return { ok: true, message: "Valor registrado" };
+  });
+}
+
+const incomeSchema = z.object({
+  goal_id: z.uuid(),
+  amount: z.coerce.number({ message: "Escribe una cantidad" }).finite().positive("La cantidad tiene que ser mayor que 0").max(1_000_000, "Cantidad demasiado grande"),
+  note: text(200),
+});
+
+/** "He ganado dinero": adds an amount to the goal's metric (a new check-in with the new total). */
+export async function addIncome(_: ActionState, formData: FormData): Promise<ActionState> {
+  return runAction(async ({ supabase }) => {
+    const { data, error } = parseForm(incomeSchema, formData);
+    if (error) return error;
+    const goal = await supabase.from("goals").select("metric_current, metric_unit").eq("id", data.goal_id).single();
+    check(goal);
+    const total = Number(goal.data!.metric_current ?? 0) + data.amount;
+    const unit = goal.data!.metric_unit ?? "";
+    const n = (x: number) => formatNumber(x, 2);
+    check(await supabase.from("goal_checkins").insert({ goal_id: data.goal_id, value: total, note: data.note ?? `+${n(data.amount)} ${unit}`.trim() }));
+    return { ok: true, message: `+${n(data.amount)} ${unit} · ya llevas ${n(total)} ${unit}` };
   });
 }

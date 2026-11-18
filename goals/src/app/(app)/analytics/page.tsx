@@ -7,12 +7,12 @@ import { BarList } from "@/components/charts/bar-list";
 import { TASK_STATUS_LABEL, TASK_STATUSES } from "@/lib/constants";
 import { addDays, dateOf, formatDate, formatMinutes, weekRange } from "@/lib/dates";
 
-export const metadata: Metadata = { title: "Análisis" };
+export const metadata: Metadata = { title: "Números" };
 
 export default function AnalyticsPage() {
   return (
     <>
-      <PageHeader title="Análisis" description="Tu ejecución real, medida con los datos de GOALS." />
+      <PageHeader title="Números" description="Cuánto has hecho de verdad, semana a semana." />
       <Suspense fallback={<ListSkeleton rows={6} />}>
         <Analytics />
       </Suspense>
@@ -94,7 +94,7 @@ async function Analytics() {
     <div className="flex flex-col gap-10">
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-5">
         <Stat label="Progreso general" value={`${overall}%`} hint={`media de ${activeGoals.length} objetivos activos`} />
-        <Stat label="Objetivos completados" value={goalsCompleted} hint={`${goalsCompletedMonth} este mes`} />
+        <Stat label="Metas conseguidas" value={goalsCompleted} hint={`${goalsCompletedMonth} este mes`} />
         <Stat label="Tareas completadas" value={doneTotalWindow} hint="últimas 12 semanas" />
         <Stat label="Proyectos activos" value={a.projects.filter((p) => p.status === "active").length} hint={`${a.projects.filter((p) => p.status === "completed").length} completados`} />
         <Stat label="Tiempo dedicado" value={formatMinutes(totalMinutes90)} hint="últimos 90 días" />
@@ -126,12 +126,12 @@ async function Analytics() {
         </Section>
       </div>
 
-      <Section title="Progreso por objetivo">
+      <Section title="Progreso por meta">
         <BarList
           items={activeGoals.map((g) => ({ key: g.id, label: g.title, value: g.progress, href: `/goals/${g.id}` }))}
           format={(v) => `${v}%`}
           max={100}
-          empty="Sin objetivos activos."
+          empty="Sin metas activas."
         />
       </Section>
     </div>

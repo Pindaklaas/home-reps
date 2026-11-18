@@ -29,8 +29,8 @@ export type ProposalView = {
 };
 
 const ACTION_LABEL: Record<string, string> = {
-  create_goal: "Nuevo objetivo",
-  update_goal: "Cambiar objetivo",
+  create_goal: "Nueva meta",
+  update_goal: "Cambiar meta",
   create_project: "Nuevo proyecto",
   update_project: "Cambiar proyecto",
   create_task: "Nueva tarea",
@@ -44,7 +44,7 @@ const FIELD_LABEL: Record<string, string> = {
   description: "Descripción",
   priority: "Prioridad",
   due_date: "Fecha límite",
-  target_date: "Fecha objetivo",
+  target_date: "Fecha límite",
   scheduled_date: "Planificada",
   estimated_minutes: "Estimación (min)",
   status: "Estado",

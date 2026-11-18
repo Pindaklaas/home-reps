@@ -5,6 +5,7 @@ import { ArrowLeft, Trash2 } from "lucide-react";
 import { z } from "zod";
 import { getAppContext } from "@/lib/data";
 import { aiConfigured } from "@/lib/ai/client";
+import { getBrainStatus } from "@/lib/brain";
 import { Chat, type ChatMessage } from "@/components/brain/chat";
 import { InlineAction } from "@/components/ui/forms";
 import { buttonClass } from "@/components/ui/button";
@@ -24,10 +25,12 @@ async function Conversation({ params }: { params: PageProps<"/brain/[id]">["para
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
   const { supabase } = await getAppContext();
-  const [conv, msgs, proposals] = await Promise.all([
+  const ai = aiConfigured();
+  const [conv, msgs, proposals, brain] = await Promise.all([
     supabase.from("ai_conversations").select("id, title").eq("id", id).maybeSingle(),
     supabase.from("ai_messages").select("id, role, content, created_at").eq("conversation_id", id).order("created_at"),
     supabase.from("ai_proposals").select("*").eq("conversation_id", id).order("created_at"),
+    ai ? null : getBrainStatus(supabase),
   ]);
   if (!conv.data) notFound();
 
@@ -66,7 +69,7 @@ async function Conversation({ params }: { params: PageProps<"/brain/[id]">["para
       <div className="mb-6 flex items-center justify-between gap-3">
         <div className="min-w-0">
           <Link href="/brain" className="mb-1 inline-flex items-center gap-1.5 text-[13px] text-faint hover:text-muted xl:hidden">
-            <ArrowLeft className="h-3.5 w-3.5" /> AI Brain
+            <ArrowLeft className="h-3.5 w-3.5" /> Claude
           </Link>
           <h1 className="truncate text-lg font-semibold tracking-tight">{conv.data.title}</h1>
         </div>
@@ -80,7 +83,7 @@ async function Conversation({ params }: { params: PageProps<"/brain/[id]">["para
           <Trash2 className="h-3.5 w-3.5" />
         </InlineAction>
       </div>
-      <Chat key={id} conversationId={id} initialMessages={messages} aiEnabled={aiConfigured()} />
+      <Chat key={id} conversationId={id} initialMessages={messages} aiEnabled={ai} bridge={!ai && Boolean(brain?.connected)} />
     </>
   );
 }

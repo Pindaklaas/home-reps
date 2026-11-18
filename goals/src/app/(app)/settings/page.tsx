@@ -12,6 +12,8 @@ import { publicEnv } from "@/lib/env";
 import { pushConfigured } from "@/lib/push";
 import { AiButton } from "@/components/brain/ai-button";
 import { checkClaude } from "@/lib/actions/ai";
+import { getBrainStatus } from "@/lib/brain";
+import { BrainConnect } from "./brain-connect";
 
 export const metadata: Metadata = { title: "Ajustes" };
 
@@ -39,15 +41,24 @@ function Block({ id, title, description, children }: { id: string; title: string
 }
 
 async function Settings() {
-  const { user, profile } = await getAppContext();
+  const { user, profile, supabase } = await getAppContext();
   const env = serverEnv();
   const ai = aiConfigured();
+  const brain = ai ? null : await getBrainStatus(supabase);
 
   return (
     <div className="max-w-4xl">
       <Block id="profile" title="Perfil y preferencias" description="Tu nombre, zona horaria y la capacidad que Claude usa para planificar.">
         <ProfileForm profile={profile} />
       </Block>
+
+      {!ai ? (
+        <Block id="claude" title="Chat con Claude" description="Escríbele desde la app y te contesta aquí en 1–3 minutos, con aviso en el móvil. Usa tu plan de Claude, sin clave de pago aparte.">
+          <BrainConnect
+            status={brain ? { ready: brain.ready, connected: brain.connected, authError: brain.authError, lastFireAt: brain.last_fire_at } : null}
+          />
+        </Block>
+      ) : null}
 
       <Block id="notifications" title="Notificaciones" description="Avisos en el móvil: tareas con hora y avisos automáticos de lo que se te escapa.">
         <NotificationSettings publicKey={pushConfigured() ? publicEnv.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null : null} />
@@ -72,11 +83,8 @@ async function Settings() {
         ) : null}
         {!ai ? (
           <>
-          <p className="mb-3 rounded-lg bg-accent-soft px-3 py-2 text-[13px] text-accent">
-            Modo cerebro con Claude Code: sin clave, Claude Code puede leer tus datos y escribir aquí recomendaciones, planes, evaluaciones y propuestas (que apruebas tú). Abre una sesión en el entorno «goals» y pídele «actúa como el cerebro de GOALS».
-          </p>
-          <p className="mb-5 rounded-lg bg-warning-soft px-3 py-2 text-[13px] text-warning">
-            Para activar el chat integrado, añade <code>ANTHROPIC_API_KEY</code> a las variables de entorno del servidor (en local, en <code>.env.local</code>; en Vercel, en Project Settings → Environment Variables) y vuelve a desplegar. La clave nunca llega al navegador.
+          <p className="mb-5 rounded-lg bg-subtle px-3 py-2 text-[13px] text-muted">
+            Sin clave de la API, Claude responde a través de «Chat con Claude» (arriba). Opcional: con <code>ANTHROPIC_API_KEY</code> en Vercel las respuestas son instantáneas, pero se paga aparte por uso. La clave nunca llega al navegador.
           </p>
           </>
         ) : null}
