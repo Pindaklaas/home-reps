@@ -1,15 +1,17 @@
 "use client";
 
 import { useId, useState } from "react";
+import { formatNumber } from "@/lib/format";
 
 export type Datum = { key: string; label: string; value: number; tooltip?: string; highlight?: boolean };
 
 /** Serializable formats, so Server Components can configure the chart. */
-export type ValueFormat = "count" | "hours" | "number";
+export type ValueFormat = "count" | "hours" | "number" | "euros";
 const FORMATTERS: Record<ValueFormat, (v: number) => string> = {
   count: (v) => String(Math.round(v)),
   hours: (v) => `${v.toLocaleString("es-ES", { maximumFractionDigits: 1 })} h`,
   number: (v) => v.toLocaleString("es-ES", { maximumFractionDigits: 2 }),
+  euros: (v) => `${formatNumber(v)} €`,
 };
 
 function niceMax(v: number) {

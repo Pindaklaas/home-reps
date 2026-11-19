@@ -48,10 +48,6 @@ async function Settings() {
 
   return (
     <div className="max-w-4xl">
-      <Block id="profile" title="Perfil y preferencias" description="Tu nombre, zona horaria y la capacidad que Claude usa para planificar.">
-        <ProfileForm profile={profile} />
-      </Block>
-
       {!ai ? (
         <Block id="claude" title="Chat con Claude" description="Escríbele desde la app y te contesta aquí en 1–3 minutos, con aviso en el móvil. Usa tu plan de Claude, sin clave de pago aparte.">
           <BrainConnect
@@ -60,7 +56,7 @@ async function Settings() {
         </Block>
       ) : null}
 
-      <Block id="notifications" title="Notificaciones" description="Avisos en el móvil: tareas con hora y avisos automáticos de lo que se te escapa.">
+      <Block id="notifications" title="Avisos en el móvil" description="Te avisa de tus tareas con hora y de lo que se te escapa.">
         <NotificationSettings publicKey={pushConfigured() ? publicEnv.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? null : null} />
         <NotificationPrefs profile={profile} />
       </Block>
@@ -69,6 +65,42 @@ async function Settings() {
         <ThemePicker initial={(profile?.theme as "dark" | "light" | "system") ?? "dark"} />
       </Block>
 
+      <Block id="profile" title="Tu perfil" description="Tu nombre, tu zona horaria y cuánto tiempo tienes al día.">
+        <ProfileForm profile={profile} />
+      </Block>
+
+      <Block id="account" title="Cuenta y seguridad" description={`Sesión iniciada como ${user.email}.`}>
+        <AccountForms />
+      </Block>
+
+      <Block id="privacy" title="Privacidad" description="Tus datos son tuyos.">
+        <ul className="mb-5 flex flex-col gap-2 text-[13px] text-muted">
+          <li className="flex gap-2">
+            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-faint" />
+            Cada tabla está protegida con Row Level Security: solo tu cuenta autorizada puede leer o escribir sus filas.
+          </li>
+          <li className="flex gap-2">
+            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-faint" />
+            Claude recibe un resumen de tus objetivos, proyectos, tareas, ideas, decisiones y memoria solo cuando lo usas, desde el servidor. Puedes desactivarlo arriba.
+          </li>
+          <li className="flex gap-2">
+            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-faint" />
+            Claude nunca modifica datos por su cuenta: todo cambio que propone queda pendiente de tu aprobación.
+          </li>
+        </ul>
+        <a
+          href="/api/export"
+          className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line bg-subtle px-3.5 text-sm font-medium text-fg hover:bg-hover"
+          download
+        >
+          <Download className="h-4 w-4" /> Exportar todos mis datos (JSON)
+        </a>
+      </Block>
+      <details className="group border-t border-line py-8">
+        <summary className="cursor-pointer list-none text-sm font-semibold text-fg">
+          Avanzado <span className="font-normal text-faint">· IA, integraciones (toca para abrir)</span>
+        </summary>
+        <div className="mt-6">
       <Block id="ai" title="Inteligencia artificial" description="Cómo trabaja Claude contigo.">
         <div className="mb-5 flex flex-wrap items-center gap-2 text-sm">
           <span className="text-muted">Estado:</span>
@@ -119,33 +151,9 @@ async function Settings() {
         </ul>
       </Block>
 
-      <Block id="account" title="Cuenta y seguridad" description={`Sesión iniciada como ${user.email}.`}>
-        <AccountForms />
-      </Block>
+        </div>
+      </details>
 
-      <Block id="privacy" title="Privacidad" description="Tus datos son tuyos.">
-        <ul className="mb-5 flex flex-col gap-2 text-[13px] text-muted">
-          <li className="flex gap-2">
-            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-faint" />
-            Cada tabla está protegida con Row Level Security: solo tu cuenta autorizada puede leer o escribir sus filas.
-          </li>
-          <li className="flex gap-2">
-            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-faint" />
-            Claude recibe un resumen de tus objetivos, proyectos, tareas, ideas, decisiones y memoria solo cuando lo usas, desde el servidor. Puedes desactivarlo arriba.
-          </li>
-          <li className="flex gap-2">
-            <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-faint" />
-            Claude nunca modifica datos por su cuenta: todo cambio que propone queda pendiente de tu aprobación.
-          </li>
-        </ul>
-        <a
-          href="/api/export"
-          className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line bg-subtle px-3.5 text-sm font-medium text-fg hover:bg-hover"
-          download
-        >
-          <Download className="h-4 w-4" /> Exportar todos mis datos (JSON)
-        </a>
-      </Block>
     </div>
   );
 }

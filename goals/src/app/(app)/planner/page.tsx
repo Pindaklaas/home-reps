@@ -4,13 +4,15 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Target } from "lucide-react";
 import { z } from "zod";
 import { getAppContext, getDay, listProjectOptions } from "@/lib/data";
-import { EmptyState, ListSkeleton, PageHeader, Section, Stat } from "@/components/ui/primitives";
+import { EmptyState, ListSkeleton, PageHeader, Section } from "@/components/ui/primitives";
 import { buttonClass } from "@/components/ui/button";
 import { TaskRow } from "@/components/tasks/task-row";
 import { QuickAddTask } from "@/components/tasks/quick-add";
 import { DayLogForm } from "./day-log-form";
 import { DayPlanPanel } from "./day-plan";
 import { aiConfigured } from "@/lib/ai/client";
+import { claudeMode } from "@/lib/brain";
+import { cn } from "@/lib/cn";
 import { dayPlanSchema } from "@/lib/ai/schemas";
 import { addDays, formatLongDate, formatMinutes, relativeDay } from "@/lib/dates";
 
@@ -35,10 +37,11 @@ async function Planner({ searchParams }: { searchParams: PageProps<"/planner">["
   const sp = await searchParams;
   const { supabase, today, tz, profile } = await getAppContext();
   const date = z.iso.date().safeParse(sp.date).success ? (sp.date as string) : today;
-  const [day, projects, goalsRes] = await Promise.all([
+  const [day, projects, goalsRes, mode] = await Promise.all([
     getDay(supabase, date, tz),
     listProjectOptions(supabase),
     supabase.from("goals").select("id, title, is_primary, status").eq("status", "active"),
+    claudeMode(supabase, aiConfigured()),
   ]);
 
   const focus = [1, 2, 3].map((rank) => day.scheduled.find((t) => t.focus_rank === rank) ?? null);
@@ -91,36 +94,12 @@ async function Planner({ searchParams }: { searchParams: PageProps<"/planner">["
         }
       />
 
+      <DaySummary done={day.completedCount} total={day.scheduled.filter((t) => t.status !== "cancelled").length} planned={plannedMinutes} available={available} logged={day.minutesToday} />
+
       <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
         <div className="flex min-w-0 flex-col gap-9">
-          <Section title="Tres prioridades">
-            <ol className="grid gap-2">
-              {focus.map((t, i) => (
-                <li key={i} className="flex items-center gap-3 rounded-lg border border-line bg-surface px-3 py-0.5">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-accent-soft text-xs font-semibold text-accent">{i + 1}</span>
-                  {t ? (
-                    <ul className="min-w-0 flex-1">
-                      <TaskRow task={t} projects={projects} today={today} focusDate={date} showFocusBadge={false} />
-                    </ul>
-                  ) : (
-                    <span className="py-3 text-sm text-faint">Libre · elige una tarea con «Prioridad {i + 1} del día» en su menú</span>
-                  )}
-                </li>
-              ))}
-            </ol>
-          </Section>
-
-          <DayPlanPanel
-            date={date}
-            aiEnabled={aiConfigured()}
-            plan={plan.success ? plan.data : null}
-            planMeta={day.log?.ai_plan as { start?: string; available_minutes?: number } | null}
-            taskTitles={taskTitles}
-            defaultMinutes={available}
-          />
-
-          <Section title={`Programadas · ${open.length}`}>
-            <QuickAddTask scheduledDate={date} placeholder="Añadir tarea a este día…" />
+          <Section title={open.length ? `Lo que te queda · ${open.length}` : "Lo que te queda"}>
+            <QuickAddTask scheduledDate={date} placeholder="Añadir algo a este día…" />
             {open.length ? (
               <ul>
                 {open.map((t, i) => {
@@ -137,57 +116,102 @@ async function Planner({ searchParams }: { searchParams: PageProps<"/planner">["
                 })}
               </ul>
             ) : (
-              <p className="px-1 text-sm text-faint">No hay más tareas programadas para este día.</p>
+              <p className="px-1 py-2 text-[15px] text-muted">{done.length ? "¡Todo hecho para este día! 🎉" : "Nada apuntado para este día."}</p>
             )}
           </Section>
 
+          {focus.some(Boolean) ? (
+            <Section title="Lo más importante">
+              <ol className="grid gap-2">
+                {focus.map((t, i) =>
+                  t ? (
+                    <li key={i} className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3 py-0.5">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-sm font-bold text-accent">{i + 1}</span>
+                      <ul className="min-w-0 flex-1">
+                        <TaskRow task={t} projects={projects} today={today} focusDate={date} showFocusBadge={false} />
+                      </ul>
+                    </li>
+                  ) : null,
+                )}
+              </ol>
+            </Section>
+          ) : null}
+
+          <DayPlanPanel
+            date={date}
+            mode={mode}
+            dayLabel={isToday ? "de hoy" : formatLongDate(date)}
+            plan={plan.success ? plan.data : null}
+            planMeta={day.log?.ai_plan as { start?: string; available_minutes?: number } | null}
+            taskTitles={taskTitles}
+            defaultMinutes={available}
+          />
+
           {isToday && day.carriedOver.length ? (
-            <Section title={`Atrasadas de días anteriores · ${day.carriedOver.length}`} description="Reprográmalas o decide si siguen teniendo sentido.">
+            <Section title={`Se te quedaron atrás · ${day.carriedOver.length}`} description="Hazlas, pásalas a otro día o bórralas si ya no tienen sentido.">
               <ul>{day.carriedOver.map((t) => <TaskRow key={t.id} task={t} projects={projects} today={today} />)}</ul>
             </Section>
           ) : null}
 
           {done.length ? (
-            <Section title={`Completadas · ${done.length}`}>
+            <Section title={`Hechas · ${done.length}`}>
               <ul>{done.map((t) => <TaskRow key={t.id} task={t} projects={projects} today={today} focusDate={date} />)}</ul>
             </Section>
           ) : null}
         </div>
 
         <aside className="flex flex-col gap-8">
-          <div className="grid grid-cols-3 gap-4 lg:grid-cols-1 lg:gap-5">
-            <Stat label="Completadas" value={day.completedCount} hint={isToday ? "hoy" : "ese día"} />
-            <Stat label="Tiempo registrado" value={formatMinutes(day.minutesToday)} />
-            <Stat
-              label="Planificado"
-              value={formatMinutes(plannedMinutes)}
-              hint={<span className={plannedMinutes > available ? "text-warning" : undefined}>de {formatMinutes(available)} disponibles</span>}
-            />
-          </div>
-
-          <Section title="Metas de hoy">
+          <Section title="Para qué sirve este día">
             {goals.length ? (
               <ul className="flex flex-col gap-1.5">
                 {goals.map((g) => (
                   <li key={g.id}>
-                    <Link href={`/goals/${g.id}`} className="flex items-center gap-2 text-sm text-muted hover:text-fg">
-                      <Target className={g.is_primary ? "h-3.5 w-3.5 text-accent" : "h-3.5 w-3.5 text-faint"} />
+                    <Link href={`/goals/${g.id}`} className="flex items-center gap-2 text-[15px] text-muted hover:text-fg">
+                      <Target className={g.is_primary ? "h-4 w-4 text-accent" : "h-4 w-4 text-faint"} />
                       <span className="truncate">{g.title}</span>
                     </Link>
                   </li>
                 ))}
               </ul>
             ) : (
-              <EmptyState className="py-6" title="Ninguna meta conectada" description="Las tareas de hoy no son de proyectos con meta." />
+              <EmptyState className="py-6" title="Ninguna meta conectada" description="Las tareas de este día no son de proyectos con meta." />
             )}
           </Section>
 
-          <Section title="Registro del día">
-            <DayLogForm date={date} log={day.log} />
-          </Section>
+          <details className="group rounded-2xl border border-line bg-surface" open={Boolean(day.log?.intention || day.log?.summary)}>
+            <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3.5 text-base font-semibold text-fg">
+              Mi diario del día
+              <span className="text-sm font-normal text-faint group-open:hidden">Abrir</span>
+            </summary>
+            <div className="border-t border-line p-4">
+              <DayLogForm date={date} log={day.log} />
+            </div>
+          </details>
         </aside>
       </div>
     </>
+  );
+}
+
+function DaySummary({ done, total, planned, available, logged }: { done: number; total: number; planned: number; available: number; logged: number }) {
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  return (
+    <div className="mb-8 rounded-2xl border border-line bg-surface p-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-[15px] text-muted">
+          <b className="text-2xl font-bold tabular-nums text-fg">{done}</b> de <b className="tabular-nums text-fg">{total}</b> hechas
+        </span>
+        {planned ? (
+          <span className={cn("text-sm tabular-nums", planned > available ? "text-warning" : "text-muted")}>
+            {formatMinutes(planned)} por hacer{planned > available ? " · ¡demasiado!" : ""}
+          </span>
+        ) : null}
+      </div>
+      <div className="mt-3 h-3 rounded-full bg-subtle" role="img" aria-label={`${pct}% del día hecho`}>
+        <div className="h-3 rounded-full bg-success transition-[width] duration-700" style={{ width: `${pct}%` }} />
+      </div>
+      {logged ? <p className="mt-2 text-xs text-faint">Tiempo registrado: {formatMinutes(logged)}</p> : null}
+    </div>
   );
 }
 

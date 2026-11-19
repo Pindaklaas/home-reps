@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { AlertTriangle, CalendarCheck2, Clock, Flame, Lightbulb, MessageCircle, PartyPopper, Sparkles, Target } from "lucide-react";
+import { AlertTriangle, CalendarCheck2, Clock, Flame, Lightbulb, MessageCircle, PartyPopper, Target } from "lucide-react";
 import type { GoalWithProgress, TaskWithProject } from "@/lib/data";
 import type { NowPick } from "@/lib/now";
 import { daysBetween, formatMinutes, relativeDay } from "@/lib/dates";
 import { cn } from "@/lib/cn";
 import { formatNumber } from "@/lib/format";
 import { AddIncome, BigDoneButton } from "./home-actions";
+import { AskClaude, type ClaudeMode } from "@/components/brain/ask-claude";
 
 const hm = (t: string | null) => (t ? t.slice(0, 5) : null);
 const toMin = (s: string) => Number(s.slice(0, 2)) * 60 + Number(s.slice(3, 5));
@@ -32,7 +33,7 @@ export function NowCard({
   done,
   total,
   streak,
-  canAskClaude,
+  mode,
 }: {
   pick: NowPick<TaskWithProject>;
   today: string;
@@ -40,7 +41,7 @@ export function NowCard({
   done: number;
   total: number;
   streak: number;
-  canAskClaude: boolean;
+  mode: ClaudeMode;
 }) {
   const task = pick.task;
   const time = hm(task?.scheduled_time ?? null);
@@ -101,14 +102,14 @@ export function NowCard({
         ) : (
           <div className="mt-3">
             <p className="text-[22px] font-bold leading-tight text-fg">{total ? "Todo hecho. ¡Descansa!" : "No hay nada apuntado."}</p>
-            {canAskClaude ? (
-              <Link
-                href={`/brain?prompt=${encodeURIComponent("Organízame lo que queda de hoy")}`}
-                className="mt-4 inline-flex h-11 items-center gap-2 rounded-xl bg-accent px-4 text-[15px] font-semibold text-accent-fg"
-              >
-                <Sparkles className="h-4 w-4" /> Pídele un plan a Claude
-              </Link>
-            ) : null}
+            <div className="mt-4">
+              <AskClaude
+                mode={mode}
+                size="md"
+                label={total ? "¿Qué más puedo hacer hoy?" : "Pídele un plan a Claude"}
+                prompt="Organízame lo que queda de hoy: qué hago y a qué hora (o si toca descansar). Propón las tareas para que yo las apruebe."
+              />
+            </div>
           </div>
         )}
 

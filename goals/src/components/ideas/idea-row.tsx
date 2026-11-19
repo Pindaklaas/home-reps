@@ -14,6 +14,7 @@ import { ideaEvaluationSchema, VERDICT_LABEL, VERDICT_TONE } from "@/lib/ai/sche
 import { formatDateTime } from "@/lib/dates";
 import type { Tables } from "@/lib/supabase/database.types";
 import { cn } from "@/lib/cn";
+import { AskClaude, type ClaudeMode } from "@/components/brain/ask-claude";
 
 function Meter({ value, label, invert = false }: { value: number | null; label: string; invert?: boolean }) {
   return (
@@ -34,7 +35,7 @@ function Meter({ value, label, invert = false }: { value: number | null; label: 
   );
 }
 
-export function IdeaRow({ idea, tz, aiEnabled }: { idea: Tables<"ideas">; tz: string; aiEnabled: boolean }) {
+export function IdeaRow({ idea, tz, mode }: { idea: Tables<"ideas">; tz: string; mode: ClaudeMode }) {
   const [open, setOpen] = useState(false);
   const [evalState, evalAction, evaluating] = useActionState(evaluateIdea, null);
   const parsed = ideaEvaluationSchema.safeParse(idea.ai_evaluation);
@@ -50,8 +51,8 @@ export function IdeaRow({ idea, tz, aiEnabled }: { idea: Tables<"ideas">; tz: st
           className="min-w-0 flex-1 text-left"
         >
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-medium text-fg">{idea.title}</span>
-            <Badge tone={IDEA_STATUS_TONE[idea.status]}>{IDEA_STATUS_LABEL[idea.status]}</Badge>
+            <span className="text-[15px] font-semibold text-fg">{idea.title}</span>
+            {idea.status !== "new" ? <Badge tone={IDEA_STATUS_TONE[idea.status]}>{IDEA_STATUS_LABEL[idea.status]}</Badge> : null}
             {evaluation ? (
               <Badge tone={VERDICT_TONE[evaluation.verdict]}>
                 <Sparkles className="h-3 w-3" /> {VERDICT_LABEL[evaluation.verdict]} · {evaluation.score}
@@ -59,10 +60,11 @@ export function IdeaRow({ idea, tz, aiEnabled }: { idea: Tables<"ideas">; tz: st
             ) : null}
             <ChevronDown className={cn("h-3.5 w-3.5 text-faint transition-transform", open && "rotate-180")} aria-hidden />
           </div>
+          {evaluation ? <p className="mt-1 line-clamp-2 text-[13.5px] text-muted">{evaluation.summary}</p> : null}
           <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
             <span className="capitalize text-faint">{idea.category}</span>
-            <Meter value={idea.potential} label="Potencial" />
-            <Meter value={idea.difficulty} label="Dificultad" invert />
+            {idea.potential ? <Meter value={idea.potential} label="Potencial" /> : null}
+            {idea.difficulty ? <Meter value={idea.difficulty} label="Dificultad" invert /> : null}
             {idea.estimated_cost !== null ? (
               <span className="tabular-nums text-faint">
                 {Number(idea.estimated_cost).toLocaleString("es-ES", { style: "currency", currency: idea.currency, maximumFractionDigits: 0 })}
@@ -123,7 +125,7 @@ export function IdeaRow({ idea, tz, aiEnabled }: { idea: Tables<"ideas">; tz: st
           {evaluation ? (
             <div className="rounded-lg border border-line bg-surface p-4 text-sm">
               <div className="mb-2 flex items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-faint">
+                <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-muted">
                   <Sparkles className="h-3.5 w-3.5 text-accent" /> Evaluación de Claude · recomendación, no un hecho
                 </span>
                 {idea.ai_evaluated_at ? <span className="text-xs text-faint">{formatDateTime(idea.ai_evaluated_at, tz)}</span> : null}
@@ -145,20 +147,28 @@ export function IdeaRow({ idea, tz, aiEnabled }: { idea: Tables<"ideas">; tz: st
             </div>
           ) : null}
 
-          <form action={evalAction} className="mt-3 flex items-center gap-3">
-            <input type="hidden" name="id" value={idea.id} />
-            <button
-              type="submit"
-              disabled={!aiEnabled || evaluating}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-line bg-subtle px-2.5 text-[13px] text-fg hover:bg-hover disabled:opacity-50"
-              title={aiEnabled ? undefined : "Configura ANTHROPIC_API_KEY para usar Claude"}
-            >
-              {evaluating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 text-accent" />}
-              {evaluating ? "Evaluando…" : evaluation ? "Reevaluar con Claude" : "Evaluar con Claude"}
-            </button>
-            {!aiEnabled ? <span className="text-xs text-faint">Sin clave: pídeselo a Claude Code («actúa como el cerebro de GOALS»).</span> : null}
-            {evalState && !evalState.ok ? <span className="text-xs text-danger">{evalState.error}</span> : null}
-          </form>
+          {mode === "api" ? (
+            <form action={evalAction} className="mt-3 flex items-center gap-3">
+              <input type="hidden" name="id" value={idea.id} />
+              <button
+                type="submit"
+                disabled={evaluating}
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-accent/40 bg-accent-soft px-3 text-[13.5px] font-medium text-accent disabled:opacity-50"
+              >
+                {evaluating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {evaluating ? "Evaluando…" : evaluation ? "Volver a evaluar" : "¿Merece la pena? Pregunta a Claude"}
+              </button>
+              {evalState && !evalState.ok ? <span className="text-xs text-danger">{evalState.error}</span> : null}
+            </form>
+          ) : (
+            <div className="mt-3">
+              <AskClaude
+                mode={mode}
+                prompt={`Evalúa mi idea «${idea.title}» (id ${idea.id}): ¿merece la pena para mi meta? Dime sí o no, por qué y el primer paso.`}
+                label={evaluation ? "Volver a preguntar a Claude" : "¿Merece la pena? Pregunta a Claude"}
+              />
+            </div>
+          )}
         </div>
       ) : null}
     </li>

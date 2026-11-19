@@ -24,3 +24,10 @@ export async function getBrainStatus(supabase: ServerSupabase): Promise<BrainSta
   const s = parsed.data;
   return { ...s, authError: s.last_status === 401 || s.last_status === 403 || s.last_status === 404 };
 }
+
+/** "api" with an Anthropic key, "bridge" when the chat bridge is connected, else "off". */
+export async function claudeMode(supabase: ServerSupabase, aiConfigured: boolean): Promise<"api" | "bridge" | "off"> {
+  if (aiConfigured) return "api";
+  const s = await getBrainStatus(supabase);
+  return s?.connected && !s.authError ? "bridge" : "off";
+}

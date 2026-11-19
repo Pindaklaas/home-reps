@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { AlertTriangle, ArrowRight, Sparkles } from "lucide-react";
-import { getAppContext, getDay, listActivity, listGoals, listPendingProposals, listProjectOptions, listProjects, listTasks } from "@/lib/data";
+import { getAppContext, getDay, listGoals, listPendingProposals, listProjectOptions, listProjects, listTasks } from "@/lib/data";
 import { EmptyState, ListSkeleton, ProgressBar, Section, Skeleton, Stat } from "@/components/ui/primitives";
 import { PrimaryGoal } from "@/components/goals/goal-bits";
 import { ProjectRow } from "@/components/projects/project-row";
@@ -11,10 +11,11 @@ import { generateRecommendation } from "@/lib/actions/ai";
 import { aiConfigured } from "@/lib/ai/client";
 import { dailyRecommendationSchema } from "@/lib/ai/schemas";
 import { PRIORITY_WEIGHT } from "@/lib/constants";
-import { addDays, dateOf, dayBoundsUtc, formatDateTime, formatLongDate, formatMinutes, relativeTime, weekRange } from "@/lib/dates";
+import { addDays, dateOf, dayBoundsUtc, formatDateTime, formatLongDate, formatMinutes, weekRange } from "@/lib/dates";
 import { GoalDialog } from "@/components/forms/entity-forms";
 import { HomeTiles, MoneyCard, NowCard } from "@/components/home/home-cards";
-import { getBrainStatus } from "@/lib/brain";
+import { claudeMode } from "@/lib/brain";
+import { OrganizeBox } from "@/components/brain/ask-claude";
 import { pickNow } from "@/lib/now";
 
 export default function DashboardPage() {
@@ -40,31 +41,16 @@ function greeting(tz: string) {
   return h < 6 ? "Buenas noches" : h < 14 ? "Buenos días" : h < 21 ? "Buenas tardes" : "Buenas noches";
 }
 
-const ENTITY: Record<string, { label: string; href: (id: string) => string }> = {
-  goals: { label: "Meta", href: (id) => `/goals/${id}` },
-  projects: { label: "Proyecto", href: (id) => `/projects/${id}` },
-  tasks: { label: "Tarea", href: () => "/tasks" },
-  ideas: { label: "Idea", href: () => "/ideas" },
-  decisions: { label: "Decisión", href: () => "/brain/memory" },
-};
-const ACTION: Record<string, string> = { created: "creado", status_changed: "→", deleted: "eliminado", updated: "editado" };
-const STATUS_ES: Record<string, string> = {
-  completed: "completado", active: "activo", paused: "pausado", in_progress: "en progreso", pending: "pendiente",
-  cancelled: "cancelado", planned: "planificado", archived: "archivado", converted: "convertida", parked: "aparcada",
-  approved: "aprobada", rejected: "rechazada", discarded: "descartada", exploring: "explorando", validated: "validada", idea: "idea", new: "nueva",
-};
-
 async function Dashboard() {
   const { supabase, today, tz, profile } = await getAppContext();
   const week = weekRange(today, profile?.week_starts_on ?? 1);
   const lastWeekStart = addDays(week.start, -7);
 
-  const [goals, projects, openTasks, day, activity, proposals, projectOptions, completedRecent, timeWeek] = await Promise.all([
+  const [goals, projects, openTasks, day, proposals, projectOptions, completedRecent, timeWeek] = await Promise.all([
     listGoals(supabase),
     listProjects(supabase),
     listTasks(supabase, { status: "open" }),
     getDay(supabase, today, tz),
-    listActivity(supabase, 5),
     listPendingProposals(supabase),
     listProjectOptions(supabase),
     supabase.from("tasks").select("completed_at").eq("status", "completed").gte("completed_at", dayBoundsUtc(addDays(today, -30), tz).start),
@@ -96,8 +82,7 @@ async function Dashboard() {
   const rec = dailyRecommendationSchema.safeParse(day.log?.ai_recommendation);
   const recTasks = rec.success ? openTasks.filter((t) => rec.data.focus_task_ids.includes(t.id)) : [];
   const ai = aiConfigured();
-  const brain = ai ? null : await getBrainStatus(supabase);
-  const canAskClaude = ai || Boolean(brain?.connected);
+  const mode = await claudeMode(supabase, ai);
   const nowHm = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: tz }).format(new Date());
   const pick = pickNow(openTasks, today, nowHm);
   const moneyGoal = primary && primary.progress_mode === "metric" && Number(primary.metric_target) > 0 ? primary : null;
@@ -113,8 +98,9 @@ async function Dashboard() {
       </header>
 
       <div className="flex flex-col gap-4">
-        <NowCard pick={pick} today={today} nowHm={nowHm} done={todayDone} total={todayTotal} streak={streak} canAskClaude={canAskClaude} />
+        <NowCard pick={pick} today={today} nowHm={nowHm} done={todayDone} total={todayTotal} streak={streak} mode={mode} />
         {moneyGoal ? <MoneyCard goal={moneyGoal} today={today} /> : null}
+        <OrganizeBox mode={mode} />
         <HomeTiles waiting={proposals.length} />
       </div>
 
@@ -191,21 +177,20 @@ async function Dashboard() {
 
       <div className="grid gap-10 lg:grid-cols-[1fr_280px]">
         <div className="flex min-w-0 flex-col gap-10">
+          {focus.length ? (
           <Section
             title="Lo más importante de hoy"
             action={
               <Link href="/planner" className="inline-flex items-center gap-1 text-xs text-muted hover:text-fg">
-                Planificar <ArrowRight className="h-3 w-3" />
+                Mi día <ArrowRight className="h-3 w-3" />
               </Link>
             }
           >
-            {focus.length ? (
-              <ul>{focus.map((t) => <TaskRow key={t.id} task={t} projects={projectOptions} today={today} focusDate={today} />)}</ul>
-            ) : (
-              <p className="text-sm text-faint">Aún no has elegido. En «Mi día», toca el menú de una tarea → «Prioridad del día».</p>
-            )}
+            <ul>{focus.map((t) => <TaskRow key={t.id} task={t} projects={projectOptions} today={today} focusDate={today} />)}</ul>
           </Section>
+          ) : null}
 
+          {upcoming.length ? (
           <Section
             title={`Para estos días${overdue.length ? ` · ${overdue.length} ${overdue.length === 1 ? "atrasada" : "atrasadas"}` : ""}`}
             action={
@@ -214,12 +199,9 @@ async function Dashboard() {
               </Link>
             }
           >
-            {upcoming.length ? (
-              <ul>{upcoming.map((t) => <TaskRow key={t.id} task={t} projects={projectOptions} today={today} />)}</ul>
-            ) : (
-              <p className="text-sm text-faint">Nada urgente en los próximos tres días.</p>
-            )}
+            <ul>{upcoming.map((t) => <TaskRow key={t.id} task={t} projects={projectOptions} today={today} />)}</ul>
           </Section>
+          ) : null}
 
           <Section
             title={`Mis proyectos · ${activeProjects.length}`}
@@ -251,6 +233,7 @@ async function Dashboard() {
             </div>
           </Section>
 
+          {activeGoals.length > 1 || !moneyGoal ? (
           <Section title="Mis metas">
             {activeGoals.length ? (
               <ul className="flex flex-col gap-3.5">
@@ -270,39 +253,8 @@ async function Dashboard() {
               <p className="text-sm text-faint">Sin metas activas.</p>
             )}
           </Section>
+          ) : null}
 
-          <Section title="Lo último que ha pasado">
-            {activity.length ? (
-              <ul className="flex flex-col gap-2.5">
-                {activity.map((a) => {
-                  const e = ENTITY[a.entity_type];
-                  const body = (
-                    <>
-                      <span className="text-faint">{e?.label ?? a.entity_type} </span>
-                      <span className="text-fg">{a.title ?? ""}</span>{" "}
-                      <span className="text-faint">
-                        {a.action === "status_changed" ? `→ ${STATUS_ES[a.to_status ?? ""] ?? a.to_status}` : ACTION[a.action]}
-                      </span>
-                    </>
-                  );
-                  return (
-                    <li key={a.id} className="text-[13px] leading-snug">
-                      {e && a.action !== "deleted" ? (
-                        <Link href={e.href(a.entity_id)} className="hover:underline">
-                          {body}
-                        </Link>
-                      ) : (
-                        body
-                      )}
-                      <div className="text-[11px] text-faint">{relativeTime(a.created_at)}</div>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p className="text-sm text-faint">Todavía no hay actividad.</p>
-            )}
-          </Section>
         </aside>
       </div>
     </div>

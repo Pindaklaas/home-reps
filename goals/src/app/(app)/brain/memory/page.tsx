@@ -11,6 +11,8 @@ import { DecisionDialog, MemoryDialog } from "./forms";
 import { confirmMemory, deleteDecision, deleteMemory, setDecisionStatus, togglePinMemory } from "@/lib/actions/memory";
 import { generateWeeklyReview } from "@/lib/actions/ai";
 import { aiConfigured } from "@/lib/ai/client";
+import { claudeMode } from "@/lib/brain";
+import { AskClaude } from "@/components/brain/ask-claude";
 import { DECISION_STATUS_LABEL, DECISION_STATUS_TONE, MEMORY_KIND_LABEL, type MemoryKind, type ProposalStatus } from "@/lib/constants";
 import { formatDateTime } from "@/lib/dates";
 
@@ -27,11 +29,11 @@ export default function MemoryPage() {
   return (
     <>
       <Link href="/brain" className="mb-5 inline-flex items-center gap-1.5 text-[13px] text-faint hover:text-muted">
-        <ArrowLeft className="h-3.5 w-3.5" /> AI Brain
+        <ArrowLeft className="h-3.5 w-3.5" /> Claude
       </Link>
       <PageHeader
-        title="Memoria y decisiones"
-        description="Lo que Claude recuerda de ti, separado por nivel de certeza, y tu registro de decisiones. Puedes editarlo todo."
+        title="Lo que Claude sabe de ti"
+        description="Lo que recuerda, lo que has decidido y los cambios que te propone. Puedes editarlo todo."
       />
       <Suspense fallback={<ListSkeleton rows={6} />}>
         <MemoryContent />
@@ -44,13 +46,13 @@ const iconBtn = "flex h-7 w-7 items-center justify-center rounded-md text-faint 
 
 async function MemoryContent() {
   const { supabase, tz } = await getAppContext();
-  const [memory, decisions, pending] = await Promise.all([listMemory(supabase), listDecisions(supabase), listPendingProposals(supabase)]);
   const ai = aiConfigured();
+  const [memory, decisions, pending, mode] = await Promise.all([listMemory(supabase), listDecisions(supabase), listPendingProposals(supabase), claudeMode(supabase, ai)]);
 
   return (
     <div className="flex flex-col gap-10">
       {pending.length ? (
-        <Section title={`Pendiente de tu aprobación · ${pending.length}`} description="Cambios que Claude ha propuesto. Ninguno se ha aplicado.">
+        <Section title={`Claude te propone · ${pending.length}`} description="Nada se hace hasta que digas que sí.">
           <div className="grid gap-2 sm:grid-cols-2">
             {pending.map((p) => (
               <ProposalCard
@@ -65,11 +67,16 @@ async function MemoryContent() {
       <div className="flex flex-wrap items-center gap-2">
         <MemoryDialog />
         <DecisionDialog />
-        <AiButton action={generateWeeklyReview} disabled={!ai} label="Generar revisión semanal" pendingLabel="Revisando la semana…" />
+        {ai ? (
+          <AiButton action={generateWeeklyReview} label="Revisión de la semana" pendingLabel="Revisando la semana…" />
+        ) : (
+          <AskClaude mode={mode} label="Revisión de la semana" prompt="Hazme la revisión de esta semana: qué hice, cuánto dinero llevo, qué falló y qué cambio para la próxima. Corto y claro." />
+        )}
       </div>
 
       {GROUPS.map((g) => {
         const items = memory.filter((m) => g.kinds.includes(m.kind));
+        if (!items.length) return null;
         return (
           <Section key={g.title} title={`${g.title} · ${items.length}`} description={g.description}>
             {items.length ? (
@@ -109,7 +116,7 @@ async function MemoryContent() {
         );
       })}
 
-      <Section title={`Registro de decisiones · ${decisions.length}`} description="Qué decidiste, entre qué opciones y por qué.">
+      <Section title={`Mis decisiones · ${decisions.length}`} description="Qué decidiste, entre qué opciones y por qué.">
         {decisions.length ? (
           <ul className="divide-y divide-line">
             {decisions.map((d) => (

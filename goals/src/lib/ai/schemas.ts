@@ -66,9 +66,9 @@ export const weeklyReviewSchema = z.object({
 export type WeeklyReview = z.infer<typeof weeklyReviewSchema>;
 
 export const VERDICT_LABEL: Record<IdeaEvaluation["verdict"], string> = {
-  pursue: "Convertir en proyecto",
-  explore: "Validar antes",
-  park: "Aparcar",
-  discard: "Descartar",
+  pursue: "Sí, adelante",
+  explore: "Probar primero",
+  park: "Más adelante",
+  discard: "Mejor no",
 };
 export const VERDICT_TONE = { pursue: "success", explore: "accent", park: "warning", discard: "muted" } as const;

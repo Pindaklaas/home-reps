@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { z } from "zod";
 import { getAppContext, getProject, listGoalOptions, listProjectOptions, listTasks } from "@/lib/data";
 import { Badge, Dot, EmptyState, ListSkeleton, ProgressBar, Section, Stat } from "@/components/ui/primitives";
@@ -15,6 +15,9 @@ import { PRIORITY_LABEL, PRIORITY_TONE, PROJECT_STATUS_LABEL, PROJECT_STATUS_TON
 import { formatDate, formatMinutes, relativeDay } from "@/lib/dates";
 import { StatusSwitcher } from "./status-switcher";
 import { NotesEditor } from "./notes-editor";
+import { AskClaude } from "@/components/brain/ask-claude";
+import { claudeMode } from "@/lib/brain";
+import { aiConfigured } from "@/lib/ai/client";
 
 export default function ProjectPage({ params }: PageProps<"/projects/[id]">) {
   return (
@@ -33,11 +36,12 @@ async function ProjectContent({ params }: { params: PageProps<"/projects/[id]">[
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
   const { supabase, today } = await getAppContext();
-  const [data, tasks, goals, projectOptions] = await Promise.all([
+  const [data, tasks, goals, projectOptions, mode] = await Promise.all([
     getProject(supabase, id),
     listTasks(supabase, { projectId: id, status: "all" }),
     listGoalOptions(supabase),
     listProjectOptions(supabase),
+    claudeMode(supabase, aiConfigured()),
   ]);
   if (!data) notFound();
   const { project, progress } = data;
@@ -45,8 +49,7 @@ async function ProjectContent({ params }: { params: PageProps<"/projects/[id]">[
   const open = tasks.filter((t) => t.status === "pending" || t.status === "in_progress");
   const closed = tasks.filter((t) => t.status === "completed" || t.status === "cancelled");
   const late = project.due_date && project.due_date < today && !["completed", "cancelled"].includes(project.status);
-  const btn = buttonClass("secondary", "sm");
-  const analyzePrompt = encodeURIComponent(`Analiza el proyecto «${project.title}»: ¿está bien planteado, qué riesgos ves y cuáles deberían ser las próximas tareas?`);
+  const analyzePrompt = `Analiza mi proyecto «${project.title}»: ¿va bien?, ¿qué falla? y propónme las 3 próximas tareas con día y hora.`;
 
   return (
     <div className="flex flex-col gap-9">
@@ -58,7 +61,7 @@ async function ProjectContent({ params }: { params: PageProps<"/projects/[id]">[
           </span>
           {goal ? (
             <Link href={`/goals/${goal.id}`} className="text-xs text-faint hover:text-muted">
-              · Objetivo: {goal.title}
+              · Meta: {goal.title}
             </Link>
           ) : (
             <span className="text-xs text-warning">· Sin meta</span>
@@ -69,9 +72,7 @@ async function ProjectContent({ params }: { params: PageProps<"/projects/[id]">[
         <div className="mt-5 flex flex-wrap items-center gap-2">
           <StatusSwitcher id={project.id} status={project.status} />
           <EditProjectButton project={project} goals={goals} />
-          <Link href={`/brain?prompt=${analyzePrompt}`} className={btn}>
-            <Sparkles className="h-3.5 w-3.5" /> Analizar con Claude
-          </Link>
+          <AskClaude mode={mode} prompt={analyzePrompt} label="¿Qué hago ahora? Pregunta a Claude" />
           <InlineAction
             action={deleteProject}
             fields={{ id: project.id, redirect: "1" }}
@@ -114,9 +115,15 @@ async function ProjectContent({ params }: { params: PageProps<"/projects/[id]">[
         ) : null}
       </Section>
 
-      <Section title="Notas y resultados">
-        <NotesEditor id={project.id} notes={project.notes ?? ""} outcomes={project.outcomes ?? ""} />
-      </Section>
+      <details className="group rounded-2xl border border-line bg-surface" open={Boolean(project.notes || project.outcomes)}>
+        <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3.5 text-base font-semibold text-fg">
+          Notas y resultados
+          <span className="text-sm font-normal text-faint group-open:hidden">Abrir</span>
+        </summary>
+        <div className="border-t border-line p-4">
+          <NotesEditor id={project.id} notes={project.notes ?? ""} outcomes={project.outcomes ?? ""} />
+        </div>
+      </details>
     </div>
   );
 }

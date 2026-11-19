@@ -23,6 +23,7 @@ export function TaskRow({
   showProject = true,
   focusDate,
   showFocusBadge = true,
+  hideDay = false,
 }: {
   task: TaskWithProject;
   projects: Option[];
@@ -32,6 +33,8 @@ export function TaskRow({
   focusDate?: string;
   /** Hide the 1-3 badge where the slot number is already shown. */
   showFocusBadge?: boolean;
+  /** The list is already grouped by day. */
+  hideDay?: boolean;
 }) {
   const done = task.status === "completed";
   const cancelled = task.status === "cancelled";
@@ -44,7 +47,7 @@ export function TaskRow({
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           {task.scheduled_time ? (
-            <span className="shrink-0 font-mono text-[11px] tabular-nums text-accent" title="Hora (con aviso)">
+            <span className="shrink-0 text-[13px] font-semibold tabular-nums text-accent" title="Hora (con aviso)">
               {task.scheduled_time.slice(0, 5)}
             </span>
           ) : null}
@@ -53,7 +56,7 @@ export function TaskRow({
               {task.focus_rank}
             </span>
           ) : null}
-          <span className={cn("truncate text-sm", done || cancelled ? "text-faint line-through" : "text-fg")}>{task.title}</span>
+          <span className={cn("truncate text-[15px]", done || cancelled ? "text-faint line-through" : "text-fg")}>{task.title}</span>
           {task.status === "in_progress" ? <span className="text-[11px] font-medium text-accent">en curso</span> : null}
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-faint">
@@ -65,12 +68,13 @@ export function TaskRow({
           {task.due_date ? (
             <span className={cn(overdue && "text-danger")}>Vence {relativeDay(task.due_date, today)}</span>
           ) : null}
-          {task.scheduled_date && !focusDate ? <span>Plan: {relativeDay(task.scheduled_date, today)}</span> : null}
+          {task.scheduled_date && !focusDate && !hideDay ? <span className="first-letter:uppercase">{relativeDay(task.scheduled_date, today)}</span> : null}
           {task.estimated_minutes || task.spent_minutes ? (
             <span className="inline-flex items-center gap-1 tabular-nums">
               <Clock className="h-3 w-3" aria-hidden />
-              {task.spent_minutes ? formatMinutes(task.spent_minutes) : "0 min"}
-              {task.estimated_minutes ? ` / ${formatMinutes(task.estimated_minutes)}` : ""}
+              {task.spent_minutes
+                ? `${formatMinutes(task.spent_minutes)}${task.estimated_minutes ? ` de ${formatMinutes(task.estimated_minutes)}` : ""}`
+                : formatMinutes(task.estimated_minutes)}
             </span>
           ) : null}
         </div>

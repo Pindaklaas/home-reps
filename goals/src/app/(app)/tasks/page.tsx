@@ -8,11 +8,11 @@ import { TaskDialog } from "@/components/forms/entity-forms";
 import { TaskRow } from "@/components/tasks/task-row";
 import { QuickAddTask } from "@/components/tasks/quick-add";
 import { PRIORITY_WEIGHT } from "@/lib/constants";
-import { addDays, formatLongDate, weekRange } from "@/lib/dates";
+import { addDays, formatLongDate } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "Tareas" };
 
-const VIEWS = ["open", "today", "week", "project", "done"] as const;
+const VIEWS = ["open", "project", "done"] as const;
 type View = (typeof VIEWS)[number];
 
 function byUrgency(today: string) {
@@ -30,7 +30,7 @@ function byUrgency(today: string) {
 export default function TasksPage({ searchParams }: PageProps<"/tasks">) {
   return (
     <>
-      <PageHeader title="Tareas" description="Lo que hay que hacer, ordenado por urgencia y prioridad." />
+      <PageHeader title="Tareas" description="Todo lo que tienes que hacer, día a día." />
       <Suspense fallback={<ListSkeleton rows={6} />}>
         <TasksContent searchParams={searchParams} />
       </Suspense>
@@ -41,25 +41,21 @@ export default function TasksPage({ searchParams }: PageProps<"/tasks">) {
 async function TasksContent({ searchParams }: { searchParams: PageProps<"/tasks">["searchParams"] }) {
   const sp = await searchParams;
   const view: View = VIEWS.includes(sp.view as View) ? (sp.view as View) : "open";
-  const { supabase, today, profile } = await getAppContext();
-  const week = weekRange(today, profile?.week_starts_on ?? 1);
+  const { supabase, today } = await getAppContext();
 
   const [tasks, projects] = await Promise.all([
-    listTasks(supabase, {
-      status: view === "done" ? "completed" : "open",
-      ...(view === "today" ? { scheduledTo: today } : {}),
-      ...(view === "week" ? { scheduledFrom: week.start, scheduledTo: week.end } : {}),
-    }),
+    listTasks(supabase, { status: view === "done" ? "completed" : "open" }),
     listProjectOptions(supabase),
   ]);
-  const sorted = view === "done" ? tasks : [...tasks].sort(byUrgency(today));
+  const sorted =
+    view === "done"
+      ? [...tasks].sort((a, b) => (b.completed_at ?? "").localeCompare(a.completed_at ?? "")).slice(0, 100)
+      : [...tasks].sort(byUrgency(today));
 
   const tabs = [
-    { value: "open", label: "Abiertas" },
-    { value: "today", label: "Hoy" },
-    { value: "week", label: "Semana" },
+    { value: "open", label: "Por días" },
     { value: "project", label: "Por proyecto" },
-    { value: "done", label: "Completadas" },
+    { value: "done", label: "Hechas" },
   ].map((t) => ({ ...t, href: t.value === "open" ? "/tasks" : `/tasks?view=${t.value}` }));
 
   let body: React.ReactNode;
@@ -68,23 +64,8 @@ async function TasksContent({ searchParams }: { searchParams: PageProps<"/tasks"
       <EmptyState
         icon={<CheckSquare className="h-5 w-5" />}
         title={view === "done" ? "Aún no has completado tareas" : "No hay tareas aquí"}
-        description={view === "today" ? "Planifica tareas para hoy desde su menú o desde el planificador." : "Escribe arriba la próxima acción concreta."}
+        description="Escribe arriba lo próximo que tengas que hacer."
       />
-    );
-  } else if (view === "week") {
-    const days = Array.from({ length: 7 }, (_, i) => addDays(week.start, i));
-    body = (
-      <div className="flex flex-col gap-7">
-        {days.map((d) => {
-          const list = sorted.filter((t) => t.scheduled_date === d);
-          if (!list.length) return null;
-          return (
-            <Section key={d} title={`${formatLongDate(d)}${d === today ? " · hoy" : ""}`}>
-              <ul>{list.map((t) => <TaskRow key={t.id} task={t} projects={projects} today={today} focusDate={d} />)}</ul>
-            </Section>
-          );
-        })}
-      </div>
     );
   } else if (view === "project") {
     const groups = new Map<string, { title: string; tasks: TaskWithProject[] }>();
@@ -105,14 +86,16 @@ async function TasksContent({ searchParams }: { searchParams: PageProps<"/tasks"
           ))}
       </div>
     );
-  } else {
+  } else if (view === "done") {
     body = (
       <ul>
         {sorted.map((t) => (
-          <TaskRow key={t.id} task={t} projects={projects} today={today} focusDate={view === "today" ? today : undefined} />
+          <TaskRow key={t.id} task={t} projects={projects} today={today} />
         ))}
       </ul>
     );
+  } else {
+    body = <ByDay tasks={sorted} projects={projects} today={today} />;
   }
 
   return (
@@ -123,8 +106,39 @@ async function TasksContent({ searchParams }: { searchParams: PageProps<"/tasks"
           <TaskDialog projects={projects} />
         </div>
       </div>
-      {view !== "done" ? <QuickAddTask scheduledDate={view === "today" ? today : undefined} /> : null}
+      {view !== "done" ? <QuickAddTask /> : null}
       {body}
     </>
+  );
+}
+
+const byTime = (a: TaskWithProject, b: TaskWithProject) => (a.scheduled_time ?? "99").localeCompare(b.scheduled_time ?? "99");
+
+/** Open tasks grouped as: atrasadas, hoy, mañana, each later day, sin día. */
+function ByDay({ tasks, projects, today }: { tasks: TaskWithProject[]; projects: { id: string; title: string }[]; today: string }) {
+  const tomorrow = addDays(today, 1);
+  const late = tasks.filter((t) => (t.scheduled_date && t.scheduled_date < today) || (!t.scheduled_date && t.due_date && t.due_date < today));
+  const lateIds = new Set(late.map((t) => t.id));
+  const dated = tasks.filter((t) => t.scheduled_date && !lateIds.has(t.id));
+  const days = [...new Set(dated.map((t) => t.scheduled_date!))].sort();
+  const undated = tasks.filter((t) => !t.scheduled_date && !lateIds.has(t.id));
+  const label = (d: string) => (d === today ? "Hoy" : d === tomorrow ? "Mañana" : formatLongDate(d));
+  const groups: { key: string; title: string; tone?: "danger"; list: TaskWithProject[]; focus?: string }[] = [
+    ...(late.length ? [{ key: "late", title: "Atrasadas", tone: "danger" as const, list: late }] : []),
+    ...days.map((d) => ({ key: d, title: label(d), list: dated.filter((t) => t.scheduled_date === d).sort(byTime), focus: d })),
+    ...(undated.length ? [{ key: "none", title: "Sin día", list: undated }] : []),
+  ];
+  return (
+    <div className="flex flex-col gap-7">
+      {groups.map((g) => (
+        <Section key={g.key} title={<span className={g.tone === "danger" ? "text-danger" : undefined}>{`${g.title} · ${g.list.length}`}</span>}>
+          <ul>
+            {g.list.map((t) => (
+              <TaskRow key={t.id} task={t} projects={projects} today={today} focusDate={g.focus} hideDay />
+            ))}
+          </ul>
+        </Section>
+      ))}
+    </div>
   );
 }

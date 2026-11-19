@@ -36,5 +36,5 @@ async function NewChat({ searchParams }: { searchParams: PageProps<"/brain">["se
   const prompt = typeof sp.prompt === "string" ? sp.prompt.slice(0, 2000) : undefined;
   const ai = aiConfigured();
   const bridge = !ai && Boolean((await getBrainStatus(supabase))?.connected);
-  return <Chat key={prompt ?? "new"} conversationId={null} initialMessages={[]} aiEnabled={ai} bridge={bridge} initialPrompt={prompt} />;
+  return <Chat key={prompt ?? "new"} conversationId={null} initialMessages={[]} aiEnabled={ai} bridge={bridge} initialPrompt={prompt} autoSend={sp.send === "1" && ai} />;
 }

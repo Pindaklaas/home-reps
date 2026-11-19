@@ -97,6 +97,7 @@ async function check(name, fn) {
     await check("open the goal and record a metric check-in", async () => {
       await page.getByText(goalTitle).first().click();
       await page.waitForURL(/\/goals\/[0-9a-f-]{36}$/);
+      await page.getByText("Escribir el total exacto").click();
       await page.fill("#ck-value", "250");
       await page.fill("#ck-note", "Primer cliente");
       await page.getByRole("button", { name: "Registrar valor" }).click();
@@ -137,6 +138,7 @@ async function check(name, fn) {
     });
 
     await check("save project notes", async () => {
+      await page.getByText("Notas y resultados").click();
       await page.fill("#pn-notes", "Publicar los martes.");
       await page.getByRole("button", { name: "Guardar notas" }).click();
       await page.getByText("Guardado").waitFor();
@@ -155,6 +157,7 @@ async function check(name, fn) {
     });
 
     await check("save the daily log", async () => {
+      await page.getByText("Mi diario del día").filter({ visible: true }).first().click();
       await page.fill("#dl-int", "Lanzar la newsletter");
       await page.fill("#dl-min", "180");
       await page.getByRole("button", { name: "Guardar" }).last().click();
@@ -178,8 +181,8 @@ async function check(name, fn) {
     if (WITH_AI) {
       await check("Claude evaluates the idea (structured output)", async () => {
         await page.getByText(ideaTitle).click();
-        await page.getByRole("button", { name: "Evaluar con Claude" }).click();
-        await page.getByText("Validar antes · 68").waitFor({ timeout: 20000 });
+        await page.getByRole("button", { name: "¿Merece la pena? Pregunta a Claude" }).click();
+        await page.getByText("Probar primero · 68").waitFor({ timeout: 20000 });
         await page.getByText("Evaluación de Claude · recomendación, no un hecho").waitFor();
         await shot("06-ideas");
       });
@@ -217,13 +220,13 @@ async function check(name, fn) {
         await page.press("#chat-input", "Enter");
         await page.waitForURL(/\/brain\/[0-9a-f-]{36}$/, { timeout: 20000 });
         await visible("He preparado 2 propuestas").waitFor({ timeout: 20000 });
-        await visible("Crear tarea «Investigar 3 competidores»").waitFor();
-        await visible("Pendiente de tu aprobación").waitFor();
+        await visible("Investigar 3 competidores").waitFor();
+        await visible("Sí, apúntalo").waitFor();
         await shot("08-brain");
       });
 
       await check("approving one proposal creates exactly that task", async () => {
-        const card = page.locator("div.rounded-lg").filter({ visible: true }).filter({ hasText: "Crear tarea «Investigar 3 competidores»" }).first();
+        const card = page.locator("[data-proposal]").filter({ visible: true }).filter({ hasText: "Investigar 3 competidores" }).first();
         await card.getByRole("button", { name: "Aprobar" }).click();
         await card.getByText("Aplicada").waitFor({ timeout: 10000 });
         await go("/tasks");
@@ -258,7 +261,7 @@ async function check(name, fn) {
 
     await check("analytics renders real numbers", async () => {
       await go("/analytics");
-      await page.getByRole("heading", { name: "Tareas completadas por semana" }).waitFor();
+      await page.getByRole("heading", { name: "Tareas hechas por semana" }).waitFor();
       await page.locator("svg[role=img]").first().waitFor();
       await shot("10-analytics");
     });
@@ -266,6 +269,7 @@ async function check(name, fn) {
     if (WITH_AI) {
       await check("settings: the Claude connection check passes", async () => {
         await go("/settings");
+        await page.getByText("Avanzado").first().click();
         await page.getByRole("button", { name: "Probar conexión con Claude" }).click();
         await page.getByText("Claude funciona").waitFor({ timeout: 20000 });
       });

@@ -16,6 +16,7 @@ import { formatDate, formatDateTime } from "@/lib/dates";
 import { deadlineText } from "@/components/goals/goal-bits";
 import { z } from "zod";
 import { formatNumber } from "@/lib/format";
+import { AddIncome } from "@/components/home/home-actions";
 
 export default function GoalPage({ params }: PageProps<"/goals/[id]">) {
   return (
@@ -100,12 +101,12 @@ async function GoalContent({ params }: { params: PageProps<"/goals/[id]">["param
 
       <Section title="Progreso" description={GOAL_PROGRESS_MODE_LABEL[goal.progress_mode]}>
         <div className="grid gap-6 sm:grid-cols-3">
-          <Stat label="Avance" value={`${progress}%`} />
+          <Stat label="Llevas" value={`${progress}%`} />
           {hasMetric ? (
             <Stat
               label={goal.metric_name!}
               value={`${formatNumber(Number(goal.metric_current), 2)} ${goal.metric_unit ?? ""}`}
-              hint={`Meta: ${formatNumber(Number(goal.metric_target), 2)} ${goal.metric_unit ?? ""} · inicio ${formatNumber(Number(goal.metric_start), 2)}`}
+              hint={`de ${formatNumber(Number(goal.metric_target), 2)} ${goal.metric_unit ?? ""}`}
             />
           ) : null}
           <Stat
@@ -118,8 +119,14 @@ async function GoalContent({ params }: { params: PageProps<"/goals/[id]">["param
       </Section>
 
       {goal.metric_name ? (
-        <Section title="Métrica" description="Registra el valor real cada vez que cambie. El historial alimenta el progreso y el análisis.">
-          <CheckinForm goalId={goal.id} unit={goal.metric_unit} current={Number(goal.metric_current)} />
+        <Section title={`Apuntar ${goal.metric_name.toLowerCase()}`} description="Suma lo que ganes con el botón. Si prefieres, escribe abajo el total exacto.">
+          <div className="mb-5">
+            <AddIncome goalId={goal.id} unit={goal.metric_unit ?? ""} />
+          </div>
+          <details>
+            <summary className="mb-3 cursor-pointer text-sm text-muted hover:text-fg">Escribir el total exacto</summary>
+            <CheckinForm goalId={goal.id} unit={goal.metric_unit} current={Number(goal.metric_current)} />
+          </details>
           {history.length > 1 ? (
             <div className="mt-6">
               <ColumnChart

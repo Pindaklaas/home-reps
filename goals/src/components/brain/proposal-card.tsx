@@ -16,6 +16,7 @@ import {
   type ProposalStatus,
 } from "@/lib/constants";
 import { cn } from "@/lib/cn";
+import { formatDate, formatMinutes } from "@/lib/dates";
 
 export type ProposalView = {
   id: string;
@@ -45,8 +46,9 @@ const FIELD_LABEL: Record<string, string> = {
   priority: "Prioridad",
   due_date: "Fecha límite",
   target_date: "Fecha límite",
-  scheduled_date: "Planificada",
-  estimated_minutes: "Estimación (min)",
+  scheduled_date: "Día",
+  scheduled_time: "Hora",
+  estimated_minutes: "Duración",
   status: "Estado",
   category: "Categoría",
   decision: "Decisión",
@@ -58,12 +60,33 @@ const FIELD_LABEL: Record<string, string> = {
   metric_target: "Meta",
 };
 
+/** Fields shown in the "when" line instead of the detail list. */
+const WHEN_FIELDS = new Set(["scheduled_date", "scheduled_time", "estimated_minutes", "priority"]);
+
+/** "viernes, 20 nov · 10:30 · 1 h 30 min" for task proposals. */
+function whenLine(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+  const p = payload as Record<string, unknown>;
+  const src = (p.changes as Record<string, unknown> | undefined) ?? p;
+  const parts: string[] = [];
+  if (typeof src.scheduled_date === "string") parts.push(formatDate(src.scheduled_date, { weekday: "long", day: "numeric", month: "short" }));
+  if (typeof src.scheduled_time === "string") parts.push(src.scheduled_time.slice(0, 5));
+  if (typeof src.estimated_minutes === "number") parts.push(formatMinutes(src.estimated_minutes));
+  return parts.length ? parts.join(" · ") : null;
+}
+
+function headline(p: ProposalView): string {
+  const payload = p.payload as Record<string, unknown> | null;
+  if (payload && typeof payload.title === "string" && !payload.changes) return payload.title;
+  return p.summary;
+}
+
 function details(payload: unknown): [string, string][] {
   if (!payload || typeof payload !== "object") return [];
   const p = payload as Record<string, unknown>;
   const src = (p.changes as Record<string, unknown> | undefined) ?? p;
   return Object.entries(src)
-    .filter(([k, v]) => k in FIELD_LABEL && v !== null && v !== undefined && v !== "" && !(Array.isArray(v) && !v.length) && !(k === "title" && !p.changes))
+    .filter(([k, v]) => k in FIELD_LABEL && !WHEN_FIELDS.has(k) && v !== null && v !== undefined && v !== "" && !(Array.isArray(v) && !v.length) && !(k === "title" && !p.changes))
     .map(([k, v]) => [FIELD_LABEL[k], Array.isArray(v) ? v.join(" · ") : humanize(k, v)]);
 }
 
@@ -89,13 +112,17 @@ export function ProposalCard({ p }: { p: ProposalView }) {
   const href = status === "applied" ? proposalHref(p.action, entityId) : null;
   const rows = details(p.payload);
 
+  const when = whenLine(p.payload);
+  const isTask = p.action === "create_task" || p.action === "update_task";
+
   return (
-    <div className={cn("rounded-lg border bg-surface p-3.5 text-sm transition-opacity", status === "pending" ? "border-line-strong" : "border-line opacity-80")}>
+    <div data-proposal={p.id} className={cn("rounded-xl border bg-surface p-4 text-sm transition-opacity", status === "pending" ? "border-line-strong" : "border-line opacity-80")}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="text-xs font-medium uppercase tracking-wider text-faint">{ACTION_LABEL[p.action] ?? p.action}</span>
-        <Badge tone={tone[status]}>{PROPOSAL_STATUS_LABEL[status]}</Badge>
+        <span className="text-[13px] font-medium text-accent">{ACTION_LABEL[p.action] ?? p.action}</span>
+        {status !== "pending" ? <Badge tone={tone[status]}>{PROPOSAL_STATUS_LABEL[status]}</Badge> : null}
       </div>
-      <p className="mt-1.5 font-medium text-fg">{p.summary}</p>
+      <p className="mt-1 text-[16px] font-semibold leading-snug text-fg">{headline(p)}</p>
+      {when ? <p className="mt-1 text-[14px] font-medium text-fg/90 first-letter:uppercase">{when}</p> : null}
       {rows.length ? (
         <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[13px]">
           {rows.map(([k, v]) => (
@@ -106,19 +133,20 @@ export function ProposalCard({ p }: { p: ProposalView }) {
           ))}
         </dl>
       ) : null}
-      {p.rationale ? <p className="mt-2 text-[13px] text-muted">{p.rationale}</p> : null}
+      {p.rationale ? <p className="mt-2 text-[13.5px] text-muted">Por qué: {p.rationale}</p> : null}
       {err && status !== "applied" ? <p className="mt-2 text-xs text-danger">{err}</p> : null}
 
       {status === "pending" ? (
         <div className="mt-3 flex gap-2">
-          <form action={approve}>
+          <form action={approve} className="flex-1 sm:flex-none">
             <input type="hidden" name="id" value={p.id} />
             <button
               type="submit"
               disabled={approving || rejecting}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md bg-accent px-3 text-[13px] font-medium text-accent-fg hover:brightness-110 disabled:opacity-50"
+              aria-label="Aprobar"
+              className="inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-accent px-4 text-[14px] font-semibold text-accent-fg hover:brightness-110 disabled:opacity-50"
             >
-              {approving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} Aprobar
+              {approving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" strokeWidth={2.5} />} {isTask ? "Sí, apúntalo" : "Sí"}
             </button>
           </form>
           <form action={reject}>
@@ -126,9 +154,10 @@ export function ProposalCard({ p }: { p: ProposalView }) {
             <button
               type="submit"
               disabled={approving || rejecting}
-              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-line px-3 text-[13px] text-muted hover:bg-hover hover:text-fg disabled:opacity-50"
+              aria-label="Rechazar"
+              className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-line px-4 text-[14px] text-muted hover:bg-hover hover:text-fg disabled:opacity-50"
             >
-              <X className="h-3.5 w-3.5" /> Rechazar
+              <X className="h-4 w-4" /> No
             </button>
           </form>
         </div>

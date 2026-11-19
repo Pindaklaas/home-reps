@@ -42,6 +42,7 @@ export function Chat({
   aiEnabled,
   bridge = false,
   initialPrompt,
+  autoSend = false,
 }: {
   conversationId: string | null;
   initialMessages: ChatMessage[];
@@ -49,6 +50,8 @@ export function Chat({
   /** No API key, but the chat can wake Claude Code (it answers in 1–3 min). */
   bridge?: boolean;
   initialPrompt?: string;
+  /** Send initialPrompt right away (a button on another page asked Claude). */
+  autoSend?: boolean;
 }) {
   const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
@@ -59,6 +62,7 @@ export function Chat({
   const abort = useRef<AbortController | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
+  const autoSent = useRef(false);
 
   // Server data wins whenever it changes (after refresh/approval).
   useEffect(() => {
@@ -167,6 +171,12 @@ export function Chat({
       else router.refresh();
     }
   }
+
+  useEffect(() => {
+    if (!autoSend || autoSent.current || !initialPrompt) return;
+    autoSent.current = true;
+    void send(initialPrompt);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const empty = messages.length === 0;
 
@@ -295,17 +305,23 @@ function Proposals({ items }: { items: ProposalView[] }) {
   const [state, action, approving] = useActionState(approveProposals, null);
   return (
     <div className="mt-4">
-      <div className="mb-2 flex items-center justify-between gap-3">
-        <span className="text-xs font-medium text-muted">
-          {items.length === 1 ? "1 propuesta" : `${items.length} propuestas`} · nada se aplica sin tu aprobación
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <span className="text-[13.5px] text-muted">
+          {pending.length
+            ? `${pending.length === 1 ? "1 cambio" : `${pending.length} cambios`} para ti · nada se hace sin tu «sí»`
+            : items.length === 1 ? "1 propuesta" : `${items.length} propuestas`}
         </span>
         {pending.length > 1 && !state?.ok ? (
           <form action={action}>
             {pending.map((p) => (
               <input key={p.id} type="hidden" name="ids" value={p.id} />
             ))}
-            <button type="submit" disabled={approving} className="inline-flex items-center gap-1 text-xs text-accent hover:underline disabled:opacity-50">
-              {approving ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCheck className="h-3.5 w-3.5" />} Aprobar las {pending.length}
+            <button
+              type="submit"
+              disabled={approving}
+              className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-success px-4 text-[14px] font-semibold text-bg disabled:opacity-50"
+            >
+              {approving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCheck className="h-4 w-4" />} Sí a todo ({pending.length})
             </button>
           </form>
         ) : null}

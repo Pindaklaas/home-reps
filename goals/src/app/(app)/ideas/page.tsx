@@ -7,13 +7,14 @@ import { Tabs } from "@/components/ui/tabs";
 import { IdeaDialog } from "@/components/forms/entity-forms";
 import { IdeaRow } from "@/components/ideas/idea-row";
 import { aiConfigured } from "@/lib/ai/client";
+import { claudeMode } from "@/lib/brain";
 import type { IdeaStatus } from "@/lib/constants";
 
 export const metadata: Metadata = { title: "Ideas" };
 
 const VIEWS: Record<string, { label: string; statuses: IdeaStatus[] }> = {
   open: { label: "Abiertas", statuses: ["new", "exploring", "validated"] },
-  parked: { label: "Aparcadas y descartadas", statuses: ["parked", "discarded"] },
+  parked: { label: "Aparcadas", statuses: ["parked", "discarded"] },
   converted: { label: "Convertidas", statuses: ["converted"] },
 };
 
@@ -21,8 +22,8 @@ export default function IdeasPage({ searchParams }: PageProps<"/ideas">) {
   return (
     <>
       <PageHeader
-        title="Ideas Vault"
-        description="Todas tus ideas, sin perder ninguna. Claude puede evaluarlas y compararlas antes de que inviertas tiempo."
+        title="Ideas"
+        description="Apunta todas tus ideas. Claude te dice cuáles merecen la pena antes de gastar tiempo."
       />
       <Suspense fallback={<ListSkeleton rows={5} />}>
         <IdeasContent searchParams={searchParams} />
@@ -42,8 +43,7 @@ async function IdeasContent({ searchParams }: { searchParams: PageProps<"/ideas"
   const sp = await searchParams;
   const view = typeof sp.view === "string" && sp.view in VIEWS ? sp.view : "open";
   const { supabase, tz } = await getAppContext();
-  const ideas = await listIdeas(supabase);
-  const ai = aiConfigured();
+  const [ideas, mode] = await Promise.all([listIdeas(supabase), claudeMode(supabase, aiConfigured())]);
   const list = ideas.filter((i) => VIEWS[view].statuses.includes(i.status)).sort((a, b) => score(b) - score(a));
 
   return (
@@ -65,8 +65,8 @@ async function IdeasContent({ searchParams }: { searchParams: PageProps<"/ideas"
       </div>
       {list.length ? (
         <>
-          <p className="mb-3 text-xs text-faint">Ordenadas por la puntuación de Claude o, si no hay evaluación, por potencial frente a dificultad.</p>
-          <ul>{list.map((i) => <IdeaRow key={i.id} idea={i} tz={tz} aiEnabled={ai} />)}</ul>
+          <p className="mb-3 text-[13px] text-faint">Las mejores primero, según la nota de Claude. Toca una para ver por qué.</p>
+          <ul>{list.map((i) => <IdeaRow key={i.id} idea={i} tz={tz} mode={mode} />)}</ul>
         </>
       ) : (
         <EmptyState

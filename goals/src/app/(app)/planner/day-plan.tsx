@@ -9,27 +9,41 @@ import { InlineAction } from "@/components/ui/forms";
 import { Section } from "@/components/ui/primitives";
 import { buttonClass } from "@/components/ui/button";
 import { formatMinutes } from "@/lib/dates";
+import { AskClaude, type ClaudeMode } from "@/components/brain/ask-claude";
 
 export function DayPlanPanel({
   date,
   plan,
   planMeta,
-  aiEnabled,
+  mode,
+  dayLabel,
   taskTitles,
   defaultMinutes,
 }: {
   date: string;
   plan: DayPlan | null;
   planMeta: { start?: string; available_minutes?: number } | null;
-  aiEnabled: boolean;
+  mode: ClaudeMode;
+  dayLabel: string;
   taskTitles: Record<string, string>;
   defaultMinutes: number;
 }) {
   const [state, generate, pending] = useActionState(generateDayPlan, null);
+  const aiEnabled = mode === "api";
+
+  const ask = (
+    <AskClaude
+      mode={mode}
+      size="md"
+      label={plan ? "Pedir otro plan a Claude" : "Pídele a Claude que organice este día"}
+      prompt={`Organízame el día ${dayLabel} (${date}): qué hago y a qué hora, con descansos. Respeta el instituto y las horas de silencio. Propón las horas como cambios para que yo los apruebe.`}
+    />
+  );
+  if (!aiEnabled && !plan) return ask;
 
   return (
     <Section
-      title="Plan propuesto por Claude"
+      title="El plan de Claude"
       description={plan ? "Una propuesta. No cambia nada hasta que la apliques." : "Claude organiza el día según tus prioridades y el tiempo disponible."}
     >
       {plan ? (
@@ -72,6 +86,7 @@ export function DayPlanPanel({
         </div>
       ) : null}
 
+      {aiEnabled ? (
       <form action={generate} className={`${plan ? "mt-3" : ""} flex flex-wrap items-end gap-2`}>
         <input type="hidden" name="date" value={date} />
         <label className="flex flex-col gap-1 text-xs text-faint">
@@ -84,16 +99,17 @@ export function DayPlanPanel({
         </label>
         <button
           type="submit"
-          disabled={!aiEnabled || pending}
+          disabled={pending}
           className="inline-flex h-8 items-center gap-1.5 rounded-md border border-line bg-subtle px-3 text-[13px] text-fg hover:bg-hover disabled:opacity-50"
-          title={aiEnabled ? undefined : "Configura ANTHROPIC_API_KEY para usar Claude"}
         >
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 text-accent" />}
           {pending ? "Planificando…" : plan ? "Rehacer plan" : "Proponer plan"}
         </button>
-        {!aiEnabled ? <span className="text-xs text-faint">Sin clave: pídeselo a Claude Code («actúa como el cerebro de GOALS»).</span> : null}
         {state && !state.ok ? <span className="text-xs text-danger">{state.error}</span> : null}
       </form>
+      ) : (
+        <div className="mt-3">{ask}</div>
+      )}
     </Section>
   );
 }

@@ -25,7 +25,8 @@ Private single-user productivity app. Read README.md for the module map and arch
 - Calendar dates are `YYYY-MM-DD` strings in the profile's time zone (`lib/dates.ts`); use `dayBoundsUtc` to compare timestamps with a local day.
 
 ## Design
-- The owner asked for "so clear a 7-year-old understands it": plain Spanish words (Metas, Mi día, Claude, Números), big touch targets, one obvious next action. Inicio opens with «Ahora toca» (`lib/now.ts`) and the money goal with «He ganado dinero».
+- The owner asked for "so clear a 7-year-old understands it": plain Spanish words (Metas, Mi día, Claude, Números), big touch targets, one obvious next action. Inicio opens with «Ahora toca» (`lib/now.ts`), the money goal with «He ganado dinero» and «¿Qué quieres hacer?» (`OrganizeBox`).
+- Every "ask Claude" button goes through `components/brain/ask-claude.tsx` (`ClaudeMode` from `lib/brain.ts`: api → chat with auto-send, bridge → `sendToBrain`, off → Settings). Don't add buttons that are disabled without an API key.
 - Dark first. Use the CSS tokens in `globals.css` via Tailwind (`bg-surface`, `text-muted`, `border-line`, `text-accent`…), never literal colors. Check light mode too.
 - Prefer lists and sections over cards. Test at ~400 px width.
 - Charts are single-series SVG (`components/charts`), one axis, hover tooltip and a hidden data table.
